@@ -1,0 +1,54 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 0.4" "http://jpf.sourceforge.net/plugin_0_4.dtd">
+
+<plugin id="org.coode.browser" version="1.0.0">
+
+    <attributes>
+        <attribute id="update-url" value="http://www.co-ode.org/downloads/protege-x/browser-plugin.xml"/>
+    </attributes>
+
+    <requires>
+        <import plugin-id="org.protege.editor.core.application"/>
+        <import plugin-id="org.protege.editor.owl"/>
+    </requires>
+
+    <runtime>
+        <library id="Browser" path="classes/" type="code">
+            <export prefix="*"/>
+        </library>
+        <library id="owlhtml" path="lib/owlhtml.jar" type="code">
+            <export prefix="*"/>
+        </library>
+        <library id="resources" path="resources/" type="resources"/>
+    </runtime>
+
+    <!-- HTML viewer - for showing javadoc for currently selected entity -->
+
+    <extension plugin-id="org.protege.editor.core.application" point-id="ViewComponent" id="org.coode.browser.OWLDocView">
+        <parameter id="label" value="OWLDoc"/>
+        <parameter id="class" value="org.coode.browser.protege.OWLDocView"/>
+    </extension>
+
+    <!--extension plugin-id="org.protege.editor.core.application" point-id="ViewComponent" id="org.coode.browser.LookupView">
+        <parameter id="label" value="Lookup"/>
+        <parameter id="class" value="org.coode.browser.protege.LookupView"/>
+    </extension-->
+
+    <extension plugin-id="org.protege.editor.core.application" point-id="EditorKitMenuAction" id="org.coode.browser.OWLDoc">
+        <parameter id="name" value="Export OWLDoc..."/>
+        <parameter id="class" value="org.coode.browser.protege.ExportOWLDocAction"/>
+        <parameter id="toolTip" value="Export OWLDoc for the active ontologies"/>
+        <parameter id="path" value="org.protege.editor.owl.menu.tools/SlotH-A"/>
+        <parameter id="editorKitId" value="OWLEditorKit"/>
+    </extension>
+
+    <!--extension plugin-id="org.protege.editor.core.application" point-id="EditorKitMenuAction" id="org.coode.browser.LookupAction">
+        <parameter id="name" value="Lookup..."/>
+        <parameter id="class" value="org.coode.browser.protege.LookupAction"/>
+        <parameter id="toolTip" value="Look the current entity up on the web"/>
+        <parameter id="path" value="org.protege.editor.owl.menu.tools/SlotG-B"/>
+        <parameter id="editorKitId" value="OWLEditorKit"/>
+        <parameter id="accelerator" value="I"/>
+    </extension-->
+
+</plugin>
