@@ -4,7 +4,7 @@
 <plugin id="org.coode.browser" version="1.0.0">
 
     <attributes>
-        <attribute id="update-url" value="http://www.co-ode.org/downloads/protege-x/browser-plugin.xml"/>
+        <attribute id="update-url" value="http://co-ode-owl-plugins.googlecode.com/svn/trunk/browser/update.xml"/>
     </attributes>
 
     <requires>
