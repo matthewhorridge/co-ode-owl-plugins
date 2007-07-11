@@ -15,9 +15,12 @@ import org.semanticweb.owl.model.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.BadLocationException;
-import java.io.*;
-import java.net.URL;
+import java.io.IOException;
+import java.io.PipedReader;
+import java.io.PipedWriter;
+import java.io.PrintWriter;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -135,8 +138,8 @@ public class OWLDocView extends AbstractBrowserView {
                         ren.render(w);
                         w.close();
                     }
-                    catch(Exception e){
-                        e.printStackTrace();
+                    catch(Throwable e){
+                        Logger.getLogger(OWLDocView.class).error(e);
                     }
                 }
             };
