@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<!DOCTYPE plugin PUBLIC "-//JPF//Java Plug-in Manifest 0.4" "http://jpf.sourceforge.net/plugin_0_4.dtd">
+
+<plugin id="org.coode.taxonomy" version="1.0.1.TaxonomyExamples">
+
+    <attributes>
+        <attribute id="update-url" value="http://co-ode-owl-plugins.googlecode.com/svn/trunk/taxonomy/update.xml"/>
+    </attributes>
+
+    <requires>
+        <import plugin-id="org.protege.editor.core.application"/>
+        <import plugin-id="org.protege.editor.owl"/>
+    </requires>
+
+    <runtime>
+        <library id="TaxonomyExamples" path="classes/" type="code">
+        </library>
+    </runtime>
+
+    <!-- Register plugins with JPF -->
+
+    <extension plugin-id="org.protege.editor.core.application" point-id="ViewComponent" id="org.coode.taxonomy.DescendantsView">
+        <parameter id="label" value="Descendant Names"/>
+        <parameter id="class" value="org.coode.taxonomy.Descendants"/>
+        <parameter id="headerColor" value="@org.protege.classcolor"/>
+        <parameter id="category" value="@org.protege.classcategory"/>
+    </extension>
+
+    <extension plugin-id="org.protege.editor.core.application" point-id="ViewComponent" id="org.coode.taxonomy.TabbedHierarchyView">
+        <parameter id="label" value="Tabbed Subclasses"/>
+        <parameter id="class" value="org.coode.taxonomy.TabbedHierarchyView"/>
+        <parameter id="headerColor" value="@org.protege.classcolor"/>
+        <parameter id="category" value="@org.protege.classcategory"/>
+    </extension>
+
+</plugin>
