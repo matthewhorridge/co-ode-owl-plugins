@@ -14,8 +14,6 @@ import org.semanticweb.owl.model.*;
 
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.BadLocationException;
-import java.io.IOException;
 import java.io.PipedReader;
 import java.io.PipedWriter;
 import java.io.PrintWriter;
@@ -57,8 +55,10 @@ import java.net.URL;
  */
 public class OWLDocView extends AbstractBrowserView {
 
+    private static final Logger logger = Logger.getLogger(OWLDocView.class);
+
     private static final String OWLDOC_CSS = "owldocview.css";
-    
+
     private URL BASE_URL;
 
     {
@@ -66,7 +66,7 @@ public class OWLDocView extends AbstractBrowserView {
             BASE_URL = new URL("http://www.co-ode.org/ontologyserver/)");
         }
         catch (MalformedURLException e) {
-            Logger.getLogger(OWLDocView.class).error(e);
+            logger.error(e);
         }
     }
 
@@ -114,7 +114,7 @@ public class OWLDocView extends AbstractBrowserView {
 
         getBrowser().addLinkListener(linkListener);
 
-        refresh(getOWLWorkspace().getOWLSelectionModel().getSelectedEntity());        
+        refresh(getOWLWorkspace().getOWLSelectionModel().getSelectedEntity());
     }
 
     protected String getCSS() {
@@ -139,24 +139,19 @@ public class OWLDocView extends AbstractBrowserView {
                         w.close();
                     }
                     catch(Throwable e){
-                        Logger.getLogger(OWLDocView.class).error(e);
+                        logger.error(e);
                     }
                 }
             };
 
-            if (generateHTML != null){
-                try {
-                    r = new PipedReader();
-                    w = new PrintWriter(new PipedWriter(r));
-                    new Thread(generateHTML).start();
-                    getBrowser().setContent(r, server.getURLMapper().getURLForEntity(entity));
-                }
-                catch (IOException e) {
-                    Logger.getLogger(OWLDocView.class).error(e);
-                }
-                catch (BadLocationException e) {
-                    Logger.getLogger(OWLDocView.class).error(e);
-                }
+            try {
+                r = new PipedReader();
+                w = new PrintWriter(new PipedWriter(r));
+                new Thread(generateHTML).start();
+                getBrowser().setContent(r, server.getURLMapper().getURLForEntity(entity));
+            }
+            catch (Exception e) {
+                logger.error(e);
             }
         }
         else{
