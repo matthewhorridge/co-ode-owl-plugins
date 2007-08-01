@@ -1,11 +1,11 @@
 package org.coode.browser.protege;
 
 import org.apache.log4j.Logger;
-import org.coode.html.OntologyServer;
 import org.coode.html.OWLNameMapper;
+import org.coode.html.OntologyServer;
+import org.coode.html.renderer.EntityRenderer;
 import org.coode.html.url.EntityURLMapper;
 import org.coode.html.url.OWLDocURLMapper;
-import org.coode.html.renderer.EntityRenderer;
 import org.coode.html.util.OWLObjectComparator;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
@@ -14,11 +14,11 @@ import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.*;
 import org.semanticweb.owl.util.ToldClassHierarchyReasoner;
 
-import java.util.Comparator;
-import java.util.Set;
-import java.net.URL;
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.util.Comparator;
+import java.util.Set;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -60,7 +60,7 @@ public class ProtegeOntologyServer implements OntologyServer {
 
     static {
         try {
-            DEFAULT_BASE = new URL("http://www.co-ode.org/ontologies/");
+            DEFAULT_BASE = new URL("http://www.co-ode.org/");
         }
         catch (MalformedURLException e) {
             Logger.getLogger(ProtegeOntologyServer.class).error(e);

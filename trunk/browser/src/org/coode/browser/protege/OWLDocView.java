@@ -1,6 +1,7 @@
 package org.coode.browser.protege;
 
 import org.apache.log4j.Logger;
+import org.coode.browser.NativeBrowserLaunch;
 import org.coode.html.AbstractHTMLPageRenderer;
 import org.coode.html.OntologyServer;
 import org.coode.html.hierarchy.OWLClassHierarchyHTMLPageRenderer;
@@ -184,9 +185,13 @@ public class OWLDocView extends AbstractBrowserView {
     }
 
     private void updateGlobalSelection(URL url) {
-        entity = server.getURLMapper().getEntityForURL(url);
-        if (entity != null){
+        OWLEntity tempEntity = server.getURLMapper().getEntityForURL(url);
+        if (tempEntity != null){
+            entity = tempEntity;
             getOWLWorkspace().getOWLSelectionModel().setSelectedEntity(entity);
+        }
+        else{
+            NativeBrowserLaunch.openURL(url.toString());
         }
     }
 }
