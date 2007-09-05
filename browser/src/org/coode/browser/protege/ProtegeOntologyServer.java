@@ -1,15 +1,12 @@
 package org.coode.browser.protege;
 
 import org.apache.log4j.Logger;
-import org.coode.html.OWLNameMapper;
-import org.coode.html.OntologyServer;
-import org.coode.html.renderer.EntityRenderer;
-import org.coode.html.url.EntityURLMapper;
 import org.coode.html.url.OWLDocURLMapper;
-import org.coode.html.util.OWLObjectComparator;
+import org.coode.owl.util.OWLObjectComparator;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.semanticweb.owl.inference.OWLClassReasoner;
+import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.*;
 import org.semanticweb.owl.util.ToldClassHierarchyReasoner;
@@ -53,7 +50,7 @@ import java.util.Set;
  * Date: Jun 7, 2007<br><br>
  * <p/>
  */
-public class ProtegeOntologyServer implements OntologyServer {
+public class ProtegeOntologyServer implements OWLServer {
 
     // as all URLs in links should be relative, this should not matter
     private static URL DEFAULT_BASE;
@@ -73,31 +70,45 @@ public class ProtegeOntologyServer implements OntologyServer {
 
     private OWLObjectComparator<OWLObject> comp;
 
-    private ProtegeOWLEntityRenderer ren;
+    private URLMapper urlMapper;
 
-    private EntityURLMapper urlMapper;
-    
     private OWLNameMapper nameMapper;
+
+    private ToldClassHierarchyReasoner toldClassHierarchyReasoner;
+
+    private MyShortformProvider shortformProvider;
 
     public ProtegeOntologyServer(OWLModelManager mngr) {
         this.mngr = mngr;
-        this.ren = new ProtegeOWLEntityRenderer();
-    }
-
-    public EntityRenderer getOWLEntityRenderer() {
-        return ren;
     }
 
     public OWLOntology getActiveOntology() {
         return mngr.getActiveOntology();
     }
 
-    public Set<OWLOntology> getActiveOntologies() {
+    public Set<OWLOntology> getOntologies() {
+        return mngr.getOntologies();
+    }
+
+    public Set<OWLOntology> getVisibleOntologies() {
         return mngr.getActiveOntologies();
     }
 
     public OWLOntologyManager getOWLOntologyManager() {
         return mngr.getOWLOntologyManager();
+    }
+
+    public OWLReasoner getOWLReasoner() {
+        return mngr.getOWLReasonerManager().getCurrentReasoner();
+    }
+
+    public ToldClassHierarchyReasoner getClassHierarchyProvider() {
+        if (toldClassHierarchyReasoner == null){
+            toldClassHierarchyReasoner = new ToldClassHierarchyReasoner(mngr.getOWLOntologyManager());
+            toldClassHierarchyReasoner.loadOntologies(mngr.getOntologies());
+            toldClassHierarchyReasoner.classify();
+        }
+        return toldClassHierarchyReasoner;
     }
 
     public OWLClassReasoner getOWLClassReasoner() {
@@ -124,7 +135,7 @@ public class ProtegeOntologyServer implements OntologyServer {
         return comp;
     }
 
-    public EntityURLMapper getURLMapper() {
+    public URLMapper getURLMapper() {
         if (urlMapper == null){
             urlMapper = new OWLDocURLMapper(this, DEFAULT_BASE);
         }
@@ -142,13 +153,32 @@ public class ProtegeOntologyServer implements OntologyServer {
         return DEFAULT_BASE;
     }
 
+    public MyShortformProvider getNameRenderer() {
+        if (shortformProvider == null){
+            shortformProvider = new ProtegeShortformProviderWrapper(mngr);
+        }
+        return shortformProvider;
+    }
+
+    public void setNameRenderer(MyShortformProvider sfp) {
+        shortformProvider = sfp;
+    }
+
+    public OWLDescriptionParser getDescriptionParser() {
+        return null;  //@@TODO implement
+    }
+
     public void loadOntology(URI ontPhysicalURI) throws OWLOntologyCreationException {
         mngr.getOWLOntologyManager().loadOntologyFromPhysicalURI(ontPhysicalURI);
     }
 
-    class ProtegeOWLEntityRenderer implements EntityRenderer{
-        public String render(OWLEntity entity) {
-            return mngr.getOWLEntityRenderer().render(entity);
+    public void dispose() {
+        //@@TODO implement
+    }
+
+    class ProtegeOWLEntityRenderer implements MyShortformProvider{
+        public String render(OWLNamedObject obj) {
+            return mngr.getRendering(obj);
         }
     }
 }

@@ -1,13 +1,13 @@
 package org.coode.browser.protege;
 
-import org.coode.html.OWLNameMapper;
-import org.semanticweb.owl.model.*;
+import org.coode.owl.OWLNameMapper;
 import org.protege.editor.owl.model.OWLModelManager;
-
-import java.util.Set;
-import java.util.Collections;
-
+import org.semanticweb.owl.model.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -51,6 +51,15 @@ public class ProtegeNameMapperWrapper implements OWLNameMapper {
         this.mngr = mngr;
     }
 
+    public Set<OWLEntity> getOWLEntities(String name) {
+        Set<OWLEntity> entities = new HashSet<OWLEntity>();
+        entities.add(mngr.getOWLClass(name));
+        entities.add(mngr.getOWLObjectProperty(name));
+        entities.add(mngr.getOWLDataProperty(name));
+        entities.add(mngr.getOWLIndividual(name));
+        return entities;
+    }
+
     public Set<OWLClass> getOWLClasses(String name) {
         return Collections.singleton(mngr.getOWLClass(name));
     }
@@ -80,6 +89,14 @@ public class ProtegeNameMapperWrapper implements OWLNameMapper {
     }
 
     public Set<String> getObjectPropertyNames() {
+        throw new NotImplementedException();
+    }
+
+    public Set<String> getDataPropertyNames() {
+        throw new NotImplementedException();
+    }
+
+    public Set<String> getIndividualNames() {
         throw new NotImplementedException();
     }
 }
