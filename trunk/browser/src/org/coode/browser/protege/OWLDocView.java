@@ -3,14 +3,14 @@ package org.coode.browser.protege;
 import org.apache.log4j.Logger;
 import org.coode.browser.NativeBrowserLaunch;
 import org.coode.html.AbstractHTMLPageRenderer;
-import org.coode.html.OntologyServer;
 import org.coode.html.hierarchy.OWLClassHierarchyHTMLPageRenderer;
 import org.coode.html.summary.OWLClassSummaryHTMLPageRenderer;
 import org.coode.html.summary.OWLDataPropertySummaryHTMLPageRenderer;
 import org.coode.html.summary.OWLIndividualSummaryHTMLPageRenderer;
 import org.coode.html.summary.OWLObjectPropertySummaryHTMLPageRenderer;
-import org.coode.html.url.EntityURLMapper;
 import org.coode.html.url.ServletURLMapper;
+import org.coode.owl.OWLServer;
+import org.coode.owl.URLMapper;
 import org.semanticweb.owl.model.*;
 
 import javax.swing.event.HyperlinkEvent;
@@ -71,14 +71,14 @@ public class OWLDocView extends AbstractBrowserView {
         }
     }
 
-    private OntologyServer server;
+    private OWLServer server;
 
     private PipedReader r;
     private PrintWriter w;
 
     private OWLEntity entity;
 
-    private EntityURLMapper urlMapper;
+    private URLMapper urlMapper;
 
     private boolean renderSubs = false;
 
@@ -105,7 +105,7 @@ public class OWLDocView extends AbstractBrowserView {
         getBrowser().setNavigateActive(false);
 
         server = new ProtegeOntologyServer(getOWLModelManager()){
-            public EntityURLMapper getURLMapper() {
+            public URLMapper getURLMapper() {
                 if (urlMapper == null){
                     urlMapper = new ServletURLMapper(server, BASE_URL);
                 }

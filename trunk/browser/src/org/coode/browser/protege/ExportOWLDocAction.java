@@ -3,13 +3,12 @@ package org.coode.browser.protege;
 import org.apache.log4j.Logger;
 import org.coode.browser.NativeBrowserLaunch;
 import org.coode.html.OntologyExporter;
-import org.coode.html.OntologyServer;
+import org.coode.owl.OWLServer;
 import org.protege.editor.core.ui.util.UIUtil;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -49,7 +48,7 @@ public class ExportOWLDocAction extends ProtegeOWLAction {
         try {
             File folder = UIUtil.chooseFolder(getOWLWorkspace(), "Select a base for OWLDoc");
             if (folder != null){
-                OntologyServer svr = new ProtegeOntologyServer(getOWLModelManager());
+                OWLServer svr = new ProtegeOntologyServer(getOWLModelManager());
                 OntologyExporter exporter = new OntologyExporter(svr);
                 File index = exporter.export(folder);
                 NativeBrowserLaunch.openURL("file://" + index.getPath());
