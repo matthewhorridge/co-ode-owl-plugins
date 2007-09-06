@@ -19,6 +19,9 @@
         <library id="owlhtml" path="lib/owlhtml.jar" type="code">
             <export prefix="*"/>
         </library>
+        <library id="owlManager" path="lib/owlManager.jar" type="code">
+            <export prefix="*"/>
+        </library>
         <library id="resources" path="resources/" type="resources"/>
     </runtime>
 
