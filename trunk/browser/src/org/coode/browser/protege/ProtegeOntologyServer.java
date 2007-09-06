@@ -2,6 +2,7 @@ package org.coode.browser.protege;
 
 import org.apache.log4j.Logger;
 import org.coode.html.url.OWLDocURLMapper;
+import org.coode.owl.*;
 import org.coode.owl.util.OWLObjectComparator;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
