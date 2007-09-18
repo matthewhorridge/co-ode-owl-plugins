@@ -16,6 +16,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 /*
@@ -78,13 +80,28 @@ public class ProtegeOntologyServer implements OWLServer {
     private ToldClassHierarchyReasoner toldClassHierarchyReasoner;
 
     private MyShortformProvider shortformProvider;
+    
+    private Map<String, String> options = new HashMap<String, String>();
 
     public ProtegeOntologyServer(OWLModelManager mngr) {
         this.mngr = mngr;
+        options.put(OWLServer.OPTION_CONTENT_WINDOW, "content");
+    }
+
+    public Map<String, String> getOptions() {
+        return options;
+    }
+
+    public String getID() {
+        return "ID" + Math.random();
     }
 
     public OWLOntology getActiveOntology() {
         return mngr.getActiveOntology();
+    }
+
+    public void setActiveOntology(OWLOntology ontology) {
+        mngr.setActiveOntology(ontology);
     }
 
     public Set<OWLOntology> getOntologies() {
@@ -171,6 +188,10 @@ public class ProtegeOntologyServer implements OWLServer {
 
     public void loadOntology(URI ontPhysicalURI) throws OWLOntologyCreationException {
         mngr.getOWLOntologyManager().loadOntologyFromPhysicalURI(ontPhysicalURI);
+    }
+
+    public void removeOntology(URI uri) {
+        mngr.getOWLOntologyManager().removeOntology(uri);
     }
 
     public void dispose() {
