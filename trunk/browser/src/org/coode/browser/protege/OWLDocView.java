@@ -3,14 +3,14 @@ package org.coode.browser.protege;
 import org.apache.log4j.Logger;
 import org.coode.browser.NativeBrowserLaunch;
 import org.coode.html.AbstractHTMLPageRenderer;
+import org.coode.html.OWLHTMLServer;
 import org.coode.html.hierarchy.OWLClassHierarchyHTMLPageRenderer;
 import org.coode.html.summary.OWLClassSummaryHTMLPageRenderer;
 import org.coode.html.summary.OWLDataPropertySummaryHTMLPageRenderer;
 import org.coode.html.summary.OWLIndividualSummaryHTMLPageRenderer;
 import org.coode.html.summary.OWLObjectPropertySummaryHTMLPageRenderer;
 import org.coode.html.url.ServletURLMapper;
-import org.coode.owl.OWLServer;
-import org.coode.owl.URLMapper;
+import org.coode.html.url.URLMapper;
 import org.semanticweb.owl.model.*;
 
 import javax.swing.event.HyperlinkEvent;
@@ -71,7 +71,7 @@ public class OWLDocView extends AbstractBrowserView {
         }
     }
 
-    private OWLServer server;
+    private OWLHTMLServer server;
 
     private PipedReader r;
     private PrintWriter w;

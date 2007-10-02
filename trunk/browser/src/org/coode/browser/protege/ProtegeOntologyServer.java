@@ -1,8 +1,13 @@
 package org.coode.browser.protege;
 
 import org.apache.log4j.Logger;
+import org.coode.html.OWLHTMLConstants;
+import org.coode.html.OWLHTMLServer;
 import org.coode.html.url.OWLDocURLMapper;
-import org.coode.owl.*;
+import org.coode.html.url.URLMapper;
+import org.coode.owl.mngr.MyShortformProvider;
+import org.coode.owl.mngr.OWLDescriptionParser;
+import org.coode.owl.mngr.OWLNameMapper;
 import org.coode.owl.util.OWLObjectComparator;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
@@ -53,7 +58,7 @@ import java.util.Set;
  * Date: Jun 7, 2007<br><br>
  * <p/>
  */
-public class ProtegeOntologyServer implements OWLServer {
+public class ProtegeOntologyServer implements OWLHTMLServer {
 
     // as all URLs in links should be relative, this should not matter
     private static URL DEFAULT_BASE;
@@ -85,7 +90,7 @@ public class ProtegeOntologyServer implements OWLServer {
 
     public ProtegeOntologyServer(OWLModelManager mngr) {
         this.mngr = mngr;
-        options.put(OWLServer.OPTION_CONTENT_WINDOW, "content");
+        options.put(OWLHTMLConstants.OPTION_CONTENT_WINDOW, "content");
     }
 
     public Map<String, String> getOptions() {
