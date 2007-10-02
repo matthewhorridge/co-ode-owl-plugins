@@ -1,6 +1,7 @@
 package org.coode.browser.protege;
 
-import org.coode.owl.OWLNameMapper;
+import org.coode.html.OWLHTMLConstants;
+import org.coode.owl.mngr.OWLNameMapper;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.*;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -58,6 +59,43 @@ public class ProtegeNameMapperWrapper implements OWLNameMapper {
         entities.add(mngr.getOWLDataProperty(name));
         entities.add(mngr.getOWLIndividual(name));
         return entities;
+    }
+
+    public Set<OWLNamedObject> getOWLNamedObjects(String string, String string1) {
+        throw new NotImplementedException();
+    }
+
+    public Set<OWLNamedObject> getOWLNamedObjects(String string, String string1, String string2, String string3) {
+        throw new NotImplementedException();
+    }
+
+    public Set<OWLNamedObject> getNamedObjects(String uri, String name, String baseURI, String type) {
+        String searchStr = uri;
+        if (searchStr == null){
+            searchStr = name;
+            if (searchStr != null && baseURI != null){
+                searchStr = baseURI + "#" + searchStr;
+            }
+        }
+
+        if (searchStr != null){
+            if (type.equals(OWLHTMLConstants.CLASSES)){
+                return new HashSet<OWLNamedObject>(getOWLClasses(searchStr));
+            }
+            else if (type.equals(OWLHTMLConstants.OBJECTPROPERTIES)){
+                return new HashSet<OWLNamedObject>(getOWLObjectProperties(searchStr));
+            }
+            else if (type.equals(OWLHTMLConstants.DATAPROPERTIES)){
+                return new HashSet<OWLNamedObject>(getOWLDataProperties(searchStr));
+            }
+            else if (type.equals(OWLHTMLConstants.INDIVIDUALS)){
+                return new HashSet<OWLNamedObject>(getOWLIndividuals(searchStr));
+            }
+            else{
+                return new HashSet<OWLNamedObject>(getOWLEntities(searchStr));
+            }
+        }
+        return Collections.EMPTY_SET;
     }
 
     public Set<OWLClass> getOWLClasses(String name) {

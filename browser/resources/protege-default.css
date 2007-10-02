@@ -8,8 +8,8 @@ h2 {margin-top: 5px; margin-bottom: 3px; font-size: 12pt; font-weight: normal;}
 /* below to remove some stuff from wikipedia  - does not work in java */
 .portlet {display: none; visibility: hidden; height: 0; width: 0;}
 
-/*a {text-decoration: none;}*/
-/*a:hover {text-decoration: underline;}*/
+a {text-decoration: none; color: black;}
+a:hover {text-decoration: underline; color: blue;}
 
 /*ul {margin: 1px; padding-left: 10px; list-style-type: none;}*/
 

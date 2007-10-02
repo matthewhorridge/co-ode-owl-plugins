@@ -1,6 +1,6 @@
 package org.coode.browser.protege;
 
-import org.coode.owl.MyShortformProvider;
+import org.coode.owl.mngr.MyShortformProvider;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owl.model.OWLEntity;
