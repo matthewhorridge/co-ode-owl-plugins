@@ -11,6 +11,8 @@ h2 {margin-top: 5px; margin-bottom: 3px; font-size: 12pt; font-weight: normal;}
 a {text-decoration: none; color: black;}
 a:hover {text-decoration: underline; color: blue;}
 
+a.subsexpand {color: #555555; font-size: 7pt; text-decoration: underline; line-height: 180%;}
+
 /*ul {margin: 1px; padding-left: 10px; list-style-type: none;}*/
 
 /*#superclasses ul {list-style: circle; color: #aaaa00;}*/
