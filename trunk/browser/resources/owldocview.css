@@ -64,6 +64,8 @@ h1 {margin-top: 5px; font-size: 14pt; font-weight: bold;}
 h2 {margin-top: 5px; margin-bottom: 3px; font-size: 12pt; font-weight: normal;}
 
 a {text-decoration: none;}
+a.subsexpand {color: #555555; font-size: 7pt; text-decoration: underline; line-height: 180%;}
+
 /*a:hover {text-decoration: underline; color: blue;} JEditorPane cannot render the hover */
 
 ul {margin: 1px; padding-left: 10px; list-style-type: none;}

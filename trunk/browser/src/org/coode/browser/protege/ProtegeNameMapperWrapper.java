@@ -61,6 +61,14 @@ public class ProtegeNameMapperWrapper implements OWLNameMapper {
         return entities;
     }
 
+    public Set<OWLDataType> getOWLDatatypes(String string) {
+        return new HashSet<OWLDataType>(mngr.getMatchingOWLDataTypes(string));
+    }
+
+    public Set<OWLOntology> getOWLOntologies(String string) {
+        throw new NotImplementedException();
+    }
+
     public Set<OWLNamedObject> getOWLNamedObjects(String string, String string1) {
         throw new NotImplementedException();
     }
@@ -136,5 +144,17 @@ public class ProtegeNameMapperWrapper implements OWLNameMapper {
 
     public Set<String> getIndividualNames() {
         throw new NotImplementedException();
+    }
+
+    public Set<String> getDatatypeNames() {
+        throw new NotImplementedException();
+    }
+
+    public Set<String> getOntologyNames() {
+        throw new NotImplementedException();
+    }
+
+    public void dispose() {
+        //@@TODO implement
     }
 }

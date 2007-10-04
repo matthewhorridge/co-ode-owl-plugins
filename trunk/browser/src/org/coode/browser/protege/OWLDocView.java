@@ -88,10 +88,11 @@ public class OWLDocView extends AbstractBrowserView {
                 final URL linkURL = event.getURL();
                 if (!linkURL.equals(server.getURLMapper().getURLForEntity(entity))){
                     if (linkURL.toString().endsWith("#")){ //@@TODO tidyup - this is a hack for now
-                        renderSubs = !renderSubs;
+                        renderSubs = true;
                         refresh(server.getURLMapper().getEntityForURL(linkURL));
                     }
                     else{
+                        renderSubs = false;
                         updateGlobalSelection(linkURL);
                     }
                 }
@@ -164,7 +165,8 @@ public class OWLDocView extends AbstractBrowserView {
         AbstractHTMLPageRenderer ren = null;
         if (entity instanceof OWLClass){
             OWLClassHierarchyHTMLPageRenderer clsHierarchyRen = new OWLClassHierarchyHTMLPageRenderer(server);
-            clsHierarchyRen.setRenderSubs(renderSubs);
+            clsHierarchyRen.setRenderHiddenSubs(false);
+            clsHierarchyRen.setAutoExpandSubs(renderSubs);
             ren = new OWLClassSummaryHTMLPageRenderer(server);
             ((OWLClassSummaryHTMLPageRenderer)ren).setOWLHierarchyRenderer(clsHierarchyRen);
         }

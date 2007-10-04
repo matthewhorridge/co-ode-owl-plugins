@@ -8,6 +8,7 @@ import org.coode.html.url.URLMapper;
 import org.coode.owl.mngr.MyShortformProvider;
 import org.coode.owl.mngr.OWLDescriptionParser;
 import org.coode.owl.mngr.OWLNameMapper;
+import org.coode.owl.mngr.OWLServerListener;
 import org.coode.owl.util.OWLObjectComparator;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
@@ -16,6 +17,7 @@ import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.*;
 import org.semanticweb.owl.util.ToldClassHierarchyReasoner;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -105,6 +107,10 @@ public class ProtegeOntologyServer implements OWLHTMLServer {
         return mngr.getActiveOntology();
     }
 
+    public OWLOntology getOntology(URI uri) {
+        return mngr.getOWLOntologyManager().getOntology(uri);
+    }
+
     public void setActiveOntology(OWLOntology ontology) {
         mngr.setActiveOntology(ontology);
     }
@@ -113,7 +119,7 @@ public class ProtegeOntologyServer implements OWLHTMLServer {
         return mngr.getOntologies();
     }
 
-    public Set<OWLOntology> getVisibleOntologies() {
+    public Set<OWLOntology> getActiveOntologies() {
         return mngr.getActiveOntologies();
     }
 
@@ -188,7 +194,7 @@ public class ProtegeOntologyServer implements OWLHTMLServer {
     }
 
     public OWLDescriptionParser getDescriptionParser() {
-        return null;  //@@TODO implement
+        throw new NotImplementedException();
     }
 
     public void loadOntology(URI ontPhysicalURI) throws OWLOntologyCreationException {
@@ -197,6 +203,14 @@ public class ProtegeOntologyServer implements OWLHTMLServer {
 
     public void removeOntology(URI uri) {
         mngr.getOWLOntologyManager().removeOntology(uri);
+    }
+
+    public void removeServerListener(OWLServerListener owlServerListener) {
+        throw new NotImplementedException();
+    }
+
+    public void addServerListener(OWLServerListener owlServerListener) {
+        throw new NotImplementedException();
     }
 
     public void dispose() {
