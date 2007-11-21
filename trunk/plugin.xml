@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<plugin>
+
+    <!-- extension point for patterns -->
+    <extension-point id="Pattern" name="Pattern"
+                     schema="schema/Pattern.exsd"/>
+
+    <!-- OWL Pattern Tab -->
+    <extension id="org.coode.PatternTab"
+            point="org.protege.editor.core.application.WorkspaceTab">
+        <label value="Patterns"/>
+        <class value="org.protege.editor.core.ui.workspace.WorkspaceViewsTab"/>
+        <editorKitId value="OWLEditorKit"/>
+        <index value="G"/>
+        <defaultViewConfigFileName value="org.coode.PatternTab.xml"/>
+    </extension>
+
+    <extension id="org.coode.PatternBrowser"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Pattern Manager"/>
+        <class value="org.coode.pattern.ui.PatternBrowserView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="Pattern"/>
+    </extension>
+
+    <extension id="org.coode.PatternEditor"
+            point="org.protege.editor.core.application.ViewComponent" >
+        <label value="Pattern Editor"/>
+        <class value="org.coode.pattern.ui.PatternEditorView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="Pattern"/>
+    </extension>
+
+    <extension id="org.coode.PatternDoc"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Pattern Docs"/>
+        <class value="org.coode.pattern.ui.PatternDocView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="Pattern"/>
+    </extension>
+
+    <!--extension plugin-id="org.protege.editor.core.application" point-id="org.protege.editor.core.preferencespanel"
+               id="org.coode.pattern.owllist">
+        <label value="OWL List Pattern"/>
+        <class value="org.coode.pattern.owllist.ListPreferences"/>
+    </extension-->
+
+</plugin>
