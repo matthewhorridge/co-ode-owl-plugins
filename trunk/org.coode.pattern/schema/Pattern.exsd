@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<schema targetNamespace="org.coode.pattern">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.coode.pattern" id="Pattern" name="Pattern"/>
+      </appInfo>
+      <documentation>
+         Implementation of OWL design patterns
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="label"/>
+            <element ref="class"/>
+            <element ref="documentationURL" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+             <annotation>
+                <documentation>
+
+                </documentation>
+             </annotation>
+          </attribute>
+      </complexType>
+   </element>
+
+   <element name="label">
+      <annotation>
+         <documentation>
+            The label that will appear in the pattern manager etc.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="class">
+      <annotation>
+         <documentation>
+            The class that should be instantiated to create the pattern.
+        This should extend the AbstractPatternDescriptor&lt;Pattern&gt; class
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="renderer">
+      <annotation>
+         <documentation>
+            The renderer that should be instantiated.
+        This should extend the AbstractPatternRenderer&lt;Pattern&gt; class
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="value" type="string" use="optional">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+
+   <element name="editor">
+      <annotation>
+         <documentation>
+            The editor that should be instantiated to create/edit the pattern.
+        This should extend the AbstractPatternEditor&lt;Pattern&gt; class
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="value" type="string" use="optional">
+            <annotation>
+               <documentation>
+
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="documentationURL">
+      <complexType>
+         <attribute name="value" type="string">
+            <annotation>
+               <documentation>
+                  A location of a web-page that describes this design pattern (optional)
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+</schema>

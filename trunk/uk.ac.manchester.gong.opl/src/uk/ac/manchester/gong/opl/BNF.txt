@@ -1,0 +1,42 @@
+// First attempt at BNF for OPL
+// created by N. Drummond 12/11/2007
+// I'm sure this is incomplete (and probably incorrect)
+
+// input is one or more mappings followed by select followed by one or more actions
+<input> ::= <NSMap>{NSMap} <select> <action>{<action}
+
+// select statement
+<select> ::= "SELECT" <unboundVar> "WHERE" <axiom>;
+
+// action statement
+<action> ::= <actionType> <axiom>
+<actionType> ::= "ADD" | "REMOVE"
+
+<axiom> ::= <unboundVar> <condition>
+
+<condition> ::= <relation> | <annotation>
+
+<relation> ::= <relationType> <owlExpression>
+<relationType> ::= "subClassOf" | "equivalentTo" | "descendantOf" // to implement "ancestorOf", "disjointWith" etc
+
+<annotation> ::= <annotationLabel> <regexp>
+
+// variables (bound and unbound)
+<unboundVar> ::= <NSPrefix>:?<identifier>
+<boundVar> ::= <NSPrefix>:<identifier> | <regexpBinding> {<identifier> | <regexpBinding>}
+
+<regexpBinding> ::= "<" (<regexpGroup> | <identifier>) ">"
+
+<regexpGroup> ::= "RG" <digit>{digit}
+<identifier> ::= <letter> { <letter> | <digit> } // must start with letter
+
+// NS handling
+<NSMap> ::= <NSPrefix> <URI>
+<NSPrefix> ::= <letter> { <letter> | <digit> } // must start with letter
+
+<owlExpression> ::= ????? BNF for Manchester OWL Syntax or alternative
+
+<URI> ::= ?????? BNF for URI
+<regexp> ::= ?????? BNF for java regexp
+<letter> ::= ?????? already in BNF??
+<digit> ::= ?????? already in BNF??

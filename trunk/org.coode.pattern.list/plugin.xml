@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+
+<plugin>
+
+    <extension id="org.coode.pattern.NamedList"
+               point="org.coode.pattern.Pattern">
+        <label value="OWL List"/>
+        <class value="org.coode.pattern.owllist.namedlist.NamedListDescriptor"/>
+        <editor value="org.coode.pattern.owllist.namedlist.ui.NamedListEditor"/>
+        <documentationUrl value="http://odps.sourceforge.net/odp/html/List.html"/>
+    </extension>
+
+    <extension id="org.coode.pattern.ListExpression"
+               point="org.coode.pattern.Pattern">
+        <label value="OWL List Expression"/>
+        <class value="org.coode.pattern.owllist.listexpression.ListExpressionDescriptor"/>
+        <renderer value="org.coode.pattern.owllist.listexpression.ui.ListExpressionRenderer"/>
+        <editor value="org.coode.pattern.owllist.listexpression.ui.ListExpressionEditor"/>
+        <documentationUrl value="http://odps.sourceforge.net/odp/html/List.html"/>
+    </extension>
+
+    <!--extension plugin-id="org.protege.editor.core.application" point-id="org.protege.editor.core.preferencespanel"
+               id="org.coode.pattern.owllist">
+        <label value="OWL List Pattern"/>
+        <class value="org.coode.pattern.owllist.ListPreferences"/>
+    </extension-->
+
+</plugin>

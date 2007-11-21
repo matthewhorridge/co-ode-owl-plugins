@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+    <VSNode splits="0.3672566371681416 0.6327433628318584">
+        <CNode>
+            <Component label="Pattern Manager">
+                <Property id="pluginId" value="org.coode.pattern.org.coode.PatternBrowser"/>
+            </Component>
+        </CNode>
+        <HSNode splits="0.09243421052631579 0.15756578947368421">
+            <CNode>
+                <Component label="Pattern Docs">
+                    <Property id="pluginId" value="org.coode.pattern.org.coode.PatternDoc"/>
+                </Component>
+            </CNode>
+            <CNode>
+                <Component label="Pattern Editor">
+                    <Property id="pluginId" value="org.coode.pattern.org.coode.PatternEditor"/>
+                </Component>
+            </CNode>
+        </HSNode>
+    </VSNode>
+</layout>
