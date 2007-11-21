@@ -1,0 +1,6 @@
+http://www.co-ode.org/ontologies/meta.owl#date, text
+http://www.co-ode.org/ontologies/meta.owl#author, multiline
+#group
+http://www.co-ode.org/ontologies/meta.owl#monkey, text
+http://www.w3.org/2000/01/rdf-schema#comment, multiline
+http://www.w3.org/2000/01/rdf-schema#label, text

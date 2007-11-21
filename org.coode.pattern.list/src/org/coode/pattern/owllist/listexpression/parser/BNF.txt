@@ -1,0 +1,23 @@
+// BNF for list expressions
+// N. Drummond
+// 12/11/2007
+
+<expression> ::= <negatedList> | <list>
+
+<negatedList> ::= "not" <list>
+
+<list> ::= "(" { <only> | <sequence> } ")" // do we need to identify the empty list explicitly?
+
+<only> ::= <owlExpression> "*"
+
+<sequence> ::= <element> {", " <element>} // one or more elements
+
+<element> ::= <anything> | <union> | <oneOrMore> | <owlExpression>
+
+<anything> ::= "..." // what is the interpretation of "(...)" - is this valid?
+
+<union> ::= "[" <owlExpression> { "|" <owlExpression>} "]" // [A|B|C]
+
+<oneOrMore> ::= <owlExpression> "+"
+
+<owlExpression> ::= ?????? delegate to Manchester Syntax Parser // named thing or valid owl expression

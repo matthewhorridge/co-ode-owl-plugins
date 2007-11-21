@@ -1,0 +1,526 @@
+/**
+ * JavaCC file
+ */
+ 
+options {
+  JDK_VERSION = "1.5";
+  STATIC = false;
+  LOOKAHEAD=2;
+  FORCE_LA_CHECK = true;
+}
+PARSER_BEGIN(OPLActionsParser)
+package uk.ac.manchester.gong.opl.javacc.actions;
+
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Map;
+import java.util.HashSet;
+import java.net.URI;
+import java.util.regex.Matcher;
+
+import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owl.model.OWLEntity;
+import org.semanticweb.owl.model.AddAxiom;
+import org.semanticweb.owl.model.RemoveAxiom;
+import org.semanticweb.owl.model.OWLAnnotation;
+import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owl.model.OWLAnnotationAxiom;
+import org.semanticweb.owl.model.OWLException;
+import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owl.model.OWLObjectProperty;
+
+import uk.ac.manchester.gong.opl.select.SelectStatementResult;
+
+public class OPLActionsParser {
+	
+	public OPLActionsParser(){}
+	public static void parse(String inString, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult) throws ParseException{
+		OWLEntity owlentity = (OWLEntity)selectResult.matchedOWLObject();
+		Reader reader = new StringReader(inString);
+		OPLActionsParser parser = new OPLActionsParser(reader);
+		parser.Input(owlentity, ns2uri, manager, selectResult);
+	}
+}
+PARSER_END(OPLActionsParser)
+
+SKIP :
+{ " "|"\t"|"\n"|"\r"}
+
+TOKEN :
+{
+  <Semicolon: ";">
+| <Colon: ":">  
+| <UppChar: ["A"-"Z"]>
+| <LowChar: ["a"-"z"]>
+| <Digit: ["0"-"9"]>
+| <UnderScore: "_">
+| <LeftPar: "(">
+| <RightPar: ")">
+| <LeftBra: "[">
+| <RightBra: "]">
+| <Question: "?">
+| <AnnotValue: "\""(<LowChar>)+"\"">
+| <AnnotChar: (~[])>
+| <Lang: <LeftBra>(<LowChar>)+<RightBra>>
+| <Var: <NS><Question>(<LowChar>)+>
+| <NS: (["A"-"Z","a"-"z","_","0"-"9"])+<Colon>>
+| <OWLNamedObject: <NS>(<LowChar>|<UppChar>|<Digit>|<UnderScore>)+>
+| <Group: <NS>"<RG"<Digit>">">
+| <OWLLABELNamedObject: <NS>"<LABEL>"(<LowChar>|<UppChar>|<Digit>|<UnderScore>)+>
+| <LABELGroup: <NS>"<LABEL><RG"<Digit>">">
+| <ADD: "ADD">
+| <REMOVE: "REMOVE">
+| <SUBCLASSOF: "subClassOf">
+| <SUBPROPERTYOF: "subPropertyOf">
+| <EQUIVALENTTO: "equivalentTo">
+| <DISJOINTWITH: "disjointWith">
+| <RANGEOF: "rangeOf">
+| <DOMAINOF: "domainOf">
+| <LABEL: "label">
+| <COMMENT: "comment">
+| <OR: "or">
+| <AND: "and">
+| <NOT: "not">
+| <SOME: "some">
+| <ALL: "all">
+| <VALUE: "value">
+| <MIN: "min">
+| <MAX: "max">
+| <EXACTLY: "exactly">
+}
+
+void Input(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult) :
+{
+	Token add=null;
+	Token remove=null;
+	OWLAxiom axiom = null;
+}
+{
+	// AddAxiom or RemoveAxiom
+    (add=<ADD>|remove=<REMOVE>)axiom=Axiom(owlentity, ns2uri, manager, selectResult)<EOF>
+	{ 
+		try{
+		if (axiom != null){
+			OWLOntology ontology = manager.getOntology(URI.create(owlentity.getURI().toString().split("#")[0]));
+			//System.out.println(owlentity);
+			//System.out.println(axiom);
+			//System.out.println("ActionStatement");
+			if(add != null){
+				AddAxiom addAxiom = new AddAxiom(ontology, axiom);
+        		manager.applyChange(addAxiom);
+			}
+			else{
+				RemoveAxiom removeAxiom = new RemoveAxiom(ontology, axiom);
+        		manager.applyChange(removeAxiom);
+			}
+		}
+		}
+		catch (OWLException e1){e1.printStackTrace();}
+	}
+}
+
+OWLAxiom Axiom(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager,SelectStatementResult selectResult):
+{
+	OWLAxiom axiom = null;
+}
+{
+	(
+	axiom = owlannotation(owlentity, manager)
+	|axiom = owlsubclassof(owlentity, ns2uri, manager, selectResult)
+	|axiom = owlequivalentclass(owlentity, ns2uri, manager, selectResult)
+	|axiom = owlsubpropertyof(owlentity, ns2uri, manager, selectResult)
+	)
+	{	
+		return axiom;
+	}
+}
+OWLAxiom owlannotation(OWLEntity owlentity,OWLOntologyManager manager):
+{
+	Token tokenAnnotValue;
+	Token tokenlang;
+}
+{
+	<Var><LABEL>tokenAnnotValue=<AnnotValue>tokenlang=<Lang>
+	{	
+		OWLAnnotation annot = null;
+		OWLAxiom axiom = null;
+		
+			OWLDataFactory factory = manager.getOWLDataFactory();
+			annot = factory.getOWLLabelAnnotation(tokenAnnotValue.image);
+			axiom =  factory.getOWLEntityAnnotationAxiom((OWLEntity) owlentity, annot);
+	
+		return axiom;
+	}
+}
+
+OWLAxiom owlsubclassof(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription superclass;
+}
+{
+	<Var><SUBCLASSOF>superclass=ClassDescription(owlentity, ns2uri, manager, selectResult)
+	{	
+		OWLAxiom axiom = null;
+					
+			OWLDataFactory factory = manager.getOWLDataFactory();
+
+			if(superclass != null){
+			axiom = factory.getOWLSubClassAxiom((OWLDescription)owlentity,superclass);
+			}
+
+		
+		return axiom;
+	}
+}
+
+OWLAxiom owlequivalentclass(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription equivalentclass;
+}
+{
+	<Var><EQUIVALENTTO>equivalentclass=ClassDescription(owlentity, ns2uri, manager, selectResult)
+	{	
+		OWLAxiom axiom = null;		
+		OWLDataFactory factory = manager.getOWLDataFactory();
+		HashSet equivSet = new HashSet();
+		equivSet.add((OWLDescription)owlentity);
+		equivSet.add(equivalentclass); 
+		axiom = factory.getOWLEquivalentClassesAxiom(equivSet);
+		return axiom;
+	}
+}
+
+OWLAxiom owlsubpropertyof(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLObjectProperty superproperty;
+}
+{
+	<Var><SUBPROPERTYOF>superproperty=resolvedOWLObjectProperty(owlentity, ns2uri, manager)
+	{
+		OWLAxiom axiom = null;
+	    OWLDataFactory factory = manager.getOWLDataFactory();
+        axiom = factory.getOWLSubObjectPropertyAxiom((OWLObjectProperty)owlentity,superproperty);
+		return axiom;
+	}
+}
+
+OWLDescription ClassDescription(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription owldescription;
+}
+{
+    owldescription = And(owlentity, ns2uri, manager, selectResult)
+    {
+    	return owldescription;
+    }
+}
+
+OWLDescription And(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription description;
+	OWLDescription totaldescription = null;
+}
+{
+    description=Or(owlentity, ns2uri, manager, selectResult) 
+    {totaldescription=description;}
+    (
+    	<AND> description=Or(owlentity, ns2uri, manager, selectResult)
+    	{
+    			if(totaldescription !=null){
+    			OWLDataFactory factory = manager.getOWLDataFactory();
+    			HashSet set = new HashSet();
+    			set.add(totaldescription);
+    			set.add(description);
+    			totaldescription = factory.getOWLObjectIntersectionOf(set);   
+    			}
+
+    	}
+    )*
+    {
+    	return totaldescription;
+    }
+}
+OWLDescription Or(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription description;
+	OWLDescription totaldescription;
+}
+{
+	description=NonNaryBooleanDescription(owlentity, ns2uri, manager, selectResult) 
+	{totaldescription=description;}
+	(
+		<OR> description=NonNaryBooleanDescription(owlentity, ns2uri, manager, selectResult)
+		{
+		    if(totaldescription !=null){
+    			OWLDataFactory factory = manager.getOWLDataFactory();
+    			HashSet set = new HashSet();
+    			set.add(totaldescription);
+    			set.add(description);
+    			totaldescription = factory.getOWLObjectUnionOf(set);   
+		    }
+
+    		
+		}
+	)*
+	{
+    	return totaldescription;
+    }
+}
+
+OWLDescription NonNaryBooleanDescription(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription description;
+}
+{
+	(
+	description=ObjectPropertyRestriction(owlentity, ns2uri, manager, selectResult)
+	|description=Not(owlentity, ns2uri, manager, selectResult)
+	|description=NamedClassOrNestedDescription(owlentity, ns2uri, manager, selectResult)
+	)
+    {
+    	return description;
+    }
+
+}
+
+OWLDescription Not(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription description;
+}
+{
+	<NOT> (description=NamedClassOrNestedDescription(owlentity, ns2uri, manager, selectResult))
+	{
+		
+    		OWLDataFactory factory = manager.getOWLDataFactory();
+    		if(description != null){
+			description = factory.getOWLObjectComplementOf(description);
+    		}
+
+    	return description;
+    }
+}
+
+OWLDescription ObjectPropertyRestriction(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription description;
+}
+{
+	(
+    description=OWLObjectSomeRestriction(owlentity, ns2uri, manager, selectResult)
+    |description=OWLObjectAllRestriction(owlentity, ns2uri, manager, selectResult)
+    //|description=OWLObjectCardinalityRestriction()
+    //|description=OWLObjectValueRestriction()
+	)
+	{
+    	return description;
+    }
+}
+
+OWLDescription OWLObjectAllRestriction(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription description = null;
+	OWLObjectProperty property;
+	OWLDescription filler;
+}
+{
+    (property=resolvedOWLObjectProperty(owlentity, ns2uri, manager) <ALL> filler=NamedClassOrNestedDescription(owlentity, ns2uri, manager, selectResult))
+    {
+    	
+    		OWLDataFactory factory = manager.getOWLDataFactory();
+    		if(filler != null){
+    		description = (OWLDescription) factory.getOWLObjectAllRestriction(property, filler);
+    		}
+
+    	return description;
+    }
+}
+
+
+OWLDescription OWLObjectSomeRestriction(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription description = null;
+	OWLObjectProperty property;
+	OWLDescription filler;
+}
+{
+    (property=resolvedOWLObjectProperty(owlentity, ns2uri, manager) <SOME> filler=NamedClassOrNestedDescription(owlentity, ns2uri, manager, selectResult))
+    {
+
+    		OWLDataFactory factory = manager.getOWLDataFactory();
+    		if(filler != null){
+    		description = (OWLDescription) factory.getOWLObjectSomeRestriction(property, filler);
+    		}
+
+    	
+    	return description;
+    }
+}
+
+OWLDescription NamedClassOrNestedDescription(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription description;
+}
+{
+    (description=owlresolvedclass(owlentity, ns2uri, manager, selectResult) | description=NestedClassDescription(owlentity, ns2uri, manager, selectResult)) 
+	{
+    	return description;
+    }
+}
+
+OWLDescription NestedClassDescription(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	OWLDescription description;
+}
+{
+	<LeftPar>description=ClassDescription(owlentity, ns2uri, manager, selectResult)<RightPar>
+	{
+    	return description;
+    }
+}
+
+OWLDescription owlresolvedclass(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager, SelectStatementResult selectResult):
+{
+	Token nonresolvedclass=null;
+	Token nonresolvedgroup=null;
+	Token owllabelnamedobject=null;
+	Token labelgroup=null;
+	OWLDescription description=null;
+}
+{
+	(
+		nonresolvedclass=<OWLNamedObject>
+		|nonresolvedgroup=<Group>
+		|owllabelnamedobject=<OWLLABELNamedObject>
+		|labelgroup=<LABELGroup>
+	)
+	{
+		
+		
+			OWLDataFactory factory = manager.getOWLDataFactory();
+			if(nonresolvedgroup!=null){
+				String NS = (nonresolvedgroup.image).split(":")[0];
+				URI nsURI = (URI)ns2uri.get(NS);
+				if (nsURI != null){
+				int groupnumber = Integer.parseInt(((nonresolvedgroup.image).split("RG")[1]).substring(0,1));
+				Matcher matcher = selectResult.regexpmatcher();
+				String ClassName=getGroupContent(matcher, groupnumber);
+				URI ClassURI = URI.create(nsURI +"#" + ClassName);
+				description= (OWLDescription)factory.getOWLClass(ClassURI);
+				}
+				//description= (OWLDescription)factory.getOWLClass(URI.create("http://www.gong.manchester.ac.uk/opl.owl#spain"));
+			}
+			else if (owllabelnamedobject!=null){
+				String NS = (owllabelnamedobject.image).split(":")[0];
+                URI nsURI = (URI)ns2uri.get(NS);
+                if (nsURI != null){
+				//description= (OWLDescription)factory.getOWLClass(URI.create("http://www.gong.manchester.ac.uk/opl.owl#spain"));
+				String label = (owllabelnamedobject.image).split("<LABEL>")[1];
+				OWLOntology ontology = manager.getOntology(nsURI);
+				description=(OWLDescription)getClassByLabel (ontology, label);
+				}
+			}
+			else if(labelgroup!=null){ 
+				String NS = (labelgroup.image).split(":")[0];
+                URI nsURI = (URI)ns2uri.get(NS);
+                if (nsURI != null){
+				String group = (labelgroup.image).split("<LABEL>")[1];
+				int groupnumber = Integer.parseInt((group.split("RG")[1]).substring(0,1));
+				Matcher matcher = selectResult.regexpmatcher();
+				String ClassName=getGroupContent(matcher, groupnumber);
+				OWLOntology ontology = manager.getOntology(nsURI);
+				description=(OWLDescription)getClassByLabel (ontology, ClassName);
+                }
+			}
+			else{
+				String NS = (nonresolvedclass.image).split(":")[0];
+                URI nsURI = (URI)ns2uri.get(NS);
+                if (nsURI != null){
+				String ClassName = (nonresolvedclass.image).split(":")[1];
+				URI ClassURI = URI.create(nsURI +"#" + ClassName);
+				description= (OWLDescription)factory.getOWLClass(ClassURI);
+                }
+			}
+		
+		return description;
+	}
+}
+
+
+OWLObjectProperty resolvedOWLObjectProperty(OWLEntity owlentity, Map ns2uri, OWLOntologyManager manager):
+{
+	Token nonresolvedproperty;
+	OWLObjectProperty property=null;
+}
+{
+	nonresolvedproperty=<OWLNamedObject>
+	{
+		
+			String NS = (nonresolvedproperty.image).split(":")[0];
+			URI nsURI = (URI)ns2uri.get(NS);
+			if (nsURI != null){
+			String PropName = (nonresolvedproperty.image).split(":")[1];
+			URI PropURI = URI.create(nsURI +"#" + PropName);
+			OWLDataFactory factory = manager.getOWLDataFactory();
+			property = factory.getOWLObjectProperty(PropURI);
+            }
+		return property;
+	}
+}
+
+String getGroupContent(Matcher matcher, int groupnumber):
+{
+	String content=null;
+}
+{
+	{
+		if(matcher != null){
+			int groups = matcher.groupCount();
+			for(int i=1;i<=groups;i++){
+				if(groupnumber==i){
+					content = matcher.group(i);
+					//System.out.println( groupnumber +" ingroup " + matcher.group(i));
+				}
+			}
+		}	
+		return content;
+	}
+}
+OWLClass getClassByLabel (OWLOntology ontology, String label):
+{
+	OWLClass resultclass = null;
+}
+{
+	{
+	
+		for(OWLClass cls : ontology.getReferencedClasses()) {
+			String finalLabel = null;
+			for(OWLAnnotationAxiom annotAxiom : cls.getAnnotationAxioms(ontology)){
+				if(annotAxiom.getAnnotation().getAnnotationURI().getFragment().equals("label")){
+					String wholeLabel = annotAxiom.getAnnotation().getAnnotationValue().toString();
+					if(wholeLabel.contains("@")){
+						finalLabel = wholeLabel.split("@")[0];
+					}
+					else if(wholeLabel.contains("^^")){
+						finalLabel = wholeLabel.split("\"")[1];
+					}
+					else{
+						finalLabel = wholeLabel;
+					}
+				}
+			}
+			if(finalLabel!=null && label!=null){
+				if(finalLabel.equals(label)){
+		  			resultclass=cls;
+				}
+			}
+		}
+
+
+    return resultclass;
+	}
+}
+
+
