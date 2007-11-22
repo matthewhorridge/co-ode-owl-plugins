@@ -88,7 +88,7 @@ public class MiniBrowser extends JComponent{
         docPanel = new JEditorPane();
         docPanel.setEditable(false);
         docPanel.setBackground(Color.WHITE);
-        
+
         linkListener = new HyperlinkListener(){
             public void hyperlinkUpdate(HyperlinkEvent event) {
                 if (event.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
@@ -140,29 +140,31 @@ public class MiniBrowser extends JComponent{
     }
 
     public boolean setURL(URL url){
-        history.push(url);
         if (url != null){
-            if (addressField != null){
-                addressField.setText(url.toString());
-            }
-
-            // load the pages in another thread so they don't interfere
-            waitingLoader = new Runnable(){
-                public void run() {
-                    loadPage();
-
-                    currentLoader = waitingLoader;
-                    if (currentLoader != null){
-                        waitingLoader = null;
-                        new Thread(currentLoader).start();
-                    }
+            if (!pageAlreadyLoaded(url)){
+                history.push(url);
+                if (addressField != null){
+                    addressField.setText(url.toString());
                 }
-            };
 
-            if (currentLoader == null){
-                currentLoader = waitingLoader;
-                waitingLoader = null;
-                new Thread(currentLoader).start();
+                // load the pages in another thread so they don't interfere
+                waitingLoader = new Runnable(){
+                    public void run() {
+                        loadPage();
+
+                        currentLoader = waitingLoader;
+                        if (currentLoader != null){
+                            waitingLoader = null;
+                            new Thread(currentLoader).start();
+                        }
+                    }
+                };
+
+                if (currentLoader == null){
+                    currentLoader = waitingLoader;
+                    waitingLoader = null;
+                    new Thread(currentLoader).start();
+                }
             }
         }
         else{
@@ -171,8 +173,17 @@ public class MiniBrowser extends JComponent{
         return true;
     }
 
+    private boolean pageAlreadyLoaded(URL url) {
+        if (history.isEmpty()){
+            return false;
+        }
+        else{
+            return url.equals(getURL());
+        }
+    }
+
     private void loadPage() {
-        final URL loadURL = history.peek();
+        final URL loadURL = getURL();
         System.out.print("loading page: " + loadURL);
         try {
             docPanel.setPage(loadURL);
@@ -197,7 +208,7 @@ public class MiniBrowser extends JComponent{
     public void setContent(Reader r, URL baseURL) throws IOException, BadLocationException {
         HTMLDocument htmlDoc = (HTMLDocument)eKit.createDefaultDocument();
         // see http://www.velocityreviews.com/forums/t132727-htmleditorkit-is-throwing-exception.html
-        htmlDoc.putProperty("IgnoreCharsetDirective", Boolean.TRUE); 
+        htmlDoc.putProperty("IgnoreCharsetDirective", Boolean.TRUE);
         htmlDoc.setBase(baseURL);
         docPanel.setContentType("text/html");
         eKit.read(r, htmlDoc, 0);
