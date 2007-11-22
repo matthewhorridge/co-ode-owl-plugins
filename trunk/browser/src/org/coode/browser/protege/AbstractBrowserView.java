@@ -1,22 +1,21 @@
 package org.coode.browser.protege;
 
-import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-import org.protege.editor.owl.model.selection.OWLSelectionModelListener;
-import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
-import org.protege.editor.owl.model.event.EventType;
-import org.semanticweb.owl.model.OWLOntologyChangeListener;
-import org.semanticweb.owl.model.OWLOntologyChange;
-import org.semanticweb.owl.model.OWLException;
-import org.semanticweb.owl.model.OWLEntity;
 import org.coode.browser.MiniBrowser;
-import org.java.plugin.standard.StandardPluginClassLoader;
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
+import org.protege.editor.owl.model.selection.OWLSelectionModelListener;
+import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
+import org.semanticweb.owl.model.OWLEntity;
+import org.semanticweb.owl.model.OWLException;
+import org.semanticweb.owl.model.OWLOntologyChange;
+import org.semanticweb.owl.model.OWLOntologyChangeListener;
 
 import java.awt.*;
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.FileReader;
-import java.net.URL;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -81,10 +80,9 @@ public abstract class AbstractBrowserView extends AbstractOWLViewComponent {
         browser = new MiniBrowser();
 
         String css = getCSS();
-        final URL cssLocation = getClass().getClassLoader().getResource(css);
-        if (cssLocation != null){
-            File cssFile = new File(cssLocation.toURI());
-            Reader cssReader = new FileReader(cssFile);
+        InputStream cssStream = getClass().getClassLoader().getResourceAsStream(css);
+        if (cssStream != null){
+            Reader cssReader = new BufferedReader(new InputStreamReader(cssStream));
             browser.setCSS(cssReader);
         }
 

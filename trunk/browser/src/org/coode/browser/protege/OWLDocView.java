@@ -58,7 +58,7 @@ public class OWLDocView extends AbstractBrowserView {
 
     private static final Logger logger = Logger.getLogger(OWLDocView.class);
 
-    private static final String OWLDOC_CSS = "owldocview.css";
+    private static final String OWLDOC_CSS = "resources/owldocview.css";
 
     private URL BASE_URL;
 

@@ -1,17 +1,17 @@
 package org.coode.browser.protege;
 
+import org.apache.log4j.Logger;
 import org.protege.editor.owl.ui.UIHelper;
 import org.semanticweb.owl.model.OWLEntity;
-import org.apache.log4j.Logger;
 
 import javax.swing.*;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
 import java.awt.*;
-import java.util.Map;
-import java.util.HashMap;
-import java.net.URL;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.net.URI;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
  * Copyright (C) 2007, University of Manchester
@@ -50,7 +50,7 @@ public class LookupView extends AbstractBrowserView {
 
     private static final Logger logger = Logger.getLogger(LookupView.class);
 
-    private static final String PROTEGE_DEFAULT_CSS = "protege-default.css";
+    private static final String PROTEGE_DEFAULT_CSS = "resources/protege-default.css";
 
     private static final String[] DEFAULT_LABELS = {
             "Wordnet",
