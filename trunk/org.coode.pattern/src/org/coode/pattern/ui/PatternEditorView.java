@@ -3,11 +3,13 @@ package org.coode.pattern.ui;
 import org.coode.pattern.api.Pattern;
 import org.coode.pattern.api.PatternDescriptor;
 import org.coode.pattern.api.PatternEditor;
-import org.semanticweb.owl.model.*;
 import org.protege.editor.core.ui.view.ViewsPane;
+import org.semanticweb.owl.model.OWLObject;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Author: drummond<br>
@@ -20,6 +22,10 @@ import java.awt.*;
  */
 public class PatternEditorView extends AbstractPatternView {
 
+    private Map<PatternDescriptor, PatternEditor> editorMap = new HashMap<PatternDescriptor, PatternEditor>();
+
+    private PatternEditor currentPatternEditor;
+
     private OWLEntityViewFactory viewFactory;
 
     protected void initialisePatternView() {
@@ -28,10 +34,9 @@ public class PatternEditorView extends AbstractPatternView {
         viewFactory = new OWLEntityViewFactory(getOWLWorkspace());
     }
 
-    protected void disposePatternView() {
-    }
-
     public void selectionChanged(Pattern pattern, OWLObject object) {
+        System.out.println("PATTERN, OBJECT");
+        currentPatternEditor = null;
         viewFactory.reset();
         object.accept(viewFactory);
         ViewsPane selectedViewsPane = viewFactory.getViewsPane();
@@ -45,23 +50,53 @@ public class PatternEditorView extends AbstractPatternView {
     }
 
     public void selectionChanged(Pattern pattern) {
-        removeAll();
-        setHeaderText("");
+        System.out.println("PATTERN");
+        boolean requiresRepaint = false;
 
         if (pattern != null){
             final PatternEditorKit patternEditorKit = PatternEditorKit.getPatternEditorKit(getOWLEditorKit());
-            PatternEditor editor = patternEditorKit.getEditor(pattern.getDescriptor(), pattern);
-            if (editor != null) {
-                add(editor.getComponent(), BorderLayout.CENTER);
+            final PatternDescriptor descriptor = pattern.getDescriptor();
+
+            PatternEditor oldEditor = currentPatternEditor;
+
+            // get the editor for this pattern type (reuse one if it already exists)
+            currentPatternEditor = editorMap.get(descriptor);
+            if (currentPatternEditor == null){
+                currentPatternEditor = patternEditorKit.getEditor(descriptor);
+                editorMap.put(descriptor, currentPatternEditor);
             }
 
-            setHeaderText(patternEditorKit.getRenderer(pattern.getDescriptor()).render(pattern));
+            if (currentPatternEditor != null){
+                currentPatternEditor.setPattern(pattern);
+            }
+
+            // if an editor is showing and is for a different type of pattern, remove it
+            if (!currentPatternEditor.equals(oldEditor)){
+                removeAll();
+                add(currentPatternEditor.getComponent(), BorderLayout.CENTER);
+                requiresRepaint = true;
+            }
+
+            setHeaderText(patternEditorKit.getRenderer(descriptor).render(pattern));
         }
-        revalidate();
-        repaint();
+        else{
+            if (currentPatternEditor != null){
+                currentPatternEditor = null;
+                removeAll();
+                requiresRepaint = true;
+            }
+            setHeaderText("");
+        }
+
+        if (requiresRepaint){
+            revalidate();
+            repaint();
+        }
     }
 
     public void selectionChanged(PatternDescriptor patternDescr) {
+        System.out.println("TYPE");
+        currentPatternEditor = null;
         removeAll();
         setHeaderText("");
         if (patternDescr != null){
@@ -74,5 +109,13 @@ public class PatternEditorView extends AbstractPatternView {
             }
         }
         repaint();
+    }
+
+
+    protected void disposePatternView() {
+        for (PatternEditor editor : editorMap.values()){
+            editor.dispose();
+        }
+        editorMap.clear();
     }
 }

@@ -1,17 +1,20 @@
 package org.coode.pattern.valuepartition;
 
-import org.coode.pattern.impl.AbstractPattern;
 import org.coode.pattern.api.PatternDescriptor;
+import org.coode.pattern.impl.AbstractPattern;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.protege.editor.owl.model.util.CoveringAxiomFactory;
-import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.protege.editor.owl.ui.renderer.OWLEntityAnnotationValueRenderer;
+import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.util.OWLEntityRenamer;
 import org.semanticweb.owl.util.OWLEntityRemover;
+import org.semanticweb.owl.util.OWLEntityRenamer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Author: drummond<br>
@@ -87,7 +90,7 @@ public class ValuePartition extends AbstractPattern {
         return mngr.getOWLClassHierarchyProvider();
     }
 
-    private OWLModelManagerEntityRenderer getOWLEntityRenderer() {
+    private OWLEntityRenderer getOWLEntityRenderer() {
         return mngr.getOWLEntityRenderer();
     }
 
@@ -330,9 +333,8 @@ public class ValuePartition extends AbstractPattern {
         }
     }
 
-
     public OWLObjectProperty setProperty(String name) throws OWLException {
-        final OWLModelManagerEntityRenderer entRen = getOWLEntityRenderer();
+        final OWLEntityRenderer entRen = getOWLEntityRenderer();
         final String currentName = entRen.render(property);
         if (name != null && name.length() > 0 && !name.equals(currentName)){
             if (entRen instanceof OWLEntityAnnotationValueRenderer){
@@ -352,7 +354,7 @@ public class ValuePartition extends AbstractPattern {
     }
 
     public OWLClass setName(String name) throws OWLException {
-        final OWLModelManagerEntityRenderer entRen = getOWLEntityRenderer();
+        final OWLEntityRenderer entRen = getOWLEntityRenderer();
         final String currentName = entRen.render(baseClass);
         if (name != null && name.length() > 0 && !name.equals(currentName)){
             if (entRen instanceof OWLEntityAnnotationValueRenderer){

@@ -1,10 +1,10 @@
 package org.coode.pattern.impl;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.core.plugin.ProtegePluginInstance;
 import org.coode.pattern.api.Pattern;
 import org.coode.pattern.api.PatternDescriptor;
 import org.coode.pattern.ui.AbstractPatternRenderer;
+import org.protege.editor.core.plugin.ProtegePluginInstance;
+import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.OWLObject;
 
 import java.net.URL;
@@ -24,10 +24,12 @@ import java.net.URL;
 public abstract class AbstractPatternDescriptor<P extends Pattern>
         implements PatternDescriptor<P>, ProtegePluginInstance {
 
+
     private String label;
     private URL referenceURL;
     private AbstractPatternRenderer<P> renderer;
-    private AbstractPatternEditor<P> editor;
+
+    private PatternPlugin plugin;
 
     public final void initialise(){
     }
@@ -73,12 +75,12 @@ public abstract class AbstractPatternDescriptor<P extends Pattern>
         this.referenceURL = referenceURL;
     }
 
-    public void setEditor(AbstractPatternEditor<P> editor) {
-        this.editor = editor;
+    public void setPlugin(PatternPlugin<P> plugin){
+        this.plugin = plugin;
     }
 
     public AbstractPatternEditor<P> getEditor(){
-        return editor;
+        return plugin.getEditor();
     }
 
     public void setRenderer(AbstractPatternRenderer<P> renderer) {

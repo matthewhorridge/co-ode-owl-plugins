@@ -1,29 +1,29 @@
 package org.coode.pattern.owllist.namedlist.ui;
 
 import org.apache.log4j.Logger;
-import org.coode.pattern.impl.AbstractPatternEditor;
-import org.coode.pattern.api.PatternEditor;
 import org.coode.pattern.api.PatternDescriptor;
-import org.coode.pattern.owllist.listexpression.parser.ListExpressionParserImpl;
-import org.coode.pattern.owllist.listexpression.parser.ListExpressionParser;
+import org.coode.pattern.api.PatternEditor;
+import org.coode.pattern.impl.AbstractPatternEditor;
 import org.coode.pattern.owllist.listexpression.ListExpression;
-import org.coode.pattern.owllist.listexpression.ui.ListExpressionCellEditor;
 import org.coode.pattern.owllist.listexpression.ListExpressionDescriptor;
-import org.coode.pattern.owllist.namedlist.NamedOWLList;
+import org.coode.pattern.owllist.listexpression.parser.ListExpressionParser;
+import org.coode.pattern.owllist.listexpression.parser.ListExpressionParserImpl;
+import org.coode.pattern.owllist.listexpression.ui.ListExpressionCellEditor;
 import org.coode.pattern.owllist.namedlist.NamedListDescriptor;
+import org.coode.pattern.owllist.namedlist.NamedOWLList;
 import org.coode.pattern.ui.PatternEditorKit;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.UIHelper;
-import org.semanticweb.owl.model.OWLException;
 import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.model.OWLException;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -110,6 +110,10 @@ public class NamedListEditor extends AbstractPatternEditor<NamedOWLList> {
         return (NamedListDescriptor)super.getPatternDescriptor();
     }
 
+    protected void disposePatternEditor() {
+        definedCheckbox.removeChangeListener(definedListener);
+    }
+
     public NamedOWLList createPattern() throws OWLException {
         NamedOWLList list = null;
         if (tableModel.getRowCount() > 0) {
@@ -140,7 +144,7 @@ public class NamedListEditor extends AbstractPatternEditor<NamedOWLList> {
         final OWLDataFactory df = getOWLEditorKit().getOWLModelManager().getOWLDataFactory();
         ListExpressionDescriptor descr = getPatternDescriptor().getListExpressionDescriptor(df);
         PatternEditorKit pEditorKit = PatternEditorKit.getPatternEditorKit(getOWLEditorKit());
-        PatternEditor<ListExpression> editor = pEditorKit.getEditor(descr, null);
+        PatternEditor<ListExpression> editor = pEditorKit.getEditor(descr);
 
         if (uiHelper == null){
             uiHelper = new UIHelper(getOWLEditorKit());

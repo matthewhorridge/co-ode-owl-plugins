@@ -1,8 +1,6 @@
 package org.coode.pattern.api;
 
 import org.semanticweb.owl.model.OWLException;
-import org.coode.pattern.api.Pattern;
-import org.coode.pattern.api.PatternDescriptor;
 
 import javax.swing.*;
 
@@ -33,4 +31,6 @@ public interface PatternEditor<P extends Pattern> {
     JComponent getComponent();
 
     JComponent getFocusComponent();
+
+    void dispose();
 }

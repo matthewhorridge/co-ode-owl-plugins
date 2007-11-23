@@ -1,13 +1,17 @@
 package org.coode.pattern.impl;
 
-import org.protege.editor.core.plugin.*;
 import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IExtension;
+import org.coode.pattern.api.Pattern;
 import org.coode.pattern.ui.AbstractPatternRenderer;
+import org.eclipse.core.runtime.IExtension;
 import org.osgi.framework.Bundle;
+import org.protege.editor.core.plugin.JPFUtil;
+import org.protege.editor.core.plugin.PluginProperties;
+import org.protege.editor.core.plugin.PluginUtilities;
+import org.protege.editor.core.plugin.ProtegePlugin;
 
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Author: Nick Drummond<br>
@@ -21,7 +25,7 @@ import java.net.MalformedURLException;
  * code made available under Mozilla Public License (http://www.mozilla.org/MPL/MPL-1.1.html)<br>
  * copyright 2006, The University of Manchester<br>
  */
-class PatternPlugin implements ProtegePlugin<AbstractPatternDescriptor> {
+class PatternPlugin<P extends Pattern> implements ProtegePlugin<AbstractPatternDescriptor<P>> {
 
     private Logger logger = Logger.getLogger(PatternPlugin.class);
 
@@ -29,8 +33,8 @@ class PatternPlugin implements ProtegePlugin<AbstractPatternDescriptor> {
 
     private static final String LABEL_PARAM = "label";
     private static final String DOC_URL_PARAM = "documentationUrl";
-    private static final String EDITOR = "editor";
     private static final String RENDERER = "renderer";
+    private static final String EDITOR = "editor";
 
     public PatternPlugin(IExtension extension) {
         this.extension = extension;
@@ -44,14 +48,24 @@ class PatternPlugin implements ProtegePlugin<AbstractPatternDescriptor> {
         return JPFUtil.getDocumentation(extension);
     }
 
-    public AbstractPatternDescriptor newInstance() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    public AbstractPatternEditor<P> getEditor(){
+        try {
+            return (AbstractPatternEditor)getExtensionObject(EDITOR);
+        }
+        catch (Exception e) {
+            logger.error(e);
+        }
+        return null;
+    }
+
+    public AbstractPatternDescriptor<P> newInstance() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         AbstractPatternDescriptor descriptor = (AbstractPatternDescriptor)PluginUtilities.getInstance().getExtensionObject(extension, "class");
 
         try {
             descriptor.setLabel(PluginProperties.getParameterValue(extension, LABEL_PARAM, ""));
             descriptor.setReferenceURL(new URL(PluginProperties.getParameterValue(extension, DOC_URL_PARAM, "")));
-            descriptor.setEditor((AbstractPatternEditor)getExtensionObject(EDITOR));
             descriptor.setRenderer((AbstractPatternRenderer)getExtensionObject(RENDERER));
+            descriptor.setPlugin(this);
         }
         catch (MalformedURLException e) {
             logger.error(e);
