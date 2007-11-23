@@ -1,15 +1,15 @@
 package org.coode.pattern.impl;
 
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLException;
-import org.semanticweb.owl.model.OWLOntologyChange;
 import org.coode.pattern.api.Pattern;
 import org.coode.pattern.api.PatternDescriptor;
 import org.coode.pattern.api.PatternEditor;
 import org.coode.pattern.api.PatternListener;
-import org.coode.pattern.ui.PatternRenderer;
 import org.coode.pattern.ui.PatternEditorKit;
+import org.coode.pattern.ui.PatternRenderer;
+import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owl.model.OWLException;
+import org.semanticweb.owl.model.OWLOntologyChange;
 
 import javax.swing.*;
 import java.awt.*;
@@ -114,7 +114,16 @@ public abstract class AbstractPatternEditor<P extends Pattern> extends JPanel im
     }
 
     protected void finalize() throws Throwable {
-        PatternManagerImpl.getInstance().removePatternListener(l);
+        System.out.println("AbstractPatternEditor.finalize");
         super.finalize();
     }
+
+    public final void dispose(){
+        disposePatternEditor();
+        pattern.removeChangeListener(l);
+        pattern = null;
+        descr = null;
+    }
+
+    protected abstract void disposePatternEditor();
 }

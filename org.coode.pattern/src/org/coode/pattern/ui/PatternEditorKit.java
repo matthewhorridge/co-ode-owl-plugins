@@ -1,16 +1,16 @@
 package org.coode.pattern.ui;
 
+import org.coode.pattern.api.Pattern;
 import org.coode.pattern.api.PatternDescriptor;
 import org.coode.pattern.api.PatternEditor;
-import org.coode.pattern.api.Pattern;
 import org.coode.pattern.impl.AbstractPatternDescriptor;
 import org.coode.pattern.impl.AbstractPatternEditor;
-import org.coode.pattern.ui.EntityEditor;
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 
 import javax.swing.*;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -63,7 +63,7 @@ public class PatternEditorKit {
 
     private final OWLEditorKit eKit;
     private Map<PatternDescriptor, AbstractPatternRenderer> renderers = new HashMap<PatternDescriptor, AbstractPatternRenderer>();
-    private Map<PatternDescriptor, AbstractPatternEditor> editors = new HashMap<PatternDescriptor, AbstractPatternEditor>();
+//    private Map<PatternDescriptor, AbstractPatternEditor> editors = new HashMap<PatternDescriptor, AbstractPatternEditor>();
 
     public PatternEditorKit(OWLEditorKit editorKit) {
         this.eKit = editorKit;
@@ -77,24 +77,13 @@ public class PatternEditorKit {
         }
     }
 
-    // @@TODO should we have a single shared editor??
-    public PatternEditor getEditor(PatternDescriptor descriptor, Pattern pattern){
+    public PatternEditor getEditor(PatternDescriptor descriptor){
         AbstractPatternEditor editor;
-        if (editors.containsKey(descriptor)){
-            editor = editors.get(descriptor);
+        editor = ((AbstractPatternDescriptor)descriptor).getEditor();
+        if (editor == null){
+            editor = defaultEditor;
         }
-        else{
-            editor = ((AbstractPatternDescriptor)descriptor).getEditor();
-            if (editor == null){
-                editor = defaultEditor;
-            }
-            editor.init(eKit, descriptor);
-            editors.put(descriptor, editor);
-        }
-
-        if (editor != null){
-            editor.setPattern(pattern);
-        }
+        editor.init(eKit, descriptor);
 
         return editor;
     }
@@ -117,6 +106,10 @@ public class PatternEditorKit {
 
     public JComponent getPropertiesEditor(PatternDescriptor patternDescr) {
         return null; // @@TODO implement
+    }
+
+    public OWLEntityRenderer getOWLEntityRenderer(){
+        return eKit.getOWLModelManager().getOWLEntityRenderer();
     }
 
     class BaseEntityPatternRenderer extends AbstractPatternRenderer{

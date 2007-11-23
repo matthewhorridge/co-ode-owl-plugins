@@ -1,21 +1,21 @@
 package org.coode.pattern.owllist.listexpression.ui;
 
 import org.apache.log4j.Logger;
+import org.coode.pattern.api.PatternDescriptor;
 import org.coode.pattern.impl.AbstractPatternEditor;
-import org.coode.pattern.owllist.listexpression.parser.ListExpressionParserImpl;
-import org.coode.pattern.owllist.listexpression.parser.ListExpressionParser;
-import org.coode.pattern.owllist.listexpression.parser.ListExpressionVocabulary;
+import org.coode.pattern.owllist.OWLAutoCompleter;
 import org.coode.pattern.owllist.listexpression.ListExpression;
 import org.coode.pattern.owllist.listexpression.ListExpressionDescriptor;
+import org.coode.pattern.owllist.listexpression.parser.ListExpressionParser;
+import org.coode.pattern.owllist.listexpression.parser.ListExpressionParserImpl;
+import org.coode.pattern.owllist.listexpression.parser.ListExpressionVocabulary;
 import org.coode.pattern.owllist.namedlist.ui.NamedListEditor;
-import org.coode.pattern.owllist.OWLAutoCompleter;
-import org.coode.pattern.api.PatternDescriptor;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.protege.editor.owl.ui.list.OWLObjectList;
-import org.semanticweb.owl.model.OWLException;
+import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owl.model.OWLException;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -174,6 +174,12 @@ public class ListExpressionEditor extends AbstractPatternEditor<ListExpression> 
 
     public ListExpressionDescriptor getPatternDescriptor() {
         return (ListExpressionDescriptor)super.getPatternDescriptor();
+    }
+
+    protected void disposePatternEditor() {
+        if (expressionField != null){
+            expressionField.getDocument().removeDocumentListener(l);
+        }
     }
 
     private JComponent createListTable() {

@@ -1,12 +1,11 @@
 package org.coode.pattern.valuepartition.ui;
 
 import org.apache.log4j.Logger;
-import org.coode.pattern.api.PatternException;
 import org.coode.pattern.api.PatternDescriptor;
-import org.coode.pattern.valuepartition.ui.PieChart;
-import org.coode.pattern.valuepartition.ValuePartition;
-import org.coode.pattern.valuepartition.EntityCreator;
+import org.coode.pattern.api.PatternException;
 import org.coode.pattern.impl.AbstractPatternEditor;
+import org.coode.pattern.valuepartition.EntityCreator;
+import org.coode.pattern.valuepartition.ValuePartition;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
@@ -15,11 +14,14 @@ import org.protege.editor.owl.ui.OWLEntityCreationPanel;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.protege.editor.owl.ui.tree.OWLModelManagerTree;
-import org.semanticweb.owl.model.*;
+import org.protege.editor.owl.ui.tree.OWLObjectTree;
+import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.model.OWLException;
+import org.semanticweb.owl.model.OWLOntology;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -29,7 +31,9 @@ import java.awt.*;
 import java.awt.event.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Author: drummond<br>
@@ -49,7 +53,7 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
     private JCheckBox propFuncCheck;
     private JTextArea valuesField;
     private PieChart pie;
-    private OWLModelManagerTree tree;
+    private OWLObjectTree tree;
     private JComponent valuesPlaceholder;
 
     private JPanel valuesWidget; // contents specific to whether create time
@@ -72,6 +76,7 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
         public void actionPerformed(ActionEvent actionEvent) {
             if (actionEvent.getSource() == nameField){
                 handleNameUpdated();
+                handlePropertyUpdated();
             }
             else if (actionEvent.getSource() == propField){
                 handlePropertyUpdated();
@@ -149,7 +154,7 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
         if (isCreateMode()){
             Keymap keymap = nameField.getKeymap();
             keymap.removeKeyStrokeBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
-            
+
             nameField.setText("");
             propField.setText("");
             propFuncCheck.setSelected(true);
@@ -324,6 +329,14 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
 
     public JComponent getFocusComponent() {
         return nameField;
+    }
+
+    public void disposePatternEditor() {
+        if (tree != null){
+            tree.dispose();
+            tree = null;
+        }
+        pie = null;
     }
 
 /////////////////////////////////

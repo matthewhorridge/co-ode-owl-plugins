@@ -3,7 +3,6 @@ package org.coode.pattern.ui;
 import org.coode.pattern.api.Pattern;
 import org.coode.pattern.api.PatternDescriptor;
 import org.coode.pattern.api.PatternManager;
-import org.coode.pattern.api.PatternEditor;
 import org.coode.pattern.impl.PatternManagerFactory;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 import org.semanticweb.owl.model.OWLEntity;
@@ -75,11 +74,6 @@ public abstract class AbstractPatternView extends AbstractOWLViewComponent {
 
     protected final PatternManager getPatternManager() {
         return PatternManagerFactory.getOWLPatternManager();
-    }
-
-    protected final PatternEditor getPatternEditor(PatternDescriptor descriptor, Pattern pattern){
-        PatternEditorKit f = PatternEditorKit.getPatternEditorKit(getOWLEditorKit());
-        return f.getEditor(descriptor, pattern);
     }
 
     protected final PatternRenderer getPatternRenderer(PatternDescriptor descriptor) {

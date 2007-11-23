@@ -1,11 +1,10 @@
 package org.coode.pattern.ui;
 
+import org.coode.pattern.api.Pattern;
+import org.coode.pattern.api.PatternDescriptor;
+import org.coode.pattern.impl.AbstractPatternEditor;
 import org.protege.editor.core.ui.view.ViewsPane;
 import org.protege.editor.owl.OWLEditorKit;
-import org.coode.pattern.api.PatternDescriptor;
-import org.coode.pattern.api.Pattern;
-import org.coode.pattern.ui.OWLEntityViewFactory;
-import org.coode.pattern.impl.AbstractPatternEditor;
 import org.semanticweb.owl.model.OWLException;
 
 import javax.swing.*;
@@ -58,6 +57,11 @@ public class EntityEditor extends AbstractPatternEditor {
 
     public Pattern createPattern() throws OWLException {
         return null;
+    }
+
+    protected void disposePatternEditor() {
+        editor.dispose();
+        editor = null;
     }
 
     public JComponent getFocusComponent() {

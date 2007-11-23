@@ -7,24 +7,25 @@ import org.coode.pattern.api.PatternEditor;
 import org.coode.pattern.impl.PatternManagerFactory;
 import org.protege.editor.core.ui.util.Icons;
 import org.protege.editor.core.ui.view.DisposableAction;
+import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.UIHelper;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-import org.protege.editor.owl.OWLEditorKit;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owl.model.OWLException;
+import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyChange;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.tree.TreePath;
 import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.List;
 
 /**
@@ -141,7 +142,8 @@ public class PatternBrowserView extends AbstractPatternView {
 
     private void createPattern() {
         PatternDescriptor selection = getSelectedPatternType();
-        PatternEditor editor = getPatternEditor(selection, null);
+        PatternEditorKit f = PatternEditorKit.getPatternEditorKit(getOWLEditorKit());
+        PatternEditor editor = f.getEditor(selection);
 
         JComponent c = editor.getComponent();
 
@@ -163,6 +165,8 @@ public class PatternBrowserView extends AbstractPatternView {
                 logger.error(e);
             }
         }
+
+        editor.dispose();
     }
 
     private void deletePattern() {
