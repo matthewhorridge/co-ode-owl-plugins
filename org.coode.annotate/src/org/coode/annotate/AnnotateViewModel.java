@@ -1,16 +1,14 @@
 package org.coode.annotate;
 
 import org.apache.log4j.Logger;
+import org.coode.annotate.prefs.AnnotationViewPrefs;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.*;
 import org.semanticweb.owl.util.OWLAxiomVisitorAdapter;
 
-import javax.swing.event.TableModelListener;
-import javax.swing.event.TableModelEvent;
+import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.*;
-import java.io.*;
 
 /*
 * Copyright (C) 2007, University of Manchester
@@ -51,13 +49,6 @@ public class AnnotateViewModel {
     public static final String ENTITY = "entity";
     public static final String MULTILINE = "multiline";
 
-    private static final String PROPS_FILENAME = "resources/default.template";
-
-    // really need an ordered Map, but for now, maintain a separate list
-    private final List<URI> uriList = new ArrayList<URI>();
-    
-    private final Map<URI, Set<String>> templateMap = new HashMap<URI, Set<String>>();
-
     private final java.util.List<AnnotationRow> cList = new ArrayList<AnnotationRow>();
 
     private final AnnotationComponentComparator comparator = new AnnotationComponentComparator();
@@ -79,36 +70,13 @@ public class AnnotateViewModel {
 
     public AnnotateViewModel(OWLModelManager mngr) throws IOException {
         this.mngr = mngr;
-        InputStream stream = getClass().getClassLoader().getResourceAsStream(PROPS_FILENAME);
-        load(stream);
 
         mngr.addOntologyChangeListener(ontChangeListener);
     }
 
-    private void load(InputStream stream) throws IOException{
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-        while(reader.ready()){
-            String line = reader.readLine();
-            if (line != null && !"".equals(line) && !line.startsWith("//") && !line.startsWith("#")){
-                String[] tokens = line.split(",");
-                try {
-                    URI uri = new URI(tokens[0].trim());
-                    Set<String> paramlist = new HashSet<String>();
-                    for (int i=1; i<tokens.length; i++){
-                        paramlist.add(tokens[i].trim());
-                    }
-                    templateMap.put(uri, paramlist);
-                    uriList.add(uri);
-                }
-                catch (URISyntaxException e) {
-                    logger.error(e);
-                }
-            }
-        }
-    }
 
     public String getComponentType(URI uri){
-        Set<String> params = templateMap.get(uri);
+        Set<String> params = AnnotationViewPrefs.getInstance().getParams(uri);
 
         // the order of these will determine precedence if multiple component types are specified
         if (params.contains(ENTITY)){
@@ -128,6 +96,18 @@ public class AnnotateViewModel {
             annotations.addAll(entity.getAnnotationAxioms(ont));
         }
         return annotations;
+    }
+
+
+    public Set<OWLOntology> getOntologiesContainingAnnotation(AnnotationRow annotationRow) {
+        Set<OWLOntology> onts = new HashSet<OWLOntology>();
+        OWLAxiom ax = annotationRow.getAxiom();
+        for (OWLOntology ont : mngr.getActiveOntologies()){
+            if (ont.containsAxiom(ax)){
+                onts.add(ont);
+            }
+        }
+        return onts;
     }
 
     public OWLModelManager getOWLModelManager() {
@@ -171,13 +151,13 @@ public class AnnotateViewModel {
             Set<URI> usedURIs = new HashSet<URI>();
             for (OWLAnnotationAxiom annot : annots){
                 final URI annotationURI = annot.getAnnotation().getAnnotationURI();
-                if (uriList.contains(annotationURI)){
+                if (AnnotationViewPrefs.getInstance().getURIList().contains(annotationURI)){
                     usedURIs.add(annotationURI);
                     cList.add(new AnnotationRow(annot, this));
                 }
             }
 
-            for (URI uri : uriList){
+            for (URI uri : AnnotationViewPrefs.getInstance().getURIList()){
                 if (!usedURIs.contains(uri)){
                     cList.add(new AnnotationRow(entity, uri, this));
                 }
@@ -189,7 +169,7 @@ public class AnnotateViewModel {
         notifyStructureChanged();
     }
 
-    public List<AnnotationRow> getComponents() {
+    public List<AnnotationRow> getRows() {
         return Collections.unmodifiableList(cList);
     }
 
@@ -239,18 +219,18 @@ public class AnnotateViewModel {
 
     class AnnotationComponentComparator implements Comparator<AnnotationRow> {
 
-    public int compare(AnnotationRow c1, AnnotationRow c2) {
-        URI uri1 = c1.getURI();
-        URI uri2 = c2.getURI();
-        for (URI uri : uriList){
-            if (uri.equals(uri1)){
-                return -1;
+        public int compare(AnnotationRow c1, AnnotationRow c2) {
+            URI uri1 = c1.getURI();
+            URI uri2 = c2.getURI();
+            for (URI uri : AnnotationViewPrefs.getInstance().getURIList()){
+                if (uri.equals(uri1)){
+                    return -1;
+                }
+                if (uri.equals(uri2)){
+                    return 1;
+                }
             }
-            if (uri.equals(uri2)){
-                return 1;
-            }
+            return 0;
         }
-        return 0;
     }
-}
 }

@@ -1,16 +1,17 @@
 package org.coode.annotate;
 
-import org.semanticweb.owl.model.*;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owl.model.*;
 
 import javax.swing.*;
+import javax.swing.border.EtchedBorder;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.Keymap;
-import java.net.URI;
-import java.awt.event.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.net.URI;
 import java.util.*;
 import java.util.List;
+
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -55,6 +56,14 @@ public class AnnotationRow {
             updateAnnotation();
         }
     };
+
+    private ActionListener acceptAction = new ActionListener(){
+        public void actionPerformed(ActionEvent actionEvent) {
+            updateAnnotation();
+            editor.transferFocusUpCycle();
+        }
+    };
+
 
     public AnnotationRow(OWLAnnotationAxiom<OWLEntity> annotAxiom, AnnotateViewModel model) {
         this(annotAxiom.getSubject(), annotAxiom.getAnnotation().getAnnotationURI(),  model);
@@ -151,28 +160,11 @@ public class AnnotationRow {
             // the order of these will determine precedence if multiple editor types are specified
             if (AnnotateViewModel.TEXT.equals(type)){
                 editor = new JTextField();
-                editor.setBorder(BorderFactory.createEmptyBorder());
             }
             else if (AnnotateViewModel.MULTILINE.equals(type)){
                 editor = new JTextArea();
+                editor.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));                
                 ((JTextArea)editor).setColumns(40);
-
-                // change the tab key to shift focus instead of inserting a tab character (to help fast input)
-
-                // bind our new forward focus traversal keys
-                Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(1);
-                newForwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB,0));
-                editor.setFocusTraversalKeys(
-                    KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
-                    Collections.unmodifiableSet(newForwardKeys)
-                );
-                // bind our new backward focus traversal keys
-                Set<AWTKeyStroke> newBackwardKeys = new HashSet<AWTKeyStroke>(1);
-                newBackwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB,KeyEvent.SHIFT_MASK+KeyEvent.SHIFT_DOWN_MASK));
-                editor.setFocusTraversalKeys(
-                    KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
-                    Collections.unmodifiableSet(newBackwardKeys)
-                );
 
                 ((JTextArea)editor).setWrapStyleWord(true);
                 ((JTextArea)editor).setLineWrap(true);
@@ -180,12 +172,35 @@ public class AnnotationRow {
             else if (AnnotateViewModel.ENTITY.equals(type)){
                 editor = new JComboBox();
             }
+
+            if (editor instanceof JTextComponent){
+                editor.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK), 0);
+            }
+
+            // change the tab key to shift focus instead of inserting a tab character (to help fast input)
+
+            // bind our new forward focus traversal keys
+            Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(1);
+            newForwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK));
+            editor.setFocusTraversalKeys(
+                KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
+                Collections.unmodifiableSet(newForwardKeys)
+            );
+            // bind our new backward focus traversal keys
+            Set<AWTKeyStroke> newBackwardKeys = new HashSet<AWTKeyStroke>(1);
+            newBackwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK+KeyEvent.SHIFT_DOWN_MASK));
+            editor.setFocusTraversalKeys(
+                KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
+                Collections.unmodifiableSet(newBackwardKeys)
+            );
+            
             editor.addFocusListener(focusListener);
         }
         return editor;
     }
 
-    public String getLabel(){
-        return uri.getFragment();
+
+    public OWLAxiom getAxiom(){
+        return annotAxiom;
     }
 }

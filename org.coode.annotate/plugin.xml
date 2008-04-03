@@ -10,5 +10,12 @@
         <category value="@org.protege.classcategory"/>
     </extension>
 
+    <extension
+         id="AnnotationViewPreferencesPanel"
+         point="org.protege.editor.core.application.preferencespanel">
+        <label value="Annotate preferences"/>
+        <class value="org.coode.annotate.prefs.AnnotationViewPrefsPanel"/>
+    </extension>
+
 </plugin>
 

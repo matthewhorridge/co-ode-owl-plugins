@@ -1,13 +1,14 @@
 package org.coode.annotate;
 
-import org.semanticweb.owl.model.*;
 import org.protege.editor.core.ui.util.Icons;
+import org.semanticweb.owl.model.OWLEntity;
+import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.util.SimpleURIShortFormProvider;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.*;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -45,6 +46,8 @@ public class AnnotationForm extends JComponent implements Scrollable {
 
     private AnnotateViewModel model;
 
+    SimpleURIShortFormProvider uriShortFormProvider;
+
     private AnnotationModelListener modelListener = new AnnotationModelListener(){
         public void modelStructureChanged() {
             rebuildUI();
@@ -56,6 +59,7 @@ public class AnnotationForm extends JComponent implements Scrollable {
         setLayout(new GridBagLayout());
         setVisible(true);
         this.model = model;
+        uriShortFormProvider = new SimpleURIShortFormProvider();
         model.addModelListener(modelListener);
     }
 
@@ -74,17 +78,21 @@ public class AnnotationForm extends JComponent implements Scrollable {
             gbConstr.anchor = GridBagConstraints.FIRST_LINE_END;
             gbConstr.fill = GridBagConstraints.HORIZONTAL;
 
-            for (AnnotationRow c : model.getComponents()){
+            for (AnnotationRow c : model.getRows()){
                 gbConstr.gridx = 0;
                 gbConstr.weightx = 0.5;
-                final JLabel jLabel = new JLabel(c.getLabel());
+
+                final JLabel jLabel = new JLabel(uriShortFormProvider.getShortForm(c.getURI()));
+                jLabel.setToolTipText(c.getURI().toString());
                 jLabel.setAlignmentX(1.0f);
                 jLabel.setForeground(LABEL_COLOUR);
                 add(jLabel, gbConstr);
 
                 gbConstr.gridx = 1;
                 gbConstr.weightx = 0.5;
-                add(c.getEditor(), gbConstr);
+                JComponent editor = c.getEditor();
+                editor.setToolTipText(getToolTipText(c));
+                add(editor, gbConstr);
 
                 gbConstr.gridx = 2;
                 final JLabel deleteButton = new JLabel(Icons.getIcon("object.delete.gif"));
@@ -100,6 +108,24 @@ public class AnnotationForm extends JComponent implements Scrollable {
             }
         }
         getParent().validate();
+    }
+
+
+//    public String getToolTipText() {
+//        // get the tooltips from the editor as long as the mouse is vertically in the same plane
+//        JComponent c = (JComponent)getComponentAt(getWidth()/2, getMousePosition().y);
+//        return (c != null) ? c.getToolTipText() : null;
+//    }
+
+    private String getToolTipText(AnnotationRow row) {
+        String str = "";
+        for (OWLOntology ont : model.getOntologiesContainingAnnotation(row)){
+            if (str.length() > 0){
+                str += "\n";
+            }
+            str += ont.getURI().toString();
+        }
+        return str.length() == 0 ? null : "Asserted in: " + str;
     }
 
     public Dimension getPreferredScrollableViewportSize() {
