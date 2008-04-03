@@ -6,8 +6,6 @@
                point="org.protege.editor.core.application.ViewComponent">
         <label value="Annotate View"/>
         <class value="org.coode.annotate.AnnotateView"/>
-        <headerColor value="@org.protege.classcolor"/>
-        <category value="@org.protege.classcategory"/>
     </extension>
 
     <extension
