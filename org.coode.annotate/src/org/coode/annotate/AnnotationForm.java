@@ -111,12 +111,6 @@ public class AnnotationForm extends JComponent implements Scrollable {
     }
 
 
-//    public String getToolTipText() {
-//        // get the tooltips from the editor as long as the mouse is vertically in the same plane
-//        JComponent c = (JComponent)getComponentAt(getWidth()/2, getMousePosition().y);
-//        return (c != null) ? c.getToolTipText() : null;
-//    }
-
     private String getToolTipText(AnnotationRow row) {
         String str = "";
         for (OWLOntology ont : model.getOntologiesContainingAnnotation(row)){
