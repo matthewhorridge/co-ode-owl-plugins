@@ -163,7 +163,7 @@ public class AnnotationRow {
             }
             else if (AnnotateViewModel.MULTILINE.equals(type)){
                 editor = new JTextArea();
-                editor.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));                
+                editor.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
                 ((JTextArea)editor).setColumns(40);
 
                 ((JTextArea)editor).setWrapStyleWord(true);
@@ -183,17 +183,17 @@ public class AnnotationRow {
             Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(1);
             newForwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK));
             editor.setFocusTraversalKeys(
-                KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
-                Collections.unmodifiableSet(newForwardKeys)
+                    KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
+                    Collections.unmodifiableSet(newForwardKeys)
             );
             // bind our new backward focus traversal keys
             Set<AWTKeyStroke> newBackwardKeys = new HashSet<AWTKeyStroke>(1);
             newBackwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK+KeyEvent.SHIFT_DOWN_MASK));
             editor.setFocusTraversalKeys(
-                KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
-                Collections.unmodifiableSet(newBackwardKeys)
+                    KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
+                    Collections.unmodifiableSet(newBackwardKeys)
             );
-            
+
             editor.addFocusListener(focusListener);
         }
         return editor;

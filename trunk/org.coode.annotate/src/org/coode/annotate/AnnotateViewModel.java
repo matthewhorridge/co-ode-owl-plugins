@@ -207,9 +207,11 @@ public class AnnotateViewModel {
      * @param changes the set of changes to apply
      */
     public void requestApplyChanges(List<OWLOntologyChange> changes) {
-        mngr.removeOntologyChangeListener(ontChangeListener);
-        mngr.applyChanges(changes);
-        mngr.addOntologyChangeListener(ontChangeListener);
+        if (!changes.isEmpty()){
+            mngr.removeOntologyChangeListener(ontChangeListener);
+            mngr.applyChanges(changes);
+            mngr.addOntologyChangeListener(ontChangeListener);
+        }
     }
 
     public void dispose() {
