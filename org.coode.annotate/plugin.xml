@@ -11,7 +11,7 @@
     <extension
          id="AnnotationViewPreferencesPanel"
          point="org.protege.editor.core.application.preferencespanel">
-        <label value="Annotate preferences"/>
+        <label value="Annotate View"/>
         <class value="org.coode.annotate.prefs.AnnotationViewPrefsPanel"/>
     </extension>
 
