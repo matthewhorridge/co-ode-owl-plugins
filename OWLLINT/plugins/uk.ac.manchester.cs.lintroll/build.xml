@@ -1,0 +1,82 @@
+<?xml version="1.0"?> 
+<project name="lintroll plugin" default="bundle" basedir="..">
+  
+  <property name="src" location="${basedir}/uk.ac.manchester.cs.lintroll/src"/>
+  <property name="classes" location="${basedir}/uk.ac.manchester.cs.lintroll/classes"/>
+  <property name="source" location="1.5"/>
+  <property name="bundles" location="/Users/luigi/Documents/workspace/protege-standalone/build/dist/bundles"/>
+  <property name="dist" location="/Users/luigi/Documents/workspace/protege-standalone/build/dist/equinox"/>	
+  <property name="jardest" location="${dist}/plugins/uk.ac.manchester.cs.lintroll.jar"/>
+  <property name="releasedownloads" location="/Users/luigi/Documents/workspace/PROTEGEDOCS/WebContent/lintRoll/downloads" />	
+  <property name="releasejardest" location="${releasedownloads}/uk.ac.manchester.cs.lintroll.jar"/>
+  <property name="releasezipsourcedest" location="${releasedownloads}/uk.ac.manchester.cs.lintroll-src.zip"/>	
+  <property name="releaselintjardest" location="${releasedownloads}/lint.jar"/>	
+    <!-- =================================================================== -->
+    <!-- Classpath declaration - used in the "compile" target -->
+    <!-- =================================================================== -->
+    <path id = "conceptlearning.classpath">    
+      <pathelement path="${dist}/org.protege.common.jar"/>
+      <pathelement path="${dist}/org.protege.editor.core.application.jar"/>
+    	<pathelement path="${bundles}/org.semanticweb.owl.owlapi.jar"/>	
+    </path>
+	
+  <target name="init"> 
+    <echo message="---------------Building the Bundle-------------"/>
+  	
+    <mkdir dir="${classes}"/>
+  </target>
+	
+    <!-- =================================================================== -->
+    <!-- COMPILE -->
+    <!-- =================================================================== -->
+  <target name = "compile" depends = "init">    
+      <javac srcdir = "${src}" 
+             destdir = "${classes}" 
+             debug = "${debug}" 
+             source = "1.5" 
+             includeAntRuntime = "${includeAntRuntime}">
+          <classpath refid = "conceptlearning.classpath"/>
+       </javac>
+  </target>
+	
+
+  <target name="bundle" depends="">
+    <!--<copy todir="${commonlibs.classes}/lib">
+        <fileset dir="${commonlibs.dir}/lib"/>
+    </copy> -->
+    <!--
+    <unjar src = "${commonlibs.dir}/lib/commons-logging.jar"
+           dest="${commonlibs.classes}"/>
+    <unjar src = "${commonlibs.dir}/lib/log4j.jar"
+           dest="${commonlibs.classes}"/>
+    <unjar src = "${commonlibs.dir}/lib/looks.jar"
+           dest="${commonlibs.classes}"/>
+    -->
+  	<delete dir="${dist}/configuration/org.eclipse.core.runtime"/>
+  	<delete dir="${dist}/configuration/org.eclipse.osgi"/>
+  	<mkdir dir="${classes}/lib"/>
+  	<delete>
+  		<fileset dir="${dist}/configuration/">
+  			<include name="*.log"/>
+  		</fileset>
+  	</delete>
+  	<copy toFile="${classes}/plugin.xml" file="${basedir}/uk.ac.manchester.cs.lintroll/plugin.xml" overwrite="true" />
+  	<copy overwrite="true" todir="${classes}/lib">
+  		<fileset dir="${basedir}/uk.ac.manchester.cs.lintroll/lib"/>
+  	</copy>
+  	<copy overwrite="true" todir="${classes}">
+  		<fileset dir="${basedir}/uk.ac.manchester.cs.lintroll/resources"/>
+  	</copy>
+    <jar basedir = "${classes}"
+         jarfile  = "${jardest}"
+         manifest = "${basedir}/uk.ac.manchester.cs.lintroll/META-INF/MANIFEST.MF" update="true"/>
+  </target> 
+
+<target name="release" depends="bundle">
+	<copy overwrite="true" tofile="${releasejardest}" file="${jardest}"/>
+	<zip update="true" zipfile="${releasezipsourcedest}" basedir="${basedir}/uk.ac.manchester.cs.lintroll"/>
+	<copy overwrite="true" tofile="${releaselintjardest}" file="${basedir}/uk.ac.manchester.cs.lintroll/lib/lint.jar"/>	
+	
+</target>	
+	
+</project>
