@@ -37,5 +37,5 @@ public interface PatternBasedLint extends Lint {
 	/**
 	 * @return the patterns
 	 */
-	public abstract Set<LintPattern> getPatterns();
+	public Set<LintPattern> getPatterns();
 }

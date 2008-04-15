@@ -27,6 +27,8 @@ import java.util.Set;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
+import uk.ac.manchester.cs.owl.lint.examples.SingleSubClassLint;
+
 /**
  * @author Luigi Iannone
  * 
@@ -57,4 +59,11 @@ public interface LintReport {
 	 * @return the Lint that generated this Report
 	 */
 	Lint getLint();
+
+	/**
+	 * Sets the Lint originating this report
+	 * 
+	 * @param singleSubClassLint
+	 */
+	void setLint(SingleSubClassLint singleSubClassLint);
 }

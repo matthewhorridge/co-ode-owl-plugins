@@ -23,19 +23,35 @@
 package uk.ac.manchester.cs.lintroll.ui.preference;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
 
-import org.protege.editor.core.ui.preferences.PreferencesPanel;
+import org.apache.log4j.Logger;
 import org.protege.editor.core.ui.util.ComponentFactory;
+import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.owl.lint.Lint;
+import org.semanticweb.owl.lint.PatternBasedLint;
+
+import uk.ac.manchester.cs.lintroll.utils.JarClassLoader;
+import uk.ac.manchester.cs.lintroll.utils.JarFileFilter;
 
 /**
  * Preference panel for the Lint Roll
@@ -43,25 +59,40 @@ import org.semanticweb.owl.lint.Lint;
  * @author Luigi Iannone
  * 
  */
-public class LintRollPreferencesPanel extends PreferencesPanel {
+public class LintRollPreferencesPanel extends OWLPreferencesPanel {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4639367272089721763L;
 	private Map<JCheckBox, Lint> map = new HashMap<JCheckBox, Lint>();
 	private Box box = new Box(BoxLayout.Y_AXIS);
+	private JButton openJarButton = new JButton(new ImageIcon(this.getClass()
+			.getClassLoader().getResource("fileOpenIcon.gif")));
+	private JButton selectAllButton = new JButton("Select all");
+	private JButton deSelectAllButton = new JButton("De-select all");
+	private JButton invertSelection = new JButton("Invert selection");
+	static Set<String> wellKnownLintClassNames;
+	static {
+		wellKnownLintClassNames = new HashSet<String>();
+		wellKnownLintClassNames.add(Lint.class.getName());
+		wellKnownLintClassNames.add(PatternBasedLint.class.getName());
+	}
 
 	/**
 	 * @see org.protege.editor.core.ui.preferences.PreferencesPanel#applyChanges()
 	 */
 	@Override
 	public void applyChanges() {
+		Set<Lint> selectedLints = LintRollPreferences.getSelectedLints();
 		for (JCheckBox cb : this.map.keySet()) {
-			LintRollPreferences.getLoadedLints().add(this.map.get(cb));
 			if (cb.isSelected()) {
-				LintRollPreferences.getSelectedLints().add(this.map.get(cb));
+				selectedLints.add(this.map.get(cb));
+			} else {
+				selectedLints.remove(this.map.get(cb));
 			}
 		}
+		LintRollPreferences.clearSelected();
+		LintRollPreferences.addAllSelected(selectedLints);
 	}
 
 	/**
@@ -76,9 +107,16 @@ public class LintRollPreferencesPanel extends PreferencesPanel {
 	 * @see org.protege.editor.core.plugin.ProtegePluginInstance#initialise()
 	 */
 	public void initialise() throws Exception {
-		this.setLayout(new BorderLayout());
+		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		Set<Lint> loadedLints = LintRollPreferences.getLoadedLints();
 		Set<Lint> selectedLints = LintRollPreferences.getSelectedLints();
+		JToolBar toolBar = new JToolBar();
+		toolBar.add(this.openJarButton);
+		toolBar.add(this.selectAllButton);
+		toolBar.add(this.deSelectAllButton);
+		toolBar.add(this.invertSelection);
+		this.initButtons();
+		this.add(toolBar);
 		for (Lint lint : loadedLints) {
 			JCheckBox checkBox = new JCheckBox(lint.getName(), selectedLints
 					.contains(lint));
@@ -91,5 +129,88 @@ public class LintRollPreferencesPanel extends PreferencesPanel {
 		holder.setBorder(ComponentFactory.createTitledBorder("Loaded Lints"));
 		holder.add(new JScrollPane(this.box));
 		this.add(holder);
+	}
+
+	private void initButtons() {
+		this.openJarButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				JFileChooser chooseAJar = new JFileChooser(System
+						.getProperty("user.dir"));
+				chooseAJar.setFileFilter(new JarFileFilter());
+				chooseAJar.showOpenDialog(LintRollPreferencesPanel.this);
+				File selectedJar = chooseAJar.getSelectedFile();
+				if (selectedJar != null) {
+					Set<Lint> lints = LintRollPreferencesPanel.this
+							.loadLints(selectedJar.getAbsolutePath());
+					for (Lint lint : lints) {
+						if (!LintRollPreferences.getLoadedLints()
+								.contains(lint)) {
+							LintRollPreferences.addLoadedLint(lint);
+							JCheckBox cb = new JCheckBox(lint.getName(), false);
+							LintRollPreferencesPanel.this.box.add(cb);
+							LintRollPreferencesPanel.this.box.add(Box
+									.createVerticalStrut(4));
+							cb.setOpaque(false);
+							LintRollPreferencesPanel.this.map.put(cb, lint);
+						}
+					}
+				}
+			}
+		});
+		this.selectAllButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				for (JCheckBox cb : LintRollPreferencesPanel.this.map.keySet()) {
+					cb.setSelected(true);
+				}
+			}
+		});
+		this.deSelectAllButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				for (JCheckBox cb : LintRollPreferencesPanel.this.map.keySet()) {
+					cb.setSelected(false);
+				}
+			}
+		});
+		this.invertSelection.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				for (JCheckBox cb : LintRollPreferencesPanel.this.map.keySet()) {
+					cb.setSelected(!cb.isSelected());
+				}
+			}
+		});
+	}
+
+	private Set<Lint> loadLints(String jarName) {
+		Set<String> classNames = new HashSet<String>();
+		Set<Lint> toReturn = new HashSet<Lint>();
+		try {
+			JarClassLoader cl = new JarClassLoader(jarName);
+			classNames = cl.getClassNames();
+			URLClassLoader urlClassLoader = new URLClassLoader(
+					new URL[] { new File(jarName).toURL() }, this.getClass()
+							.getClassLoader());
+			for (String string : new HashSet<String>(classNames)) {
+				Class<? extends Object> clazz = urlClassLoader
+						.loadClass(string);
+				if (!wellKnownLintClassNames.contains(string)
+						&& Lint.class.isAssignableFrom(clazz)) {
+					toReturn.add((Lint) clazz.newInstance());
+				} else {
+					classNames.remove(string);
+				}
+			}
+		} catch (ClassNotFoundException e) {
+			Logger.getLogger(this.getClass()).error("Unable to load class", e);
+		} catch (InstantiationException e) {
+			Logger.getLogger(this.getClass()).error(
+					"Unable to instantiate lint class", e);
+		} catch (IllegalAccessException e) {
+			Logger.getLogger(this.getClass()).error(
+					"Unable to instantiate lint class", e);
+		} catch (MalformedURLException e) {
+			Logger.getLogger(this.getClass()).error(
+					"Unable to load the selected jar containing the lints", e);
+		}
+		return toReturn;
 	}
 }

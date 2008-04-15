@@ -64,6 +64,7 @@
   	<copy overwrite="true" todir="${classes}/lib">
   		<fileset dir="${basedir}/uk.ac.manchester.cs.lintroll/lib"/>
   	</copy>
+
   	<copy overwrite="true" todir="${classes}">
   		<fileset dir="${basedir}/uk.ac.manchester.cs.lintroll/resources"/>
   	</copy>

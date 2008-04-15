@@ -22,9 +22,15 @@
  */
 package uk.ac.manchester.cs.owl.lint.examples;
 
-import org.semanticweb.owl.lint.PatternBasedLint;
+import java.util.Set;
 
-import uk.ac.manchester.cs.owl.lint.PatternBasedLintImpl;
+import org.semanticweb.owl.lint.LintException;
+import org.semanticweb.owl.lint.LintPattern;
+import org.semanticweb.owl.lint.LintReport;
+import org.semanticweb.owl.lint.PatternBasedLint;
+import org.semanticweb.owl.model.OWLOntology;
+
+import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 
 /**
  * @author Luigi Iannone
@@ -33,14 +39,33 @@ import uk.ac.manchester.cs.owl.lint.PatternBasedLintImpl;
  * Bio-Health Informatics Group<br>
  * Feb 20, 2008
  */
-public class SingleSubClassLint extends PatternBasedLintImpl implements
-		PatternBasedLint {
+public class SingleSubClassLint implements PatternBasedLint {
+	private PatternBasedLint instance;
+
 	public SingleSubClassLint() {
-		super(new SingleSubClassLintPattern());
+		this.instance = (PatternBasedLint) LintManagerFactory.getLintManager()
+				.getLintFactory().createLint(new SingleSubClassLintPattern());
 	}
 
-	@Override
 	public String getDescription() {
 		return "This lint is detected when there is a class in the ontology with only one subclass";
+	}
+
+	public Set<LintPattern> getPatterns() {
+		return this.instance.getPatterns();
+	}
+
+	public LintReport detected(Set<OWLOntology> targets) throws LintException {
+		LintReport instanceReport = this.instance.detected(targets);
+		instanceReport.setLint(this);
+		return instanceReport;
+	}
+
+	public String getName() {
+		return this.instance.getName();
+	}
+
+	public void setName(String name) {
+		this.instance.setName(name);
 	}
 }

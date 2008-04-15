@@ -2,10 +2,10 @@
   <plugin>
   	<extension id="LintRollView"
 			point="org.protege.editor.core.application.ViewComponent">
-  		<label value="Lint Roll View"/>
+  		<label value="Lint Roll"/>
   		<class value="uk.ac.manchester.cs.lintroll.ui.LintRollView"/>
-  		<headerColor value="@org.protege.classcolor"/>
-  		<category value="@org.protege.misc"/>
+		<headerColor value="@org.protege.ontologycolor"/>
+        <category value="@org.protege.ontologycategory"/>
   	</extension>
   	<!-- TABS -->
   	<extension id="LintRollTab"
@@ -15,5 +15,22 @@
         <editorKitId value="OWLEditorKit"/>
         <index value="L"/>
         <defaultViewConfigFileName value="viewconfig-lintrolltab.xml"/>
+    </extension>
+    <!-- Preference panel-->
+    <extension id="ui.preferences.renderer" 
+               point="org.protege.editor.core.application.preferencespanel">
+        <label value="Lint Roll"/>
+        <class value="uk.ac.manchester.cs.lintroll.ui.preference.LintRollPreferencesPanel"/>
+    </extension>
+    <!-- Menu actions -->
+       <extension
+ id="activatelintroll"
+         point="org.protege.editor.core.application.EditorKitMenuAction">
+        <name value="Activate Lint Roll..."/>
+        <class value="uk.ac.manchester.cs.lintroll.ui.ActivateLintRollAction"/>
+        <toolTip value="Activate Lint roll and show results"/>
+        <path value="org.protege.editor.owl.menu.tools/SlotA-C"/>
+        <editorKitId value="OWLEditorKit"/>
+        <accelerator value="L"/>
     </extension>
   </plugin>

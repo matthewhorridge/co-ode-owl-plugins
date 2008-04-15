@@ -22,6 +22,7 @@
  */
 package uk.ac.manchester.cs.lintroll.ui.preference;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -34,19 +35,122 @@ import org.semanticweb.owl.lint.Lint;
 public class LintRollPreferences {
 	private static Set<Lint> loadedLints;
 	private static Set<Lint> selectedLints;
+	private static Set<LintRollPreferenceChangeListener> listeners = new HashSet<LintRollPreferenceChangeListener>();
 	static {
 		loadedLints = new HashSet<Lint>();
 		selectedLints = new HashSet<Lint>();
 	}
 
 	public static Set<Lint> getLoadedLints() {
-		return loadedLints;
+		return new HashSet<Lint>(loadedLints);
 	}
 
 	/**
 	 * @return the selectedLints
 	 */
 	public static Set<Lint> getSelectedLints() {
-		return selectedLints;
+		return new HashSet<Lint>(selectedLints);
+	}
+
+	public static void addSelectedLint(Lint lint) {
+		boolean changed = selectedLints.add(lint);
+		if (changed) {
+			for (LintRollPreferenceChangeListener listener : listeners) {
+				listener.handleChange(new LintRollPreferenceChangeEvent(
+						selectedLints,
+						LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE));
+			}
+		}
+	}
+
+	public static void removeSelectedLint(Lint lint) {
+		boolean changed = selectedLints.remove(lint);
+		if (changed) {
+			for (LintRollPreferenceChangeListener listener : listeners) {
+				listener.handleChange(new LintRollPreferenceChangeEvent(
+						selectedLints,
+						LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE));
+			}
+		}
+	}
+
+	public static void addLoadedLint(Lint lint) {
+		boolean changed = loadedLints.add(lint);
+		if (changed) {
+			for (LintRollPreferenceChangeListener listener : listeners) {
+				listener.handleChange(new LintRollPreferenceChangeEvent(
+						loadedLints,
+						LintRollPreferenceChangeEvent.LOADED_LINT_CHANGE));
+			}
+		}
+	}
+
+	public static void removeLoadedLint(Lint lint) {
+		boolean changed = loadedLints.remove(lint);
+		if (changed) {
+			for (LintRollPreferenceChangeListener listener : listeners) {
+				listener.handleChange(new LintRollPreferenceChangeEvent(
+						loadedLints,
+						LintRollPreferenceChangeEvent.LOADED_LINT_CHANGE));
+			}
+		}
+	}
+
+	public static void clearSelected() {
+		selectedLints.clear();
+		for (LintRollPreferenceChangeListener listener : listeners) {
+			listener.handleChange(new LintRollPreferenceChangeEvent(
+					selectedLints,
+					LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE));
+		}
+	}
+
+	public static void addAllSelected(Collection<? extends Lint> lints) {
+		boolean change = selectedLints.addAll(lints);
+		if (change) {
+			for (LintRollPreferenceChangeListener listener : listeners) {
+				listener.handleChange(new LintRollPreferenceChangeEvent(
+						selectedLints,
+						LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE));
+			}
+		}
+	}
+
+	public static void addAllLoaded(Collection<? extends Lint> lints) {
+		boolean change = loadedLints.addAll(lints);
+		if (change) {
+			for (LintRollPreferenceChangeListener listener : listeners) {
+				listener.handleChange(new LintRollPreferenceChangeEvent(
+						loadedLints,
+						LintRollPreferenceChangeEvent.LOADED_LINT_CHANGE));
+			}
+		}
+	}
+
+	public static void removeAllSelected(Collection<? extends Lint> lints) {
+		boolean change = selectedLints.removeAll(lints);
+		if (change) {
+			for (LintRollPreferenceChangeListener listener : listeners) {
+				listener.handleChange(new LintRollPreferenceChangeEvent(
+						selectedLints,
+						LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE));
+			}
+		}
+	}
+
+	public static void removeAllLoaded(Collection<? extends Lint> lints) {
+		boolean change = loadedLints.removeAll(lints);
+		if (change) {
+			for (LintRollPreferenceChangeListener listener : listeners) {
+				listener.handleChange(new LintRollPreferenceChangeEvent(
+						loadedLints,
+						LintRollPreferenceChangeEvent.LOADED_LINT_CHANGE));
+			}
+		}
+	}
+
+	public static void addLintRollPreferenceChangeListener(
+			LintRollPreferenceChangeListener listener) {
+		listeners.add(listener);
 	}
 }

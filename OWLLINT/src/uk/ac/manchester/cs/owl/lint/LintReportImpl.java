@@ -33,6 +33,8 @@ import org.semanticweb.owl.lint.PatternReport;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
+import uk.ac.manchester.cs.owl.lint.examples.SingleSubClassLint;
+
 /**
  * @author Luigi Iannone
  * 
@@ -139,5 +141,9 @@ public class LintReportImpl implements LintReport {
 	 */
 	public Lint getLint() {
 		return this.lint;
+	}
+
+	public void setLint(SingleSubClassLint lint) {
+		this.lint = lint;
 	}
 }
