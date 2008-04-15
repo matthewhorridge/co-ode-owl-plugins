@@ -71,7 +71,7 @@ public class AnnotationViewPrefs {
         if (template.isEmpty()){
             InputStream stream = getClass().getClassLoader().getResourceAsStream(PROPS_FILENAME);
             try {
-                template = parseDefaults(stream);
+                template = parseStream(stream);
                 putValues(template);
             }
             catch (IOException e) {
@@ -95,7 +95,7 @@ public class AnnotationViewPrefs {
     }
 
 
-    private List<String> parseDefaults(InputStream stream) throws IOException {
+    public static List<String> parseStream(InputStream stream) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         List<String> list = new ArrayList<String>();
         while(reader.ready()){
@@ -127,6 +127,17 @@ public class AnnotationViewPrefs {
             }
         }
     }
+
+//    public void importFromStream(InputStream stream) throws IOException {
+//        List<String> list = parseStream(stream);
+//        putValues(list);
+//    }
+//
+//    public void exportToStream(PrintStream stream){
+//        for (String value : getValues()){
+//            stream.println(value);
+//        }
+//    }
 
     public Set<String> getParams(URI uri) {
         if (templateMap == null){

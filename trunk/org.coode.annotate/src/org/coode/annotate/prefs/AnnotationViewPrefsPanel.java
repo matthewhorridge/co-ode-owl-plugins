@@ -1,6 +1,7 @@
 package org.coode.annotate.prefs;
 
 import org.protege.editor.core.ui.util.Icons;
+import org.protege.editor.core.ui.util.UIUtil;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.frame.AnnotationURIList;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
@@ -10,8 +11,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -45,10 +49,12 @@ import java.util.List;
  */
 public class AnnotationViewPrefsPanel extends OWLPreferencesPanel {
 
+    private static final String TEMPLATE_EXT = "template";
+    
     private JTable table;
     private JToolBar toolbar;
 
-    private DefaultTableModel model;
+    private MyTableModel model;
 
     private boolean dirty = false;
 
@@ -77,25 +83,45 @@ public class AnnotationViewPrefsPanel extends OWLPreferencesPanel {
 
     };
 
+    private Action importAction = new AbstractAction("Import from file", Icons.getIcon("project.open.gif")){
+        public void actionPerformed(ActionEvent actionEvent) {
+            handleImport();
+        }
+
+    };
+
+
+    private Action exportAction = new AbstractAction("Export to file", Icons.getIcon("project.save.gif")){
+        public void actionPerformed(ActionEvent actionEvent) {
+            handleExport();
+        }
+
+    };
+
     public void applyChanges() {
         if (dirty){
-            List<String> values = new ArrayList<String>();
-            for (int i=0; i<model.getRowCount(); i++){
-                String str = "";
-                for (int j=0; j<model.getColumnCount(); j++){
-                    if (j>0){
-                        str+=",";
-                    }
-                    final Object v = model.getValueAt(i, j);
-                    if (v != null){
-                        str+= v;
-                    }
-                }
-                values.add(str);
-            }
-            AnnotationViewPrefs.getInstance().putValues(values);
+            AnnotationViewPrefs.getInstance().putValues(getValuesFromTable());
             dirty = false;
         }
+    }
+
+
+    private List<String> getValuesFromTable() {
+        List<String> values = new ArrayList<String>();
+        for (int i=0; i<model.getRowCount(); i++){
+            String str = "";
+            for (int j=0; j<model.getColumnCount(); j++){
+                if (j>0){
+                    str+=",";
+                }
+                final Object v = model.getValueAt(i, j);
+                if (v != null){
+                    str+= v;
+                }
+            }
+            values.add(str);
+        }
+        return values;
     }
 
 
@@ -110,18 +136,14 @@ public class AnnotationViewPrefsPanel extends OWLPreferencesPanel {
         toolbar.addSeparator(new Dimension(6, 6));
         addToolbarAction(upAction);
         addToolbarAction(downAction);
+        toolbar.addSeparator(new Dimension(6, 6));
+        addToolbarAction(importAction);
+        addToolbarAction(exportAction);
 
         add(toolbar, BorderLayout.NORTH);
 
-        model = new DefaultTableModel();
-        model.addColumn("uri");
-        model.addColumn("params");
-
         List<String> rows = AnnotationViewPrefs.getInstance().getValues();
-        for (String row : rows){
-            model.addRow(row.split(","));
-        }
-
+        model = new MyTableModel(rows);
         table = new JTable(model);
         table.setShowVerticalLines(false);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
@@ -165,10 +187,10 @@ public class AnnotationViewPrefsPanel extends OWLPreferencesPanel {
         if (row != -1){
             model.removeRow(row);
             if (row < model.getRowCount()){
-                table.getSelectionModel().setSelectionInterval(row, row);  
+                table.getSelectionModel().setSelectionInterval(row, row);
             }
             else if (row-1 > 0){
-                table.getSelectionModel().setSelectionInterval(row-1, row-1);                
+                table.getSelectionModel().setSelectionInterval(row-1, row-1);
             }
             dirty = true;
         }
@@ -189,6 +211,64 @@ public class AnnotationViewPrefsPanel extends OWLPreferencesPanel {
             model.moveRow(row, row, row+1);
             table.getSelectionModel().setSelectionInterval(row+1, row+1);
             dirty = true;
+        }
+    }
+
+
+    private void handleImport() {
+        Set<String> extensions = new HashSet<String>();
+        extensions.add(TEMPLATE_EXT);
+        JFrame f = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, getParent());
+        if (f == null) {
+            f = new JFrame();
+        }
+
+        File importFile = UIUtil.openFile(f, "Import a template file for your annotations", extensions);
+        try {
+            FileInputStream inStream = new FileInputStream(importFile);
+            List<String> rows = AnnotationViewPrefs.parseStream(inStream);
+            model = new MyTableModel(rows);
+            table.setModel(model);
+            dirty = true;
+            inStream.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleExport() {
+        Set<String> extensions = new HashSet<String>();
+        extensions.add(TEMPLATE_EXT);
+        JFrame f = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, getParent());
+        if (f == null) {
+            f = new JFrame();
+        }
+
+        File importFile = UIUtil.saveFile(f, "Export a template file for your annotations", extensions);
+        try {
+            PrintStream outStream = new PrintStream(new FileOutputStream(importFile));
+            for (String row : getValuesFromTable()){
+                outStream.println(row);
+            }
+            outStream.flush();
+            outStream.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private class MyTableModel extends DefaultTableModel {
+
+        private MyTableModel(List<String> rows) {
+            addColumn("uri");
+            addColumn("params");
+
+            for (String row : rows){
+                addRow(row.split(","));
+            }
         }
     }
 }
