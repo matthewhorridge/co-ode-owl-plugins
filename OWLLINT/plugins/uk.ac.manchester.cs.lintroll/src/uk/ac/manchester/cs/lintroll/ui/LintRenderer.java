@@ -5,8 +5,10 @@ package uk.ac.manchester.cs.lintroll.ui;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.net.URL;
 
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
 import javax.swing.JList;
 import javax.swing.JTextPane;
 import javax.swing.JTree;
@@ -47,23 +49,51 @@ public class LintRenderer extends OWLCellRenderer implements TreeCellRenderer,
 			boolean selected, boolean expanded, boolean leaf, int row,
 			boolean hasFocus) {
 		Component toReturn;
-		Object nodeUserObject = ((DefaultMutableTreeNode) value)
-				.getUserObject();
-		if (nodeUserObject instanceof OWLObject) {
-			toReturn = this.owlCellRenderer.getTreeCellRendererComponent(tree,
-					nodeUserObject, selected, expanded, leaf, row, hasFocus);
-		} else if (nodeUserObject instanceof LintReport) {
-			toReturn = new JTextPane();
-			((JTextPane) toReturn).setText("Lint name "
-					+ ((LintReport) nodeUserObject).getLint().getName()
-					+ " Affected: "
-					+ ((LintReport) nodeUserObject).getAffectedOntologies()
-							.size());
-			this.render(tree, toReturn, selected);
+		DefaultMutableTreeNode valueNode = (DefaultMutableTreeNode) value;
+		if (valueNode.isRoot()) {
+			URL url = this.getClass().getClassLoader().getResource(
+					"lintroll.jpg");
+			ImageIcon newIcon = new ImageIcon(url);
+			if (valueNode.isLeaf()) {
+				this.defaultTreeCellRenderer.setLeafIcon(newIcon);
+				toReturn = this.defaultTreeCellRenderer
+						.getTreeCellRendererComponent(tree, "", selected,
+								expanded, leaf, row, hasFocus);
+				this.defaultTreeCellRenderer
+						.setLeafIcon(this.defaultTreeCellRenderer
+								.getDefaultLeafIcon());
+			} else {
+				this.defaultTreeCellRenderer.setOpenIcon(newIcon);
+				this.defaultTreeCellRenderer.setClosedIcon(newIcon);
+				toReturn = this.defaultTreeCellRenderer
+						.getTreeCellRendererComponent(tree, "", selected,
+								expanded, leaf, row, hasFocus);
+				this.defaultTreeCellRenderer
+						.setOpenIcon(this.defaultTreeCellRenderer
+								.getDefaultOpenIcon());
+				this.defaultTreeCellRenderer
+						.setClosedIcon(this.defaultTreeCellRenderer
+								.getDefaultClosedIcon());
+			}
 		} else {
-			toReturn = this.defaultTreeCellRenderer
-					.getTreeCellRendererComponent(tree, value, selected,
-							expanded, leaf, row, hasFocus);
+			Object nodeUserObject = valueNode.getUserObject();
+			if (nodeUserObject instanceof OWLObject) {
+				toReturn = this.owlCellRenderer.getTreeCellRendererComponent(
+						tree, nodeUserObject, selected, expanded, leaf, row,
+						hasFocus);
+			} else if (nodeUserObject instanceof LintReport) {
+				toReturn = new JTextPane();
+				((JTextPane) toReturn).setText("Lint name "
+						+ ((LintReport) nodeUserObject).getLint().getName()
+						+ " Affected: "
+						+ ((LintReport) nodeUserObject).getAffectedOntologies()
+								.size());
+				this.render(tree, toReturn, selected);
+			} else {
+				toReturn = this.defaultTreeCellRenderer
+						.getTreeCellRendererComponent(tree, value, selected,
+								expanded, leaf, row, hasFocus);
+			}
 		}
 		return toReturn;
 	}

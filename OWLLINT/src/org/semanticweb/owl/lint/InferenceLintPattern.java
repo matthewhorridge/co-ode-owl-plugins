@@ -23,6 +23,7 @@
 package org.semanticweb.owl.lint;
 
 import org.semanticweb.owl.inference.OWLReasoner;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * A LintPattern that will use the inferred ontology rather than (or in addition
@@ -34,6 +35,8 @@ import org.semanticweb.owl.inference.OWLReasoner;
  * Bio-Health Informatics Group<br>
  * Feb 15, 2008
  */
-public interface InferenceLintPatter extends LintPattern {
+public interface InferenceLintPattern {
 	OWLReasoner getOWLReasoner() throws LintException;
+
+	OWLOntologyManager getOWLOntologyManager();
 }

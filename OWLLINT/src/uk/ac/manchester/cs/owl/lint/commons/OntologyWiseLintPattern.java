@@ -52,7 +52,10 @@ public abstract class OntologyWiseLintPattern implements LintPattern {
 		this.patternReport = (PatternReportImpl) LintManagerFactory
 				.getLintManager().getLintFactory().createPatternReport(this);
 		for (OWLOntology ontology : targets) {
-			this.patternReport.add(ontology, this.matches(ontology));
+			Set<OWLObject> matches = this.matches(ontology);
+			if (!matches.isEmpty()) {
+				this.patternReport.add(ontology, matches);
+			}
 		}
 		return this.patternReport;
 	}

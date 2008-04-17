@@ -22,11 +22,19 @@
  */
 package uk.ac.manchester.cs.owl.lint;
 
+import java.lang.reflect.Constructor;
+
+import org.apache.log4j.Logger;
+import org.protege.editor.owl.model.inference.NoOpReasoner;
+import org.semanticweb.owl.apibinding.OWLManager;
+import org.semanticweb.owl.inference.OWLReasoner;
+import org.semanticweb.owl.lint.InferenceLintPattern;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintFactory;
 import org.semanticweb.owl.lint.LintPattern;
 import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.lint.PatternReport;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -36,6 +44,8 @@ import org.semanticweb.owl.lint.PatternReport;
  * Feb 14, 2008
  */
 public class LintFactoryImpl implements LintFactory {
+	protected OWLReasoner reasoner;
+
 	/**
 	 * Creates a {@link PatternBasedLintImpl} starting from a variable number of
 	 * {@link LintPattern} elements
@@ -60,5 +70,30 @@ public class LintFactoryImpl implements LintFactory {
 	 */
 	public LintReport createLintReport(Lint lint) {
 		return new LintReportImpl(lint);
+	}
+
+	@SuppressWarnings("unchecked")
+	public InferenceLintPattern createInferenceLintPattern() {
+		if (this.reasoner == null) {
+			String reasonerClassName = "org.mindswap.pellet.owlapi.Reasoner";
+			Class reasonerClass;
+			try {
+				reasonerClass = Class.forName(reasonerClassName);
+				Constructor<OWLReasoner> con = reasonerClass
+						.getConstructor(OWLOntologyManager.class);
+				this.reasoner = con.newInstance(OWLManager
+						.createOWLOntologyManager());
+			} catch (Exception e) {
+				Logger
+						.getLogger(this.getClass().toString())
+						.warn(
+								"Unable to load the default reasoner - NoOpReasoner will be used",
+								e);
+				NoOpReasoner noOpReasoner = new NoOpReasoner(OWLManager
+						.createOWLOntologyManager());
+				this.reasoner = noOpReasoner;
+			}
+		}
+		return new InferenceLintPatternImpl(this.reasoner);
 	}
 }

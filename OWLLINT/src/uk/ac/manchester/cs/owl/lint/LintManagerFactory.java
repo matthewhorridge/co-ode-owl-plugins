@@ -32,10 +32,20 @@ import org.semanticweb.owl.lint.LintManager;
  * Feb 13, 2008
  */
 public class LintManagerFactory {
+	static private LintManager preferredLintManager = new LintManagerImpl();
+
 	/**
 	 * @return a new {@link LintManager}
 	 */
 	public static LintManager getLintManager() {
-		return new LintManagerImpl();
+		return preferredLintManager;
+	}
+
+	/**
+	 * @param preferredLintManager
+	 *            the preferredLintManager to set
+	 */
+	public static void setPreferredLintManager(LintManager preferredLintManager) {
+		LintManagerFactory.preferredLintManager = preferredLintManager;
 	}
 }

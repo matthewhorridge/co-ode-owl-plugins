@@ -36,6 +36,9 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.log4j.Logger;
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 import org.protege.editor.owl.ui.view.OWLOntologyAnnotationViewComponent;
 import org.semanticweb.owl.lint.LintException;
@@ -64,7 +67,8 @@ import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
  * 
  */
 public class LintRollView extends AbstractOWLViewComponent implements
-		OWLOntologyChangeListener, LintRollPreferenceChangeListener {
+		OWLOntologyChangeListener, LintRollPreferenceChangeListener,
+		OWLModelManagerListener, TreeSelectionListener {
 	private static final Logger logger = Logger
 			.getLogger(OWLOntologyAnnotationViewComponent.class);
 	private OWLOntologyChangeListener listener;
@@ -77,24 +81,13 @@ public class LintRollView extends AbstractOWLViewComponent implements
 	@Override
 	protected void initialiseOWLView() throws Exception {
 		this.listener = this;
+		this.getWorkspace();
 		LintRollPreferences.addLintRollPreferenceChangeListener(this);
 		this.getOWLModelManager().getOWLOntologyManager()
 				.addOntologyChangeListener(this.listener);
 		this.setLayout(new BorderLayout());
 		this.lintReportTree = new JTree(this.lintReportTreeModel);
-		this.lintReportTree
-				.addTreeSelectionListener(new TreeSelectionListener() {
-					public void valueChanged(TreeSelectionEvent e) {
-						DefaultMutableTreeNode selected = (DefaultMutableTreeNode) LintRollView.this.lintReportTree
-								.getLastSelectedPathComponent();
-						if (selected.getUserObject() instanceof LintReport) {
-							LintRollView.this.lintDescriptionTextArea
-									.setText(((LintReport) selected
-											.getUserObject()).getLint()
-											.getDescription());
-						}
-					}
-				});
+		this.lintReportTree.addTreeSelectionListener(this);
 		this.lintReportTree.setCellRenderer(new LintRenderer(this
 				.getOWLEditorKit()));
 		this.lintManager = LintManagerFactory.getLintManager();
@@ -115,9 +108,11 @@ public class LintRollView extends AbstractOWLViewComponent implements
 	 * 
 	 */
 	private void displayReport(Set<LintReport> lintReports) {
-		DefaultMutableTreeNode root = new DefaultMutableTreeNode(
-				UIConstants.TREE_REPORT_CAPTION);
+		DefaultMutableTreeNode root = new DefaultMutableTreeNode("Lint Reports");
 		this.lintReportTreeModel = new DefaultTreeModel(root);
+		this.lintReportTree.removeTreeSelectionListener(this);
+		this.lintReportTree.clearSelection();
+		this.lintDescriptionTextArea.setText("");
 		for (LintReport lintReport : lintReports) {
 			DefaultMutableTreeNode lintNode = new DefaultMutableTreeNode(
 					lintReport);
@@ -137,6 +132,7 @@ public class LintRollView extends AbstractOWLViewComponent implements
 			this.lintReportTreeModel.insertNodeInto(lintNode, root, 0);
 		}
 		this.lintReportTree.setModel(this.lintReportTreeModel);
+		this.lintReportTree.addTreeSelectionListener(this);
 		this.lintReportTree.revalidate();
 		this.revalidate();
 	}
@@ -161,7 +157,10 @@ public class LintRollView extends AbstractOWLViewComponent implements
 	}
 
 	public void handleChange(LintRollPreferenceChangeEvent e) {
-		if (e.getType() == LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE) {
+		if (e
+				.getType()
+				.equals(
+						uk.ac.manchester.cs.lintroll.ui.preference.EventType.SELECTED_LINT_CHANGE)) {
 			Set<LintReport> reports;
 			try {
 				reports = this.lintManager.run(LintRollPreferences
@@ -171,6 +170,28 @@ public class LintRollView extends AbstractOWLViewComponent implements
 			} catch (LintException lintException) {
 				logger.error("Error in running the lint roll ", lintException);
 			}
+		}
+	}
+
+	public void handleChange(OWLModelManagerChangeEvent event) {
+		if (event.getType().equals(EventType.ONTOLOGY_CLASSIFIED)) {
+			try {
+				Set<LintReport> reports = this.lintManager.run(
+						LintRollPreferences.getSelectedLints(), this
+								.getOWLModelManager().getOntologies());
+				this.displayReport(reports);
+			} catch (LintException lintException) {
+				logger.error("Error in running the lint roll ", lintException);
+			}
+		}
+	}
+
+	public void valueChanged(TreeSelectionEvent e) {
+		DefaultMutableTreeNode selected = (DefaultMutableTreeNode) LintRollView.this.lintReportTree
+				.getLastSelectedPathComponent();
+		if (selected.getUserObject() instanceof LintReport) {
+			this.lintDescriptionTextArea.setText(((LintReport) selected
+					.getUserObject()).getLint().getDescription());
 		}
 	}
 }

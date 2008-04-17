@@ -57,8 +57,7 @@ public class LintRollPreferences {
 		if (changed) {
 			for (LintRollPreferenceChangeListener listener : listeners) {
 				listener.handleChange(new LintRollPreferenceChangeEvent(
-						selectedLints,
-						LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE));
+						selectedLints, EventType.SELECTED_LINT_CHANGE));
 			}
 		}
 	}
@@ -68,8 +67,7 @@ public class LintRollPreferences {
 		if (changed) {
 			for (LintRollPreferenceChangeListener listener : listeners) {
 				listener.handleChange(new LintRollPreferenceChangeEvent(
-						selectedLints,
-						LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE));
+						selectedLints, EventType.SELECTED_LINT_CHANGE));
 			}
 		}
 	}
@@ -79,8 +77,7 @@ public class LintRollPreferences {
 		if (changed) {
 			for (LintRollPreferenceChangeListener listener : listeners) {
 				listener.handleChange(new LintRollPreferenceChangeEvent(
-						loadedLints,
-						LintRollPreferenceChangeEvent.LOADED_LINT_CHANGE));
+						loadedLints, EventType.LOADED_LINT_CHANGE));
 			}
 		}
 	}
@@ -90,8 +87,7 @@ public class LintRollPreferences {
 		if (changed) {
 			for (LintRollPreferenceChangeListener listener : listeners) {
 				listener.handleChange(new LintRollPreferenceChangeEvent(
-						loadedLints,
-						LintRollPreferenceChangeEvent.LOADED_LINT_CHANGE));
+						loadedLints, EventType.LOADED_LINT_CHANGE));
 			}
 		}
 	}
@@ -100,8 +96,7 @@ public class LintRollPreferences {
 		selectedLints.clear();
 		for (LintRollPreferenceChangeListener listener : listeners) {
 			listener.handleChange(new LintRollPreferenceChangeEvent(
-					selectedLints,
-					LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE));
+					selectedLints, EventType.SELECTED_LINT_CHANGE));
 		}
 	}
 
@@ -110,8 +105,7 @@ public class LintRollPreferences {
 		if (change) {
 			for (LintRollPreferenceChangeListener listener : listeners) {
 				listener.handleChange(new LintRollPreferenceChangeEvent(
-						selectedLints,
-						LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE));
+						selectedLints, EventType.SELECTED_LINT_CHANGE));
 			}
 		}
 	}
@@ -121,8 +115,7 @@ public class LintRollPreferences {
 		if (change) {
 			for (LintRollPreferenceChangeListener listener : listeners) {
 				listener.handleChange(new LintRollPreferenceChangeEvent(
-						loadedLints,
-						LintRollPreferenceChangeEvent.LOADED_LINT_CHANGE));
+						loadedLints, EventType.LOADED_LINT_CHANGE));
 			}
 		}
 	}
@@ -132,8 +125,7 @@ public class LintRollPreferences {
 		if (change) {
 			for (LintRollPreferenceChangeListener listener : listeners) {
 				listener.handleChange(new LintRollPreferenceChangeEvent(
-						selectedLints,
-						LintRollPreferenceChangeEvent.SELECTED_LINT_CHANGE));
+						selectedLints, EventType.SELECTED_LINT_CHANGE));
 			}
 		}
 	}
@@ -143,8 +135,7 @@ public class LintRollPreferences {
 		if (change) {
 			for (LintRollPreferenceChangeListener listener : listeners) {
 				listener.handleChange(new LintRollPreferenceChangeEvent(
-						loadedLints,
-						LintRollPreferenceChangeEvent.LOADED_LINT_CHANGE));
+						loadedLints, EventType.LOADED_LINT_CHANGE));
 			}
 		}
 	}

@@ -22,22 +22,23 @@
  */
 package uk.ac.manchester.cs.owl.lint.examples;
 
-import java.lang.reflect.Constructor;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.semanticweb.owl.apibinding.OWLManager;
+import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.lint.InferenceLintPatter;
+import org.semanticweb.owl.lint.InferenceLintPattern;
 import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
-import uk.ac.manchester.cs.owl.lint.ReasonerCreationImpossibleException;
+import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
 
 /**
@@ -47,8 +48,19 @@ import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
  * Bio-Health Informatics Group<br>
  * Feb 13, 2008
  */
-public class SingleSubClassLintPattern extends OntologyWiseLintPattern
-		implements InferenceLintPatter {
+public class SingleSubClassLintPattern extends OntologyWiseLintPattern {
+	protected InferenceLintPattern inferenceLintPattern;
+
+	@SuppressWarnings("unchecked")
+	public SingleSubClassLintPattern() {
+		try {
+			this.inferenceLintPattern = LintManagerFactory.getLintManager()
+					.getLintFactory().createInferenceLintPattern();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	/**
 	 * @return the set of {@link OWLClass} that have just one <b>asserted</b>
 	 *         subclass in the input {@link OWLOntology}
@@ -59,9 +71,10 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern
 	public Set<OWLObject> matches(OWLOntology ontology) throws LintException {
 		Set<OWLObject> toReturn = new HashSet<OWLObject>();
 		Set<OWLClass> nothing = new HashSet<OWLClass>();
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
 		try {
-			OWLReasoner reasoner = this.getOWLReasoner();
+			OWLReasoner reasoner = this.inferenceLintPattern.getOWLReasoner();
+			OWLOntologyManager manager = this.inferenceLintPattern
+					.getOWLOntologyManager();
 			reasoner.loadOntologies(manager.getImportsClosure(ontology));
 			if (!reasoner.isClassified()) {
 				reasoner.classify();
@@ -69,16 +82,35 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern
 			nothing.add(manager.getOWLDataFactory().getOWLNothing());
 			nothing.addAll(reasoner.getEquivalentClasses(manager
 					.getOWLDataFactory().getOWLNothing()));
-			// Subclasses are equivalence classes rather than OWLClass therefore
-			// they are presented in sets
-			for (OWLClass cls : ontology.getReferencedClasses()) {
-				Set<Set<OWLClass>> subClasses = reasoner.getSubClasses(cls);
-				subClasses.remove(nothing);
-				if (subClasses.size() == 1) {
-					Set<OWLClass> subclassEquivalenceClass = subClasses
-							.iterator().next();
-					if (subclassEquivalenceClass.size() == 1) {
+			if (reasoner instanceof NoOpReasoner) {
+				for (OWLClass cls : ontology.getReferencedClasses()) {
+					Set<OWLDescription> subClasses = cls
+							.getSubClasses(ontology);
+					int count = 0;
+					Iterator<OWLDescription> it = subClasses.iterator();
+					while (count <= 1 && it.hasNext()) {
+						OWLDescription anSubClassOWLDescription = it.next();
+						if (!anSubClassOWLDescription.isAnonymous()) {
+							count++;
+						}
+					}
+					if (count == 1) {
 						toReturn.add(cls);
+					}
+				}
+			} else {
+				// Subclasses are equivalence classes rather than OWLClass
+				// therefore
+				// they are presented in sets
+				for (OWLClass cls : ontology.getReferencedClasses()) {
+					Set<Set<OWLClass>> subClasses = reasoner.getSubClasses(cls);
+					subClasses.remove(nothing);
+					if (subClasses.size() == 1) {
+						Set<OWLClass> subclassEquivalenceClass = subClasses
+								.iterator().next();
+						if (subclassEquivalenceClass.size() == 1) {
+							toReturn.add(cls);
+						}
 					}
 				}
 			}
@@ -95,22 +127,5 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern
 			throw new LintException(e);
 		}
 		return toReturn;
-	}
-
-	/**
-	 * @see org.semanticweb.owl.lint.InferenceLintPatter#getOWLReasoner()
-	 */
-	@SuppressWarnings("unchecked")
-	public OWLReasoner getOWLReasoner() throws LintException {
-		String reasonerClassName = "org.mindswap.pellet.owlapi.Reasoner";
-		Class reasonerClass;
-		try {
-			reasonerClass = Class.forName(reasonerClassName);
-			Constructor<OWLReasoner> con = reasonerClass
-					.getConstructor(OWLOntologyManager.class);
-			return con.newInstance(OWLManager.createOWLOntologyManager());
-		} catch (Exception e) {
-			throw new ReasonerCreationImpossibleException(e);
-		}
 	}
 }

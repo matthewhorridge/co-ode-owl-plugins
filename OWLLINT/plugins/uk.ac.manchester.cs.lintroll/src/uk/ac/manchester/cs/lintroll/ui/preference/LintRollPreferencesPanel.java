@@ -36,22 +36,24 @@ import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
 import org.apache.log4j.Logger;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.PatternBasedLint;
+import org.semanticweb.owl.lint.protege.ProtegeLintManager;
 
 import uk.ac.manchester.cs.lintroll.utils.JarClassLoader;
 import uk.ac.manchester.cs.lintroll.utils.JarFileFilter;
+import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 
 /**
  * Preference panel for the Lint Roll
@@ -66,8 +68,8 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel {
 	private static final long serialVersionUID = 4639367272089721763L;
 	private Map<JCheckBox, Lint> map = new HashMap<JCheckBox, Lint>();
 	private Box box = new Box(BoxLayout.Y_AXIS);
-	private JButton openJarButton = new JButton(new ImageIcon(this.getClass()
-			.getClassLoader().getResource("fileOpenIcon.gif")));
+	private JButton openJarButton = new JButton(new DefaultTreeCellRenderer()
+			.getDefaultOpenIcon());
 	private JButton selectAllButton = new JButton("Select all");
 	private JButton deSelectAllButton = new JButton("De-select all");
 	private JButton invertSelection = new JButton("Invert selection");
@@ -108,6 +110,8 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel {
 	 */
 	public void initialise() throws Exception {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		LintManagerFactory.setPreferredLintManager(new ProtegeLintManager(this
+				.getOWLModelManager()));
 		Set<Lint> loadedLints = LintRollPreferences.getLoadedLints();
 		Set<Lint> selectedLints = LintRollPreferences.getSelectedLints();
 		JToolBar toolBar = new JToolBar();

@@ -6,7 +6,7 @@ Bundle-Category: protege
 Bundle-Description: Demo
 Bundle-Vendor: The CO-ODE Group
 Bundle-DocURL: http://www.co-ode.org
-Bundle-ClassPath: .,lib/lint.jar,lib/aterm-java-1.6.jar,lib/pellet.jar,lib/relaxngDatatype.jar,lib/xsdlib.jar,lib/commons-logging-1.1.jar
+Bundle-ClassPath: .
 Import-Package: org.osgi.framework,
  org.apache.log4j,
  javax.swing,

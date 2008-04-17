@@ -52,4 +52,6 @@ public interface LintFactory {
 	 * @return a new {@link LintReport} for the input {@link Lint}
 	 */
 	public LintReport createLintReport(Lint lint);
+
+	public InferenceLintPattern createInferenceLintPattern();
 }

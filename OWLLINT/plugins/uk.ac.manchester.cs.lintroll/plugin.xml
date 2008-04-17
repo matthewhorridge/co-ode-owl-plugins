@@ -22,15 +22,4 @@
         <label value="Lint Roll"/>
         <class value="uk.ac.manchester.cs.lintroll.ui.preference.LintRollPreferencesPanel"/>
     </extension>
-    <!-- Menu actions -->
-       <extension
- id="activatelintroll"
-         point="org.protege.editor.core.application.EditorKitMenuAction">
-        <name value="Activate Lint Roll..."/>
-        <class value="uk.ac.manchester.cs.lintroll.ui.ActivateLintRollAction"/>
-        <toolTip value="Activate Lint roll and show results"/>
-        <path value="org.protege.editor.owl.menu.tools/SlotA-C"/>
-        <editorKitId value="OWLEditorKit"/>
-        <accelerator value="L"/>
-    </extension>
   </plugin>
