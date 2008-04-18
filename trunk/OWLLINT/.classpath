@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="plugins/uk.ac.manchester.cs.lintroll/classes" path="src"/>
+	<classpathentry kind="src" output="plugins/uk.ac.manchester.cs.lintroll/classes" path="plugins/uk.ac.manchester.cs.lintroll/src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/OWLAPI"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/protege-standalone"/>
+	<classpathentry kind="lib" path="lib/aterm-java-1.6.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/pellet.jar"/>
+	<classpathentry kind="lib" path="lib/relaxngDatatype.jar"/>
+	<classpathentry kind="lib" path="lib/xsdlib.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="lib" path="lib/log4j.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

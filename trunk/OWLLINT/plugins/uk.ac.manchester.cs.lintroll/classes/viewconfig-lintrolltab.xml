@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+    <VSNode splits="0.7">
+
+            <CNode>
+
+                <Component label="Lint Roll View">
+                    <Property id="pluginId" value="uk.ac.manchester.cs.lintroll.LintRollView"/>
+                </Component>
+            </CNode>
+
+    </VSNode>
+</layout>
