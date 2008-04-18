@@ -1,0 +1,280 @@
+/**
+* JJTree file
+*/
+
+options {
+  JDK_VERSION = "1.5";
+    VISITOR=true;
+    MULTI=true;
+    NODE_PREFIX="MAE";
+    NODE_PACKAGE="uk.ac.manchester.mae";
+    OUTPUT_DIRECTORY= "../../mae";
+    DEBUG_TOKEN_MANAGER=false;
+}
+ 
+PARSER_BEGIN(ArithmeticsParser) 
+package uk.ac.manchester.mae;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+public class ArithmeticsParser {
+  public static void main(String args[]) {
+    System.out.println("Reading from standard input...");
+    System.out.print("Enter an expression like \"1+(2+3)*var;\" :");
+    new ArithmeticsParser(System.in);
+    try {
+      SimpleNode n = ArithmeticsParser.Start();
+      n.dump("");
+      System.out.println("Thank you.");
+    } catch (Exception e) {
+      System.out.println("Oops.");
+      System.out.println(e.getMessage());
+    }
+  }
+}
+PARSER_END(ArithmeticsParser)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+}
+
+TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL:
+        <DECIMAL_LITERAL> (["l","L"])?
+      | <HEX_LITERAL> (["l","L"])?
+      | <OCTAL_LITERAL> (["l","L"])?
+  >
+|
+  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+|
+  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+|
+  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+}
+
+TOKEN:{
+	<NUMBER : <INTEGER_LITERAL> (<URISYMBOLS> <INTEGER_LITERAL>)?>
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|
+  < #LETTER: ["_","a"-"z","A"-"Z"] >
+|
+  < #DIGIT: ["0"-"9"] >
+ 
+ | <URISYMBOLS: ":" | "." | "#">
+
+  
+}
+
+TOKEN : /* OPERATORS */
+{
+	
+	<SUM: ("+"|"-")>
+	|<MULTIPLY: ( "*" | "/" | "%" )>
+}
+
+TOKEN: /*Strategies*/
+{
+	<STRATEGY: ("OVERRIDING" | "OVERRIDDEN" | "EXCEPTION")>
+}
+
+
+SimpleNode Start() : {}
+{
+	
+  (ConflictStrategy())?(AppliesTo())?("{"Binding() ("," Binding())* "}->")*  (Expression() | Function()) ";"
+  { return jjtThis; }
+}
+
+
+void ConflictStrategy():{Token t;}
+{
+	 "$"t = <IDENTIFIER>
+	{
+		jjtThis.setStrategyName(t.image);
+	}"$"
+}
+
+
+
+void AppliesTo() #void :{}
+{
+	"APPLIESTO <" manSyntaxClassExpression() ">"
+}
+
+
+JAVACODE
+
+	 void manSyntaxClassExpression(){
+		Token t;
+		while(true){
+			t = getToken(1);
+			if (t.image.equals(">")){
+				break;
+			}else{
+				jjtThis.setContent(jjtThis.getContent()+(jjtThis.getContent().equals("")?"":" ")+t.image);
+				t = getNextToken();
+			}
+		}
+	}
+
+
+void Binding():{Token identifier; Token propertyName;}
+{
+	identifier=<IDENTIFIER>
+	{
+		jjtThis.setIdentifier(identifier.image);
+	}
+	"=" PropertyChain()
+}
+
+
+void PropertyChain(): {String propertyName; Token index;}
+{
+
+	propertyName= PropertyURI(){
+		jjtThis.setPropertyName(propertyName);
+	}
+	("[" index = <INTEGER_LITERAL>{
+		jjtThis.setIndex(Integer.parseInt(index.image));
+	}
+	"]")? ("!" {
+		jjtThis.setEnd(false);
+	}
+		  (PropertyChain()))*
+}
+
+JAVACODE
+
+String PropertyURI() #void{
+	String toReturn;
+	String uriString="";
+	Token t;
+	while(true){
+		t= getToken(1);
+		if(t.image.startsWith("!") || t.image.startsWith("[") || t.image.startsWith("}")){
+			break;
+		}
+		uriString = (uriString+t.image).trim();
+		t=getNextToken();
+		
+	}
+	try{
+		toReturn = new URI(uriString.trim()).toString();
+	}catch(URISyntaxException e){
+		throw new ParseException(uriString + " " +e.getMessage());
+	}
+	return toReturn;
+} 
+
+void Expression() #void : {}
+{
+  AdditiveExpression() 
+  
+}
+
+void AdditiveExpression() #void : {Token op =null;}
+{
+	
+  (
+  	 MultiplicativeExpression() (  op=<SUM> {
+    	jjtThis.setIsSum(op == null || op.image.compareTo("+")==0);
+    	
+    } AdditiveExpression() )*
+    
+    
+    
+  ) #Add(>1)
+}
+
+void MultiplicativeExpression() #void : {Token op =null;}
+{
+  (
+    UnaryExpression() ( op =<MULTIPLY> { 
+     jjtThis.setIsMultiplication(op == null || op.image.compareTo("*")==0);
+     jjtThis.setIsPercentage(op != null && op.image.compareTo("%")==0);
+    }
+    MultiplicativeExpression() )*
+  ) #Mult(>1)
+}
+
+void UnaryExpression() #void : {}
+{
+	LOOKAHEAD(2)
+	Power()	
+  |"(" Expression() ")"  
+  |  groundTerm()
+}
+
+void Power() :{Double base=null; Token exp; Token baseId=null;}
+{
+	(
+		((base = Integer()) | baseId =<IDENTIFIER>) "^" exp = <INTEGER_LITERAL>
+		{
+			if(base!=null){
+				jjtThis.setBase(base);
+			}else{
+				jjtThis.setSymbolic(true);
+				jjtThis.setBaseIdentifier(baseId.image);
+			}
+			jjtThis.setExp(Double.parseDouble(exp.image));
+		}
+	)
+}
+
+
+double Integer() #IntNode :{Token t;} 
+{
+	
+t = <NUMBER> 
+{
+  	jjtThis.setValue(Double.parseDouble(t.image));
+  	jjtThis.setSymbolic(false);
+  	return jjtThis.getValue();
+  	}
+| t= <INTEGER_LITERAL>
+  {
+  	jjtThis.setValue(Double.parseDouble(t.image));
+  	jjtThis.setSymbolic(false);
+  	return jjtThis.getValue();
+  	}
+}
+
+
+
+
+void Identifier() #Identifier: {Token t;}
+{
+	t=<IDENTIFIER> 
+	{
+		jjtThis.setIdentifierName(t.image);
+		jjtThis.setSymbolic(true);
+	}
+}
+
+void groundTerm() #void: {}
+{
+	(Integer() |  Identifier() ) 
+}
+
+void Function() #void:{}
+{
+	BigSum()
+}
+
+void BigSum() :{}
+{
+	
+	("SUM("|"sum(")  Expression()")" 
+}
