@@ -4,9 +4,6 @@
 package org.coode.www.exception;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.Set;
@@ -109,26 +106,26 @@ public class InvalidRequestException extends OntServerException {
 //        return str;
     }
 
-        private final void renderRequestDetails(HttpServletRequest request, HttpServletResponse response){
-        response.setContentType("text/html");
-        try {
-            PrintWriter out = response.getWriter();
-
-            // Print the HTML header
-            out.println("<HTML><HEAD><TITLE>");
-            out.println("Request info");
-            out.println("</TITLE></HEAD>");
-
-            // Print the HTML body
-            out.println("<BODY>");
-            renderRequest(request);
-
-            // Print the HTML footer
-            out.println("</PRE></BODY></HTML>");
-            out.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//        private final void renderRequestDetails(HttpServletRequest request, HttpServletResponse response){
+//        response.setContentType("text/html");
+//        try {
+//            PrintWriter out = response.getWriter();
+//
+//            // Print the HTML header
+//            out.println("<HTML><HEAD><TITLE>");
+//            out.println("Request info");
+//            out.println("</TITLE></HEAD>");
+//
+//            // Print the HTML body
+//            out.println("<BODY>");
+//            renderRequest(request);
+//
+//            // Print the HTML footer
+//            out.println("</PRE></BODY></HTML>");
+//            out.close();
+//        }
+//        catch (IOException e) {
+//            logger.error(e);
+//        }
+//    }
 }

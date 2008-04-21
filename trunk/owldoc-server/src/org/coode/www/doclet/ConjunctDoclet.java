@@ -1,5 +1,6 @@
 package org.coode.www.doclet;
 
+import org.apache.log4j.Logger;
 import org.coode.html.OWLHTMLServer;
 import org.coode.html.doclet.AbstractHTMLDoclet;
 import org.coode.html.impl.OWLHTMLConstants;
@@ -29,6 +30,8 @@ import java.util.Set;
  */
 public class ConjunctDoclet extends AbstractHTMLDoclet<OWLQuantifiedRestriction> {
 
+    private static final Logger logger = Logger.getLogger(ConjunctDoclet.class);
+
     private static final String ID = "doclet.conjunct";
 
     private static final String REMOVE_JS_ACTION = "removeFromForm(this.parentNode);" +
@@ -51,6 +54,7 @@ public class ConjunctDoclet extends AbstractHTMLDoclet<OWLQuantifiedRestriction>
     private boolean renderRemoveButton = false;
     private boolean renderAllTypes = true;
     private OWLHTMLServer server;
+
 
     public ConjunctDoclet(OWLHTMLServer server) throws Exception {
         this.server = server;
@@ -182,7 +186,7 @@ public class ConjunctDoclet extends AbstractHTMLDoclet<OWLQuantifiedRestriction>
                             "' width='24' height='24' onmouseup='" + REMOVE_JS_ACTION + "' />");
             }
             catch (MalformedURLException e) {
-                e.printStackTrace();
+                logger.error("Could not find image for remove button: " + OWLHTMLConstants.IMAGES_REMOVE_PNG, e);
             }
         }
     }

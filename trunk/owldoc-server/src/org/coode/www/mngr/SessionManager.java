@@ -126,7 +126,7 @@ public class SessionManager {
             out.close();
 
             server.setCurrentLabel(label);
-            System.out.println("server state saved at: " + file.getAbsolutePath());
+            logger.debug("server state saved at: " + file.getAbsolutePath());
         }
         catch (IOException e) {
             throw new OntServerException(e);
@@ -259,6 +259,10 @@ public class SessionManager {
     private static OWLHTMLServer createServer(String id, URL basePath) {
         OWLOntologyManager mngr = org.semanticweb.owl.apibinding.OWLManager.createOWLOntologyManager();
 
+        // set silent error handling for missing imports
+        mngr.setSilentMissingImportsHandling(true);
+//        mngr.addMissingImportListener(missingImportsListener);
+
         OWLHTMLServerImpl server = new OWLHTMLServerImpl(id, mngr, basePath);
 
         // use a servlet URL scheme which encodes the names in params
@@ -282,7 +286,7 @@ public class SessionManager {
         properties.set(OWLHTMLConstants.OPTION_REASONER_ENABLED, ServerConstants.TRUE);
 
         // default to factplusplus
-        properties.set(ServerConstants.OPTION_REASONER, ServerConstants.FACTPLUSPLUS);
+        properties.set(ServerConstants.OPTION_REASONER, ServerConstants.PELLET);
 
         // render a permalink
         properties.set(OWLHTMLConstants.OPTION_RENDER_PERMALINK, ServerConstants.TRUE);

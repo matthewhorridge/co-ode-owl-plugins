@@ -14,6 +14,7 @@ import org.coode.html.summary.*;
 import org.coode.owl.mngr.NamedObjectType;
 import org.coode.owl.mngr.OWLNamedObjectFinder;
 import org.coode.owl.mngr.OWLServer;
+import org.coode.owl.mngr.ServerConstants;
 import org.coode.www.exception.OntServerException;
 import org.coode.www.exception.RedirectException;
 import org.semanticweb.owl.inference.OWLClassReasoner;
@@ -23,7 +24,6 @@ import org.semanticweb.owl.util.ToldClassHierarchyReasoner;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.*;
@@ -72,6 +72,7 @@ public class Summary extends AbstractOntologyServerServlet {
         String uri = params.get(PARAM_URI);
         String entityName = params.get(PARAM_NAME);
         String ontology = params.get(PARAM_ONTOLOGY);
+        String expanded = params.get(PARAM_EXPAND);
 
         NamedObjectType type = server.getURLScheme().getType(pageURL);
 
@@ -112,7 +113,7 @@ public class Summary extends AbstractOntologyServerServlet {
                 return ren;
             }
             else {
-                return getSummaryRenderer(object, server, false);
+                return getSummaryRenderer(object, server, ServerConstants.TRUE.equals(expanded));
             }
         }
     }
@@ -249,12 +250,7 @@ public class Summary extends AbstractOntologyServerServlet {
 
     private OWLOntology getOntology(String ontStr, OWLHTMLServer server) throws OntServerException {
         if (ontStr != null){
-            try {
-                return server.getOWLOntologyManager().getOntology(new URI(ontStr));
-            }
-            catch (URISyntaxException e) {
-                e.printStackTrace();
-            }
+            return server.getOWLOntologyManager().getOntology(URI.create(ontStr));
         }
         return null;
     }

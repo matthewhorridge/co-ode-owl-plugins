@@ -3,6 +3,7 @@
 */
 package org.coode.www;
 
+import org.apache.log4j.Logger;
 import org.coode.html.OWLHTMLServer;
 import org.coode.owl.util.ModelUtil;
 import org.semanticweb.owl.inference.OWLReasoner;
@@ -24,6 +25,8 @@ import java.util.Set;
 public enum QueryType {
     equivalents, subclasses, descendants, superclasses, ancestors, instances;
 
+    private Logger logger = Logger.getLogger(QueryType.class);
+
     public Set<OWLEntity> getResults(OWLDescription descr, OWLHTMLServer server) {
         Set<OWLEntity> results = new HashSet<OWLEntity>();
         try{
@@ -38,7 +41,7 @@ public enum QueryType {
             }
         }
         catch(OWLReasonerException e){
-            e.printStackTrace();
+            logger.error("Reasoner error", e);
         }
         return results;
     }
