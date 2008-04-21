@@ -97,7 +97,7 @@ public class Find extends AbstractOntologyServerServlet {
                 }
             }
             catch(URISyntaxException e){
-                System.err.println("Could not find anything called: " + uri);
+                logger.error("Could not find anything called: " + uri);
             }
         }
         else{
@@ -115,7 +115,7 @@ public class Find extends AbstractOntologyServerServlet {
                 return server.getOWLOntologyManager().getOntology(new URI(ontStr));
             }
             catch (URISyntaxException e) {
-                e.printStackTrace();
+                logger.error("Cannot find ontology for: " + ontStr, e);
             }
         }
         return null;

@@ -3,6 +3,7 @@
 */
 package org.coode.www.doclet;
 
+import org.apache.log4j.Logger;
 import org.coode.html.OWLHTMLServer;
 import org.coode.html.doclet.AbstractOWLDocDoclet;
 import org.coode.html.impl.OWLHTMLConstants;
@@ -29,11 +30,14 @@ import java.util.Set;
  */
 public class OntologyMappingsTableDoclet extends AbstractOWLDocDoclet {
 
+    private static final Logger logger = Logger.getLogger(OntologyMappingsTableDoclet.class);
+
     public static final String ID = "doclet.ontology.mappings";
 
     private static final String TITLE = "Ontology Locations";
 
     private Map<URI, URI> map;
+
 
     public OntologyMappingsTableDoclet(OWLHTMLServer server) {
         super(server);
@@ -87,7 +91,7 @@ public class OntologyMappingsTableDoclet extends AbstractOWLDocDoclet {
                     out.println("</td></tr>");
                 }
                 catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    logger.error("Cannot encode URL: " + ontURI, e);
                 }
             }
             else{

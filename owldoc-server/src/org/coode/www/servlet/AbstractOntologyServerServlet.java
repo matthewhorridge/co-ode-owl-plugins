@@ -144,7 +144,6 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
             return SessionManager.getServer(request, sessionLabel);
         }
         catch (OntServerException e) {
-            e.printStackTrace();
             throw new ServletException("Severe exception initialising server session: " + pageURL, e);
         }
     }
@@ -211,7 +210,7 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
             return new URL(baseURL, urlstr);
         }
         catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
         return null;
     }

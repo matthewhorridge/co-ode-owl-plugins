@@ -3,6 +3,7 @@
 */
 package org.coode.www.doclet;
 
+import org.apache.log4j.Logger;
 import org.coode.html.OWLHTMLServer;
 import org.coode.html.doclet.AbstractOWLDocDoclet;
 import org.coode.html.impl.OWLHTMLConstants;
@@ -21,6 +22,9 @@ import java.util.Set;
  * Date: Feb 4, 2008<br><br>
  */
 public class AutocompleteDoclet extends AbstractOWLDocDoclet {
+
+    private static final Logger logger = Logger.getLogger(AutocompleteDoclet.class);
+
 
     private String id;
     private boolean multiword = false;
@@ -115,7 +119,7 @@ public class AutocompleteDoclet extends AbstractOWLDocDoclet {
             findURL = new URL(getServer().getBaseURL(), "find/?format=xml&type=entities&");
         }
         catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
 
         out.print("<script type=\"text/javascript\">\n" +

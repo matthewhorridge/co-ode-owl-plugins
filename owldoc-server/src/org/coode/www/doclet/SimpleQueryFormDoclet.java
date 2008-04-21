@@ -3,6 +3,7 @@
 */
 package org.coode.www.doclet;
 
+import org.apache.log4j.Logger;
 import org.coode.html.OWLHTMLServer;
 import org.coode.html.doclet.AbstractHTMLDoclet;
 import org.coode.html.impl.OWLHTMLConstants;
@@ -28,11 +29,14 @@ import java.util.Set;
  */
 public class SimpleQueryFormDoclet extends AbstractHTMLDoclet<OWLDescription> {
 
+    private static final Logger logger = Logger.getLogger(SimpleQueryFormDoclet.class);
+
     private static final String ID = "doclet.query.form";
 
     private final OWLHTMLServer server;
 
     private SuggestorManager sm;
+
 
     public SimpleQueryFormDoclet(OWLHTMLServer server) {
         this.server = server;
@@ -124,7 +128,7 @@ public class SimpleQueryFormDoclet extends AbstractHTMLDoclet<OWLDescription> {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Cannot render suggested content", e);
         }
     }
 
@@ -141,7 +145,7 @@ public class SimpleQueryFormDoclet extends AbstractHTMLDoclet<OWLDescription> {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Cannot render simple content", e);
         }
     }
 

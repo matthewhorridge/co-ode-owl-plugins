@@ -97,7 +97,7 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
 
     private NestedHTMLDoclet handleLoad(Set<URI> uris, boolean clear, OWLHTMLServer server) throws OntServerException {
         Set<URI> success = new HashSet<URI>();
-        Set<URI> fail = new HashSet<URI>();
+        Map<URI, Throwable> fail = new HashMap<URI, Throwable>();
 
         String message = "";
 
@@ -112,18 +112,24 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
                     success.add(uri);
                 }
                 else{
-                    fail.add(uri);
+                    throw new IllegalArgumentException("Ontology URIs must be absolute");
                 }
             }
             catch(Exception e){
-                fail.add(uri);
+                fail.put(uri, e);
+            }
+            catch (OutOfMemoryError e){
+                fail.put(uri, e);
+                // clear all ontologies as we are in an unpredictable state
+                server.clearOntologies();
+                throw new OntServerException("Out of memory trying to load ontologies");
             }
         }
 
 
         if (!fail.isEmpty()){
-            for (URI uri : fail){
-                message += "failed to load: " + uri + "<br />";
+            for (URI uri : fail.keySet()){
+                message += "failed to load: " + uri + " (" + fail.get(uri).getMessage() + ")<br />";
             }
         }
         if (!success.isEmpty()){
@@ -241,10 +247,6 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
                             "'>continue to browse</a> your ontology without loading the imports.</p>");
             }
 
-            if (message != null){
-                ren.addMessage(message);
-            }
-            
             ren.addDoclet(new LoadFormDoclet());
 
             OntologyMappingsTableDoclet table = new OntologyMappingsTableDoclet(server);
@@ -252,6 +254,10 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
             ren.addDoclet(table);
         }
 
+        if (message != null){
+            ren.addMessage(message);
+        }
+        
         return ren;
     }
 

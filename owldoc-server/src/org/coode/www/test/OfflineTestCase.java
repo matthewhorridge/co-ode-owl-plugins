@@ -31,7 +31,7 @@ public class OfflineTestCase extends TestCase {
 
     public void testUnmodifiable(){
         Set s = Collections.unmodifiableSet(null);
-        System.out.println("s = " + s);
+        logger.debug("s = " + s);
     }
 
     public void testImports(){
@@ -54,7 +54,7 @@ public class OfflineTestCase extends TestCase {
             assertEquals(2, mngr.getOntologies().size());
         }
         catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e);
             fail();
         }
     }
@@ -80,7 +80,7 @@ public class OfflineTestCase extends TestCase {
             server.loadOntology(b);
 
             String str = ren.render(df.getOWLClass(new URI("http://www.co-ode.org/ontologies/b.owl#class1")), null);
-            System.out.println("str = " + str);
+            logger.debug("str = " + str);
         }
         catch (Exception e) {
             logger.error(e);
