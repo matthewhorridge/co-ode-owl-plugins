@@ -25,4 +25,21 @@ public class MAEAdd extends SimpleNode {
 	public boolean isSum() {
 		return this.isSum;
 	}
+
+	@Override
+	public String toString() {
+		String toReturn = "";
+		String operator = this.isSum ? " + " : "-";
+		boolean isFirst = true;
+		for (Node node : this.children) {
+			if (!isFirst) {
+				toReturn += operator;
+				isFirst = false;
+			}
+			toReturn += node instanceof MAEIntNode
+					|| node instanceof MAEIdentifier ? node.toString() : "("
+					+ node.toString() + ")";
+		}
+		return toReturn;
+	}
 }

@@ -25,4 +25,9 @@ public class MAEConflictStrategy extends SimpleNode {
 	public String getStrategyName() {
 		return this.strategyName;
 	}
+
+	@Override
+	public String toString() {
+		return "$" + this.strategyName + "$";
+	}
 }

@@ -20,30 +20,36 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae;
+package uk.ac.manchester.mae.visitor;
 
-import java.net.URI;
-
-import org.coode.oae.ui.BindingModel;
-import org.coode.oae.ui.FormulaModel;
-import org.coode.oae.ui.PropertyChainModel;
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.model.description.OWLExpressionParserException;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLProperty;
+import uk.ac.manchester.mae.ArithmeticsParserVisitor;
+import uk.ac.manchester.mae.MAEAdd;
+import uk.ac.manchester.mae.MAEBigSum;
+import uk.ac.manchester.mae.MAEBinding;
+import uk.ac.manchester.mae.MAEConflictStrategy;
+import uk.ac.manchester.mae.MAEIdentifier;
+import uk.ac.manchester.mae.MAEIntNode;
+import uk.ac.manchester.mae.MAEMult;
+import uk.ac.manchester.mae.MAEPower;
+import uk.ac.manchester.mae.MAEPropertyChain;
+import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.MAEStoreTo;
+import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
+import uk.ac.manchester.mae.Node;
+import uk.ac.manchester.mae.SimpleNode;
 
 /**
  * @author Luigi Iannone
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Apr 10, 2008
+ * Apr 7, 2008
  */
-public class FormulaModelExtractor implements ArithmeticsParserVisitor {
-	protected FormulaModel formulaModel;
+public class BindingPropertyChainExtractor implements ArithmeticsParserVisitor {
+	private MAEBinding binding;
 
-	public FormulaModelExtractor(OWLEditorKit owlEditorKit) {
-		this.formulaModel = new FormulaModel(owlEditorKit);
+	public BindingPropertyChainExtractor(MAEBinding binding) {
+		this.binding = binding;
 	}
 
 	/**
@@ -59,12 +65,15 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStart node, Object data) {
-		int childCount = node.jjtGetNumChildren();
-		for (int i = 0; i < childCount; i++) {
+		MAEPropertyChain toReturn = null;
+		boolean found = false;
+		for (int i = 0; !found && i < node.jjtGetNumChildren(); i++) {
 			Node child = node.jjtGetChild(i);
-			child.jjtAccept(this, data);
+			if (child.equals(this.binding)) {
+				toReturn = (MAEPropertyChain) child.jjtAccept(this, null);
+			}
 		}
-		return null;
+		return toReturn;
 	}
 
 	/**
@@ -72,41 +81,30 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEConflictStrategy node, Object data) {
-		this.formulaModel.setConflictStrategy(ConflictStrategyFactory
-				.getStrategy(node.getStrategyName()));
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEmanSyntaxClassExpression,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
-		OWLEditorKit owlEditorKit = this.formulaModel.getOwlEditorKit();
-		try {
-			OWLDescription owlExpresion = owlEditorKit.getOWLModelManager()
-					.getOWLDescriptionParser().createOWLDescription(
-							node.getContent());
-			this.formulaModel.setAppliesTo(owlExpresion);
-		} catch (OWLExpressionParserException e) {
-			e.printStackTrace();
-		}
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBinding,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEBinding node, Object data) {
-		BindingModel bindingModel = new BindingModel(node.getIdentifier(),
-				(PropertyChainModel) node.jjtGetChild(0).jjtAccept(this, data));
-		this.formulaModel.getBindings().add(bindingModel);
-		return null;
+		MAEPropertyChain toReturn = null;
+		boolean found = false;
+		for (int i = 0; !found && i < node.jjtGetNumChildren(); i++) {
+			Node child = node.jjtGetChild(i);
+			toReturn = (MAEPropertyChain) child.jjtAccept(this, data);
+			found = toReturn != null;
+		}
+		return toReturn;
 	}
 
 	/**
@@ -114,18 +112,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEPropertyChain node, Object data) {
-		OWLEditorKit owlEditorKit = this.formulaModel.getOwlEditorKit();
-		URI propertyURI = URI.create(node.getPropertyName());
-		OWLProperty property = node.isEnd() ? owlEditorKit.getOWLModelManager()
-				.getOWLDataFactory().getOWLDataProperty(propertyURI)
-				: owlEditorKit.getOWLModelManager().getOWLDataFactory()
-						.getOWLObjectProperty(propertyURI);
-		PropertyChainModel toReturn = new PropertyChainModel(property);
-		if (!node.isEnd() && node.jjtGetNumChildren() > 0) {
-			toReturn.setChild((PropertyChainModel) node.jjtGetChild(0)
-					.jjtAccept(this, data));
-		}
-		return toReturn;
+		return node.jjtGetParent().equals(this.binding) ? node : null;
 	}
 
 	/**
@@ -133,7 +120,6 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEAdd node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
@@ -142,7 +128,6 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEMult node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
@@ -151,7 +136,6 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEPower node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
@@ -160,7 +144,6 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEIntNode node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
@@ -169,7 +152,6 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEIdentifier node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
@@ -178,11 +160,14 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEBigSum node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
-	public FormulaModel getExtractedFormulaModel() {
-		return this.formulaModel;
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 *      java.lang.Object)
+	 */
+	public Object visit(MAEStoreTo node, Object data) {
+		return null;
 	}
 }

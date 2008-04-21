@@ -106,7 +106,10 @@ void ConflictStrategy():{Token t;}
 	}"$"
 }
 
-
+void StoreTo():{}
+{
+	"STORETO <" PropertyChain() ">"
+}
 
 void AppliesTo() #void :{}
 {
@@ -189,7 +192,7 @@ void AdditiveExpression() #void : {Token op =null;}
 	
   (
   	 MultiplicativeExpression() (  op=<SUM> {
-    	jjtThis.setIsSum(op == null || op.image.compareTo("+")==0);
+    	jjtThis.setSum(op == null || op.image.compareTo("+")==0);
     	
     } AdditiveExpression() )*
     
@@ -202,8 +205,8 @@ void MultiplicativeExpression() #void : {Token op =null;}
 {
   (
     UnaryExpression() ( op =<MULTIPLY> { 
-     jjtThis.setIsMultiplication(op == null || op.image.compareTo("*")==0);
-     jjtThis.setIsPercentage(op != null && op.image.compareTo("%")==0);
+     jjtThis.setMultiplication(op == null || op.image.compareTo("*")==0);
+     jjtThis.setPercentage(op != null && op.image.compareTo("%")==0);
     }
     MultiplicativeExpression() )*
   ) #Mult(>1)

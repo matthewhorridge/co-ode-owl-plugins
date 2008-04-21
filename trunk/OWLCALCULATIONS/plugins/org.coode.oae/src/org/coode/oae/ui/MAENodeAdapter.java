@@ -35,13 +35,13 @@ import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLProperty;
 
 import uk.ac.manchester.mae.ArithmeticsParser;
-import uk.ac.manchester.mae.BindingPropertyChainExtractor;
 import uk.ac.manchester.mae.ConflictStrategy;
-import uk.ac.manchester.mae.FormulaModelExtractor;
 import uk.ac.manchester.mae.MAEBinding;
 import uk.ac.manchester.mae.MAEPropertyChain;
 import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.ParseException;
+import uk.ac.manchester.mae.visitor.BindingPropertyChainExtractor;
+import uk.ac.manchester.mae.visitor.FormulaModelExtractor;
 
 /**
  * @author Luigi Iannone
@@ -130,22 +130,18 @@ public class MAENodeAdapter {
 									.getOWLEntityRenderer());
 			formulaString += "APPLIESTO <" + rendering + "> ";
 		}
+		StorageModel storageModel = formulaModel.getStorageModel();
+		if (storageModel != null) {
+			formulaString += "STORETO<"
+					+ storageModel.getPropertyChainModel().toString() + ">";
+		}
 		Set<BindingModel> bindings = formulaModel.getBindings();
 		for (BindingModel bindingModel : bindings) {
 			formulaString += "{" + bindingModel.getIdentifier() + "=";
 			PropertyChainModel propertyChainModel = bindingModel
 					.getPropertyChainModel();
 			if (propertyChainModel != null) {
-				formulaString += propertyChainModel.getProperty().getURI()
-						.toString();
-				boolean endReached = propertyChainModel.getChild() == null;
-				while (!endReached) {
-					propertyChainModel = propertyChainModel.getChild();
-					formulaString += "!"
-							+ propertyChainModel.getProperty().getURI()
-									.toString();
-					endReached = propertyChainModel.getChild() == null;
-				}
+				formulaString += propertyChainModel.toString();
 			}
 			formulaString += "}";
 		}
@@ -159,5 +155,10 @@ public class MAENodeAdapter {
 		FormulaModelExtractor fme = new FormulaModelExtractor(owlEditorKit);
 		formula.jjtAccept(fme, null);
 		return fme.getExtractedFormulaModel();
+	}
+
+	public static StorageModel toStorageModel(
+			DefaultMutableTreeNode storageSubTreeRoot) {
+		return new StorageModel(toPropertyChainModel(storageSubTreeRoot));
 	}
 }

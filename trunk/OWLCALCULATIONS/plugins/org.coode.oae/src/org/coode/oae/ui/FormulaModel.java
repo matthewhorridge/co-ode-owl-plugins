@@ -43,6 +43,7 @@ public class FormulaModel {
 	protected OWLDescription appliesTo = null;
 	protected Set<BindingModel> bindings = new HashSet<BindingModel>();
 	protected String formulaBody = null;
+	protected StorageModel storageModel = null;
 
 	/**
 	 * @param owlEditorKit
@@ -106,5 +107,19 @@ public class FormulaModel {
 
 	public OWLEditorKit getOwlEditorKit() {
 		return this.owlEditorKit;
+	}
+
+	/**
+	 * @param storageModel
+	 */
+	public void setStorageModel(StorageModel storageModel) {
+		this.storageModel = storageModel;
+	}
+
+	/**
+	 * @return the storageModel
+	 */
+	public StorageModel getStorageModel() {
+		return this.storageModel;
 	}
 }

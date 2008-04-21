@@ -74,4 +74,19 @@ public class PropertyChainModel {
 	public void setChild(PropertyChainModel childPropertyChainModel) {
 		this.child = childPropertyChainModel;
 	}
+
+	@Override
+	public String toString() {
+		String toReturn = "";
+		PropertyChainModel propertyChainModel = this;
+		toReturn += propertyChainModel.getProperty().getURI().toString();
+		boolean endReached = propertyChainModel.getChild() == null;
+		while (!endReached) {
+			propertyChainModel = propertyChainModel.getChild();
+			toReturn += "!"
+					+ propertyChainModel.getProperty().getURI().toString();
+			endReached = propertyChainModel.getChild() == null;
+		}
+		return toReturn;
+	}
 }
