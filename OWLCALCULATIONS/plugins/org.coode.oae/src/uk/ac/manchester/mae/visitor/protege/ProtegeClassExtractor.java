@@ -20,11 +20,27 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae;
+package uk.ac.manchester.mae.visitor.protege;
 
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.description.OWLExpressionParserException;
 import org.semanticweb.owl.model.OWLDescription;
+
+import uk.ac.manchester.mae.ArithmeticsParserVisitor;
+import uk.ac.manchester.mae.MAEAdd;
+import uk.ac.manchester.mae.MAEBigSum;
+import uk.ac.manchester.mae.MAEBinding;
+import uk.ac.manchester.mae.MAEConflictStrategy;
+import uk.ac.manchester.mae.MAEIdentifier;
+import uk.ac.manchester.mae.MAEIntNode;
+import uk.ac.manchester.mae.MAEMult;
+import uk.ac.manchester.mae.MAEPower;
+import uk.ac.manchester.mae.MAEPropertyChain;
+import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.MAEStoreTo;
+import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
+import uk.ac.manchester.mae.Node;
+import uk.ac.manchester.mae.SimpleNode;
 
 /**
  * @author Luigi Iannone
@@ -52,8 +68,8 @@ public class ProtegeClassExtractor implements ArithmeticsParserVisitor {
 	public Object visit(MAEStart node, Object data) {
 		boolean assigned = false;
 		Object toReturn = null;
-		for (int i = 0; i < node.children.length && !assigned; i++) {
-			Node child = node.children[i];
+		for (int i = 0; i < node.jjtGetNumChildren() && !assigned; i++) {
+			Node child = node.jjtGetChild(i);
 			toReturn = child.jjtAccept(this, data);
 			assigned = toReturn != null;
 		}
@@ -145,7 +161,19 @@ public class ProtegeClassExtractor implements ArithmeticsParserVisitor {
 		return toReturn;
 	}
 
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEConflictStrategy,
+	 *      java.lang.Object)
+	 */
 	public Object visit(MAEConflictStrategy node, Object data) {
+		return null;
+	}
+
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 *      java.lang.Object)
+	 */
+	public Object visit(MAEStoreTo node, Object data) {
 		return null;
 	}
 }

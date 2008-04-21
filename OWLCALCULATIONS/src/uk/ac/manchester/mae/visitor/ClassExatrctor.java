@@ -20,7 +20,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae;
+package uk.ac.manchester.mae.visitor;
 
 import java.util.Set;
 
@@ -35,6 +35,21 @@ import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
 import org.semanticweb.owl.util.OWLEntitySetProvider;
 import org.semanticweb.owl.util.ReferencedEntitySetProvider;
 import org.semanticweb.owl.util.ShortFormProvider;
+
+import uk.ac.manchester.mae.ArithmeticsParserVisitor;
+import uk.ac.manchester.mae.MAEAdd;
+import uk.ac.manchester.mae.MAEBigSum;
+import uk.ac.manchester.mae.MAEBinding;
+import uk.ac.manchester.mae.MAEConflictStrategy;
+import uk.ac.manchester.mae.MAEIdentifier;
+import uk.ac.manchester.mae.MAEIntNode;
+import uk.ac.manchester.mae.MAEMult;
+import uk.ac.manchester.mae.MAEPower;
+import uk.ac.manchester.mae.MAEPropertyChain;
+import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.MAEStoreTo;
+import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
+import uk.ac.manchester.mae.SimpleNode;
 
 /**
  * @author Luigi Iannone
@@ -165,5 +180,13 @@ public class ClassExatrctor implements ArithmeticsParserVisitor {
 			toReturn = data;
 		}
 		return toReturn;
+	}
+
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 *      java.lang.Object)
+	 */
+	public Object visit(MAEStoreTo node, Object data) {
+		return null;
 	}
 }

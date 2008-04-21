@@ -43,4 +43,13 @@ public class MAEPower extends SimpleNode {
 	public double getExp() {
 		return this.exp;
 	}
+
+	@Override
+	public String toString() {
+		String toReturn = "";
+		toReturn += this.baseIdentifier == null ? new Double(this.base)
+				: this.baseIdentifier;
+		toReturn += "^" + new Double(this.exp);
+		return toReturn;
+	}
 }

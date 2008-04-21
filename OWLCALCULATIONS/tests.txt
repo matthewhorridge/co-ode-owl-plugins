@@ -10,3 +10,4 @@ a+b;
 4^5+1;
 a /b;
 2.3^2;
+APPLIESTO <Square> 2*1;

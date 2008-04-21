@@ -33,7 +33,7 @@ import org.semanticweb.owl.util.NamespaceUtil;
 import uk.ac.manchester.mae.ArithmeticsParser;
 import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.ParseException;
-import uk.ac.manchester.mae.ProtegeClassExtractor;
+import uk.ac.manchester.mae.visitor.protege.ProtegeClassExtractor;
 
 /**
  * @author Luigi Iannone

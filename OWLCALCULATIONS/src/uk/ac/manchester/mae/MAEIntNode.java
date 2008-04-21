@@ -25,4 +25,9 @@ public class MAEIntNode extends SimpleNode {
 	public double getValue() {
 		return this.value;
 	}
+
+	@Override
+	public String toString() {
+		return new Double(this.value).toString();
+	}
 }

@@ -55,6 +55,7 @@ import uk.ac.manchester.mae.report.EvaluationReport;
 import uk.ac.manchester.mae.report.ExceptionReportWriter;
 import uk.ac.manchester.mae.report.FormulaReportWriter;
 import uk.ac.manchester.mae.report.ResultReportWriter;
+import uk.ac.manchester.mae.visitor.protege.ProtegeClassExtractor;
 
 /**
  * @author Luigi Iannone
@@ -69,7 +70,6 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 	protected Map<OWLIndividual, Map<String, List<Object>>> bindings = new HashMap<OWLIndividual, Map<String, List<Object>>>();
 	protected OWLModelManager modelManager;
 	private OWLDescription classDescription;
-	private String reasonerClassName = "org.mindswap.pellet.owlapi.Reasoner";
 	private OWLReasoner reasoner;
 	private Set<OWLIndividual> instances;
 	private Set<OWLIndividual> selectedIndividuals = new HashSet<OWLIndividual>();
@@ -91,7 +91,6 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 		this.ontologies = this.modelManager.getOntologies();
 		this.classDescription = modelManager.getOWLDataFactory().getOWLThing();
 		this.reasoner = this.modelManager.getReasoner();
-		this.reasoner.loadOntologies(this.ontologies);
 	}
 
 	/**
@@ -678,5 +677,9 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 	 */
 	public EvaluationReport getReport() {
 		return this.report;
+	}
+
+	public Object visit(MAEStoreTo node, Object data) {
+		return null;
 	}
 }

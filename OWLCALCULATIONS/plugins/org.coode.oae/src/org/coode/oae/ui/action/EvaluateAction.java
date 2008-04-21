@@ -85,7 +85,7 @@ public class EvaluateAction extends ProtegeOWLAction implements ReportVisitor {
 		ProtegeEvaluator protegeEvaluator = null;
 		try {
 			protegeEvaluator = new ProtegeEvaluator(this.getOWLModelManager());
-			Object evaluationResult = protegeEvaluator.evaluate(true);
+			protegeEvaluator.evaluate(true);
 			this.showReport(protegeEvaluator.getReport());
 		} catch (OWLReasonerException e) {
 			JOptionPane
@@ -143,12 +143,11 @@ public class EvaluateAction extends ProtegeOWLAction implements ReportVisitor {
 		return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see uk.ac.manchester.mae.report.ReportVisitor#visitFormulaEvaluationReport(uk.ac.manchester.mae.report.FormulaEvaluationReport,
 	 *      java.lang.Object)
 	 */
+	@SuppressWarnings("unchecked")
 	public Object visitFormulaEvaluationReport(
 			FormulaEvaluationReport formulaEvaluationReport, Object data) {
 		MutableTreeNode formulaNode = new DefaultMutableTreeNode(

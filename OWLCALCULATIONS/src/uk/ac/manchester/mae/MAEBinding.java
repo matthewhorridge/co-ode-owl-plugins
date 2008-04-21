@@ -25,4 +25,14 @@ public class MAEBinding extends SimpleNode {
 	public String getIdentifier() {
 		return this.identifier;
 	}
+
+	@Override
+	public String toString() {
+		String toReturn = "{";
+		toReturn += this.getIdentifier() + "=";
+		for (Node node : this.children) {
+			toReturn += node.toString();
+		}
+		return toReturn + "}";
+	}
 }

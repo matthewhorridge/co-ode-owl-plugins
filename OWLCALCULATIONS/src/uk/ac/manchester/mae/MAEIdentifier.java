@@ -25,4 +25,9 @@ public class MAEIdentifier extends SimpleNode {
 	public String getIdentifierName() {
 		return this.identifierName;
 	}
+
+	@Override
+	public String toString() {
+		return this.identifierName;
+	}
 }

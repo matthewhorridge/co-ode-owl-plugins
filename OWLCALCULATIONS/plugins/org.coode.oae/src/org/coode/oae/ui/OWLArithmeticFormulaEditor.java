@@ -70,16 +70,18 @@ import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObjectProperty;
 
 import uk.ac.manchester.mae.ArithmeticsParser;
-import uk.ac.manchester.mae.BindingExtractor;
 import uk.ac.manchester.mae.ConflictStrategy;
-import uk.ac.manchester.mae.ConflictStrategyExtractor;
 import uk.ac.manchester.mae.ExceptionStrategy;
 import uk.ac.manchester.mae.MAEBinding;
+import uk.ac.manchester.mae.MAEPropertyChain;
 import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.OverriddenStrategy;
 import uk.ac.manchester.mae.OverridingStrategy;
 import uk.ac.manchester.mae.ParseException;
-import uk.ac.manchester.mae.ProtegeClassExtractor;
+import uk.ac.manchester.mae.visitor.BindingExtractor;
+import uk.ac.manchester.mae.visitor.ConflictStrategyExtractor;
+import uk.ac.manchester.mae.visitor.StorageExtractor;
+import uk.ac.manchester.mae.visitor.protege.ProtegeClassExtractor;
 
 /**
  * @author Luigi Iannone
@@ -98,6 +100,7 @@ public class OWLArithmeticFormulaEditor extends
 	private static final String OVERRIDING_BUTTON_TEXT = "OVERRIDING";
 	private static final String OVERRIDDEN_BUTTON_TEXT = "OVERRIDDEN";
 	private static final String EXCEPTION_BUTTON_TEXT = "EXCEPTION";
+	private static final String STORE_TREE_ROOT_NAME = "STORE";
 	private OWLEditorKit owlEditorKit;
 	private JLabel appliesToLabel = new JLabel();
 	private JButton editAppliesToButton = new JButton(new ImageIcon(
@@ -108,7 +111,7 @@ public class OWLArithmeticFormulaEditor extends
 	private FormulaModel formulaModel;
 	private OWLDescription owlDescription;
 	private boolean canEditAppliesTo;
-	private JTree bindingTree;
+	private JTree bindingTree, storeTree;
 	private Map<ConflictStrategy, JRadioButton> conflictStrategyRadioButtonMap = new HashMap<ConflictStrategy, JRadioButton>();
 	private Map<JRadioButton, ConflictStrategy> radioButtonConflictStrategyMap = new HashMap<JRadioButton, ConflictStrategy>();
 	private JLabel arithmeticFormulaLabel = new JLabel(
@@ -120,16 +123,24 @@ public class OWLArithmeticFormulaEditor extends
 	private JRadioButton exceptionButton;
 	private DefaultTreeModel bindingTreeModel = new DefaultTreeModel(
 			new DefaultMutableTreeNode(BINDING_TREE_ROOT_NAME));
-	private JButton deleteButton = new JButton(new ImageIcon(
+	private JButton deleteBindingButton = new JButton(new ImageIcon(
 			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
 					"delete.png")));
-	private JButton addButton = new JButton(new ImageIcon(
+	private JButton addBindingButton = new JButton(new ImageIcon(
 			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
 					"add.png")));
-	private JButton addDataPropertyButton = new JButton(new ImageIcon(
+	private JButton addDataPropertyBindingButton = new JButton(new ImageIcon(
 			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
 					"property.data.add.png")));
-	private JButton addObjectPropertyButton = new JButton(new ImageIcon(
+	private JButton addObjectPropertyBindingButton = new JButton(new ImageIcon(
+			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
+					"property.object.add.png")));
+	private DefaultTreeModel storeTreeModel = new DefaultTreeModel(
+			new DefaultMutableTreeNode(STORE_TREE_ROOT_NAME));
+	private JButton deleteStoreButton = new JButton(new ImageIcon(
+			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
+					"delete.png")));
+	private JButton addObjectPropertyStoreButton = new JButton(new ImageIcon(
 			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
 					"property.object.add.png")));
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
@@ -165,6 +176,7 @@ public class OWLArithmeticFormulaEditor extends
 		this.setupConflictButtons();
 		this.setupAppliesTo();
 		this.setupBindings();
+		this.setupStorage();
 		this.setupFormulaBody();
 		this.addStatusChangedListener(this);
 	}
@@ -238,9 +250,66 @@ public class OWLArithmeticFormulaEditor extends
 		}
 	}
 
-	/**
-	 * 
-	 */
+	private void setupStorage() {
+		MutableTreeNode root = new DefaultMutableTreeNode(
+				OWLArithmeticFormulaEditor.STORE_TREE_ROOT_NAME);
+		this.storeTreeModel = new DefaultTreeModel(root);
+		this.storeTree.addTreeSelectionListener(new TreeSelectionListener() {
+			public void valueChanged(TreeSelectionEvent e) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.storeTree
+						.getLastSelectedPathComponent();
+				if (node != null) {
+					OWLArithmeticFormulaEditor.this
+							.decideBindingButtonEnabling(node);
+				}
+			}
+		});
+		if (this.formula != null) {
+			StorageExtractor bindingExtractor = new StorageExtractor();
+			this.formula.jjtAccept(bindingExtractor, null);
+			MAEPropertyChain storeToNode = bindingExtractor
+					.getExtractedStorage();
+			if (storeToNode != null) {
+				MutableTreeNode storageNode = MAENodeAdapter.toTreeNode(
+						storeToNode, this.owlEditorKit.getModelManager());
+				this.storeTreeModel.insertNodeInto(storageNode, root, 0);
+				this.storeTree.setModel(this.bindingTreeModel);
+				this.storeTree.setCellRenderer(new BindingTreeCellRenderer(
+						this.owlEditorKit));
+				this.storeTree.revalidate();
+			}
+		}
+		this.storeTreeModel.addTreeModelListener(new TreeModelListener() {
+			private void updateFormulaModel() {
+				DefaultMutableTreeNode root = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.storeTreeModel
+						.getRoot();
+				DefaultMutableTreeNode storageSubTreeRoot = (DefaultMutableTreeNode) root
+						.getChildAt(0);
+				StorageModel storageModel = MAENodeAdapter
+						.toStorageModel(storageSubTreeRoot);
+				OWLArithmeticFormulaEditor.this.formulaModel
+						.setStorageModel(storageModel);
+				OWLArithmeticFormulaEditor.this.handleVerifyEditorContents();
+			}
+
+			public void treeNodesChanged(TreeModelEvent e) {
+				this.updateFormulaModel();
+			}
+
+			public void treeNodesInserted(TreeModelEvent e) {
+				this.updateFormulaModel();
+			}
+
+			public void treeNodesRemoved(TreeModelEvent e) {
+				this.updateFormulaModel();
+			}
+
+			public void treeStructureChanged(TreeModelEvent e) {
+				this.updateFormulaModel();
+			}
+		});
+	}
+
 	/**
 	 * 
 	 */
@@ -253,7 +322,8 @@ public class OWLArithmeticFormulaEditor extends
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.bindingTree
 						.getLastSelectedPathComponent();
 				if (node != null) {
-					OWLArithmeticFormulaEditor.this.decideButtonEnabling(node);
+					OWLArithmeticFormulaEditor.this
+							.decideBindingButtonEnabling(node);
 				}
 			}
 		});
@@ -308,16 +378,24 @@ public class OWLArithmeticFormulaEditor extends
 		});
 	}
 
-	protected void decideButtonEnabling(DefaultMutableTreeNode node) {
+	protected void decideBindingButtonEnabling(DefaultMutableTreeNode node) {
 		Object userObject = node.getUserObject();
-		this.addObjectPropertyButton
+		this.addObjectPropertyBindingButton
 				.setEnabled(!(userObject instanceof OWLDataProperty)
 						&& node.isLeaf() && !node.isRoot());
-		this.addDataPropertyButton
+		this.addDataPropertyBindingButton
 				.setEnabled(!(userObject instanceof OWLDataProperty)
 						&& node.isLeaf() && !node.isRoot());
-		this.deleteButton.setEnabled(node.isLeaf() && !node.isRoot());
-		this.addButton.setEnabled(node.isRoot());
+		this.deleteBindingButton.setEnabled(node.isLeaf() && !node.isRoot());
+		this.addBindingButton.setEnabled(node.isRoot());
+	}
+
+	protected void decideStoreButtonEnabling(DefaultMutableTreeNode node) {
+		Object userObject = node.getUserObject();
+		this.addObjectPropertyStoreButton
+				.setEnabled(!(userObject instanceof OWLDataProperty)
+						&& node.isLeaf() && !node.isRoot());
+		this.deleteStoreButton.setEnabled(node.isLeaf() && !node.isRoot());
 	}
 
 	/**
@@ -326,22 +404,37 @@ public class OWLArithmeticFormulaEditor extends
 	private void drawBindingSection() {
 		JPanel bindingPanel = new JPanel(new BorderLayout());
 		bindingPanel.setBorder(LineBorder.createBlackLineBorder());
-		this.addButton.setEnabled(false);
-		this.addDataPropertyButton.setEnabled(false);
-		this.addObjectPropertyButton.setEnabled(false);
-		this.deleteButton.setEnabled(false);
+		this.addBindingButton.setEnabled(false);
+		this.addDataPropertyBindingButton.setEnabled(false);
+		this.addObjectPropertyBindingButton.setEnabled(false);
+		this.deleteBindingButton.setEnabled(false);
 		JToolBar toolBar = new JToolBar();
-		toolBar.add(this.addButton);
-		toolBar.add(this.addDataPropertyButton);
-		toolBar.add(this.addObjectPropertyButton);
-		toolBar.add(this.deleteButton);
+		toolBar.add(this.addBindingButton);
+		toolBar.add(this.addDataPropertyBindingButton);
+		toolBar.add(this.addObjectPropertyBindingButton);
+		toolBar.add(this.deleteBindingButton);
 		toolBar.setBorder(null);
 		toolBar.setBorderPainted(false);
 		bindingPanel.add(toolBar, BorderLayout.NORTH);
 		this.bindingTree = new JTree(this.bindingTreeModel);
 		JScrollPane bindingTreePane = new JScrollPane(this.bindingTree);
 		bindingPanel.add(bindingTreePane, BorderLayout.CENTER);
+		// store
+		JPanel storePanel = new JPanel(new BorderLayout());
+		storePanel.setBorder(LineBorder.createBlackLineBorder());
+		this.addObjectPropertyStoreButton.setEnabled(false);
+		this.deleteStoreButton.setEnabled(false);
+		JToolBar storeToolBar = new JToolBar();
+		storeToolBar.add(this.addObjectPropertyStoreButton);
+		storeToolBar.add(this.deleteStoreButton);
+		storeToolBar.setBorder(null);
+		storeToolBar.setBorderPainted(false);
+		storePanel.add(storeToolBar, BorderLayout.NORTH);
+		this.storeTree = new JTree(this.storeTreeModel);
+		JScrollPane storeTreePane = new JScrollPane(this.storeTree);
+		storePanel.add(storeTreePane, BorderLayout.CENTER);
 		this.mainPanel.add(bindingPanel);
+		this.mainPanel.add(storePanel);
 	}
 
 	/**
@@ -380,24 +473,33 @@ public class OWLArithmeticFormulaEditor extends
 	}
 
 	private void addButtonActions() {
-		this.deleteButton.addActionListener(new ActionListener() {
+		this.addBindingButtons();
+		this.addStorageButtons();
+	}
+
+	/**
+	 * 
+	 */
+	private void addBindingButtons() {
+		this.deleteBindingButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.bindingTree
 						.getLastSelectedPathComponent();
 				if (node != null) {
 					OWLArithmeticFormulaEditor.this.bindingTreeModel
 							.removeNodeFromParent(node);
-					OWLArithmeticFormulaEditor.this.deleteButton
+					OWLArithmeticFormulaEditor.this.deleteBindingButton
 							.setEnabled(false);
-					OWLArithmeticFormulaEditor.this.addButton.setEnabled(false);
-					OWLArithmeticFormulaEditor.this.addDataPropertyButton
+					OWLArithmeticFormulaEditor.this.addBindingButton
 							.setEnabled(false);
-					OWLArithmeticFormulaEditor.this.addObjectPropertyButton
+					OWLArithmeticFormulaEditor.this.addDataPropertyBindingButton
+							.setEnabled(false);
+					OWLArithmeticFormulaEditor.this.addObjectPropertyBindingButton
 							.setEnabled(false);
 				}
 			}
 		});
-		this.addButton.addActionListener(new ActionListener() {
+		this.addBindingButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String newName = JOptionPane.showInputDialog(
 						OWLArithmeticFormulaEditor.this.mainPanel, null,
@@ -414,50 +516,95 @@ public class OWLArithmeticFormulaEditor extends
 				}
 			}
 		});
-		this.addDataPropertyButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				OWLModelManagerTree<OWLDataProperty> dataPropertyTree = new OWLModelManagerTree<OWLDataProperty>(
-						OWLArithmeticFormulaEditor.this.owlEditorKit,
-						OWLArithmeticFormulaEditor.this.owlEditorKit
-								.getOWLModelManager()
-								.getOWLDataPropertyHierarchyProvider());
-				JOptionPane.showMessageDialog(
-						OWLArithmeticFormulaEditor.this.mainPanel,
-						dataPropertyTree);
-				Object selectedProperty = ((DefaultMutableTreeNode) dataPropertyTree
-						.getLastSelectedPathComponent()).getUserObject();
-				Object currentNode = OWLArithmeticFormulaEditor.this.bindingTree
+		this.addDataPropertyBindingButton
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						OWLModelManagerTree<OWLDataProperty> dataPropertyTree = new OWLModelManagerTree<OWLDataProperty>(
+								OWLArithmeticFormulaEditor.this.owlEditorKit,
+								OWLArithmeticFormulaEditor.this.owlEditorKit
+										.getOWLModelManager()
+										.getOWLDataPropertyHierarchyProvider());
+						JOptionPane.showMessageDialog(
+								OWLArithmeticFormulaEditor.this.mainPanel,
+								dataPropertyTree);
+						Object selectedProperty = ((DefaultMutableTreeNode) dataPropertyTree
+								.getLastSelectedPathComponent())
+								.getUserObject();
+						Object currentNode = OWLArithmeticFormulaEditor.this.bindingTree
+								.getLastSelectedPathComponent();
+						if (selectedProperty != null && currentNode != null) {
+							OWLArithmeticFormulaEditor.this.bindingTreeModel
+									.insertNodeInto(new DefaultMutableTreeNode(
+											selectedProperty),
+											(MutableTreeNode) currentNode, 0);
+						}
+					}
+				});
+		this.addObjectPropertyBindingButton
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						OWLModelManagerTree<OWLObjectProperty> dataPropertyTree = new OWLModelManagerTree<OWLObjectProperty>(
+								OWLArithmeticFormulaEditor.this.owlEditorKit,
+								OWLArithmeticFormulaEditor.this.owlEditorKit
+										.getOWLModelManager()
+										.getOWLObjectPropertyHierarchyProvider());
+						JOptionPane.showMessageDialog(
+								OWLArithmeticFormulaEditor.this.mainPanel,
+								dataPropertyTree);
+						Object selectedProperty = ((DefaultMutableTreeNode) dataPropertyTree
+								.getLastSelectedPathComponent())
+								.getUserObject();
+						Object currentNode = OWLArithmeticFormulaEditor.this.bindingTree
+								.getLastSelectedPathComponent();
+						if (selectedProperty != null && currentNode != null) {
+							OWLArithmeticFormulaEditor.this.bindingTreeModel
+									.insertNodeInto(new DefaultMutableTreeNode(
+											selectedProperty),
+											(MutableTreeNode) currentNode, 0);
+						}
+					}
+				});
+	}
+
+	private void addStorageButtons() {
+		this.deleteStoreButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ae) {
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.storeTree
 						.getLastSelectedPathComponent();
-				if (selectedProperty != null && currentNode != null) {
-					OWLArithmeticFormulaEditor.this.bindingTreeModel
-							.insertNodeInto(new DefaultMutableTreeNode(
-									selectedProperty),
-									(MutableTreeNode) currentNode, 0);
+				if (node != null) {
+					OWLArithmeticFormulaEditor.this.storeTreeModel
+							.removeNodeFromParent(node);
+					OWLArithmeticFormulaEditor.this.deleteStoreButton
+							.setEnabled(false);
+					OWLArithmeticFormulaEditor.this.addObjectPropertyStoreButton
+							.setEnabled(false);
 				}
 			}
 		});
-		this.addObjectPropertyButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				OWLModelManagerTree<OWLObjectProperty> dataPropertyTree = new OWLModelManagerTree<OWLObjectProperty>(
-						OWLArithmeticFormulaEditor.this.owlEditorKit,
-						OWLArithmeticFormulaEditor.this.owlEditorKit
-								.getOWLModelManager()
-								.getOWLObjectPropertyHierarchyProvider());
-				JOptionPane.showMessageDialog(
-						OWLArithmeticFormulaEditor.this.mainPanel,
-						dataPropertyTree);
-				Object selectedProperty = ((DefaultMutableTreeNode) dataPropertyTree
-						.getLastSelectedPathComponent()).getUserObject();
-				Object currentNode = OWLArithmeticFormulaEditor.this.bindingTree
-						.getLastSelectedPathComponent();
-				if (selectedProperty != null && currentNode != null) {
-					OWLArithmeticFormulaEditor.this.bindingTreeModel
-							.insertNodeInto(new DefaultMutableTreeNode(
-									selectedProperty),
-									(MutableTreeNode) currentNode, 0);
-				}
-			}
-		});
+		this.addObjectPropertyStoreButton
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						OWLModelManagerTree<OWLObjectProperty> dataPropertyTree = new OWLModelManagerTree<OWLObjectProperty>(
+								OWLArithmeticFormulaEditor.this.owlEditorKit,
+								OWLArithmeticFormulaEditor.this.owlEditorKit
+										.getOWLModelManager()
+										.getOWLObjectPropertyHierarchyProvider());
+						JOptionPane.showMessageDialog(
+								OWLArithmeticFormulaEditor.this.mainPanel,
+								dataPropertyTree);
+						Object selectedProperty = ((DefaultMutableTreeNode) dataPropertyTree
+								.getLastSelectedPathComponent())
+								.getUserObject();
+						Object currentNode = OWLArithmeticFormulaEditor.this.storeTree
+								.getLastSelectedPathComponent();
+						if (selectedProperty != null && currentNode != null) {
+							OWLArithmeticFormulaEditor.this.storeTreeModel
+									.insertNodeInto(new DefaultMutableTreeNode(
+											selectedProperty),
+											(MutableTreeNode) currentNode, 0);
+						}
+					}
+				});
 	}
 
 	/**
@@ -588,7 +735,7 @@ public class OWLArithmeticFormulaEditor extends
 	private void handleVerifyEditorContents() {
 		if (!this.listeners.isEmpty()) {
 			boolean validated = this.validateBindings()
-					&& this.validateFormulaBody();
+					&& this.validateStorage() && this.validateFormulaBody();
 			for (InputVerificationStatusChangedListener l : this.listeners) {
 				l.verifiedStatusChanged(validated);
 			}
@@ -600,6 +747,25 @@ public class OWLArithmeticFormulaEditor extends
 				}
 			}
 		}
+	}
+
+	private boolean validateStorage() {
+		boolean toReturn = false;
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.storeTreeModel
+				.getRoot();
+		toReturn = root.isLeaf();
+		if (!toReturn) {
+			int variableCount = root.getChildCount();
+			for (int i = 0; i < variableCount; i++) {
+				DefaultMutableTreeNode variableNode = (DefaultMutableTreeNode) root
+						.getChildAt(i);
+				toReturn = variableNode.getChildCount() == 1
+						&& this
+								.validateStoragePropertyChain((DefaultMutableTreeNode) variableNode
+										.getChildAt(0));
+			}
+		}
+		return toReturn;
 	}
 
 	private boolean validateFormulaBody() {
@@ -644,6 +810,17 @@ public class OWLArithmeticFormulaEditor extends
 				&& propertychainNode.getChildCount() == 1
 				&& this
 						.validatePropertyChain((DefaultMutableTreeNode) propertychainNode
+								.getChildAt(0));
+	}
+
+	private boolean validateStoragePropertyChain(
+			DefaultMutableTreeNode propertychainNode) {
+		return propertychainNode.isLeaf()
+				&& propertychainNode.getUserObject() instanceof OWLObjectProperty
+				|| !propertychainNode.isLeaf()
+				&& propertychainNode.getChildCount() == 1
+				&& this
+						.validateStoragePropertyChain((DefaultMutableTreeNode) propertychainNode
 								.getChildAt(0));
 	}
 

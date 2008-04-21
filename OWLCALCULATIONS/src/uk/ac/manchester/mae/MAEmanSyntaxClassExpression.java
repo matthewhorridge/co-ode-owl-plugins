@@ -2,7 +2,7 @@
 package uk.ac.manchester.mae;
 
 public class MAEmanSyntaxClassExpression extends SimpleNode {
-	private String content;
+	private String content = "";
 
 	public MAEmanSyntaxClassExpression(int id) {
 		super(id);
@@ -24,5 +24,10 @@ public class MAEmanSyntaxClassExpression extends SimpleNode {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	@Override
+	public String toString() {
+		return "APPLIESTO <" + this.content + ">";
 	}
 }

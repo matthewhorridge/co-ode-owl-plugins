@@ -1,5 +1,5 @@
 <?xml version="1.0"?> 
-<project name="lintroll plugin" default="bundle" basedir="/Users/luigi/Documents/workspace/OWLARiTHMETICS">
+<project name="lintroll plugin" default="bundle" basedir="/Users/luigi/Documents/workspace/OWLCALCULATIONS">
   
   
   <property name="classes" location="${basedir}/bin"/>

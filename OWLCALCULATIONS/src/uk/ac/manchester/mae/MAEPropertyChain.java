@@ -4,7 +4,7 @@ package uk.ac.manchester.mae;
 public class MAEPropertyChain extends SimpleNode {
 	private String propertyName;
 	private int index = -1;
-	private boolean isEnd;
+	private boolean isEnd = true;
 
 	public MAEPropertyChain(int id) {
 		super(id);
@@ -42,5 +42,14 @@ public class MAEPropertyChain extends SimpleNode {
 
 	public boolean isEnd() {
 		return this.isEnd;
+	}
+
+	@Override
+	public String toString() {
+		String toReturn = this.propertyName;
+		if (this.isEnd) {
+			toReturn += "!" + this.children[0].toString();
+		}
+		return toReturn;
 	}
 }

@@ -157,12 +157,12 @@
 
     <owl:DatatypeProperty rdf:about="#hasPerimeter">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <formula:polygonPerimeter rdf:datatype="&xsd;string"
+            >$OVERRIDING$APPLIESTO &lt;Polygon and not Circle&gt;{sideLength=http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasSide}-&gt;SUM(sideLength);</formula:polygonPerimeter>
         <formula:squarePerimeter
             >APPLIESTO &lt;Square&gt;{sideLength=http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasSide!http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasLength}-&gt; 4*sideLength;</formula:squarePerimeter>
         <formula:circumference
             >$OVERRIDING$ APPLIESTO &lt;Circle&gt;{r=http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasRadius!http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasLength}-&gt; 2*3.14*r;</formula:circumference>
-        <formula:polygonPerimeter
-            >$OVERRIDING$ APPLIESTO &lt;Polygon&gt;{sideLength=http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasSide!http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasLength}-&gt; SUM(sideLength);</formula:polygonPerimeter>
         <rdfs:domain rdf:resource="#Polygon"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
@@ -185,6 +185,7 @@
     <owl:Class rdf:about="#BiDimesionalGeometricEntity">
         <rdfs:subClassOf rdf:resource="#GeometricEntity"/>
         <owl:disjointWith rdf:resource="#MonoDimensionalGeometricEntity"/>
+        <owl:disjointWith rdf:resource="#TriDimensionalGeometricEntity"/>
     </owl:Class>
     
 
@@ -199,6 +200,8 @@
                 <owl:someValuesFrom rdf:resource="#Segment"/>
             </owl:Restriction>
         </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="#Rectagle"/>
+        <owl:disjointWith rdf:resource="#Triangle"/>
     </owl:Class>
     
 
@@ -225,6 +228,7 @@
 
     <owl:Class rdf:about="#MonoDimensionalGeometricEntity">
         <rdfs:subClassOf rdf:resource="#GeometricEntity"/>
+        <owl:disjointWith rdf:resource="#TriDimensionalGeometricEntity"/>
     </owl:Class>
     
 
@@ -233,6 +237,7 @@
 
     <owl:Class rdf:about="#Point">
         <rdfs:subClassOf rdf:resource="#MonoDimensionalGeometricEntity"/>
+        <owl:disjointWith rdf:resource="#Segment"/>
     </owl:Class>
     
 
@@ -278,6 +283,7 @@
                 <owl:cardinality rdf:datatype="&xsd;nonNegativeInteger">4</owl:cardinality>
             </owl:Restriction>
         </rdfs:subClassOf>
+        <owl:disjointWith rdf:resource="#Triangle"/>
     </owl:Class>
     
 
@@ -292,7 +298,6 @@
                 <owl:someValuesFrom rdf:resource="&xsd;double"/>
             </owl:Restriction>
         </rdfs:subClassOf>
-        <owl:disjointWith rdf:resource="#Point"/>
     </owl:Class>
     
 
@@ -310,8 +315,6 @@
 
     <owl:Class rdf:about="#TriDimensionalGeometricEntity">
         <rdfs:subClassOf rdf:resource="#GeometricEntity"/>
-        <owl:disjointWith rdf:resource="#BiDimesionalGeometricEntity"/>
-        <owl:disjointWith rdf:resource="#MonoDimensionalGeometricEntity"/>
     </owl:Class>
     
 
@@ -351,8 +354,6 @@
     <!-- http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#aCircle -->
 
     <Circle rdf:about="#aCircle">
-        <hasArea rdf:datatype="&xsd;double">12.56</hasArea>
-        <hasPerimeter rdf:datatype="&xsd;double">6.28</hasPerimeter>
         <hasRadius rdf:resource="#aSide"/>
     </Circle>
     
@@ -377,8 +378,6 @@
     <!-- http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#aSquare -->
 
     <Square rdf:about="#aSquare">
-        <hasArea rdf:datatype="&xsd;double">16.0</hasArea>
-        <hasPerimeter rdf:datatype="&xsd;double">16.0</hasPerimeter>
         <hasSide rdf:resource="#aFourLongSide"/>
     </Square>
     
@@ -405,7 +404,6 @@
     <!-- http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#anotherCircle -->
 
     <rdf:Description rdf:about="#anotherCircle">
-        <hasArea rdf:datatype="&xsd;double">200.96</hasArea>
         <hasRadius rdf:resource="#aFourLongSide"/>
     </rdf:Description>
     
@@ -422,7 +420,6 @@
     <!-- http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#anotherTriangle -->
 
     <Triangle rdf:about="#anotherTriangle">
-        <hasPerimeter rdf:datatype="&xsd;double">6.0</hasPerimeter>
         <hasSide rdf:resource="#aFourLongSide"/>
         <hasSide rdf:resource="#aSide"/>
         <hasSide rdf:resource="#anotherSide"/>

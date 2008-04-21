@@ -65,6 +65,8 @@ import org.semanticweb.owl.util.ReferencedEntitySetProvider;
 import org.semanticweb.owl.util.ShortFormProvider;
 import org.semanticweb.owl.vocab.XSDVocabulary;
 
+import uk.ac.manchester.mae.visitor.ClassExatrctor;
+
 /**
  * @author Luigi Iannone
  * 
@@ -782,5 +784,13 @@ public class Evaluator implements ArithmeticsParserVisitor {
 		this.conflictStrategyMap.put((MAEStart) node.jjtGetParent(),
 				conflictStrategy);
 		return conflictStrategy;
+	}
+
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 *      java.lang.Object)
+	 */
+	public Object visit(MAEStoreTo node, Object data) {
+		return null;
 	}
 }

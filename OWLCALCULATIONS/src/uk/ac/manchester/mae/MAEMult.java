@@ -34,4 +34,28 @@ public class MAEMult extends SimpleNode {
 	public boolean isPercentage() {
 		return this.isPercentage;
 	}
+
+	@Override
+	public String toString() {
+		String toReturn = "";
+		String operator;
+		if (this.isMultiplication) {
+			operator = " * ";
+		} else if (this.isPercentage) {
+			operator = " % ";
+		} else {
+			operator = " / ";
+		}
+		boolean isFirst = true;
+		for (Node node : this.children) {
+			if (!isFirst) {
+				toReturn += operator;
+			}
+			isFirst = false;
+			toReturn += node instanceof MAEIntNode
+					|| node instanceof MAEIdentifier ? node.toString() : "("
+					+ node.toString() + ")";
+		}
+		return toReturn;
+	}
 }

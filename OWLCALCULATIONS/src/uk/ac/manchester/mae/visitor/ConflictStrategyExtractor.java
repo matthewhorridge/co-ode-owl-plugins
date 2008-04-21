@@ -20,7 +20,25 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae;
+package uk.ac.manchester.mae.visitor;
+
+import uk.ac.manchester.mae.ArithmeticsParserVisitor;
+import uk.ac.manchester.mae.ConflictStrategy;
+import uk.ac.manchester.mae.ConflictStrategyFactory;
+import uk.ac.manchester.mae.MAEAdd;
+import uk.ac.manchester.mae.MAEBigSum;
+import uk.ac.manchester.mae.MAEBinding;
+import uk.ac.manchester.mae.MAEConflictStrategy;
+import uk.ac.manchester.mae.MAEIdentifier;
+import uk.ac.manchester.mae.MAEIntNode;
+import uk.ac.manchester.mae.MAEMult;
+import uk.ac.manchester.mae.MAEPower;
+import uk.ac.manchester.mae.MAEPropertyChain;
+import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.MAEStoreTo;
+import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
+import uk.ac.manchester.mae.OverriddenStrategy;
+import uk.ac.manchester.mae.SimpleNode;
 
 /**
  * @author Luigi Iannone
@@ -29,13 +47,7 @@ package uk.ac.manchester.mae;
  * Bio-Health Informatics Group<br>
  * Apr 7, 2008
  */
-public class BindingPropertyChainExtractor implements ArithmeticsParserVisitor {
-	private MAEBinding binding;
-
-	public BindingPropertyChainExtractor(MAEBinding binding) {
-		this.binding = binding;
-	}
-
+public class ConflictStrategyExtractor implements ArithmeticsParserVisitor {
 	/**
 	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.SimpleNode,
 	 *      java.lang.Object)
@@ -49,15 +61,13 @@ public class BindingPropertyChainExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStart node, Object data) {
-		MAEPropertyChain toReturn = null;
 		boolean found = false;
-		for (int i = 0; !found && i < node.children.length; i++) {
-			Node child = node.children[i];
-			if (child.equals(this.binding)) {
-				toReturn = (MAEPropertyChain) child.jjtAccept(this, null);
-			}
+		Object visitResult = null;
+		for (int i = 0; !found && i < node.jjtGetNumChildren(); i++) {
+			visitResult = node.jjtGetChild(i).jjtAccept(this, null);
+			found = visitResult != null;
 		}
-		return toReturn;
+		return visitResult;
 	}
 
 	/**
@@ -65,7 +75,10 @@ public class BindingPropertyChainExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEConflictStrategy node, Object data) {
-		return null;
+		ConflictStrategy conflictStrategy = ConflictStrategyFactory
+				.getStrategy(node.getStrategyName());
+		return conflictStrategy == null ? OverriddenStrategy.getInstance()
+				: conflictStrategy;
 	}
 
 	/**
@@ -81,14 +94,7 @@ public class BindingPropertyChainExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEBinding node, Object data) {
-		MAEPropertyChain toReturn = null;
-		boolean found = false;
-		for (int i = 0; !found && i < node.children.length; i++) {
-			Node child = node.children[i];
-			toReturn = (MAEPropertyChain) child.jjtAccept(this, data);
-			found = toReturn != null;
-		}
-		return toReturn;
+		return null;
 	}
 
 	/**
@@ -96,7 +102,7 @@ public class BindingPropertyChainExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEPropertyChain node, Object data) {
-		return node.parent.equals(this.binding) ? node : null;
+		return null;
 	}
 
 	/**
@@ -144,6 +150,14 @@ public class BindingPropertyChainExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEBigSum node, Object data) {
+		return null;
+	}
+
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 *      java.lang.Object)
+	 */
+	public Object visit(MAEStoreTo node, Object data) {
 		return null;
 	}
 }
