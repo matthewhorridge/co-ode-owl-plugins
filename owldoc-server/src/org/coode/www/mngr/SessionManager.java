@@ -211,9 +211,11 @@ public class SessionManager {
     }
 
     public synchronized static void closeSession(HttpSession mySession) {
-        SessionID id = (SessionID) mySession.getAttribute(ID);
-        cleanupSession(id);
-        mySession.invalidate();
+        if (mySession != null){
+            SessionID id = (SessionID) mySession.getAttribute(ID);
+            cleanupSession(id);
+            mySession.invalidate();
+        }
     }
 
     public synchronized static void cleanupSession(SessionID id) {
