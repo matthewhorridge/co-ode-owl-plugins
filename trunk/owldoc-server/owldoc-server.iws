@@ -30,33 +30,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/exception/InvalidRequestException.java" afterPath="$PROJECT_DIR$/src/org/coode/www/exception/InvalidRequestException.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/mngr/SessionManager.java" afterPath="$PROJECT_DIR$/src/org/coode/www/mngr/SessionManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/test/OfflineTestCase.java" afterPath="$PROJECT_DIR$/src/org/coode/www/test/OfflineTestCase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/servlet/AbstractOntologyServerServlet.java" afterPath="$PROJECT_DIR$/src/org/coode/www/servlet/AbstractOntologyServerServlet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/servlet/Find.java" afterPath="$PROJECT_DIR$/src/org/coode/www/servlet/Find.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/owlapi-bin.jar" afterPath="$PROJECT_DIR$/lib/owlapi-bin.jar" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/lib/FaCT++OWLAPI-v1.0.0.jar" afterPath="" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/native/xerces-c_2_7.dll" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/servlet/ManageOntologies.java" afterPath="$PROJECT_DIR$/src/org/coode/www/servlet/ManageOntologies.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/log4j.properties" afterPath="$PROJECT_DIR$/src/log4j.properties" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/native/libFaCTPlusPlusJNI.so" afterPath="$PROJECT_DIR$/lib/native/libFaCTPlusPlusJNI.so" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/doclet/BlurbDoclet.java" afterPath="$PROJECT_DIR$/src/org/coode/www/doclet/BlurbDoclet.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/docs/images/options.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/docs/images/frag-rendering.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/owlmanager.jar" afterPath="$PROJECT_DIR$/lib/owlmanager.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/QueryType.java" afterPath="$PROJECT_DIR$/src/org/coode/www/QueryType.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/owldoc-server.iml" afterPath="$PROJECT_DIR$/owldoc-server.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/docs/images/load.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/owldoc-server.iws" afterPath="$PROJECT_DIR$/owldoc-server.iws" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/version.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/native/FaCTPlusPlusJNI.dll" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/owldoc-server.ipr" afterPath="$PROJECT_DIR$/owldoc-server.ipr" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/doclet/OntologyMappingsTableDoclet.java" afterPath="$PROJECT_DIR$/src/org/coode/www/doclet/OntologyMappingsTableDoclet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/servlet/Summary.java" afterPath="$PROJECT_DIR$/src/org/coode/www/servlet/Summary.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/owlhtml.jar" afterPath="$PROJECT_DIR$/lib/owlhtml.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/native/libFaCTPlusPlusJNI.jnilib" afterPath="$PROJECT_DIR$/lib/native/libFaCTPlusPlusJNI.jnilib" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/doclet/AutocompleteDoclet.java" afterPath="$PROJECT_DIR$/src/org/coode/www/doclet/AutocompleteDoclet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/native/FaCT++Server" afterPath="$PROJECT_DIR$/lib/native/FaCT++Server" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/doclet/SimpleQueryFormDoclet.java" afterPath="$PROJECT_DIR$/src/org/coode/www/doclet/SimpleQueryFormDoclet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/doclet/ConjunctDoclet.java" afterPath="$PROJECT_DIR$/src/org/coode/www/doclet/ConjunctDoclet.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/FaCTpp-OWLAPI-v1.1.11.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/docs/images/contents.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/docs/bugs.html" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/docs/images" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/docs" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/docs/images/missing-imports.png" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/docs/index.html" />
+      <change type="MOVED" beforePath="$PROJECT_DIR$/resources/api.html" afterPath="$PROJECT_DIR$/resources/docs/index.html" />
     </list>
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
@@ -147,7 +134,7 @@
         <option name="CONDITION" value="" />
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
-      <breakpoint url="file:///Users/drummond/Work/CO-ODE/Code/owlmanager/src/org/coode/owl/mngr/impl/OWLServerImpl.java" line="217" class="org.coode.owl.mngr.impl.OWLServerImpl" package="org.coode.owl.mngr.impl">
+      <breakpoint url="file:///Users/drummond/Work/CO-ODE/Code/owlmanager/src/org/coode/owl/mngr/impl/OWLServerImpl.java" line="230" class="org.coode.owl.mngr.impl.OWLServerImpl" package="org.coode.owl.mngr.impl">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -241,57 +228,79 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="HierarchyNodeDoclet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/HierarchyNodeDoclet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="55" column="56" selection-start="1834" selection-end="1834" vertical-scroll-proportion="0.6219178">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="HierarchyNodeSubsDoclet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/HierarchyNodeSubsDoclet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="54" column="55" selection-start="1617" selection-end="1617" vertical-scroll-proportion="0.3260274">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="OWLHTMLConstants.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/impl/OWLHTMLConstants.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="13" selection-start="1285" selection-end="1285" vertical-scroll-proportion="-0.23287672">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AbstractHierarchyNodeDoclet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/AbstractHierarchyNodeDoclet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="44" column="31" selection-start="1272" selection-end="1272" vertical-scroll-proportion="0.30273974">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Summary.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/coode/www/servlet/Summary.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="115" column="79" selection-start="4690" selection-end="4690" vertical-scroll-proportion="1.3636364">
-              <folding>
-                <marker date="1208789040000" expanded="false" signature="39:1143" placeholder="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="version.txt" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="version.txt" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/version.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="1" column="47" selection-start="96" selection-end="96" vertical-scroll-proportion="0.016438356">
+            <state line="1" column="0" selection-start="49" selection-end="49" vertical-scroll-proportion="0.011650485">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/resources/docs/index.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="169" column="32" selection-start="8432" selection-end="8432" vertical-scroll-proportion="2.0950413">
+              <folding />
+            </state>
+          </provider>
+          <provider editor-type-id="HtmlPreview">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="bugs.html" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/resources/docs/bugs.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="26" column="0" selection-start="940" selection-end="940" vertical-scroll-proportion="0.32231405">
+              <folding />
+            </state>
+          </provider>
+          <provider editor-type-id="HtmlPreview">
+            <state />
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SessionManager.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/coode/www/mngr/SessionManager.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="213" column="0" selection-start="7570" selection-end="7570" vertical-scroll-proportion="0.3339806">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OWLOntologyManagerImpl.class" pinned="false" current="false" current-in-tab="false">
+        <entry file="jar:///Users/drummond/Work/CO-ODE/Code/owlmanager/lib/owlapi-bin.jar!/uk/ac/manchester/cs/owl/OWLOntologyManagerImpl.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="149" column="0" selection-start="11905" selection-end="11905" vertical-scroll-proportion="0.8699507">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OWLHTMLServerImpl.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/impl/OWLHTMLServerImpl.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="90" column="0" selection-start="3086" selection-end="3086" vertical-scroll-proportion="0.55728155">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="LabelShortFormProvider.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlmanager/src/org/coode/owl/mngr/impl/LabelShortFormProvider.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="3" column="0" selection-start="71" selection-end="71" vertical-scroll-proportion="0.034951456">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BlurbDoclet.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/coode/www/doclet/BlurbDoclet.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="27" column="33" selection-start="869" selection-end="869" vertical-scroll-proportion="0.25631067">
               <folding />
             </state>
           </provider>
@@ -300,38 +309,17 @@
       <file leaf-file-name="OWLServerImpl.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlmanager/src/org/coode/owl/mngr/impl/OWLServerImpl.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="232" column="12" selection-start="7395" selection-end="7395" vertical-scroll-proportion="0.31748253">
+            <state line="83" column="58" selection-start="2873" selection-end="2873" vertical-scroll-proportion="0.48446602">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SessionManager.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/coode/www/mngr/SessionManager.java">
+      <file leaf-file-name="ServerConstants.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlmanager/src/org/coode/owl/mngr/ServerConstants.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="279" column="67" selection-start="10309" selection-end="10335" vertical-scroll-proportion="0.3178082">
+            <state line="56" column="0" selection-start="2164" selection-end="2164" vertical-scroll-proportion="0.41747573">
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AbstractOWLDocDoclet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/AbstractOWLDocDoclet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="19" column="79" selection-start="536" selection-end="536" vertical-scroll-proportion="0.24657534">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AbstractHTMLDoclet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/AbstractHTMLDoclet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="78" column="53" selection-start="2200" selection-end="2200" vertical-scroll-proportion="0.38601398">
-              <folding>
-                <marker date="1208785908000" expanded="true" signature="2059:2097" placeholder="{...}" />
-                <marker date="1208785908000" expanded="true" signature="2145:2206" placeholder="{...}" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -518,6 +506,76 @@
         <PATH_ELEMENT>
           <option name="myItemId" value="owlmanager" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Libraries" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owlmanager" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Libraries" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owlmanager/lib/owlapi-bin.jar" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owlmanager/lib/owlapi-bin.jar!/uk/ac/manchester/cs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owlmanager/lib/owlapi-bin.jar!/uk/ac/manchester/cs/owl" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owlmanager" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Libraries" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owlmanager/lib/owlapi-bin.jar" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owlmanager/lib/owlapi-bin.jar!/uk/ac/manchester/cs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owlmanager" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="Libraries" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.LibraryGroupNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owlmanager/lib/owlapi-bin.jar" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
       <PATH>
@@ -768,32 +826,6 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
         <PATH_ELEMENT>
-          <option name="myItemId" value="owlhtml" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owlhtml" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owlhtml/src" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="owldoc-server" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
           <option name="myItemId" value="owldoc-server" />
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
         </PATH_ELEMENT>
@@ -812,6 +844,190 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
         </PATH_ELEMENT>
       </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src/org/coode/www" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src/org/coode/www" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src/org/coode/www/servlet" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src/org/coode/www" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src/org/coode/www/mngr" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src/org/coode/www" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/src/org/coode/www/doclet" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/resources" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/resources" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/resources/docs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
+      <PATH>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/resources" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/resources/docs" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+        <PATH_ELEMENT>
+          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/owldoc-server/resources/docs/images" />
+          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+        </PATH_ELEMENT>
+      </PATH>
     </subPane>
   </component>
   <component name="ProjectReloadState">
@@ -825,7 +1041,7 @@
       <showLibraryContents />
       <hideEmptyPackages />
       <abbreviatePackageNames />
-      <showStructure Favorites="false" J2EEPane="false" Scope="false" PackagesPane="false" ProjectPane="false" />
+      <showStructure PackagesPane="false" J2EEPane="false" Scope="false" Favorites="false" ProjectPane="false" />
       <autoscrollToSource />
       <autoscrollFromSource PackagesPane="true" ProjectPane="true" />
       <sortByType />
@@ -1265,16 +1481,16 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="22" width="1440" height="874" extended-state="6" />
+    <frame x="0" y="22" width="1920" height="1174" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.46146703" order="7" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24370956" order="0" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2974359" order="1" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.18118653" order="0" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.29722223" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3974359" order="10" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39722222" order="10" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="6" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="7" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="11" />
@@ -1282,7 +1498,7 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="1" />
       <window_info id="Maven projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="12" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2653846" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.51111114" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="2" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="0" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.40641025" order="4" />
@@ -1314,7 +1530,7 @@
     <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
     <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="- OWL API update to 2.2.0 release&#10;- pellet default reasoner&#10;- partial fix in OWLHTML for recursion on hierarchies&#10;- tidyup of debug/error reporting - all using log4j" />
+    <option name="LAST_COMMIT_MESSAGE" value="Docs" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
@@ -1336,6 +1552,7 @@
     <MESSAGE value="- focus on load&#10;- dl query on load" />
     <MESSAGE value="- massive refactoring to support doclets" />
     <MESSAGE value="- OWL API update to 2.2.0 release&#10;- pellet default reasoner&#10;- partial fix in OWLHTML for recursion on hierarchies&#10;- tidyup of debug/error reporting - all using log4j" />
+    <MESSAGE value="Docs" />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
@@ -1386,53 +1603,30 @@
     <option name="myLastEditedConfigurable" value="Default" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/url/NamedObjectURLRenderer.java">
+    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/impl/OWLHTMLConstants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="22" column="0" selection-start="494" selection-end="494" vertical-scroll-proportion="1.08">
+        <state line="34" column="13" selection-start="1285" selection-end="1285" vertical-scroll-proportion="0.1262136">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/renderer/OWLHTMLVisitor.java">
+    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/AbstractHierarchyNodeDoclet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="707" column="0" selection-start="21429" selection-end="21429" vertical-scroll-proportion="1.53">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/coode/www/servlet/AbstractOntologyServerServlet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="175" column="17" selection-start="7694" selection-end="7694" vertical-scroll-proportion="0.06486487">
+        <state line="44" column="31" selection-start="1272" selection-end="1272" vertical-scroll-proportion="0.067961164">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/hierarchy/AbstractTreeFragment.java">
+    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/AbstractOWLDocDoclet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="22" selection-start="503" selection-end="503" vertical-scroll-proportion="-1.4328767">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/url/PermalinkURLScheme.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="49" column="0" selection-start="1167" selection-end="1351" vertical-scroll-proportion="1.225">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/OWLObjectHierarchyFragmentDoclet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="219" column="0" selection-start="6407" selection-end="6765" vertical-scroll-proportion="1.0193799">
+        <state line="19" column="79" selection-start="536" selection-end="536" vertical-scroll-proportion="0.24423338">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/AbstractHTMLDoclet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="78" column="53" selection-start="2200" selection-end="2200" vertical-scroll-proportion="0.38601398">
+        <state line="78" column="53" selection-start="2200" selection-end="2200" vertical-scroll-proportion="0.025477707">
           <folding>
             <marker date="1208785908000" expanded="true" signature="2059:2097" placeholder="{...}" />
             <marker date="1208785908000" expanded="true" signature="2145:2206" placeholder="{...}" />
@@ -1440,69 +1634,96 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/AbstractOWLDocDoclet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="79" selection-start="536" selection-end="536" vertical-scroll-proportion="0.24657534">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/impl/OWLHTMLConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="13" selection-start="1285" selection-end="1285" vertical-scroll-proportion="-0.23287672">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/HierarchyNodeSubsDoclet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="55" selection-start="1617" selection-end="1617" vertical-scroll-proportion="0.3260274">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/HierarchyNodeDoclet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="55" column="56" selection-start="1834" selection-end="1834" vertical-scroll-proportion="0.6219178">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/doclet/AbstractHierarchyNodeDoclet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="44" column="31" selection-start="1272" selection-end="1272" vertical-scroll-proportion="0.30273974">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/coode/www/mngr/SessionManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="279" column="67" selection-start="10309" selection-end="10335" vertical-scroll-proportion="0.3178082">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlmanager/src/org/coode/owl/mngr/impl/OWLServerImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="232" column="12" selection-start="7395" selection-end="7395" vertical-scroll-proportion="0.31748253">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/coode/www/servlet/Summary.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="115" column="79" selection-start="4690" selection-end="4690" vertical-scroll-proportion="1.3636364">
+        <state line="115" column="79" selection-start="4690" selection-end="4690" vertical-scroll-proportion="0.025477707">
           <folding>
             <marker date="1208789040000" expanded="false" signature="39:1143" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/version.txt">
+    <entry file="file://$PROJECT_DIR$/src/org/coode/www/servlet/ManageOntologies.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="1" column="47" selection-start="96" selection-end="96" vertical-scroll-proportion="0.016438356">
+        <state line="74" column="25" selection-start="2904" selection-end="2904" vertical-scroll-proportion="0.61747575">
           <folding />
         </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/coode/www/doclet/BlurbDoclet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="33" selection-start="869" selection-end="869" vertical-scroll-proportion="0.25631067">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/version.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="1" column="0" selection-start="49" selection-end="49" vertical-scroll-proportion="0.011650485">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlmanager/src/org/coode/owl/mngr/ServerConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="0" selection-start="2164" selection-end="2164" vertical-scroll-proportion="0.41747573">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlmanager/src/org/coode/owl/mngr/impl/LabelShortFormProvider.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="3" column="0" selection-start="71" selection-end="71" vertical-scroll-proportion="0.034951456">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlmanager/src/org/coode/owl/mngr/impl/OWLServerImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="83" column="58" selection-start="2873" selection-end="2873" vertical-scroll-proportion="0.48446602">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/src/org/coode/html/impl/OWLHTMLServerImpl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="90" column="0" selection-start="3086" selection-end="3086" vertical-scroll-proportion="0.55728155">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///Users/drummond/Work/CO-ODE/Code/owlmanager/lib/owlapi-bin.jar!/uk/ac/manchester/cs/owl/OWLOntologyManagerImpl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="149" column="0" selection-start="11905" selection-end="11905" vertical-scroll-proportion="0.8699507">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/coode/www/mngr/SessionManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="213" column="0" selection-start="7570" selection-end="7570" vertical-scroll-proportion="0.3339806">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/docs/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="169" column="32" selection-start="8432" selection-end="8432" vertical-scroll-proportion="2.0950413">
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="HtmlPreview">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/docs/bugs.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="26" column="0" selection-start="940" selection-end="940" vertical-scroll-proportion="0.32231405">
+          <folding />
+        </state>
+      </provider>
+      <provider editor-type-id="HtmlPreview">
+        <state />
       </provider>
     </entry>
   </component>
