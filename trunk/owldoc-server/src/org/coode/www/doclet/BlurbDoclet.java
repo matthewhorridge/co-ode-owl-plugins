@@ -25,7 +25,7 @@ public class BlurbDoclet extends AbstractHTMLDoclet {
         out.println("<h1>Ontology Server v1.1</h1>");
         renderBoxStart("Author", out);
         out.println("<p>Nick Drummond, The University of Manchester</p>\n" +
-                    "<p>Made available as part of the <a href=\"http://www.co-ode.org/\">CO-ODE</a> project.</p>" +
+                    "<p>Made available as part of the <a href=\"http://www.co-ode.org/downloads/owldoc-server/\">CO-ODE</a> project.</p>" +
                     "<p><a href=\"" + OWLHTMLConstants.ONTOLOGY_SERVER + "docs/index.html\">Documentation</a></p>");
     }
 
