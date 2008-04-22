@@ -4,6 +4,7 @@
 package org.coode.www.doclet;
 
 import org.coode.html.doclet.AbstractHTMLDoclet;
+import org.coode.html.impl.OWLHTMLConstants;
 
 import java.io.PrintWriter;
 import java.net.URL;
@@ -25,7 +26,7 @@ public class BlurbDoclet extends AbstractHTMLDoclet {
         renderBoxStart("Author", out);
         out.println("<p>Nick Drummond, The University of Manchester</p>\n" +
                     "<p>Made available as part of the <a href=\"http://www.co-ode.org/\">CO-ODE</a> project.</p>" +
-                    "<p><a href=\"docs/index.html\">Documentation</a></p>");
+                    "<p><a href=\"" + OWLHTMLConstants.ONTOLOGY_SERVER + "docs/index.html\">Documentation</a></p>");
     }
 
     protected void renderFooter(URL pageURL, PrintWriter out) {
