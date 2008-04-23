@@ -1,2 +1,0 @@
-Fact++ jar and native v1.1.11 release (Mar 2008)
-OWLAPI jar corresponds to release 2.2.0 (Apr 17, 2008)
