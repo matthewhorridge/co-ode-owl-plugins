@@ -64,7 +64,7 @@ public class OWLArithmeticsFormulaClassFrameSection extends
 	@Override
 	public OWLFrameSectionRowObjectEditor<MAEStart> getObjectEditor() {
 		return new OWLArithmeticFormulaEditor(this.getOWLEditorKit(), this
-				.getRootObject(), false);
+				.getRootObject(), false, this.formulaAnnotationURIs);
 	}
 
 	@Override
@@ -78,9 +78,9 @@ public class OWLArithmeticsFormulaClassFrameSection extends
 						this.getRootObject(), this.getOWLModelManager());
 				annotationAxiom.accept(visitor);
 				if (visitor.getExtractedFormula() != null) {
-					this.addRow(new OWLArithmeticsFormulaClassFrameSectionRow(this
-							.getOWLEditorKit(), this, ontology, this
-							.getRootObject(), annotationAxiom));
+					this.addRow(new OWLArithmeticsFormulaClassFrameSectionRow(
+							this.getOWLEditorKit(), this, ontology, this
+									.getRootObject(), annotationAxiom));
 				}
 			}
 		}

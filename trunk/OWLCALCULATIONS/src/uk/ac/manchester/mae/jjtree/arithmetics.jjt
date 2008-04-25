@@ -72,7 +72,7 @@ TOKEN : /* IDENTIFIERS */
 |
   < #DIGIT: ["0"-"9"] >
  
- | <URISYMBOLS: ":" | "." | "#">
+ | <URISYMBOLS: ":" | "." | "#" | "~">
 
   
 }
@@ -93,7 +93,7 @@ TOKEN: /*Strategies*/
 SimpleNode Start() : {}
 {
 	
-  (ConflictStrategy())?(AppliesTo())?("{"Binding() ("," Binding())* "}->")*  (Expression() | Function()) ";"
+  (ConflictStrategy())?(AppliesTo())?(StoreTo())?("{"Binding() ("," Binding())* "}->")*  (Expression() | Function()) ";"
   { return jjtThis; }
 }
 
@@ -123,7 +123,7 @@ JAVACODE
 		Token t;
 		while(true){
 			t = getToken(1);
-			if (t.image.equals(">")){
+			if (t.image.equals(">") || t.image.equals("]")){
 				break;
 			}else{
 				jjtThis.setContent(jjtThis.getContent()+(jjtThis.getContent().equals("")?"":" ")+t.image);
@@ -149,14 +149,20 @@ void PropertyChain(): {String propertyName; Token index;}
 	propertyName= PropertyURI(){
 		jjtThis.setPropertyName(propertyName);
 	}
-	("[" index = <INTEGER_LITERAL>{
-		jjtThis.setIndex(Integer.parseInt(index.image));
-	}
+	("[" PropertyFacet()
+	
 	"]")? ("!" {
 		jjtThis.setEnd(false);
 	}
 		  (PropertyChain()))*
 }
+
+
+void PropertyFacet():{}
+{
+	manSyntaxClassExpression()
+}
+
 
 JAVACODE
 
@@ -166,7 +172,7 @@ String PropertyURI() #void{
 	Token t;
 	while(true){
 		t= getToken(1);
-		if(t.image.startsWith("!") || t.image.startsWith("[") || t.image.startsWith("}")){
+		if(t.image.startsWith("!") || t.image.startsWith("[") || t.image.startsWith("}") || t.image.startsWith(">")){
 			break;
 		}
 		uriString = (uriString+t.image).trim();
@@ -220,10 +226,10 @@ void UnaryExpression() #void : {}
   |  groundTerm()
 }
 
-void Power() :{Double base=null; Token exp; Token baseId=null;}
+void Power() :{Double base=null; Double exp; Token baseId=null;}
 {
 	(
-		((base = Integer()) | baseId =<IDENTIFIER>) "^" exp = <INTEGER_LITERAL>
+		((base = Integer()) | baseId =<IDENTIFIER>) "^" exp = Integer()
 		{
 			if(base!=null){
 				jjtThis.setBase(base);
@@ -231,7 +237,7 @@ void Power() :{Double base=null; Token exp; Token baseId=null;}
 				jjtThis.setSymbolic(true);
 				jjtThis.setBaseIdentifier(baseId.image);
 			}
-			jjtThis.setExp(Double.parseDouble(exp.image));
+			jjtThis.setExp(exp);
 		}
 	)
 }

@@ -22,6 +22,7 @@
  */
 package org.coode.oae.ui;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,6 +39,7 @@ import uk.ac.manchester.mae.ConflictStrategy;
  * Apr 10, 2008
  */
 public class FormulaModel {
+	protected URI formulaURI;
 	protected OWLEditorKit owlEditorKit = null;
 	protected ConflictStrategy conflictStrategy = null;
 	protected OWLDescription appliesTo = null;
@@ -121,5 +123,13 @@ public class FormulaModel {
 	 */
 	public StorageModel getStorageModel() {
 		return this.storageModel;
+	}
+
+	public URI getFormulaURI() {
+		return this.formulaURI;
+	}
+
+	public void setFormulaURI(URI formulaURI) {
+		this.formulaURI = formulaURI;
 	}
 }

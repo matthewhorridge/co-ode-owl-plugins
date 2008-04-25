@@ -20,11 +20,12 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae.visitor;
+package uk.ac.manchester.mae.visitor.protege;
 
-import uk.ac.manchester.mae.ArithmeticsParserVisitor;
-import uk.ac.manchester.mae.ConflictStrategy;
-import uk.ac.manchester.mae.ConflictStrategyFactory;
+import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.description.OWLExpressionParserException;
+import org.semanticweb.owl.model.OWLDescription;
+
 import uk.ac.manchester.mae.MAEAdd;
 import uk.ac.manchester.mae.MAEBigSum;
 import uk.ac.manchester.mae.MAEBinding;
@@ -38,18 +39,24 @@ import uk.ac.manchester.mae.MAEPropertyFacet;
 import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.MAEStoreTo;
 import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
-import uk.ac.manchester.mae.OverriddenStrategy;
+import uk.ac.manchester.mae.Node;
 import uk.ac.manchester.mae.SimpleNode;
+import uk.ac.manchester.mae.visitor.FacetExtractor;
 
 /**
  * @author Luigi Iannone
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Apr 7, 2008
+ * Apr 24, 2008
  */
-public class ConflictStrategyExtractor implements ArithmeticsParserVisitor {
-	private ConflictStrategy extractedConflictStrategy = null;
+public class ProtegeDescriptionFacetExtractor extends FacetExtractor {
+	private OWLModelManager modelManager;
+	private OWLDescription classDescription;
+
+	public ProtegeDescriptionFacetExtractor(OWLModelManager modelManager) {
+		this.modelManager = modelManager;
+	}
 
 	/**
 	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.SimpleNode,
@@ -64,13 +71,7 @@ public class ConflictStrategyExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStart node, Object data) {
-		boolean found = false;
-		Object visitResult = null;
-		for (int i = 0; !found && i < node.jjtGetNumChildren(); i++) {
-			visitResult = node.jjtGetChild(i).jjtAccept(this, null);
-			found = visitResult != null;
-		}
-		return visitResult;
+		return null;
 	}
 
 	/**
@@ -78,11 +79,16 @@ public class ConflictStrategyExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEConflictStrategy node, Object data) {
-		ConflictStrategy conflictStrategy = ConflictStrategyFactory
-				.getStrategy(node.getStrategyName());
-		this.extractedConflictStrategy = conflictStrategy;
-		return conflictStrategy == null ? OverriddenStrategy.getInstance()
-				: conflictStrategy;
+		return null;
+	}
+
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 *      java.lang.Object)
+	 */
+	public Object visit(MAEStoreTo node, Object data) {
+		node.childrenAccept(this, data);
+		return null;
 	}
 
 	/**
@@ -90,7 +96,15 @@ public class ConflictStrategyExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
-		return null;
+		try {
+			this.classDescription = this.modelManager.getOWLDescriptionParser()
+					.createOWLDescription(node.getContent());
+			data = this.classDescription;
+			return data;
+		} catch (OWLExpressionParserException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	/**
@@ -106,6 +120,26 @@ public class ConflictStrategyExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEPropertyChain node, Object data) {
+		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+			Node child = node.jjtGetChild(i);
+			if (child instanceof MAEPropertyFacet) {
+				child.jjtAccept(this, data);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
+	 *      java.lang.Object)
+	 */
+	public Object visit(MAEPropertyFacet node, Object data) {
+		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+			Node child = node.jjtGetChild(i);
+			if (child instanceof MAEmanSyntaxClassExpression) {
+				child.jjtAccept(this, data);
+			}
+		}
 		return null;
 	}
 
@@ -157,23 +191,8 @@ public class ConflictStrategyExtractor implements ArithmeticsParserVisitor {
 		return null;
 	}
 
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEStoreTo node, Object data) {
-		return null;
-	}
-
-	public ConflictStrategy getExtractedConflictStrategy() {
-		return this.extractedConflictStrategy;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEPropertyFacet node, Object data) {
-		return null;
+	@Override
+	public OWLDescription getExtractedDescription() {
+		return this.classDescription;
 	}
 }

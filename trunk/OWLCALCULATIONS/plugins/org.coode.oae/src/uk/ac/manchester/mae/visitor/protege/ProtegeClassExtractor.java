@@ -36,6 +36,7 @@ import uk.ac.manchester.mae.MAEIntNode;
 import uk.ac.manchester.mae.MAEMult;
 import uk.ac.manchester.mae.MAEPower;
 import uk.ac.manchester.mae.MAEPropertyChain;
+import uk.ac.manchester.mae.MAEPropertyFacet;
 import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.MAEStoreTo;
 import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
@@ -51,6 +52,7 @@ import uk.ac.manchester.mae.SimpleNode;
  */
 public class ProtegeClassExtractor implements ArithmeticsParserVisitor {
 	private OWLModelManager manager;
+	private OWLDescription extractedClass;
 
 	/**
 	 * @param ontologies
@@ -67,11 +69,17 @@ public class ProtegeClassExtractor implements ArithmeticsParserVisitor {
 
 	public Object visit(MAEStart node, Object data) {
 		boolean assigned = false;
-		Object toReturn = null;
+		OWLDescription toReturn = null;
 		for (int i = 0; i < node.jjtGetNumChildren() && !assigned; i++) {
 			Node child = node.jjtGetChild(i);
-			toReturn = child.jjtAccept(this, data);
+			toReturn = (OWLDescription) child.jjtAccept(this, data);
 			assigned = toReturn != null;
+		}
+		if (assigned) {
+			this.extractedClass = toReturn;
+		} else {
+			this.extractedClass = this.manager.getOWLDataFactory()
+					.getOWLThing();
 		}
 		return toReturn;
 	}
@@ -175,5 +183,17 @@ public class ProtegeClassExtractor implements ArithmeticsParserVisitor {
 	 */
 	public Object visit(MAEStoreTo node, Object data) {
 		return null;
+	}
+
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
+	 *      java.lang.Object)
+	 */
+	public Object visit(MAEPropertyFacet node, Object data) {
+		return null;
+	}
+
+	public OWLDescription getExtractedClass() {
+		return this.extractedClass;
 	}
 }

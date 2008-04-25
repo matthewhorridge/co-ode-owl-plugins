@@ -66,6 +66,7 @@ import org.semanticweb.owl.util.ShortFormProvider;
 import org.semanticweb.owl.vocab.XSDVocabulary;
 
 import uk.ac.manchester.mae.visitor.ClassExatrctor;
+import uk.ac.manchester.mae.visitor.DescriptionFacetExtractor;
 
 /**
  * @author Luigi Iannone
@@ -616,8 +617,9 @@ public class Evaluator implements ArithmeticsParserVisitor {
 	}
 
 	private Collection<Object> fetch(OWLIndividual currentIndividual,
-			String propertyName, boolean isDatatype) throws URISyntaxException,
-			UnsupportedDataTypeException {
+			String propertyName, boolean isDatatype,
+			OWLDescription facetDescription) throws URISyntaxException,
+			UnsupportedDataTypeException, OWLReasonerException {
 		Collection<Object> toReturn = null;
 		Iterator<OWLOntology> it = this.ontologies.iterator();
 		boolean found = false;
@@ -641,12 +643,15 @@ public class Evaluator implements ArithmeticsParserVisitor {
 				OWLObjectProperty objectProperty = this.ontologyManager
 						.getOWLDataFactory().getOWLObjectProperty(
 								new URI(propertyName));
+				OWLReasoner reasoner = this.reasoner;
 				Set<OWLIndividual> fillers = currentIndividual
 						.getObjectPropertyValues(ontology).get(objectProperty);
 				toReturn = new HashSet<Object>();
 				if (!(fillers == null || fillers.isEmpty())) {
 					for (OWLIndividual filler : fillers) {
-						toReturn.add(filler);
+						if (reasoner.hasType(filler, facetDescription, false)) {
+							toReturn.add(filler);
+						}
 					}
 				}
 			}
@@ -729,16 +734,23 @@ public class Evaluator implements ArithmeticsParserVisitor {
 		List<Object> toReturn = null;
 		Set<OWLIndividual> individuals = (Set<OWLIndividual>) data;
 		String propertyName = node.getPropertyName();
+		DescriptionFacetExtractor descriptionExtractor = new DescriptionFacetExtractor(
+				this.ontologyManager, this.ontologies, this.shortFormProvider);
+		OWLDescription facetDescription = descriptionExtractor
+				.getExtractedDescription() == null ? this.ontologyManager
+				.getOWLDataFactory().getOWLThing() : descriptionExtractor
+				.getExtractedDescription();
 		if (node.isEnd()) {
 			toReturn = new ArrayList<Object>();
 			for (OWLIndividual individual : individuals) {
 				try {
-					toReturn.addAll(this.fetch(individual, propertyName, true));
+					toReturn.addAll(this.fetch(individual, propertyName, true,
+							facetDescription));
 				} catch (UnsupportedDataTypeException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OWLReasonerException e) {
 					e.printStackTrace();
 				}
 			}
@@ -748,13 +760,15 @@ public class Evaluator implements ArithmeticsParserVisitor {
 					Set<Object> fillers;
 					try {
 						fillers = (Set<Object>) this.fetch(individual,
-								propertyName, false);
+								propertyName, false, facetDescription);
 						toReturn = new ArrayList<Object>();
 						toReturn.addAll((List<Object>) child.jjtAccept(this,
 								fillers));
 					} catch (UnsupportedDataTypeException e) {
 						e.printStackTrace();
 					} catch (URISyntaxException e) {
+						e.printStackTrace();
+					} catch (OWLReasonerException e) {
 						e.printStackTrace();
 					}
 				}
@@ -791,6 +805,10 @@ public class Evaluator implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStoreTo node, Object data) {
+		return null;
+	}
+
+	public Object visit(MAEPropertyFacet node, Object data) {
 		return null;
 	}
 }

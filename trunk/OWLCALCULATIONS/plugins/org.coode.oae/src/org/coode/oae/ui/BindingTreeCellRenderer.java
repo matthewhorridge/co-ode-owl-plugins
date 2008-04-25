@@ -2,6 +2,7 @@ package org.coode.oae.ui;
 
 import java.awt.Component;
 
+import javax.swing.ImageIcon;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -9,7 +10,7 @@ import javax.swing.tree.TreeCellRenderer;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLObjectProperty;
 
 public class BindingTreeCellRenderer implements TreeCellRenderer {
 	protected DefaultTreeCellRenderer defaultTreeCellRenderer = new DefaultTreeCellRenderer();
@@ -29,9 +30,37 @@ public class BindingTreeCellRenderer implements TreeCellRenderer {
 		Component toReturn = this.defaultTreeCellRenderer
 				.getTreeCellRendererComponent(tree, value, selected, expanded,
 						leaf, row, hasFocus);
-		if (nodeUserObject instanceof OWLObject) {
-			toReturn = this.owlCellRenderer.getTreeCellRendererComponent(tree,
-					nodeUserObject, selected, expanded, leaf, row, hasFocus);
+		if (nodeUserObject instanceof PropertyChainModel) {
+			PropertyChainModel propertyChainModel = (PropertyChainModel) nodeUserObject;
+			String propertyRendering = this.owlEditorKit.getOWLModelManager()
+					.getRendering(propertyChainModel.getProperty());
+			String facetRendering = propertyChainModel.getFacet() == null ? ""
+					: "["
+							+ this.owlEditorKit
+									.getOWLModelManager()
+									.getRendering(propertyChainModel.getFacet())
+							+ "]";
+			String iconName = propertyChainModel.getProperty() instanceof OWLObjectProperty ? "property.object.png"
+					: "property.data.png";
+			this.defaultTreeCellRenderer.setOpenIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			this.defaultTreeCellRenderer.setClosedIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			this.defaultTreeCellRenderer.setLeafIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			toReturn = this.defaultTreeCellRenderer
+					.getTreeCellRendererComponent(tree, propertyRendering
+							+ facetRendering, selected, expanded, leaf, row,
+							hasFocus);
+			this.defaultTreeCellRenderer
+					.setOpenIcon(this.defaultTreeCellRenderer
+							.getDefaultOpenIcon());
+			this.defaultTreeCellRenderer
+					.setClosedIcon(this.defaultTreeCellRenderer
+							.getDefaultClosedIcon());
+			this.defaultTreeCellRenderer
+					.setLeafIcon(this.defaultTreeCellRenderer
+							.getDefaultLeafIcon());
 		}
 		return toReturn;
 	}

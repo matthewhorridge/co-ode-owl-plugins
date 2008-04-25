@@ -39,14 +39,9 @@ public class OWLArithmeticsFormulaDataPropertyFrameSection extends
 	}
 
 	@Override
-	public boolean canAddRows() {
-		return false;
-	}
-
-	@Override
 	protected OWLAnnotationAxiom createAxiom(MAEStart object) {
 		OWLAnnotationAxiom toReturn = null;
-		OWLDataProperty dataProperty = this.formulaProperties.get(object);
+		OWLDataProperty dataProperty = this.getRootObject();
 		if (dataProperty != null) {
 			URI uri = this.formulaAnnotationURIs.get(object);
 			if (uri != null) {
@@ -64,7 +59,7 @@ public class OWLArithmeticsFormulaDataPropertyFrameSection extends
 	@Override
 	public OWLFrameSectionRowObjectEditor<MAEStart> getObjectEditor() {
 		return new OWLArithmeticFormulaEditor(this.getOWLEditorKit(), null,
-				true);
+				true, this.formulaAnnotationURIs);
 	}
 
 	@Override

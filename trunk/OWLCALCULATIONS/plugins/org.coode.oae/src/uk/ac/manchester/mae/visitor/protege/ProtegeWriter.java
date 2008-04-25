@@ -20,27 +20,29 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae;
+package uk.ac.manchester.mae.visitor.protege;
+
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owl.model.OWLIndividual;
+
+import uk.ac.manchester.mae.report.EvaluationReport;
+import uk.ac.manchester.mae.visitor.Writer;
 
 /**
  * @author Luigi Iannone
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Mar 14, 2008
+ * Apr 22, 2008
  */
-public class MoreThanOneValueForFunctionalPropertyException extends
-		EvaluationException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 9031901854901898966L;
-
-	public MoreThanOneValueForFunctionalPropertyException() {
-		super();
-	}
-
-	public MoreThanOneValueForFunctionalPropertyException(String message) {
-		super(message);
+public class ProtegeWriter extends Writer {
+	public ProtegeWriter(OWLIndividual individual,
+			OWLDataProperty dataProperty, Object results,
+			OWLModelManager modelManager, EvaluationReport evaluationReport) {
+		super(individual, dataProperty, results, modelManager
+				.getActiveOntology(), modelManager.getReasoner(), modelManager
+				.getOWLOntologyManager(), evaluationReport,
+				new ProtegeDescriptionFacetExtractor(modelManager));
 	}
 }

@@ -44,11 +44,13 @@ import uk.ac.manchester.mae.MAEIntNode;
 import uk.ac.manchester.mae.MAEMult;
 import uk.ac.manchester.mae.MAEPower;
 import uk.ac.manchester.mae.MAEPropertyChain;
+import uk.ac.manchester.mae.MAEPropertyFacet;
 import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.MAEStoreTo;
 import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
 import uk.ac.manchester.mae.Node;
 import uk.ac.manchester.mae.SimpleNode;
+import uk.ac.manchester.mae.visitor.protege.ProtegeDescriptionFacetExtractor;
 
 /**
  * @author Luigi Iannone
@@ -131,6 +133,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyChain,
 	 *      java.lang.Object)
 	 */
+	@SuppressWarnings("unchecked")
 	public Object visit(MAEPropertyChain node, Object data) {
 		OWLEditorKit owlEditorKit = this.formulaModel.getOwlEditorKit();
 		URI propertyURI = URI.create(node.getPropertyName());
@@ -138,10 +141,22 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 				.getOWLDataFactory().getOWLDataProperty(propertyURI)
 				: owlEditorKit.getOWLModelManager().getOWLDataFactory()
 						.getOWLObjectProperty(propertyURI);
-		PropertyChainModel toReturn = new PropertyChainModel(property);
+		ProtegeDescriptionFacetExtractor pdfExtractor = new ProtegeDescriptionFacetExtractor(
+				this.formulaModel.getOwlEditorKit().getOWLModelManager());
+		node.jjtAccept(pdfExtractor, data);
+		OWLDescription facet = pdfExtractor.getExtractedDescription();
+		PropertyChainModel toReturn = new PropertyChainModel(property, facet,
+				this.formulaModel.getOwlEditorKit());
 		if (!node.isEnd() && node.jjtGetNumChildren() > 0) {
-			toReturn.setChild((PropertyChainModel) node.jjtGetChild(0)
-					.jjtAccept(this, data));
+			boolean found = false;
+			for (int i = 0; !found && i < node.jjtGetNumChildren(); i++) {
+				Node child = node.jjtGetChild(i);
+				if (child instanceof MAEPropertyChain) {
+					found = true;
+					toReturn.setChild((PropertyChainModel) node.jjtGetChild(i)
+							.jjtAccept(this, data));
+				}
+			}
 		}
 		return toReturn;
 	}
@@ -209,9 +224,37 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStoreTo node, Object data) {
-		StorageModel storageModel = new StorageModel((PropertyChainModel) node
-				.jjtGetChild(0).jjtAccept(this, data));
-		this.formulaModel.setStorageModel(storageModel);
+		// PropertyChainModel propertyChainModel = (PropertyChainModel) node
+		// .jjtGetChild(0).jjtAccept(this, data);
+		MAEPropertyChain propertyChain = (MAEPropertyChain) node.jjtGetChild(0);
+		if (propertyChain != null) {
+			PropertyChainModel propertyChainModel = this
+					.toPropertyChainModel(propertyChain);
+			StorageModel storageModel = new StorageModel(propertyChainModel);
+			this.formulaModel.setStorageModel(storageModel);
+		}
+		return null;
+	}
+
+	private PropertyChainModel toPropertyChainModel(
+			MAEPropertyChain propertyChain) {
+		String propertyName = propertyChain.getPropertyName();
+		ProtegeDescriptionFacetExtractor descriptionFacetExatrctor = new ProtegeDescriptionFacetExtractor(
+				this.formulaModel.getOwlEditorKit().getModelManager());
+		PropertyChainModel toReturn = new PropertyChainModel(this.formulaModel
+				.getOwlEditorKit().getOWLModelManager().getOWLDataFactory()
+				.getOWLObjectProperty(URI.create(propertyName)),
+				descriptionFacetExatrctor.getExtractedDescription(),
+				this.formulaModel.getOwlEditorKit());
+		if (!propertyChain.isEnd()) {
+			toReturn.setChild(this
+					.toPropertyChainModel((MAEPropertyChain) propertyChain
+							.jjtGetChild(0)));
+		}
+		return toReturn;
+	}
+
+	public Object visit(MAEPropertyFacet node, Object data) {
 		return null;
 	}
 }

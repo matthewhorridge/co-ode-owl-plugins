@@ -27,20 +27,8 @@ package uk.ac.manchester.mae;
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Mar 14, 2008
+ * Apr 22, 2008
  */
-public class MoreThanOneValueForFunctionalPropertyException extends
-		EvaluationException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 9031901854901898966L;
-
-	public MoreThanOneValueForFunctionalPropertyException() {
-		super();
-	}
-
-	public MoreThanOneValueForFunctionalPropertyException(String message) {
-		super(message);
-	}
+public interface Constants {
+	public static final String FORMULA_NAMESPACE_URI_STRING = "http://www.cs.manchester.ac.uk/owlcalculations/formula#";
 }

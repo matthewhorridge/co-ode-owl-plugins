@@ -42,7 +42,6 @@ import org.semanticweb.owl.util.NamespaceUtil;
  * Mar 12, 2008
  */
 public class PropertyVisitor implements OWLPropertyExpressionVisitor {
-	private static final String FORMULA_NAMESPACE_URI_STRING = "http://www.cs.manchester.ac.uk/owlarithmetics/formula#";
 	protected Set<String> extractedFormulaStrings = new HashSet<String>();
 	private Set<OWLOntology> ontologies;
 
@@ -84,7 +83,7 @@ public class PropertyVisitor implements OWLPropertyExpressionVisitor {
 			if (annotationURI != null) {
 				String annotationNameSpace = nsUtil.split(annotationURI
 						.toString(), new String[2])[0];
-				if (annotationNameSpace.compareTo(FORMULA_NAMESPACE_URI_STRING) == 0) {
+				if (annotationNameSpace.compareTo(Constants.FORMULA_NAMESPACE_URI_STRING) == 0) {
 					String annotationBody = annotation
 							.getAnnotationValueAsConstant().getLiteral();
 					this.extractedFormulaStrings.add(annotationBody);

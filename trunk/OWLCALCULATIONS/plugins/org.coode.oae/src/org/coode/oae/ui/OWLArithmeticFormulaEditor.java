@@ -23,9 +23,11 @@
 package org.coode.oae.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -65,12 +67,16 @@ import org.protege.editor.owl.ui.frame.InputVerificationStatusChangedListener;
 import org.protege.editor.owl.ui.frame.OWLClassDescriptionEditor;
 import org.protege.editor.owl.ui.frame.VerifiedInputEditor;
 import org.protege.editor.owl.ui.tree.OWLModelManagerTree;
+import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObjectProperty;
+import org.semanticweb.owl.model.OWLProperty;
+import org.semanticweb.owl.util.NamespaceUtil;
 
 import uk.ac.manchester.mae.ArithmeticsParser;
 import uk.ac.manchester.mae.ConflictStrategy;
+import uk.ac.manchester.mae.Constants;
 import uk.ac.manchester.mae.ExceptionStrategy;
 import uk.ac.manchester.mae.MAEBinding;
 import uk.ac.manchester.mae.MAEPropertyChain;
@@ -106,6 +112,7 @@ public class OWLArithmeticFormulaEditor extends
 	private JButton editAppliesToButton = new JButton(new ImageIcon(
 			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
 					"edit.png")));
+	private JTextField formulaURITextField = new JTextField();
 	private JPanel mainPanel = new JPanel();
 	private MAEStart formula = null;
 	private FormulaModel formulaModel;
@@ -129,6 +136,9 @@ public class OWLArithmeticFormulaEditor extends
 	private JButton addBindingButton = new JButton(new ImageIcon(
 			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
 					"add.png")));
+	private JButton addBindingFacetButton = new JButton(new ImageIcon(
+			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
+					"class.defined.add.png")));
 	private JButton addDataPropertyBindingButton = new JButton(new ImageIcon(
 			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
 					"property.data.add.png")));
@@ -140,45 +150,102 @@ public class OWLArithmeticFormulaEditor extends
 	private JButton deleteStoreButton = new JButton(new ImageIcon(
 			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
 					"delete.png")));
+	private JButton addStoreFacetButton = new JButton(new ImageIcon(
+			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
+					"class.defined.add.png")));
 	private JButton addObjectPropertyStoreButton = new JButton(new ImageIcon(
 			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
 					"property.object.add.png")));
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
+	private Map<MAEStart, URI> formulaURIMap = new HashMap<MAEStart, URI>();
 
 	/**
 	 * @param owlEditorKit
+	 * @param formulaAnnotationURIs
 	 */
 	public OWLArithmeticFormulaEditor(OWLEditorKit owlEditorKit,
-			OWLDescription appliesToOWLDescription, boolean canEditAppliesTo) {
+			OWLDescription appliesToOWLDescription, boolean canEditAppliesTo,
+			Map<MAEStart, URI> formulaAnnotationURIs) {
 		this.owlEditorKit = owlEditorKit;
 		this.owlDescription = appliesToOWLDescription;
 		this.formulaModel = new FormulaModel(owlEditorKit);
 		this.canEditAppliesTo = canEditAppliesTo;
 		this.init();
 		this.mainPanel.revalidate();
+		this.formulaURIMap = formulaAnnotationURIs;
+	}
+
+	public OWLArithmeticFormulaEditor(OWLEditorKit editorKit,
+			OWLClass rootObject, boolean b) {
+		this(editorKit, rootObject, b, null);
 	}
 
 	private void init() {
 		this.mainPanel.setName(OWLArithmeticFormulaEditor.MAIN_PANEL_NAME);
 		BoxLayout boxLayout = new BoxLayout(this.mainPanel, BoxLayout.Y_AXIS);
 		this.mainPanel.setLayout(boxLayout);
+		this.drawFormulaURISection();
 		this.drawConflictSection();
 		this.drawBindingSection();
+		this.drawStorageSection();
 		this.drawFormulaBodySection();
 		this.drawAppliesToSection();
 		this.setupSections();
+	}
+
+	private void drawFormulaURISection() {
+		JPanel formulaURIPanel = new JPanel(new BorderLayout());
+		formulaURIPanel.setBorder(new TitledBorder("Formula URI:"));
+		formulaURIPanel.add(this.formulaURITextField);
+		this.formulaURITextField.getDocument().addDocumentListener(
+				new DocumentListener() {
+					private void updateFormulaModel() {
+						OWLArithmeticFormulaEditor.this.formulaModel
+								.setFormulaURI(URI
+										.create(OWLArithmeticFormulaEditor.this.formulaURITextField
+												.getText()));
+						OWLArithmeticFormulaEditor.this
+								.handleVerifyEditorContents();
+					}
+
+					public void changedUpdate(DocumentEvent arg0) {
+						this.updateFormulaModel();
+					}
+
+					public void insertUpdate(DocumentEvent arg0) {
+						this.updateFormulaModel();
+					}
+
+					public void removeUpdate(DocumentEvent arg0) {
+						this.updateFormulaModel();
+					}
+				});
+		this.mainPanel.add(formulaURIPanel);
 	}
 
 	/**
 	 * 
 	 */
 	private void setupSections() {
+		this.setupFormulaURISection();
 		this.setupConflictButtons();
 		this.setupAppliesTo();
 		this.setupBindings();
 		this.setupStorage();
 		this.setupFormulaBody();
 		this.addStatusChangedListener(this);
+	}
+
+	private void setupFormulaURISection() {
+		URI formulaURI = this.formulaModel.getFormulaURI();
+		if (formulaURI != null) {
+			this.formulaURITextField.setText(formulaURI.toString());
+		} else {
+			this.formulaURITextField
+					.setText(Constants.FORMULA_NAMESPACE_URI_STRING);
+		}
+		this.formulaModel.setFormulaURI(URI.create(this.formulaURITextField
+				.getText()));
 	}
 
 	/**
@@ -243,10 +310,12 @@ public class OWLArithmeticFormulaEditor extends
 	 * 
 	 */
 	private void setupFormulaBody() {
-		if (this.formula != null) {
-			this.arithmeticFormulaTextArea.setText(this.formula.jjtGetChild(
-					this.formula.jjtGetNumChildren() - 1).toString()
-					+ ";");
+		if (this.formula != null || this.formulaModel != null) {
+			String formulaBodyString = this.formula != null ? this.formula
+					.jjtGetChild(this.formula.jjtGetNumChildren() - 1)
+					.toString()
+					+ ";" : this.formulaModel.getFormulaBody();
+			this.arithmeticFormulaTextArea.setText(formulaBodyString);
 		}
 	}
 
@@ -254,13 +323,16 @@ public class OWLArithmeticFormulaEditor extends
 		MutableTreeNode root = new DefaultMutableTreeNode(
 				OWLArithmeticFormulaEditor.STORE_TREE_ROOT_NAME);
 		this.storeTreeModel = new DefaultTreeModel(root);
+		this.storeTree.setModel(this.storeTreeModel);
+		this.storeTree.setCellRenderer(new StorageTreeCellRenderer(
+				this.owlEditorKit));
 		this.storeTree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.storeTree
 						.getLastSelectedPathComponent();
 				if (node != null) {
 					OWLArithmeticFormulaEditor.this
-							.decideBindingButtonEnabling(node);
+							.decideStoreButtonEnabling(node);
 				}
 			}
 		});
@@ -273,20 +345,27 @@ public class OWLArithmeticFormulaEditor extends
 				MutableTreeNode storageNode = MAENodeAdapter.toTreeNode(
 						storeToNode, this.owlEditorKit.getModelManager());
 				this.storeTreeModel.insertNodeInto(storageNode, root, 0);
-				this.storeTree.setModel(this.bindingTreeModel);
-				this.storeTree.setCellRenderer(new BindingTreeCellRenderer(
-						this.owlEditorKit));
-				this.storeTree.revalidate();
+			}
+			this.storeTree.revalidate();
+		} else if (this.formulaModel != null) {
+			StorageModel storageModel = this.formulaModel.getStorageModel();
+			if (storageModel != null) {
+				MutableTreeNode storageNode = MAENodeAdapter.toTreeNode(
+						storageModel, this.owlEditorKit.getModelManager());
+				this.storeTreeModel.setRoot(storageNode);
 			}
 		}
 		this.storeTreeModel.addTreeModelListener(new TreeModelListener() {
 			private void updateFormulaModel() {
 				DefaultMutableTreeNode root = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.storeTreeModel
 						.getRoot();
-				DefaultMutableTreeNode storageSubTreeRoot = (DefaultMutableTreeNode) root
-						.getChildAt(0);
-				StorageModel storageModel = MAENodeAdapter
-						.toStorageModel(storageSubTreeRoot);
+				StorageModel storageModel = null;
+				if (!root.isLeaf()) {
+					DefaultMutableTreeNode storageSubTreeRoot = (DefaultMutableTreeNode) root
+							.getChildAt(0);
+					storageModel = MAENodeAdapter
+							.toStorageModel(storageSubTreeRoot);
+				}
 				OWLArithmeticFormulaEditor.this.formulaModel
 						.setStorageModel(storageModel);
 				OWLArithmeticFormulaEditor.this.handleVerifyEditorContents();
@@ -313,10 +392,14 @@ public class OWLArithmeticFormulaEditor extends
 	/**
 	 * 
 	 */
+	@SuppressWarnings( { "unchecked" })
 	private void setupBindings() {
 		MutableTreeNode root = new DefaultMutableTreeNode(
 				OWLArithmeticFormulaEditor.BINDING_TREE_ROOT_NAME);
 		this.bindingTreeModel = new DefaultTreeModel(root);
+		this.bindingTree.setModel(this.bindingTreeModel);
+		this.bindingTree.setCellRenderer(new BindingTreeCellRenderer(
+				this.owlEditorKit));
 		this.bindingTree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
 				DefaultMutableTreeNode node = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.bindingTree
@@ -335,9 +418,14 @@ public class OWLArithmeticFormulaEditor extends
 				MutableTreeNode bindingNode = MAENodeAdapter.toTreeNode(
 						binding, this.owlEditorKit.getModelManager());
 				this.bindingTreeModel.insertNodeInto(bindingNode, root, 0);
-				this.bindingTree.setModel(this.bindingTreeModel);
-				this.bindingTree.setCellRenderer(new BindingTreeCellRenderer(
-						this.owlEditorKit));
+				this.bindingTree.revalidate();
+			}
+		} else if (this.formulaModel != null) {
+			Set<BindingModel> bindings = this.formulaModel.getBindings();
+			for (BindingModel binding : bindings) {
+				MutableTreeNode bindingNode = MAENodeAdapter.toTreeNode(
+						binding, this.owlEditorKit.getModelManager());
+				this.bindingTreeModel.insertNodeInto(bindingNode, root, 0);
 				this.bindingTree.revalidate();
 			}
 		}
@@ -381,20 +469,26 @@ public class OWLArithmeticFormulaEditor extends
 	protected void decideBindingButtonEnabling(DefaultMutableTreeNode node) {
 		Object userObject = node.getUserObject();
 		this.addObjectPropertyBindingButton
-				.setEnabled(!(userObject instanceof OWLDataProperty)
+				.setEnabled(!(userObject instanceof PropertyChainModel && ((PropertyChainModel) userObject)
+						.getProperty() instanceof OWLDataProperty)
 						&& node.isLeaf() && !node.isRoot());
+		this.addBindingFacetButton
+				.setEnabled(userObject instanceof PropertyChainModel
+						&& ((PropertyChainModel) userObject).getProperty() instanceof OWLObjectProperty);
 		this.addDataPropertyBindingButton
-				.setEnabled(!(userObject instanceof OWLDataProperty)
+				.setEnabled(!(userObject instanceof PropertyChainModel && ((PropertyChainModel) userObject)
+						.getProperty() instanceof OWLDataProperty)
 						&& node.isLeaf() && !node.isRoot());
 		this.deleteBindingButton.setEnabled(node.isLeaf() && !node.isRoot());
 		this.addBindingButton.setEnabled(node.isRoot());
 	}
 
 	protected void decideStoreButtonEnabling(DefaultMutableTreeNode node) {
-		Object userObject = node.getUserObject();
-		this.addObjectPropertyStoreButton
-				.setEnabled(!(userObject instanceof OWLDataProperty)
-						&& node.isLeaf() && !node.isRoot());
+		this.addObjectPropertyStoreButton.setEnabled(true);
+		this.addStoreFacetButton
+				.setEnabled(node.getUserObject() instanceof PropertyChainModel
+						&& ((PropertyChainModel) node.getUserObject())
+								.getProperty() instanceof OWLObjectProperty);
 		this.deleteStoreButton.setEnabled(node.isLeaf() && !node.isRoot());
 	}
 
@@ -407,11 +501,13 @@ public class OWLArithmeticFormulaEditor extends
 		this.addBindingButton.setEnabled(false);
 		this.addDataPropertyBindingButton.setEnabled(false);
 		this.addObjectPropertyBindingButton.setEnabled(false);
+		this.addBindingFacetButton.setEnabled(false);
 		this.deleteBindingButton.setEnabled(false);
 		JToolBar toolBar = new JToolBar();
 		toolBar.add(this.addBindingButton);
 		toolBar.add(this.addDataPropertyBindingButton);
 		toolBar.add(this.addObjectPropertyBindingButton);
+		toolBar.add(this.addBindingFacetButton);
 		toolBar.add(this.deleteBindingButton);
 		toolBar.setBorder(null);
 		toolBar.setBorderPainted(false);
@@ -419,13 +515,21 @@ public class OWLArithmeticFormulaEditor extends
 		this.bindingTree = new JTree(this.bindingTreeModel);
 		JScrollPane bindingTreePane = new JScrollPane(this.bindingTree);
 		bindingPanel.add(bindingTreePane, BorderLayout.CENTER);
-		// store
+		this.mainPanel.add(bindingPanel);
+	}
+
+	/**
+	 * 
+	 */
+	private void drawStorageSection() {
 		JPanel storePanel = new JPanel(new BorderLayout());
 		storePanel.setBorder(LineBorder.createBlackLineBorder());
 		this.addObjectPropertyStoreButton.setEnabled(false);
+		this.addStoreFacetButton.setEnabled(false);
 		this.deleteStoreButton.setEnabled(false);
 		JToolBar storeToolBar = new JToolBar();
 		storeToolBar.add(this.addObjectPropertyStoreButton);
+		storeToolBar.add(this.addStoreFacetButton);
 		storeToolBar.add(this.deleteStoreButton);
 		storeToolBar.setBorder(null);
 		storeToolBar.setBorderPainted(false);
@@ -433,7 +537,6 @@ public class OWLArithmeticFormulaEditor extends
 		this.storeTree = new JTree(this.storeTreeModel);
 		JScrollPane storeTreePane = new JScrollPane(this.storeTree);
 		storePanel.add(storeTreePane, BorderLayout.CENTER);
-		this.mainPanel.add(bindingPanel);
 		this.mainPanel.add(storePanel);
 	}
 
@@ -496,6 +599,7 @@ public class OWLArithmeticFormulaEditor extends
 							.setEnabled(false);
 					OWLArithmeticFormulaEditor.this.addObjectPropertyBindingButton
 							.setEnabled(false);
+					OWLArithmeticFormulaEditor.this.bindingTree.revalidate();
 				}
 			}
 		});
@@ -513,11 +617,13 @@ public class OWLArithmeticFormulaEditor extends
 									newVariableNameNode,
 									(MutableTreeNode) OWLArithmeticFormulaEditor.this.bindingTreeModel
 											.getRoot(), 0);
+					OWLArithmeticFormulaEditor.this.bindingTree.revalidate();
 				}
 			}
 		});
 		this.addDataPropertyBindingButton
 				.addActionListener(new ActionListener() {
+					@SuppressWarnings("unchecked")
 					public void actionPerformed(ActionEvent e) {
 						OWLModelManagerTree<OWLDataProperty> dataPropertyTree = new OWLModelManagerTree<OWLDataProperty>(
 								OWLArithmeticFormulaEditor.this.owlEditorKit,
@@ -534,14 +640,21 @@ public class OWLArithmeticFormulaEditor extends
 								.getLastSelectedPathComponent();
 						if (selectedProperty != null && currentNode != null) {
 							OWLArithmeticFormulaEditor.this.bindingTreeModel
-									.insertNodeInto(new DefaultMutableTreeNode(
-											selectedProperty),
+									.insertNodeInto(
+											new DefaultMutableTreeNode(
+													new PropertyChainModel(
+															(OWLProperty) selectedProperty,
+															null,
+															OWLArithmeticFormulaEditor.this.owlEditorKit)),
 											(MutableTreeNode) currentNode, 0);
+							OWLArithmeticFormulaEditor.this.bindingTree
+									.revalidate();
 						}
 					}
 				});
 		this.addObjectPropertyBindingButton
 				.addActionListener(new ActionListener() {
+					@SuppressWarnings("unchecked")
 					public void actionPerformed(ActionEvent e) {
 						OWLModelManagerTree<OWLObjectProperty> dataPropertyTree = new OWLModelManagerTree<OWLObjectProperty>(
 								OWLArithmeticFormulaEditor.this.owlEditorKit,
@@ -558,12 +671,63 @@ public class OWLArithmeticFormulaEditor extends
 								.getLastSelectedPathComponent();
 						if (selectedProperty != null && currentNode != null) {
 							OWLArithmeticFormulaEditor.this.bindingTreeModel
-									.insertNodeInto(new DefaultMutableTreeNode(
-											selectedProperty),
+									.insertNodeInto(
+											new DefaultMutableTreeNode(
+													new PropertyChainModel(
+															(OWLProperty) selectedProperty,
+															null,
+															OWLArithmeticFormulaEditor.this.owlEditorKit)),
 											(MutableTreeNode) currentNode, 0);
+							OWLArithmeticFormulaEditor.this.bindingTree
+									.revalidate();
 						}
 					}
 				});
+		this.addBindingFacetButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.bindingTree
+						.getLastSelectedPathComponent();
+				if (treeNode != null
+						&& treeNode.getUserObject() instanceof PropertyChainModel) {
+					PropertyChainModel currentPropertyChainModel = (PropertyChainModel) treeNode
+							.getUserObject();
+					OWLDescription initialFacetDescription = currentPropertyChainModel
+							.getFacet();
+					OWLClassDescriptionEditor owlDescriptionEditor = new OWLClassDescriptionEditor(
+							OWLArithmeticFormulaEditor.this.owlEditorKit,
+							initialFacetDescription);
+					final JComponent editorComponent = owlDescriptionEditor
+							.getEditorComponent();
+					final VerifyingOptionPane optionPane = new VerifyingOptionPane(
+							editorComponent);
+					final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
+						public void verifiedStatusChanged(boolean verified) {
+							optionPane.setOKEnabled(verified);
+						}
+					};
+					// if the editor is verifying, will need to prevent the OK
+					// button from being available
+					if (owlDescriptionEditor instanceof VerifiedInputEditor) {
+						//			            
+						((VerifiedInputEditor) owlDescriptionEditor)
+								.addStatusChangedListener(verificationListener);
+					}
+					final JDialog dlg = optionPane.createDialog(
+							OWLArithmeticFormulaEditor.this.mainPanel, null);
+					dlg.setModal(true);
+					dlg.setResizable(true);
+					dlg.pack();
+					dlg
+							.setLocationRelativeTo(OWLArithmeticFormulaEditor.this.mainPanel);
+					dlg.setVisible(true);
+					OWLDescription editedObject = owlDescriptionEditor
+							.getEditedObject();
+					currentPropertyChainModel.setFacet(editedObject);
+					OWLArithmeticFormulaEditor.this
+							.handleVerifyEditorContents();
+				}
+			}
+		});
 	}
 
 	private void addStorageButtons() {
@@ -578,11 +742,13 @@ public class OWLArithmeticFormulaEditor extends
 							.setEnabled(false);
 					OWLArithmeticFormulaEditor.this.addObjectPropertyStoreButton
 							.setEnabled(false);
+					OWLArithmeticFormulaEditor.this.storeTree.revalidate();
 				}
 			}
 		});
 		this.addObjectPropertyStoreButton
 				.addActionListener(new ActionListener() {
+					@SuppressWarnings("unchecked")
 					public void actionPerformed(ActionEvent e) {
 						OWLModelManagerTree<OWLObjectProperty> dataPropertyTree = new OWLModelManagerTree<OWLObjectProperty>(
 								OWLArithmeticFormulaEditor.this.owlEditorKit,
@@ -599,12 +765,63 @@ public class OWLArithmeticFormulaEditor extends
 								.getLastSelectedPathComponent();
 						if (selectedProperty != null && currentNode != null) {
 							OWLArithmeticFormulaEditor.this.storeTreeModel
-									.insertNodeInto(new DefaultMutableTreeNode(
-											selectedProperty),
+									.insertNodeInto(
+											new DefaultMutableTreeNode(
+													new PropertyChainModel(
+															(OWLProperty) selectedProperty,
+															null,
+															OWLArithmeticFormulaEditor.this.owlEditorKit)),
 											(MutableTreeNode) currentNode, 0);
+							OWLArithmeticFormulaEditor.this.storeTree
+									.revalidate();
 						}
 					}
 				});
+		this.addStoreFacetButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.storeTree
+						.getLastSelectedPathComponent();
+				if (treeNode != null
+						&& treeNode.getUserObject() instanceof PropertyChainModel) {
+					PropertyChainModel currentPropertyChainModel = (PropertyChainModel) treeNode
+							.getUserObject();
+					OWLDescription initialFacetDescription = currentPropertyChainModel
+							.getFacet();
+					OWLClassDescriptionEditor owlDescriptionEditor = new OWLClassDescriptionEditor(
+							OWLArithmeticFormulaEditor.this.owlEditorKit,
+							initialFacetDescription);
+					final JComponent editorComponent = owlDescriptionEditor
+							.getEditorComponent();
+					final VerifyingOptionPane optionPane = new VerifyingOptionPane(
+							editorComponent);
+					final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
+						public void verifiedStatusChanged(boolean verified) {
+							optionPane.setOKEnabled(verified);
+						}
+					};
+					// if the editor is verifying, will need to prevent the OK
+					// button from being available
+					if (owlDescriptionEditor instanceof VerifiedInputEditor) {
+						//			            
+						((VerifiedInputEditor) owlDescriptionEditor)
+								.addStatusChangedListener(verificationListener);
+					}
+					final JDialog dlg = optionPane.createDialog(
+							OWLArithmeticFormulaEditor.this.mainPanel, null);
+					dlg.setModal(true);
+					dlg.setResizable(true);
+					dlg.pack();
+					dlg
+							.setLocationRelativeTo(OWLArithmeticFormulaEditor.this.mainPanel);
+					dlg.setVisible(true);
+					OWLDescription editedObject = owlDescriptionEditor
+							.getEditedObject();
+					currentPropertyChainModel.setFacet(editedObject);
+					OWLArithmeticFormulaEditor.this
+							.handleVerifyEditorContents();
+				}
+			}
+		});
 	}
 
 	/**
@@ -617,11 +834,13 @@ public class OWLArithmeticFormulaEditor extends
 					this.owlEditorKit.getOWLModelManager());
 			appliesToOWLDescription = (OWLDescription) this.formula.jjtAccept(
 					classExtractor, null);
+		} else if (this.formulaModel != null) {
+			appliesToOWLDescription = this.formulaModel.getAppliesTo();
 		}
-		this.appliesToLabel.setText(APPLIES_TO_LABEL_NAME + ": "
-				+ this.owlDescription != null ? this.owlEditorKit
+		String string = appliesToOWLDescription != null ? this.owlEditorKit
 				.getOWLModelManager().getRendering(appliesToOWLDescription)
-				: "");
+				: "";
+		this.appliesToLabel.setText(APPLIES_TO_LABEL_NAME + ": " + string);
 		this.editAppliesToButton.setEnabled(this.canEditAppliesTo);
 	}
 
@@ -690,16 +909,20 @@ public class OWLArithmeticFormulaEditor extends
 	 */
 	private void setupConflictButtons() {
 		if (this.formula != null
-				&& this.formulaModel.getConflictStrategy() != null) {
+				|| this.formulaModel.getConflictStrategy() != null) {
 			ConflictStrategyExtractor conflictStrategyExtractor = new ConflictStrategyExtractor();
-			ConflictStrategy strategy = (ConflictStrategy) this.formula
-					.jjtAccept(conflictStrategyExtractor, null);
+			ConflictStrategy strategy = this.formula != null ? (ConflictStrategy) this.formula
+					.jjtAccept(conflictStrategyExtractor, null)
+					: this.formulaModel.getConflictStrategy();
 			this.conflictButtnGroup.setSelected(
 					this.conflictStrategyRadioButtonMap.get(strategy)
 							.getModel(), true);
 		} else {
 			this.conflictButtnGroup.setSelected(this.overriddenButton
 					.getModel(), true);
+			this.formulaModel
+					.setConflictStrategy(this.radioButtonConflictStrategyMap
+							.get(this.overriddenButton));
 		}
 	}
 
@@ -708,7 +931,6 @@ public class OWLArithmeticFormulaEditor extends
 	}
 
 	public void dispose() {
-		// TODO Auto-generated method stub
 	}
 
 	public JComponent getEditorComponent() {
@@ -722,7 +944,7 @@ public class OWLArithmeticFormulaEditor extends
 	public void setFormula(MAEStart formula) {
 		this.formula = formula;
 		this.formulaModel = MAENodeAdapter.toFormulaModel(formula,
-				this.owlEditorKit);
+				this.formulaModel.getFormulaURI(), this.owlEditorKit);
 		this.setupSections();
 	}
 
@@ -734,8 +956,10 @@ public class OWLArithmeticFormulaEditor extends
 
 	private void handleVerifyEditorContents() {
 		if (!this.listeners.isEmpty()) {
-			boolean validated = this.validateBindings()
-					&& this.validateStorage() && this.validateFormulaBody();
+			boolean validated = this.validateFormulaURI()
+					&& this.validateBindings() && this.validateStorage()
+					&& this.validateFormulaBody();
+			this.highlightInvalidSections();
 			for (InputVerificationStatusChangedListener l : this.listeners) {
 				l.verifiedStatusChanged(validated);
 			}
@@ -749,6 +973,32 @@ public class OWLArithmeticFormulaEditor extends
 		}
 	}
 
+	private void highlightInvalidSections() {
+		this.formulaURITextField
+				.setBorder(this.validateFormulaURI() ? new LineBorder(
+						Color.BLACK) : new LineBorder(Color.RED));
+		this.bindingTree.setBorder(this.validateBindings() ? new LineBorder(
+				Color.BLACK) : new LineBorder(Color.RED));
+		this.storeTree.setBorder(this.validateStorage() ? new LineBorder(
+				Color.BLACK) : new LineBorder(Color.RED));
+		this.arithmeticFormulaTextArea
+				.setBorder(this.validateFormulaBody() ? new LineBorder(
+						Color.BLACK) : new LineBorder(Color.RED));
+	}
+
+	private boolean validateFormulaURI() {
+		URI formulaURI = this.formulaModel.getFormulaURI();
+		boolean toReturn = false;
+		if (formulaURI != null && formulaURI.toString().length() > 0) {
+			NamespaceUtil nsUtil = new NamespaceUtil();
+			String[] split = nsUtil.split(formulaURI.toString(), null);
+			toReturn = split.length > 1
+					&& split[0]
+							.compareTo(Constants.FORMULA_NAMESPACE_URI_STRING) == 0;
+		}
+		return toReturn;
+	}
+
 	private boolean validateStorage() {
 		boolean toReturn = false;
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.storeTreeModel
@@ -756,13 +1006,12 @@ public class OWLArithmeticFormulaEditor extends
 		toReturn = root.isLeaf();
 		if (!toReturn) {
 			int variableCount = root.getChildCount();
-			for (int i = 0; i < variableCount; i++) {
-				DefaultMutableTreeNode variableNode = (DefaultMutableTreeNode) root
-						.getChildAt(i);
-				toReturn = variableNode.getChildCount() == 1
-						&& this
-								.validateStoragePropertyChain((DefaultMutableTreeNode) variableNode
-										.getChildAt(0));
+			if (root.getChildCount() == 1) {
+				for (int i = 0; i < variableCount; i++) {
+					DefaultMutableTreeNode variableNode = (DefaultMutableTreeNode) root
+							.getChildAt(i);
+					toReturn = this.validateStoragePropertyChain(variableNode);
+				}
 			}
 		}
 		return toReturn;
@@ -805,7 +1054,8 @@ public class OWLArithmeticFormulaEditor extends
 	private boolean validatePropertyChain(
 			DefaultMutableTreeNode propertychainNode) {
 		return propertychainNode.isLeaf()
-				&& propertychainNode.getUserObject() instanceof OWLDataProperty
+				&& ((PropertyChainModel) propertychainNode.getUserObject())
+						.getProperty() instanceof OWLDataProperty
 				|| !propertychainNode.isLeaf()
 				&& propertychainNode.getChildCount() == 1
 				&& this
@@ -816,7 +1066,8 @@ public class OWLArithmeticFormulaEditor extends
 	private boolean validateStoragePropertyChain(
 			DefaultMutableTreeNode propertychainNode) {
 		return propertychainNode.isLeaf()
-				&& propertychainNode.getUserObject() instanceof OWLObjectProperty
+				&& ((PropertyChainModel) propertychainNode.getUserObject())
+						.getProperty() instanceof OWLObjectProperty
 				|| !propertychainNode.isLeaf()
 				&& propertychainNode.getChildCount() == 1
 				&& this
@@ -833,11 +1084,20 @@ public class OWLArithmeticFormulaEditor extends
 		if (valid) {
 			try {
 				this.formula = MAENodeAdapter.toFormula(this.formulaModel);
+				if (this.formulaURIMap != null) {
+					this.formulaURIMap.put(this.formula, this.formulaModel
+							.getFormulaURI());
+				}
 			} catch (ParseException e) {
 				this.formula = null;
 			}
 		} else {
 			this.formula = null;
 		}
+	}
+
+	public void setFormulaURI(URI annotationURI) {
+		this.formulaModel.setFormulaURI(annotationURI);
+		this.setupFormulaURISection();
 	}
 }

@@ -22,6 +22,8 @@
  */
 package org.coode.oae.ui;
 
+import org.protege.editor.owl.OWLEditorKit;
+import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLProperty;
 
 /**
@@ -34,23 +36,19 @@ import org.semanticweb.owl.model.OWLProperty;
 @SuppressWarnings("unchecked")
 public class PropertyChainModel {
 	protected OWLProperty property;
-	protected int index = -1;
 	protected PropertyChainModel child = null;
+	protected OWLDescription facet = null;
+	private OWLEditorKit owlEditorKit;
 
 	/**
 	 * @param property
 	 * @param index
 	 */
-	public PropertyChainModel(OWLProperty property, int index) {
+	public PropertyChainModel(OWLProperty property, OWLDescription facet,
+			OWLEditorKit owlEditorKit) {
 		this.property = property;
-		this.index = index;
-	}
-
-	/**
-	 * @param property
-	 */
-	public PropertyChainModel(OWLProperty property) {
-		this.property = property;
+		this.facet = facet;
+		this.owlEditorKit = owlEditorKit;
 	}
 
 	/**
@@ -58,13 +56,6 @@ public class PropertyChainModel {
 	 */
 	public OWLProperty getProperty() {
 		return this.property;
-	}
-
-	/**
-	 * @return the index
-	 */
-	public int getIndex() {
-		return this.index;
 	}
 
 	public PropertyChainModel getChild() {
@@ -80,6 +71,11 @@ public class PropertyChainModel {
 		String toReturn = "";
 		PropertyChainModel propertyChainModel = this;
 		toReturn += propertyChainModel.getProperty().getURI().toString();
+		if (this.facet != null) {
+			toReturn += "["
+					+ this.owlEditorKit.getModelManager().getRendering(
+							this.facet) + "]";
+		}
 		boolean endReached = propertyChainModel.getChild() == null;
 		while (!endReached) {
 			propertyChainModel = propertyChainModel.getChild();
@@ -88,5 +84,16 @@ public class PropertyChainModel {
 			endReached = propertyChainModel.getChild() == null;
 		}
 		return toReturn;
+	}
+
+	public OWLDescription getFacet() {
+		return this.facet;
+	}
+
+	/**
+	 * @param descriptionFacet
+	 */
+	public void setFacet(OWLDescription descriptionFacet) {
+		this.facet = descriptionFacet;
 	}
 }

@@ -29,6 +29,7 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRow;
 import org.protege.editor.owl.ui.frame.OWLFrameSection;
 import org.protege.editor.owl.ui.frame.OWLFrameSectionRowObjectEditor;
+import org.semanticweb.owl.model.OWLAnnotation;
 import org.semanticweb.owl.model.OWLAnnotationAxiom;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataProperty;
@@ -48,7 +49,8 @@ public class OWLArithmeticsFormulaClassFrameSectionRow extends
 		AbstractOWLFrameSectionRow<OWLClass, OWLAnnotationAxiom, MAEStart> {
 	protected OWLAnnotationAxiom<OWLDataProperty> axiom;
 
-	protected OWLArithmeticsFormulaClassFrameSectionRow(OWLEditorKit owlEditorKit,
+	protected OWLArithmeticsFormulaClassFrameSectionRow(
+			OWLEditorKit owlEditorKit,
 			OWLFrameSection<OWLClass, OWLAnnotationAxiom, MAEStart> section,
 			OWLOntology ontology, OWLClass rootObject,
 			OWLAnnotationAxiom<OWLDataProperty> axiom) {
@@ -73,9 +75,12 @@ public class OWLArithmeticsFormulaClassFrameSectionRow extends
 				this.getOWLEditorKit(), this.getRootObject(), false);
 		AnnotationFormulaExtractor extractor = new AnnotationFormulaExtractor(
 				this.getRootObject(), this.getOWLModelManager());
-		this.axiom.getAnnotation().accept(extractor);
+		OWLAnnotation annotation = this.axiom.getAnnotation();
+		annotation.accept(extractor);
 		MAEStart formula = extractor.getExtractedFormula();
 		if (formula != null) {
+			arithmeticClassFormulaEditor.setFormulaURI(annotation
+					.getAnnotationURI());
 			arithmeticClassFormulaEditor.setFormula(formula);
 		}
 		return arithmeticClassFormulaEditor;

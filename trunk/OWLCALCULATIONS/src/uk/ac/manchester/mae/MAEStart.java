@@ -27,7 +27,13 @@ public class MAEStart extends SimpleNode {
 			if (isLastBinding) {
 				toString += "->";
 			}
-			toString += child.toString();
+			if (child instanceof MAEStoreTo) {
+				toString += " STORETO <" + child.toString() + ">";
+			} else if (child instanceof MAEmanSyntaxClassExpression) {
+				toString += " APPLIESTO <" + child.toString() + ">";
+			} else {
+				toString += " " + child.toString();
+			}
 			previousChild = child;
 		}
 		return toString + ";";
