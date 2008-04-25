@@ -8,7 +8,7 @@
     <!ENTITY owl11xml "http://www.w3.org/2006/12/owl11-xml#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
     <!ENTITY rdf "http://www.w3.org/1999/02/22-rdf-syntax-ns#" >
-    <!ENTITY formula "http://www.cs.manchester.ac.uk/owlarithmetics/formula#" >
+    <!ENTITY formula "http://www.cs.manchester.ac.uk/owlcalculations/formula#" >
     <!ENTITY geometry "http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#" >
 ]>
 
@@ -19,7 +19,7 @@
      xmlns:owl11="http://www.w3.org/2006/12/owl11#"
      xmlns:owl11xml="http://www.w3.org/2006/12/owl11-xml#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
-     xmlns:formula="http://www.cs.manchester.ac.uk/owlarithmetics/formula#"
+     xmlns:formula="http://www.cs.manchester.ac.uk/owlcalculations/formula#"
      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
      xmlns:owl="http://www.w3.org/2002/07/owl#">
@@ -124,10 +124,10 @@
 
     <owl:DatatypeProperty rdf:about="#hasArea">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
+        <formula:circleArea rdf:datatype="&xsd;string"
+            >$OVERRIDING$APPLIESTO &lt;Circle&gt;{r=http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasRadius!http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasLength}-&gt;3.14 * (r^2.0);</formula:circleArea>
         <formula:squareArea
             >$EXCEPTION$ APPLIESTO &lt;Square&gt;{sideLength=http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasSide!http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasLength}-&gt; sideLength^2;</formula:squareArea>
-        <formula:circleArea
-            >$OVERRIDING$ APPLIESTO &lt;Circle&gt;{r=http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasRadius!http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasLength}-&gt; 4*3.14*r^2;</formula:circleArea>
         <rdfs:domain rdf:resource="#Polygon"/>
         <rdfs:range rdf:resource="&xsd;double"/>
     </owl:DatatypeProperty>
@@ -158,7 +158,7 @@
     <owl:DatatypeProperty rdf:about="#hasPerimeter">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <formula:polygonPerimeter rdf:datatype="&xsd;string"
-            >$OVERRIDING$APPLIESTO &lt;Polygon and not Circle&gt;{sideLength=http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasSide}-&gt;SUM(sideLength);</formula:polygonPerimeter>
+            >$OVERRIDING$APPLIESTO &lt;Polygon and not Circle&gt;{sideLength=http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasSide!http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasLength}-&gt;SUM(sideLength);</formula:polygonPerimeter>
         <formula:squarePerimeter
             >APPLIESTO &lt;Square&gt;{sideLength=http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasSide!http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#hasLength}-&gt; 4*sideLength;</formula:squarePerimeter>
         <formula:circumference
@@ -430,8 +430,6 @@
     <!-- http://www.cs.manchester.ac.uk/owlarithmetics/examples/geometry.owl#sebastianSquare -->
 
     <Square rdf:about="#sebastianSquare">
-        <hasArea rdf:datatype="&xsd;double">100.0</hasArea>
-        <hasPerimeter rdf:datatype="&xsd;double">40.0</hasPerimeter>
         <hasSide rdf:resource="#aTenLongSide"/>
     </Square>
     

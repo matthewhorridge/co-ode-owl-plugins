@@ -31,6 +31,7 @@ import org.semanticweb.owl.model.OWLObjectAnnotation;
 import org.semanticweb.owl.util.NamespaceUtil;
 
 import uk.ac.manchester.mae.ArithmeticsParser;
+import uk.ac.manchester.mae.Constants;
 import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.ParseException;
 import uk.ac.manchester.mae.visitor.protege.ProtegeClassExtractor;
@@ -43,7 +44,6 @@ import uk.ac.manchester.mae.visitor.protege.ProtegeClassExtractor;
  * Apr 4, 2008
  */
 public class AnnotationFormulaExtractor implements OWLAnnotationVisitor {
-	private static final String FORMULA_NAMESPACE_URI_STRING = "http://www.cs.manchester.ac.uk/owlarithmetics/formula#";
 	protected OWLClass owlClass = null;
 	private OWLModelManager modelManager;
 	private MAEStart extractedFormula;
@@ -78,7 +78,8 @@ public class AnnotationFormulaExtractor implements OWLAnnotationVisitor {
 			namespaceUtil.split(uriString, namespaceSplitURString);
 			String namespace = namespaceSplitURString[0];
 			if (namespace != null
-					&& namespace.compareTo(FORMULA_NAMESPACE_URI_STRING) == 0) {
+					&& namespace
+							.compareTo(Constants.FORMULA_NAMESPACE_URI_STRING) == 0) {
 				String formulaString = annotation.getAnnotationValue()
 						.getLiteral().toString();
 				ParserFactory.initParser(formulaString);
@@ -88,8 +89,7 @@ public class AnnotationFormulaExtractor implements OWLAnnotationVisitor {
 					ProtegeClassExtractor classExtractor = new ProtegeClassExtractor(
 							this.modelManager);
 					this.extractedFormula = this.owlClass == null
-							|| this.owlClass != null
-							&& this.owlClass.equals(extractedFormula.jjtAccept(
+							|| this.owlClass.equals(extractedFormula.jjtAccept(
 									classExtractor, null)) ? extractedFormula
 							: null;
 				} catch (ParseException e) {

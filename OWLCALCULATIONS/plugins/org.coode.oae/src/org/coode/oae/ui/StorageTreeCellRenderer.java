@@ -10,14 +10,14 @@ import javax.swing.tree.TreeCellRenderer;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLObjectProperty;
 
-public class StoreTreeCellRenderer implements TreeCellRenderer {
+public class StorageTreeCellRenderer implements TreeCellRenderer {
 	protected DefaultTreeCellRenderer defaultTreeCellRenderer = new DefaultTreeCellRenderer();
 	protected OWLCellRenderer owlCellRenderer;
 	protected OWLEditorKit owlEditorKit;
 
-	public StoreTreeCellRenderer(OWLEditorKit owlEditorKit) {
+	public StorageTreeCellRenderer(OWLEditorKit owlEditorKit) {
 		this.owlEditorKit = owlEditorKit;
 		this.owlCellRenderer = new OWLCellRenderer(this.owlEditorKit);
 	}
@@ -30,21 +30,49 @@ public class StoreTreeCellRenderer implements TreeCellRenderer {
 		Component toReturn = this.defaultTreeCellRenderer
 				.getTreeCellRendererComponent(tree, value, selected, expanded,
 						leaf, row, hasFocus);
-		if (nodeUserObject instanceof OWLObject) {
-			toReturn = this.owlCellRenderer.getTreeCellRendererComponent(tree,
-					nodeUserObject, selected, expanded, leaf, row, hasFocus);
+		if (nodeUserObject instanceof PropertyChainModel) {
+			PropertyChainModel propertyChainModel = (PropertyChainModel) nodeUserObject;
+			String propertyRendering = this.owlEditorKit.getOWLModelManager()
+					.getRendering(propertyChainModel.getProperty());
+			String facetRendering = propertyChainModel.getFacet() == null ? ""
+					: "["
+							+ this.owlEditorKit
+									.getOWLModelManager()
+									.getRendering(propertyChainModel.getFacet())
+							+ "]";
+			String iconName = propertyChainModel.getProperty() instanceof OWLObjectProperty ? "property.object.png"
+					: "property.data.png";
+			this.defaultTreeCellRenderer.setOpenIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			this.defaultTreeCellRenderer.setClosedIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			this.defaultTreeCellRenderer.setLeafIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			toReturn = this.defaultTreeCellRenderer
+					.getTreeCellRendererComponent(tree, propertyRendering
+							+ facetRendering, selected, expanded, leaf, row,
+							hasFocus);
+			this.defaultTreeCellRenderer
+					.setOpenIcon(this.defaultTreeCellRenderer
+							.getDefaultOpenIcon());
+			this.defaultTreeCellRenderer
+					.setClosedIcon(this.defaultTreeCellRenderer
+							.getDefaultClosedIcon());
+			this.defaultTreeCellRenderer
+					.setLeafIcon(this.defaultTreeCellRenderer
+							.getDefaultLeafIcon());
 		}
 		if (((DefaultMutableTreeNode) value).isRoot()) {
 			this.defaultTreeCellRenderer.setOpenIcon(new ImageIcon(
-					StoreTreeCellRenderer.class.getClassLoader().getResource(
+					StorageTreeCellRenderer.class.getClassLoader().getResource(
 							"storage.png")));
 			this.defaultTreeCellRenderer.setClosedIcon(new ImageIcon(
-					StoreTreeCellRenderer.class.getClassLoader().getResource(
+					StorageTreeCellRenderer.class.getClassLoader().getResource(
 							"storage.png")));
 			String message = "Store to";
 			if (((DefaultMutableTreeNode) value).isLeaf()) {
 				this.defaultTreeCellRenderer.setLeafIcon(new ImageIcon(
-						StoreTreeCellRenderer.class.getClassLoader()
+						StorageTreeCellRenderer.class.getClassLoader()
 								.getResource("storage.png")));
 				message = "No storage set";
 			}

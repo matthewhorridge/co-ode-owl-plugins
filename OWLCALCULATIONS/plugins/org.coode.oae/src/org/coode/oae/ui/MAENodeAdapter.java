@@ -32,7 +32,6 @@ import org.coode.oae.utils.ParserFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLProperty;
 
 import uk.ac.manchester.mae.ArithmeticsParser;
 import uk.ac.manchester.mae.ConflictStrategy;
@@ -71,18 +70,14 @@ public class MAENodeAdapter {
 			MAEPropertyChain propertyChain, OWLModelManager modelManager) {
 		DefaultMutableTreeNode toReturn;
 		if (!propertyChain.isEnd()) {
-			toReturn = new DefaultMutableTreeNode(modelManager
-					.getOWLDataFactory().getOWLObjectProperty(
-							URI.create(propertyChain.getPropertyName())));
+			toReturn = new DefaultMutableTreeNode(propertyChain);
 			MAEPropertyChain innerPropertyChain = (MAEPropertyChain) propertyChain
 					.jjtGetChild(0);
 			DefaultMutableTreeNode innerPropertyChainNode = toTreeNode(
 					innerPropertyChain, modelManager);
 			toReturn.insert(innerPropertyChainNode, 0);
 		} else {
-			toReturn = new DefaultMutableTreeNode(modelManager
-					.getOWLDataFactory().getOWLDataProperty(
-							URI.create(propertyChain.getPropertyName())));
+			toReturn = new DefaultMutableTreeNode(propertyChain);
 		}
 		return toReturn;
 	}
@@ -102,8 +97,8 @@ public class MAENodeAdapter {
 	@SuppressWarnings("unchecked")
 	private static PropertyChainModel toPropertyChainModel(
 			DefaultMutableTreeNode propertyChainNode) {
-		PropertyChainModel toReturn = new PropertyChainModel(
-				(OWLProperty) propertyChainNode.getUserObject());
+		PropertyChainModel toReturn = (PropertyChainModel) propertyChainNode
+				.getUserObject();
 		if (!propertyChainNode.isLeaf()) {
 			toReturn
 					.setChild(toPropertyChainModel((DefaultMutableTreeNode) propertyChainNode
@@ -132,7 +127,7 @@ public class MAENodeAdapter {
 		}
 		StorageModel storageModel = formulaModel.getStorageModel();
 		if (storageModel != null) {
-			formulaString += "STORETO<"
+			formulaString += "STORETO <"
 					+ storageModel.getPropertyChainModel().toString() + ">";
 		}
 		Set<BindingModel> bindings = formulaModel.getBindings();
@@ -145,20 +140,60 @@ public class MAENodeAdapter {
 			}
 			formulaString += "}";
 		}
-		formulaString += "->" + formulaModel.getFormulaBody();
+		if (!bindings.isEmpty()) {
+			formulaString += "->";
+		}
+		formulaString += formulaModel.getFormulaBody();
 		ParserFactory.initParser(formulaString);
 		return (MAEStart) ArithmeticsParser.Start();
 	}
 
-	public static FormulaModel toFormulaModel(MAEStart formula,
+	public static FormulaModel toFormulaModel(MAEStart formula, URI formulaURI,
 			OWLEditorKit owlEditorKit) {
 		FormulaModelExtractor fme = new FormulaModelExtractor(owlEditorKit);
 		formula.jjtAccept(fme, null);
-		return fme.getExtractedFormulaModel();
+		FormulaModel extractedFormulaModel = fme.getExtractedFormulaModel();
+		if (extractedFormulaModel != null) {
+			extractedFormulaModel.setFormulaURI(formulaURI);
+		}
+		return extractedFormulaModel;
 	}
 
 	public static StorageModel toStorageModel(
 			DefaultMutableTreeNode storageSubTreeRoot) {
 		return new StorageModel(toPropertyChainModel(storageSubTreeRoot));
+	}
+
+	public static MutableTreeNode toTreeNode(StorageModel storageModel,
+			OWLModelManager modelManager) {
+		DefaultMutableTreeNode toReturn = new DefaultMutableTreeNode("Store to");
+		PropertyChainModel propertyChainModel = storageModel
+				.getPropertyChainModel();
+		if (propertyChainModel != null) {
+			toReturn.insert(toTreeNode(propertyChainModel, modelManager), 0);
+		}
+		return toReturn;
+	}
+
+	public static MutableTreeNode toTreeNode(
+			PropertyChainModel propertyChainModel, OWLModelManager modelManager) {
+		DefaultMutableTreeNode toReturn = new DefaultMutableTreeNode(
+				propertyChainModel);
+		if (propertyChainModel.getChild() != null) {
+			toReturn.insert(toTreeNode(propertyChainModel.getChild(),
+					modelManager), 0);
+		}
+		return toReturn;
+	}
+
+	public static MutableTreeNode toTreeNode(BindingModel binding,
+			OWLModelManager modelManager) {
+		DefaultMutableTreeNode toReturn = new DefaultMutableTreeNode(binding
+				.getIdentifier());
+		PropertyChainModel propertyChainModel = binding.getPropertyChainModel();
+		if (propertyChainModel != null) {
+			toReturn.insert(toTreeNode(propertyChainModel, modelManager), 0);
+		}
+		return toReturn;
 	}
 }

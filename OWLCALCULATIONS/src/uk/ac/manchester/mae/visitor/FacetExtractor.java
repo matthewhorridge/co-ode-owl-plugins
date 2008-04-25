@@ -20,27 +20,19 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae;
+package uk.ac.manchester.mae.visitor;
+
+import org.semanticweb.owl.model.OWLDescription;
+
+import uk.ac.manchester.mae.ArithmeticsParserVisitor;
 
 /**
  * @author Luigi Iannone
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Mar 14, 2008
+ * Apr 25, 2008
  */
-public class MoreThanOneValueForFunctionalPropertyException extends
-		EvaluationException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 9031901854901898966L;
-
-	public MoreThanOneValueForFunctionalPropertyException() {
-		super();
-	}
-
-	public MoreThanOneValueForFunctionalPropertyException(String message) {
-		super(message);
-	}
+public abstract class FacetExtractor implements ArithmeticsParserVisitor {
+	public abstract OWLDescription getExtractedDescription();
 }

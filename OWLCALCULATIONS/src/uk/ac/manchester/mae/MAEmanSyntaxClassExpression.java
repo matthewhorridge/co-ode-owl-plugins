@@ -28,6 +28,6 @@ public class MAEmanSyntaxClassExpression extends SimpleNode {
 
 	@Override
 	public String toString() {
-		return "APPLIESTO <" + this.content + ">";
+		return this.content;
 	}
 }

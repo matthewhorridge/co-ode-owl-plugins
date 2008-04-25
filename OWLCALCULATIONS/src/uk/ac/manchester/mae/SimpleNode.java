@@ -103,4 +103,14 @@ public class SimpleNode implements Node {
 	public void setSymbolic(boolean isSymbolic) {
 		this.isSymbolic = isSymbolic;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return this.toString().equals(obj.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		return this.toString().hashCode();
+	}
 }

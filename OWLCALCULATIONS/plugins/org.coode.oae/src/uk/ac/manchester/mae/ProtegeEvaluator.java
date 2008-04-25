@@ -38,10 +38,8 @@ import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.description.OWLExpressionParserException;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLConstant;
 import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owl.model.OWLDataType;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLIndividual;
@@ -56,6 +54,8 @@ import uk.ac.manchester.mae.report.ExceptionReportWriter;
 import uk.ac.manchester.mae.report.FormulaReportWriter;
 import uk.ac.manchester.mae.report.ResultReportWriter;
 import uk.ac.manchester.mae.visitor.protege.ProtegeClassExtractor;
+import uk.ac.manchester.mae.visitor.protege.ProtegeDescriptionFacetExtractor;
+import uk.ac.manchester.mae.visitor.protege.ProtegeWriter;
 
 /**
  * @author Luigi Iannone
@@ -69,7 +69,7 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 	protected OWLOntology startingOntology;
 	protected Map<OWLIndividual, Map<String, List<Object>>> bindings = new HashMap<OWLIndividual, Map<String, List<Object>>>();
 	protected OWLModelManager modelManager;
-	private OWLDescription classDescription;
+	private OWLDescription appliesToClassDescription;
 	private OWLReasoner reasoner;
 	private Set<OWLIndividual> instances;
 	private Set<OWLIndividual> selectedIndividuals = new HashSet<OWLIndividual>();
@@ -89,8 +89,12 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 		this.modelManager = modelManager;
 		this.startingOntology = modelManager.getActiveOntology();
 		this.ontologies = this.modelManager.getOntologies();
-		this.classDescription = modelManager.getOWLDataFactory().getOWLThing();
+		this.appliesToClassDescription = modelManager.getOWLDataFactory()
+				.getOWLThing();
 		this.reasoner = this.modelManager.getReasoner();
+		if (!this.reasoner.isClassified()) {
+			this.reasoner.classify();
+		}
 	}
 
 	/**
@@ -237,7 +241,8 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 		this.report = new EvaluationReport();
 		Map<OWLDataProperty, Map<OWLIndividual, Object>> result = new HashMap<OWLDataProperty, Map<OWLIndividual, Object>>();
 		for (OWLOntology ontology : this.ontologies) {
-			for (OWLIndividual individual : ontology.getReferencedIndividuals()) {
+			for (OWLIndividual individual : new HashSet<OWLIndividual>(ontology
+					.getReferencedIndividuals())) {
 				Map<OWLDataProperty, Map<OWLIndividual, Object>> individualEvaluation = this
 						.evaluate(individual.getURI().toString(), true);
 				if (!individualEvaluation.isEmpty()) {
@@ -296,9 +301,11 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 							if (!individualResults.isEmpty()) {
 								result.put(dataProperty, individualResults);
 								if (storeValues) {
-									this.write(individual, dataProperty,
+									ProtegeWriter protegeWriter = new ProtegeWriter(
+											individual, dataProperty,
 											individualResults.get(individual),
-											formula);
+											this.modelManager, this.report);
+									formula.jjtAccept(protegeWriter, null);
 								}
 							}
 						}
@@ -313,99 +320,21 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
-	private void write(OWLIndividual individual, OWLDataProperty dataProperty,
-			Object object, SimpleNode formula) throws EvaluationException,
-			OWLOntologyChangeException {
-		Set<OWLConstant> oldValues = individual.getDataPropertyValues(
-				this.startingOntology).get(dataProperty);
-		if (!dataProperty.isFunctional(this.ontologies) || oldValues == null
-				|| oldValues.isEmpty()) {
-			if (object instanceof Collection) {
-				for (Object newValue : (Collection<Object>) object) {
-					this.writeSingleValue(individual, dataProperty, newValue);
-				}
-			} else {
-				this.writeSingleValue(individual, dataProperty, object);
-			}
-		} else if (dataProperty.isFunctional(this.ontologies)) {
-			if (object instanceof Collection
-					&& ((Collection<Object>) object).size() > 1) {
-				throw new MoreThanOneValueForFunctionalPropertyException(
-						"More than one value for the functional property "
-								+ dataProperty + " for the individual "
-								+ individual.getURI().toString());
-			}
-			if (oldValues != null && !oldValues.isEmpty()) {
-				ConflictStrategy solver = this.conflictStrategyMap.get(formula);
-				OWLDataPropertyAssertionAxiom oldAssertion = this.modelManager
-						.getOWLDataFactory().getOWLDataPropertyAssertionAxiom(
-								individual, dataProperty,
-								oldValues.iterator().next());
-				if (solver != null) {
-					solver
-							.solve(
-									individual,
-									oldAssertion,
-									this
-											.convert2OWLConstant(object instanceof Collection ? ((Collection) object)
-													.iterator().next()
-													: object),
-									this.modelManager);
-				} else {
-					this
-							.writeSingleValue(
-									individual,
-									dataProperty,
-									object instanceof Collection ? ((Collection) object)
-											.iterator().next()
-											: object);
-				}
-			}
-		}
-	}
-
-	private void writeSingleValue(OWLIndividual individual,
-			OWLDataProperty dataProperty, Object newValue)
-			throws UnsupportedDataTypeException, OWLOntologyChangeException {
-		OWLConstant valueAsOWLConstant = this.convert2OWLConstant(newValue);
-		AddAxiom addAxiom = new AddAxiom(this.startingOntology,
-				this.modelManager.getOWLDataFactory()
-						.getOWLDataPropertyAssertionAxiom(individual,
-								dataProperty, valueAsOWLConstant));
-		this.modelManager.applyChange(addAxiom);
-	}
-
-	private OWLConstant convert2OWLConstant(Object newValue)
-			throws UnsupportedDataTypeException {
-		OWLConstant toReturn = null;
-		if (newValue instanceof Double) {
-			toReturn = this.modelManager.getOWLDataFactory()
-					.getOWLTypedConstant(((Double) newValue).doubleValue());
-		} else {
-			throw new UnsupportedDataTypeException(newValue.getClass()
-					.getName());
-		}
-		return toReturn;
-	}
-
 	private SimpleNode pickFormula(OWLIndividual individual,
 			OWLDataProperty dataProperty, Set<SimpleNode> formulas)
 			throws OWLReasonerException,
 			MoreThanOneFormulaPerIndividualException {
 		Set<SimpleNode> applicableFormulas = new HashSet<SimpleNode>();
-		ProtegeClassExtractor classExtractor = new ProtegeClassExtractor(
-				this.modelManager);
 		if (!this.reasoner.isClassified()) {
 			this.reasoner.classify();
 		}
 		boolean isApplicable;
 		OWLDescription classDescription = null, anotherClassDescription = null;
 		for (SimpleNode formula : formulas) {
-			for (Node child : formula.children) {
-				classDescription = (OWLDescription) child.jjtAccept(
-						classExtractor, classDescription);
-			}
+			ProtegeClassExtractor protegeClassExtractor = new ProtegeClassExtractor(
+					this.modelManager);
+			formula.jjtAccept(protegeClassExtractor, null);
+			classDescription = protegeClassExtractor.getExtractedClass();
 			isApplicable = this.reasoner
 					.getIndividuals(classDescription, false).contains(
 							individual);
@@ -417,18 +346,17 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 		// set of applicable formulas
 		for (SimpleNode anApplicableFormula : new HashSet<SimpleNode>(
 				applicableFormulas)) {
-			for (Node child : anApplicableFormula.children) {
-				classDescription = (OWLDescription) child.jjtAccept(
-						classExtractor, classDescription);
-			}
+			ProtegeClassExtractor protegeClassExtractor = new ProtegeClassExtractor(
+					this.modelManager);
+			anApplicableFormula.jjtAccept(protegeClassExtractor, null);
+			classDescription = protegeClassExtractor.getExtractedClass();
 			for (SimpleNode anotherApplicableFormula : new HashSet<SimpleNode>(
 					applicableFormulas)) {
 				if (!anApplicableFormula.equals(anotherApplicableFormula)) {
-					for (Node child : anotherApplicableFormula.children) {
-						anotherClassDescription = (OWLDescription) child
-								.jjtAccept(classExtractor,
-										anotherClassDescription);
-					}
+					anotherApplicableFormula.jjtAccept(protegeClassExtractor,
+							null);
+					anotherClassDescription = protegeClassExtractor
+							.getExtractedClass();
 					if (this.reasoner.isSubClassOf(classDescription,
 							anotherClassDescription)
 							&& !this.reasoner.isSubClassOf(
@@ -527,8 +455,9 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 	}
 
 	private Collection<Object> fetch(OWLIndividual currentIndividual,
-			String propertyName, boolean isDatatype) throws URISyntaxException,
-			UnsupportedDataTypeException {
+			String propertyName, boolean isDatatype,
+			OWLDescription facetDescription) throws URISyntaxException,
+			UnsupportedDataTypeException, OWLReasonerException {
 		Collection<Object> toReturn = null;
 		Iterator<OWLOntology> it = this.ontologies.iterator();
 		boolean found = false;
@@ -549,6 +478,9 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 					}
 				}
 			} else {
+				if (!this.reasoner.isClassified()) {
+					this.reasoner.classify();
+				}
 				OWLObjectProperty objectProperty = this.modelManager
 						.getOWLDataFactory().getOWLObjectProperty(
 								new URI(propertyName));
@@ -557,7 +489,10 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 				toReturn = new HashSet<Object>();
 				if (!(fillers == null || fillers.isEmpty())) {
 					for (OWLIndividual filler : fillers) {
-						toReturn.add(filler);
+						if (this.reasoner.hasType(filler, facetDescription,
+								false)) {
+							toReturn.add(filler);
+						}
 					}
 				}
 			}
@@ -587,8 +522,9 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 
 	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
 		try {
-			this.classDescription = this.modelManager.getOWLDescriptionParser()
-					.createOWLDescription(node.getContent());
+			this.appliesToClassDescription = this.modelManager
+					.getOWLDescriptionParser().createOWLDescription(
+							node.getContent());
 		} catch (OWLExpressionParserException e) {
 			ExceptionReportWriter erw = new ExceptionReportWriter(
 					(OWLDataProperty) data, (MAEStart) data, e);
@@ -602,8 +538,8 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 		if (!this.reasoner.isClassified()) {
 			this.reasoner.classify();
 		}
-		this.instances = this.reasoner.getIndividuals(this.classDescription,
-				false);
+		this.instances = this.reasoner.getIndividuals(
+				this.appliesToClassDescription, false);
 		if (!this.selectedIndividuals.isEmpty()) {
 			this.instances.retainAll(this.selectedIndividuals);
 		}
@@ -614,16 +550,24 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 		List<Object> toReturn = null;
 		Set<OWLIndividual> individuals = (Set<OWLIndividual>) data;
 		String propertyName = node.getPropertyName();
+		ProtegeDescriptionFacetExtractor facetExtractor = new ProtegeDescriptionFacetExtractor(
+				this.modelManager);
+		node.jjtAccept(facetExtractor, data);
+		OWLDescription extractedDescription = facetExtractor
+				.getExtractedDescription() == null ? this.modelManager
+				.getOWLDataFactory().getOWLThing() : facetExtractor
+				.getExtractedDescription();
 		if (node.isEnd()) {
 			toReturn = new ArrayList<Object>();
 			for (OWLIndividual individual : individuals) {
 				try {
-					toReturn.addAll(this.fetch(individual, propertyName, true));
+					toReturn.addAll(this.fetch(individual, propertyName, true,
+							extractedDescription));
 				} catch (UnsupportedDataTypeException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (OWLReasonerException e) {
 					e.printStackTrace();
 				}
 			}
@@ -633,13 +577,17 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 					Set<Object> fillers;
 					try {
 						fillers = (Set<Object>) this.fetch(individual,
-								propertyName, false);
+								propertyName, false, extractedDescription);
 						toReturn = new ArrayList<Object>();
-						toReturn.addAll((List<Object>) child.jjtAccept(this,
-								fillers));
+						if (child instanceof MAEPropertyChain) {
+							toReturn.addAll((List<Object>) child.jjtAccept(
+									this, fillers));
+						}
 					} catch (UnsupportedDataTypeException e) {
 						e.printStackTrace();
 					} catch (URISyntaxException e) {
+						e.printStackTrace();
+					} catch (OWLReasonerException e) {
 						e.printStackTrace();
 					}
 				}
@@ -679,7 +627,19 @@ public class ProtegeEvaluator implements ArithmeticsParserVisitor {
 		return this.report;
 	}
 
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 *      java.lang.Object)
+	 */
 	public Object visit(MAEStoreTo node, Object data) {
+		return null;
+	}
+
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
+	 *      java.lang.Object)
+	 */
+	public Object visit(MAEPropertyFacet node, Object data) {
 		return null;
 	}
 }

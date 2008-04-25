@@ -71,16 +71,18 @@ public class OWLArithmeticsFormulaDataPropertyFrameSectionRow
 
 	@Override
 	protected OWLFrameSectionRowObjectEditor<MAEStart> getObjectEditor() {
-		OWLArithmeticFormulaEditor arithmeticClassFormulaEditor = new OWLArithmeticFormulaEditor(
+		OWLArithmeticFormulaEditor arithmeticFormulaEditor = new OWLArithmeticFormulaEditor(
 				this.getOWLEditorKit(), null, true);
 		AnnotationFormulaExtractor extractor = new AnnotationFormulaExtractor(
 				null, this.getOWLModelManager());
 		this.axiom.getAnnotation().accept(extractor);
 		MAEStart formula = extractor.getExtractedFormula();
 		if (formula != null) {
-			arithmeticClassFormulaEditor.setFormula(formula);
+			arithmeticFormulaEditor.setFormulaURI(this.axiom.getAnnotation()
+					.getAnnotationURI());
+			arithmeticFormulaEditor.setFormula(formula);
 		}
-		return arithmeticClassFormulaEditor;
+		return arithmeticFormulaEditor;
 	}
 
 	public List<? extends OWLObject> getManipulatableObjects() {

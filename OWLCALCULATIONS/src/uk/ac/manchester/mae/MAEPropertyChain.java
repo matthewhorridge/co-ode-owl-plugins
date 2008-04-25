@@ -47,8 +47,25 @@ public class MAEPropertyChain extends SimpleNode {
 	@Override
 	public String toString() {
 		String toReturn = this.propertyName;
-		if (this.isEnd) {
-			toReturn += "!" + this.children[0].toString();
+		boolean hasFacet = false;
+		Node facet = null;
+		for (int i = 0; i < this.jjtGetNumChildren() && !hasFacet; i++) {
+			facet = this.children[i];
+			hasFacet = facet instanceof MAEPropertyFacet;
+		}
+		if (hasFacet) {
+			toReturn += facet.toString();
+		}
+		if (!this.isEnd) {
+			boolean found = false;
+			Node child = null;
+			for (int i = 0; i < this.jjtGetNumChildren() && !found; i++) {
+				child = this.children[i];
+				found = child instanceof MAEPropertyChain;
+			}
+			if (found) {
+				toReturn += "!" + child.toString();
+			}
 		}
 		return toReturn;
 	}

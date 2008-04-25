@@ -32,6 +32,7 @@ import uk.ac.manchester.mae.MAEIntNode;
 import uk.ac.manchester.mae.MAEMult;
 import uk.ac.manchester.mae.MAEPower;
 import uk.ac.manchester.mae.MAEPropertyChain;
+import uk.ac.manchester.mae.MAEPropertyFacet;
 import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.MAEStoreTo;
 import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
@@ -168,6 +169,14 @@ public class BindingPropertyChainExtractor implements ArithmeticsParserVisitor {
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStoreTo node, Object data) {
+		return null;
+	}
+
+	/**
+	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
+	 *      java.lang.Object)
+	 */
+	public Object visit(MAEPropertyFacet node, Object data) {
 		return null;
 	}
 }
