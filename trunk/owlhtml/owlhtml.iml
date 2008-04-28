@@ -7,7 +7,7 @@
         <attribute name="URI" value="/" />
       </containerElement>
     </containerInfo>
-    <setting name="jarUrl" value="file://$MODULE_DIR$/../owldoc-server/lib/owlhtml.jar" />
+    <setting name="jarUrl" value="file://$MODULE_DIR$/../browser/lib/owlhtml.jar" />
     <setting name="buildJar" value="true" />
     <setting name="mainClass" value="org.coode.html.OntologyExporter" />
   </component>
