@@ -25,6 +25,8 @@ public interface ServerProperties {
 
     Set<String> keySet();
 
+    void remove(String key);    
+
     void addPropertyChangeListener(PropertyChangeListener l);
 
     void removePropertyChangeListener(PropertyChangeListener l);

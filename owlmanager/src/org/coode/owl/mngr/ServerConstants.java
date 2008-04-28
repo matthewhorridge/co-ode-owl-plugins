@@ -45,6 +45,9 @@ public class ServerConstants {
     public static final String OPTION_RENDER_SUB_EXPAND_LINKS = "option_render_sub_expand_links";
     public static final String OPTION_RENDER_SUBS = "option_render_subs";
     public static final String OPTION_REN = "ren";
+    public static final String OPTION_LABEL_URI = "option_label_uri";
+    public static final String OPTION_ACTIVE_ONT = "option_active_ont";
+
 
     public static final String TRUE = "true";
     public static final String FALSE = "false";
@@ -53,8 +56,6 @@ public class ServerConstants {
     public static final String PELLET = "pellet";
     public static final String FACTPLUSPLUS = "factPlusPlus";
     public static final String DIG = "DIG";
-
-    public static final String OPTION_LABEL_URI = "option_label_uri";
 
     // supported syntaxes
 //    public static final String QUICK_DESCRIPTION_SYNTAX = "qd";
