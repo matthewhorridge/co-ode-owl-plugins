@@ -64,6 +64,12 @@ public class ServerPropertiesImpl implements ServerProperties {
         return keys;
     }
 
+    public void remove(String key) {
+        String oldValue = properties.getProperty(key);
+        properties.remove(key);
+        notifyPropertyChanged(key, oldValue, null);
+    }
+
     public void addPropertyChangeListener(PropertyChangeListener l) {
         listeners.add(l);
     }

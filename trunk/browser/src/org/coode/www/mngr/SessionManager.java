@@ -142,7 +142,7 @@ public class SessionManager {
      */
     private synchronized static void loadServerState(OWLHTMLServer server, String label) throws OntServerException {
 
-        server.clear(); // dump all ontologies and caches
+        server.clearOntologies(); // dump all ontologies and caches
 
         try {
             File file = getFile(label);

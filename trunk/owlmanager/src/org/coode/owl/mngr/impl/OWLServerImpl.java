@@ -13,10 +13,10 @@ import uk.ac.manchester.cs.owl.inference.dig11.DIGReasonerPreferences;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Constructor;
 import java.net.URI;
 import java.net.URL;
 import java.util.*;
-import java.lang.reflect.Constructor;
 
 
 /**
@@ -134,7 +134,7 @@ public class OWLServerImpl implements OWLServer {
             handleTopOntology(existingLoadedOntologies);
         }
 
-        if (activeOntology == null){
+        if (getActiveOntology() == null){
             setActiveOntology(ont); // the active ontology is always the first that was loaded
         }
     }
@@ -144,16 +144,16 @@ public class OWLServerImpl implements OWLServer {
      * @param ontURI
      */
     public void removeOntology(URI ontURI) {
-        if (activeOntology.getURI().equals(ontURI)){
-            activeOntology = null;
+        if (getActiveOntology().getURI().equals(ontURI)){
+            setActiveOntology(null);
         }
 
         mngr.removeOntology(ontURI);
 
-        if (activeOntology == null){
+        if (getActiveOntology() == null){
             final Set<OWLOntology> visibleOntologies = getActiveOntologies();
             if (!visibleOntologies.isEmpty()){
-                activeOntology = visibleOntologies.iterator().next();
+                setActiveOntology(visibleOntologies.iterator().next());
             }
         }
 
@@ -190,12 +190,28 @@ public class OWLServerImpl implements OWLServer {
     }
 
     public OWLOntology getActiveOntology() {
+        if (activeOntology == null){
+            String ont = getProperties().get(ServerConstants.OPTION_ACTIVE_ONT);
+            if (ont != null){
+                URI activeOntURI = URI.create(ont);
+                if (activeOntURI != null){
+                    activeOntology = getOntology(activeOntURI);
+                }
+            }
+        }
         return activeOntology;
     }
 
     public void setActiveOntology(OWLOntology ont) {
-        if (activeOntology == null || !activeOntology.equals(ont)){
+        if (getActiveOntology() == null || !getActiveOntology().equals(ont)){
             activeOntology = ont;
+
+            if (ont != null){
+                getProperties().set(ServerConstants.OPTION_ACTIVE_ONT, ont.getURI().toString());
+            }
+            else{
+                getProperties().remove(ServerConstants.OPTION_ACTIVE_ONT);
+            }
 
             clear();
 
