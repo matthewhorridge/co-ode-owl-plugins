@@ -10,7 +10,6 @@ import org.coode.html.renderer.OWLHTMLRenderer;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
-import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
 
@@ -65,5 +64,9 @@ public abstract class AbstractOWLElementsDoclet<O extends OWLObject, E extends O
             ren.setContentTargetWindow(linkTarget);
         }
         return ren;
+    }
+
+    public String getID() {
+        return super.getID() + " (" + getElements().size() + ")";
     }
 }

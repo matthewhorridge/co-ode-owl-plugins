@@ -61,13 +61,21 @@ public class OWLHTMLConstants extends ServerConstants {
 
     public static final String DL_QUERY_LABEL = "DL Query";
     public static final String PERMALINK_LABEL = "Permalink";    
+    public static final String MANAGE_LABEL = "Manage";
+    public static final String CONTENTS_LABEL = "Contents";
+    public static final String RESTART_LABEL = "Restart";
+    public static final String BOOKMARKS_LABEL = "Bookmarks";
 
     public static final int MAX_SESSIONS = 4;
     public static final int SESSION_TIMEOUT = 5;
 
     public static final String PARAM_SESSION_LABEL = "session";
 
-    public enum LinkTarget{_top, content, nav, subnav, header}
+    public static String ONTOLOGY_BROWSER_LABEL = "Ontology Browser";
+
+
+
+    public enum LinkTarget{_top, content, nav, subnav, header, _blank}
 
 
     // window modes

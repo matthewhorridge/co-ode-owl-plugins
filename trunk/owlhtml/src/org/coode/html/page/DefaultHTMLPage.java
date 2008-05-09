@@ -4,6 +4,7 @@
 package org.coode.html.page;
 
 import org.coode.html.doclet.AbstractHTMLDoclet;
+import org.coode.html.impl.OWLHTMLConstants;
 import org.coode.html.util.URLUtils;
 
 import java.io.PrintWriter;
@@ -104,7 +105,7 @@ public class DefaultHTMLPage<O> extends AbstractHTMLDoclet<O> {
     }
 
     protected String getTitle() {
-        return title;
+        return OWLHTMLConstants.ONTOLOGY_BROWSER_LABEL + ": " + title;
     }
 
     public String getID() {

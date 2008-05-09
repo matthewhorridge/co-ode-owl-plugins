@@ -3,18 +3,16 @@
 */
 package org.coode.html.doclet;
 
+import org.apache.log4j.Logger;
 import org.coode.html.OWLHTMLServer;
 import org.coode.html.impl.OWLHTMLConstants;
 import org.coode.html.util.URLUtils;
 import org.coode.owl.mngr.impl.FragmentShortFormProvider;
-import org.apache.log4j.Logger;
 
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-
-import edu.unika.aifb.rdf.api.syntax.RDFParser;
 
 /**
  * Author: Nick Drummond<br>
@@ -42,11 +40,11 @@ public class MenuBarDoclet extends AbstractOWLDocDoclet {
 
         out.println("<a style='display: none;' href='#content'>skip to content</a> ");
 
-        renderLink("Contents", getServer().getURLScheme().getURLForRelativePage(OWLHTMLConstants.CONTENTS_HTML), OWLHTMLConstants.LinkTarget.content, "", isSingleFrameNavigation(), pageURL, out);
+        renderLink(OWLHTMLConstants.CONTENTS_LABEL, getServer().getURLScheme().getURLForRelativePage(OWLHTMLConstants.CONTENTS_HTML), OWLHTMLConstants.LinkTarget.content, "", isSingleFrameNavigation(), pageURL, out);
         out.print(" | ");
-        renderLink("Manage", getServer().getURLScheme().getURLForRelativePage(OWLHTMLConstants.MANAGE_HTML), OWLHTMLConstants.LinkTarget.content, null, isSingleFrameNavigation(), pageURL, out);
+        renderLink(OWLHTMLConstants.MANAGE_LABEL, getServer().getURLScheme().getURLForRelativePage(OWLHTMLConstants.MANAGE_HTML), OWLHTMLConstants.LinkTarget.content, null, isSingleFrameNavigation(), pageURL, out);
         out.print(" | ");
-        renderLink("Restart", getServer().getURLScheme().getURLForRelativePage(OWLHTMLConstants.SIGNOUT_HTML), OWLHTMLConstants.LinkTarget._top, "", isSingleFrameNavigation(), pageURL, out);
+        renderLink(OWLHTMLConstants.RESTART_LABEL, getServer().getURLScheme().getURLForRelativePage(OWLHTMLConstants.SIGNOUT_HTML), OWLHTMLConstants.LinkTarget._top, "", isSingleFrameNavigation(), pageURL, out);
     }
 
     protected void renderFooter(URL pageURL, PrintWriter out) {
