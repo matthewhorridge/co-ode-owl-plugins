@@ -9,7 +9,7 @@ import org.coode.html.doclet.AbstractOWLDocDoclet;
 import org.coode.html.impl.OWLHTMLConstants;
 import org.coode.html.renderer.OWLHTMLRenderer;
 import org.coode.www.ManageAction;
-import org.coode.www.OWLDocServerConstants;
+import org.coode.www.OntologyBrowserConstants;
 import org.semanticweb.owl.model.OWLOntology;
 
 import java.io.PrintWriter;
@@ -81,8 +81,8 @@ public class OntologyMappingsTableDoclet extends AbstractOWLDocDoclet {
                     for (ManageAction action : ManageAction.values()){
                         if (!action.equals(ManageAction.load)){
                             String linkURL = OWLHTMLConstants.MANAGE_HTML + "?" +
-                                             OWLDocServerConstants.PARAM_ACTION + "=" + action + "&" +
-                                             OWLDocServerConstants.PARAM_URI + "=" + encodedURI;
+                                             OntologyBrowserConstants.PARAM_ACTION + "=" + action + "&" +
+                                             OntologyBrowserConstants.PARAM_URI + "=" + encodedURI;
                             renderLink(action.toString(),
                                        server.getURLScheme().getURLForRelativePage(linkURL),
                                        OWLHTMLConstants.LinkTarget._top, "", isSingleFrameNavigation(), pageURL, out);
