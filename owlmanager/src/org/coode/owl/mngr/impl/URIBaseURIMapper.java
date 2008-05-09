@@ -2,6 +2,9 @@ package org.coode.owl.mngr.impl;
 
 import org.semanticweb.owl.model.OWLOntologyURIMapper;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -49,7 +52,30 @@ public class URIBaseURIMapper implements OWLOntologyURIMapper {
     public URI getPhysicalURI(URI ontologyURI) {
         String base = getBase(ontologyURI).toString();
         String ontologyName = ontologyURI.toString().substring(base.length());
-        return URI.create(baseURI + ontologyName);
+        URI loc = URI.create(baseURI + ontologyName);
+
+        try {
+            // see if the location on the web exists
+            if (loc.getScheme().equals("http")){
+                HttpURLConnection con = (HttpURLConnection)loc.toURL().openConnection();
+                con.setRequestMethod("HEAD");
+                int response = con.getResponseCode();
+                con.disconnect();
+                if (response == HttpURLConnection.HTTP_OK){
+                    return loc;
+                }
+            }
+            else if (loc.getScheme().equals("file")){
+                File file = new File(loc);
+                if (file.exists()){
+                    return loc;
+                }
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace(); // not a URL
+        }
+        return null;
     }
 
     private URI getBase(URI uri){
