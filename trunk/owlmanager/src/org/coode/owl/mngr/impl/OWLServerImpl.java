@@ -6,6 +6,7 @@ import org.coode.owl.util.OWLObjectComparator;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.*;
+import org.semanticweb.owl.util.NonMappingOntologyURIMapper;
 import org.semanticweb.owl.util.ToldClassHierarchyReasoner;
 import org.semanticweb.owl.vocab.OWLRDFVocabulary;
 import uk.ac.manchester.cs.owl.inference.dig11.DIGReasoner;
@@ -104,6 +105,10 @@ public class OWLServerImpl implements OWLServer {
     public OWLServerImpl(String id, OWLOntologyManager mngr) {
         this.id = id;
         this.mngr = mngr;
+
+        // always default to trying the URI of the ontology
+        mngr.addURIMapper(new NonMappingOntologyURIMapper());
+
         this.properties = new ServerPropertiesImpl();
 
         properties.set(ServerConstants.OPTION_REN, ServerConstants.RENDERER_FRAG);
