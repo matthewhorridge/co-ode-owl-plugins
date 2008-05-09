@@ -5,6 +5,7 @@ package org.coode.www.doclet;
 
 import org.coode.html.doclet.AbstractHTMLDoclet;
 import org.coode.html.impl.OWLHTMLConstants;
+import org.coode.www.OntologyBrowserConstants;
 
 import java.io.PrintWriter;
 import java.net.URL;
@@ -22,9 +23,10 @@ public class BlurbDoclet extends AbstractHTMLDoclet {
     private static final String ID = "doclet.blurb";
 
     protected void renderHeader(URL pageURL, PrintWriter out) {
-        out.println("<h1>Ontology Browser v1.1</h1>");
-        renderBoxStart("About", out);
-        out.println("<p>Made available as part of the <a href=\"http://www.co-ode.org/downloads/owldoc-server/\">CO-ODE</a> project.</p>" +
+        out.println("<h1>" + OntologyBrowserConstants.ONTOLOGY_SERVER_NAME + " " + OntologyBrowserConstants.VERSION + "</h1>");
+        renderBoxStart("Author", out);
+        out.println("<p>Nick Drummond, The University of Manchester</p>\n" +
+                    "<p>Made available as part of the <a href=\"http://www.co-ode.org/downloads/owldoc-server/\">CO-ODE</a> project.</p>" +
                     "<p><a href=\"" + OWLHTMLConstants.ONTOLOGY_SERVER + "docs/index.html\">Documentation</a></p>");
     }
 
