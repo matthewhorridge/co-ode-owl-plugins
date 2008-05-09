@@ -244,9 +244,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/browser.iml" filepath="$PROJECT_DIR$/browser.iml" />
       <module fileurl="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/owlhtml.iml" filepath="/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/owlhtml.iml" />
-      <module fileurl="file:///Users/drummond/Work/CO-ODE/Code/owlhtml/owlhtml.iml" filepath="/Users/drummond/Work/CO-ODE/Code/owlhtml/owlhtml.iml" />
       <module fileurl="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlmanager/owlmanager.iml" filepath="/Users/drummond/Work/CO-ODE/Code/HTML/owlmanager/owlmanager.iml" />
-      <module fileurl="file:///Users/drummond/Work/CO-ODE/Code/owlmanager/owlmanager.iml" filepath="/Users/drummond/Work/CO-ODE/Code/owlmanager/owlmanager.iml" />
     </modules>
   </component>
   <component name="ProjectRootManager" version="2" assert-keyword="true" jdk-15="true" project-jdk-name="1.5" project-jdk-type="JavaSDK">

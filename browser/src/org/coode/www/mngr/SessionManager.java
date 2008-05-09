@@ -10,6 +10,7 @@ import org.coode.owl.mngr.ServerConstants;
 import org.coode.owl.mngr.ServerProperties;
 import org.coode.owl.mngr.impl.ManchesterOWLSyntaxParser;
 import org.coode.suggestor.api.SuggestorManager;
+import org.coode.www.OntologyBrowserConstants;
 import org.coode.www.exception.OntServerException;
 import org.coode.www.query.QuickDescriptionParser;
 import org.coode.www.servlet.ManageOntologies;
@@ -53,7 +54,6 @@ public class SessionManager {
     private static Logger logger = Logger.getLogger(SessionManager.class.getName());
 
     private static final String ID = "ID";
-    private static final String SERVER_STATES_DIR = "caches/";
 
     private static Map<SessionID, OWLHTMLServer> activeServers = new HashMap<SessionID, OWLHTMLServer>();
     private static Map<String, SuggestorManager> activeSuggestorManagers = new HashMap<String, SuggestorManager>();
@@ -101,7 +101,7 @@ public class SessionManager {
      */
     public synchronized static void labelServerState(OWLHTMLServer server) throws OntServerException {
         String label = server.getID() + "-" + createID();
-        File file = getFile(label);
+        File file = getFile(label + OntologyBrowserConstants.SERVER_STATES_EXT);
         try {
             OutputStream out = new FileOutputStream(file);
             PrintWriter writer = new PrintWriter(out);
@@ -187,12 +187,12 @@ public class SessionManager {
     }
 
 
-    private static File getFile(String name) {
-        File cacheDir = new File(SERVER_STATES_DIR);
+    public static File getFile(String name) {
+        File cacheDir = new File(OntologyBrowserConstants.SERVER_STATES_DIR);
         if (!cacheDir.exists()){
             cacheDir.mkdir();
         }
-        return new File(SERVER_STATES_DIR + name + ".saved");
+        return new File(OntologyBrowserConstants.SERVER_STATES_DIR + name);
     }
 
     /**

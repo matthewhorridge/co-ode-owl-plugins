@@ -1,6 +1,7 @@
 package org.coode.www.servlet;
 
 import org.coode.html.OWLHTMLServer;
+import org.coode.owl.mngr.ServerConstants;
 import org.coode.www.exception.OntServerException;
 import org.coode.www.mngr.SessionManager;
 
@@ -34,15 +35,32 @@ public class SignOut extends HttpServlet {
     }
 
     private void signout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        SessionManager.closeSession(session);
 
-        try {
-            OWLHTMLServer server = SessionManager.getServer(request);
-            response.sendRedirect(server.getBaseURL().toString());
+        final String confirm = request.getParameter("confirm");
+
+        if (confirm == null){ // no confirm
+            StringBuffer requestURL = request.getRequestURL();
+            response.getOutputStream().println(
+                    "<html><body>" +
+                    "This will clear all ontologies you are browsing. " +
+                    "Are you sure you wish to restart? " +
+                    "<a href='" + requestURL + "?confirm=true'>YES</a> " +
+                    "<a href='" + requestURL + "?confirm=false'>No</a>" +
+                    "</body></html>");
         }
-        catch (OntServerException e) {
-            throw new ServletException(e);
+        else{
+            if (confirm.equals(ServerConstants.TRUE)){
+                HttpSession session = request.getSession(false);
+                SessionManager.closeSession(session);
+            }
+
+            try {
+                OWLHTMLServer server = SessionManager.getServer(request);
+                response.sendRedirect(server.getBaseURL().toString());
+            }
+            catch (OntServerException e) {
+                throw new ServletException(e);
+            }
         }
     }
 }

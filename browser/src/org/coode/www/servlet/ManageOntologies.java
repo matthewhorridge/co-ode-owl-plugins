@@ -1,15 +1,17 @@
 package org.coode.www.servlet;
 
+import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 import org.coode.html.OWLHTMLServer;
-import org.coode.html.impl.OWLHTMLConstants;
-import org.coode.html.util.URLUtils;
 import org.coode.html.doclet.HTMLDoclet;
 import org.coode.html.doclet.NestedHTMLDoclet;
+import org.coode.html.impl.OWLHTMLConstants;
 import org.coode.html.page.EmptyOWLDocPage;
+import org.coode.html.util.FileUtils;
+import org.coode.html.util.URLUtils;
 import org.coode.owl.mngr.OWLServer;
 import org.coode.owl.mngr.ServerConstants;
 import org.coode.www.ManageAction;
-import org.coode.www.OWLDocServerConstants;
+import org.coode.www.OntologyBrowserConstants;
 import org.coode.www.doclet.BlurbDoclet;
 import org.coode.www.doclet.LoadFormDoclet;
 import org.coode.www.doclet.OntologyMappingsTableDoclet;
@@ -18,12 +20,16 @@ import org.coode.www.exception.RedirectException;
 import org.coode.www.mngr.SessionManager;
 import org.semanticweb.owl.model.OWLImportsDeclaration;
 import org.semanticweb.owl.model.OWLOntology;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.MalformedURLException;
 import java.util.*;
 
 /**
@@ -45,7 +51,7 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
 
     protected HTMLDoclet handleHTMLRequest(Map<String, String> params, OWLHTMLServer server, URL pageURL) throws OntServerException {
 
-        final String actionValue = params.get(OWLDocServerConstants.PARAM_ACTION);
+        final String actionValue = params.get(OntologyBrowserConstants.PARAM_ACTION);
 
         NestedHTMLDoclet ren = null;
 
@@ -54,7 +60,7 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
 
             switch(action){
                 case load:
-                    boolean clear = (ServerConstants.TRUE.equals(params.get(OWLDocServerConstants.PARAM_CLEAR)));
+                    boolean clear = (ServerConstants.TRUE.equals(params.get(OntologyBrowserConstants.PARAM_CLEAR)));
                     ren = handleLoad(getURIsFromParams(params), clear, server, pageURL);
                     break;
                 case remove:
@@ -64,13 +70,13 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
                     ren = handleReload(getURIsFromParams(params), server, pageURL);
                     break;
                 case browse:
-                    ren = handleBrowse(getURIFromParam(params.get(OWLDocServerConstants.PARAM_URI)), server, pageURL);
+                    ren = handleBrowse(getURIFromParam(params.get(OntologyBrowserConstants.PARAM_URI)), server, pageURL);
                     break;
                 case hide:
-                    handleSetVisibility(getURIFromParam(params.get(OWLDocServerConstants.PARAM_URI)), false, server);
+                    handleSetVisibility(getURIFromParam(params.get(OntologyBrowserConstants.PARAM_URI)), false, server);
                     break;
                 case unhide:
-                    handleSetVisibility(getURIFromParam(params.get(OWLDocServerConstants.PARAM_URI)), true, server);
+                    handleSetVisibility(getURIFromParam(params.get(OntologyBrowserConstants.PARAM_URI)), true, server);
                     break;
             }
         }
@@ -132,7 +138,9 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
 
         if (!fail.isEmpty()){
             for (URI uri : fail.keySet()){
-                message += "failed to load: " + uri + " (" + fail.get(uri).getMessage() + ")<br />";
+                message += "failed to load: " + uri +
+                        " ("  + fail.get(uri).getClass().getSimpleName() +
+                        ": " + fail.get(uri).getMessage() + ")<br />";
             }
         }
         if (!success.isEmpty()){
@@ -233,11 +241,16 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
     private NestedHTMLDoclet createManagePageRenderer(OWLHTMLServer server, Map<URI, URI> map, String message, URL pageURL) throws OntServerException {
 
         EmptyOWLDocPage ren = new EmptyOWLDocPage(server);
-        ren.setAutoFocusedComponent(OWLDocServerConstants.LOAD_ONTOLOGIES_INPUT_ID);
+        ren.setTitle(OntologyBrowserConstants.MANAGE_LABEL);
+        ren.setAutoFocusedComponent(OntologyBrowserConstants.LOAD_ONTOLOGIES_INPUT_ID);
+
+        Map<String, URI> bookmarks = getBookmarks(server);
+        final LoadFormDoclet loadDoclet = new LoadFormDoclet();
+        loadDoclet.addBookmarkSet("or Select a bookmark from below:", bookmarks);
 
         if (map.isEmpty()){
             ren.addDoclet(new BlurbDoclet());
-            ren.addDoclet(new LoadFormDoclet());
+            ren.addDoclet(loadDoclet);
         }
         else{
             if (map.containsValue(null)){
@@ -251,7 +264,7 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
                         "'>continue to browse</a> your ontology without loading the imports.</p>");
             }
 
-            ren.addDoclet(new LoadFormDoclet());
+            ren.addDoclet(loadDoclet);
 
             OntologyMappingsTableDoclet table = new OntologyMappingsTableDoclet(server);
             table.setMap(map);
@@ -282,7 +295,7 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
 
 
     private Set<URI> getURIsFromParams(Map<String, String> params) {
-        final URI uri = getURIFromParam(params.get(OWLDocServerConstants.PARAM_URI));
+        final URI uri = getURIFromParam(params.get(OntologyBrowserConstants.PARAM_URI));
         if (uri != null){
             return Collections.singleton(uri);
         }
@@ -310,9 +323,51 @@ public class ManageOntologies extends AbstractOntologyServerServlet {
         if (param != null && param.length() > 0){
             String ontURIStr = param.trim();
             if (ontURIStr != null){
+                logger.debug("uri param: " + ontURIStr);
                 return URI.create(ontURIStr);
             }
         }
         return null;
+    }
+
+
+    public Map<String, URI> getBookmarks(OWLHTMLServer server) {
+        Map<String, URI> bookmarks = Collections.emptyMap();
+        File bookmarksFile = SessionManager.getFile(OntologyBrowserConstants.BOOKMARKS_XML);
+        if (!bookmarksFile.exists()){
+            FileUtils fileUtils = new FileUtils("resources/"); // path not used
+            InputStream in = getClass().getResourceAsStream("default.bookmarks.xml");
+            try {
+                fileUtils.saveFile(in, bookmarksFile);
+            }
+            catch (IOException e) {
+                logger.error(e);
+            }
+        }
+
+        try {
+            bookmarks = loadBookmarks(new BufferedReader(new FileReader(bookmarksFile)));
+        }
+        catch (Exception e) {
+            logger.error(e);
+        }
+        return bookmarks;
+    }
+
+
+    private Map<String, URI> loadBookmarks(Reader reader) throws IOException, SAXException {
+        Map<String, URI> bookmarkMap = new HashMap<String, URI>();
+        DOMParser parser = new DOMParser();
+        InputSource inputSource = new InputSource(reader);
+        parser.parse(inputSource);
+        Document doc = parser.getDocument();
+        NodeList bookmarkElements = doc.getElementsByTagName("bookmark");
+        for (int i=0; i<bookmarkElements.getLength(); i++){
+            Node element = bookmarkElements.item(i);
+            String name = element.getAttributes().getNamedItem("name").getTextContent();
+            URI uri = URI.create(element.getTextContent());
+            bookmarkMap.put(name, uri);
+        }
+        return bookmarkMap;
     }
 }

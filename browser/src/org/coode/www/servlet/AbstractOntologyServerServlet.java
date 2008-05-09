@@ -10,7 +10,7 @@ import org.coode.html.page.EmptyOWLDocPage;
 import org.coode.owl.mngr.NamedObjectType;
 import org.coode.owl.mngr.OWLServer;
 import org.coode.suggestor.api.SuggestorManager;
-import org.coode.www.OWLDocServerConstants;
+import org.coode.www.OntologyBrowserConstants;
 import org.coode.www.doclet.AutocompleteDoclet;
 import org.coode.www.exception.InvalidRequestException;
 import org.coode.www.exception.OntServerException;
@@ -68,7 +68,7 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
     private void doRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         final String sessionLabel = request.getParameter(OWLHTMLConstants.PARAM_SESSION_LABEL);
-        final String format = request.getParameter(OWLDocServerConstants.PARAM_FORMAT);
+        final String format = request.getParameter(OntologyBrowserConstants.PARAM_FORMAT);
 
         // @@TODO this is not good enough - doesn't include params - need to rebuild the URL and fix AbstractSummaryHTMLPage
         final URL pageURL = new URL(request.getRequestURL().toString());
@@ -108,7 +108,8 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
         catch(RedirectException e){
             response.sendRedirect(e.getRedirectPage().toString());
         }
-        catch (OntServerException e) {
+        catch (Throwable e) {
+            logger.error(e);
             renderError(null, e, server, pageURL, format, response);
         }
         finally{
@@ -128,6 +129,11 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
                                                             OWLHTMLConstants.LinkTarget.subnav,
                                                             server));
                 }
+                
+                menuDoclet.addToMenu(new MenuItemDoclet("Help",
+                                                        server.getURLScheme().getURLForRelativePage(OntologyBrowserConstants.DOCS_HTML),
+                                                        OWLHTMLConstants.LinkTarget._blank,
+                                                        server));
 
                 AutocompleteDoclet searchboxDoclet = new AutocompleteDoclet(server, "find", true);
                 searchboxDoclet.setParamName("name");
@@ -160,7 +166,7 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
         }
         for (Object param : requestParams){
             if (!OWLHTMLConstants.PARAM_SESSION_LABEL.equals(param) &&
-                !OWLDocServerConstants.PARAM_FORMAT.equals(param)){
+                !OntologyBrowserConstants.PARAM_FORMAT.equals(param)){
                 String[] v = (String[])request.getParameterMap().get(param);
                 params.put(param.toString(), v[0]);
             }

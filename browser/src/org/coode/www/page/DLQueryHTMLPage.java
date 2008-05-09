@@ -8,6 +8,7 @@ import org.coode.html.doclet.AbstractHTMLDoclet;
 import org.coode.html.doclet.MessageBoxDoclet;
 import org.coode.html.impl.OWLHTMLConstants;
 import org.coode.html.page.EmptyOWLDocPage;
+import org.coode.www.OntologyBrowserConstants;
 import org.coode.www.doclet.AutocompleteDoclet;
 
 import java.io.PrintWriter;
@@ -26,8 +27,6 @@ public class DLQueryHTMLPage extends EmptyOWLDocPage {
 
     public static final String PARAM_EXPRESSION = "expression";
 
-    private static final String TITLE = "DL Query";
-
     private static final String DL_QUERY_AC_ID = "dlQuery";
 
     private String query;
@@ -37,13 +36,15 @@ public class DLQueryHTMLPage extends EmptyOWLDocPage {
     public DLQueryHTMLPage(OWLHTMLServer server) {
         super(server);
 
+        setTitle(OntologyBrowserConstants.DL_QUERY_LABEL);
+        
         acDoclet = new AutocompleteDoclet(server, DL_QUERY_AC_ID, false);
         acDoclet.setSubmitURL(server.getURLScheme().getURLForRelativePage(OWLHTMLConstants.DL_QUERY_HTML));
         acDoclet.setSubmitName("query");
         acDoclet.setMultiword(true);
         acDoclet.setWidth("400px");
 
-        MessageBoxDoclet queryBoxDoclet = new MessageBoxDoclet(getTitle(), null);
+        MessageBoxDoclet queryBoxDoclet = new MessageBoxDoclet(OntologyBrowserConstants.DL_QUERY_LABEL, null);
         queryBoxDoclet.addDoclet(acDoclet);
 
         addDoclet(queryBoxDoclet);
@@ -79,12 +80,6 @@ public class DLQueryHTMLPage extends EmptyOWLDocPage {
         acDoclet.setInitialValue(query);
 //        acDoclet.setJsAction(jsAction);
     }
-
-
-    public String getTitle() {
-        return TITLE;
-    }
-
 
     public Set<URL> getRequiredJS() {
         Set<URL> js = super.getRequiredJS();
