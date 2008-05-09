@@ -137,12 +137,16 @@ public abstract class AbstractHTMLDoclet<O> implements NestedHTMLDoclet<O> {
      */
     protected final void renderLink(String name, URL href, OWLHTMLConstants.LinkTarget target, String cssClass, boolean singleFrame, URL pageURL, PrintWriter out) {
         out.print("<a href='" + URLUtils.createRelativeURL(pageURL, href) + "'");
+
         if (cssClass != null){
             out.print(" class='" + cssClass + "'");
         }
-        if (target != null && !singleFrame){
+
+        // if the linktarget is another window or we are in a frames view add the target
+        if (target != null && (target == OWLHTMLConstants.LinkTarget._blank || !singleFrame)){
             out.print(" target='" + target + "'");
         }
+
         out.println(" >" + name + "</a>");
     }
 

@@ -30,16 +30,17 @@ public class OWLEntityIndexHTMLPage<O extends OWLObject> extends EmptyOWLDocPage
 
     private AbstractOWLElementsDoclet<OWLOntology, O> indexDoclet;
 
-    private String title = "Index";
+    private String id = "Index";
+
 
     public OWLEntityIndexHTMLPage(OWLHTMLServer server) {
         super(server);
-        indexDoclet = new AbstractOWLElementsDoclet<OWLOntology, O>(title, ElementsDoclet.Format.list, server) {
+        indexDoclet = new AbstractOWLElementsDoclet<OWLOntology, O>(id, ElementsDoclet.Format.list, server) {
             protected Collection<O> getElements(Set<OWLOntology> onts) {
                 return index;
             }
             public String getID() {
-                return getTitle();
+                return id + " (" + index.size() + ")";
             }
         };
         String contentWindow = getServer().getProperties().get(OWLHTMLConstants.OPTION_CONTENT_WINDOW);
@@ -52,9 +53,12 @@ public class OWLEntityIndexHTMLPage<O extends OWLObject> extends EmptyOWLDocPage
         addDoclet(indexDoclet);
     }
 
+
     public void setTitle(String title) {
-        this.title = title;
+        this.id = title;
+        super.setTitle(title);
     }
+
 
     public void add(O obj){
         index.add(obj);
@@ -65,6 +69,6 @@ public class OWLEntityIndexHTMLPage<O extends OWLObject> extends EmptyOWLDocPage
     }
 
     public String getTitle() {
-        return title + " (" + index.size() + ")";
+        return super.getTitle() + " (" + index.size() + ")";
     }
 }

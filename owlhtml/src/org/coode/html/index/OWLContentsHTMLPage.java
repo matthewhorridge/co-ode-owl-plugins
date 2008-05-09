@@ -5,6 +5,7 @@ import org.coode.html.doclet.BookmarksDoclet;
 import org.coode.html.doclet.ElementsDoclet;
 import org.coode.html.doclet.OntologyContentsDoclet;
 import org.coode.html.doclet.OverallContentsDoclet;
+import org.coode.html.impl.OWLHTMLConstants;
 import org.coode.html.page.EmptyOWLDocPage;
 import org.semanticweb.owl.model.OWLOntology;
 
@@ -24,16 +25,17 @@ import java.util.Set;
  */
 public class OWLContentsHTMLPage extends EmptyOWLDocPage<OWLOntology> {
 
-    private String title = "Contents";
     private OverallContentsDoclet contentsDoclet;
 
     public OWLContentsHTMLPage(OWLHTMLServer server) {
         super(server);
 
-        addDoclet(new BookmarksDoclet("Bookmarks", ElementsDoclet.Format.list, server));
+        addDoclet(new BookmarksDoclet(OWLHTMLConstants.BOOKMARKS_LABEL, ElementsDoclet.Format.list, server));
 
-        contentsDoclet = new OverallContentsDoclet(server, title);
+        contentsDoclet = new OverallContentsDoclet(server, OWLHTMLConstants.CONTENTS_LABEL);
         addDoclet(contentsDoclet);
+
+        setTitle(OWLHTMLConstants.CONTENTS_LABEL);
 
         final Set<OWLOntology> visibleOntologies = getServer().getVisibleOntologies();
 
@@ -48,11 +50,7 @@ public class OWLContentsHTMLPage extends EmptyOWLDocPage<OWLOntology> {
     }
 
     public void setTitle(String title) {
-        this.title = title;
         contentsDoclet.setTitle(title);
-    }
-
-    public String getTitle() {
-        return title;
+        super.setTitle(title);
     }
 }
