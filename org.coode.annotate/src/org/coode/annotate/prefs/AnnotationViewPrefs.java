@@ -109,9 +109,10 @@ public class AnnotationViewPrefs {
 
 
     private void refresh() {
+        final List<String> lines = getValues(); // must get this first as it may reset the templateMap
         templateMap = new HashMap<URI, Set<String>>();
         uriList = new ArrayList<URI>();
-        for (String line : getValues()){
+        for (String line : lines){
             String[] tokens = line.split(",");
             try {
                 URI uri = new URI(tokens[0].trim());
