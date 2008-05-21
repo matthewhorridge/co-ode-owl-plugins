@@ -66,4 +66,33 @@ public interface LintReport {
 	 * @param singleSubClassLint
 	 */
 	void setLint(SingleSubClassLint singleSubClassLint);
+
+	/**
+	 * Adds the input OWLObject to the this LintReport for the input ontology
+	 * 
+	 * @param object
+	 * @param affectedOntology
+	 */
+	void add(OWLObject object, OWLOntology affectedOntology);
+
+	/**
+	 * Adds the input OWLObject to the this LintReport for the input ontology
+	 * with an explanation
+	 * 
+	 * @param object
+	 * @param affectedOntology
+	 * @param explanation
+	 */
+	void add(OWLObject object, OWLOntology affectedOntology, String explanation);
+
+	/**
+	 * 
+	 * 
+	 * 
+	 * @param object
+	 * @param affectedOntology
+	 * @return the explanation for the input object to be in the report for the
+	 *         input ontology, it can be null
+	 */
+	String getExplanation(OWLObject object, OWLOntology affectedOntology);
 }

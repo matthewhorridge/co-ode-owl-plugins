@@ -30,6 +30,7 @@ import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
 
@@ -42,6 +43,11 @@ import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
  */
 public class RedundantInfoInSubClassesLintPattern extends
 		OntologyWiseLintPattern {
+	public RedundantInfoInSubClassesLintPattern(
+			OWLOntologyManager ontologyManager) {
+		super(ontologyManager);
+	}
+
 	/**
 	 * @return the Set of OWLObject that have redundant information in their
 	 *         subclasses

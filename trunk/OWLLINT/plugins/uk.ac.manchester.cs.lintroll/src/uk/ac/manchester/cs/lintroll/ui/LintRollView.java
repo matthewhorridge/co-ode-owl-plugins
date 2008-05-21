@@ -75,6 +75,7 @@ public class LintRollView extends AbstractOWLViewComponent implements
 	private static final long serialVersionUID = 2527582629024593024L;
 	JTree lintReportTree = null;
 	JTextArea lintDescriptionTextArea = new JTextArea();
+	JTextArea explanationTextArea = new JTextArea();
 	DefaultTreeModel lintReportTreeModel;
 	private LintManager lintManager;
 
@@ -90,7 +91,9 @@ public class LintRollView extends AbstractOWLViewComponent implements
 		this.lintReportTree.addTreeSelectionListener(this);
 		this.lintReportTree.setCellRenderer(new LintRenderer(this
 				.getOWLEditorKit()));
-		this.lintManager = LintManagerFactory.getLintManager();
+		this.lintManager = LintManagerFactory
+				.getLintManager(this.getOWLEditorKit().getOWLModelManager()
+						.getOWLOntologyManager());
 		Set<LintReport> reports = this.lintManager.run(LintRollPreferences
 				.getSelectedLints(), this.getOWLModelManager().getOntologies());
 		this.displayReport(reports);
@@ -99,9 +102,13 @@ public class LintRollView extends AbstractOWLViewComponent implements
 		this.add(treePane, BorderLayout.NORTH);
 		JScrollPane lintDescriptionPane = new JScrollPane(
 				this.lintDescriptionTextArea);
+		JScrollPane explanationPane = new JScrollPane(this.explanationTextArea);
+		explanationPane.setBorder(new TitledBorder("Explanation"));
+		this.explanationTextArea.setEditable(false);
 		lintDescriptionPane.setBorder(new TitledBorder("Lint Description: "));
 		this.lintDescriptionTextArea.setEditable(false);
-		this.add(lintDescriptionPane, BorderLayout.SOUTH);
+		this.add(lintDescriptionPane, BorderLayout.CENTER);
+		this.add(explanationPane, BorderLayout.SOUTH);
 	}
 
 	/**
@@ -144,7 +151,9 @@ public class LintRollView extends AbstractOWLViewComponent implements
 
 	public void ontologiesChanged(List<? extends OWLOntologyChange> changes)
 			throws OWLException {
-		this.lintManager = LintManagerFactory.getLintManager();
+		this.lintManager = LintManagerFactory
+				.getLintManager(this.getOWLEditorKit().getOWLModelManager()
+						.getOWLOntologyManager());
 		Set<LintReport> reports;
 		try {
 			reports = this.lintManager.run(
@@ -190,8 +199,25 @@ public class LintRollView extends AbstractOWLViewComponent implements
 		DefaultMutableTreeNode selected = (DefaultMutableTreeNode) LintRollView.this.lintReportTree
 				.getLastSelectedPathComponent();
 		if (selected.getUserObject() instanceof LintReport) {
-			this.lintDescriptionTextArea.setText(((LintReport) selected
-					.getUserObject()).getLint().getDescription());
+			LintReport lintReport = (LintReport) selected.getUserObject();
+			this.lintDescriptionTextArea.setText(lintReport.getLint()
+					.getDescription());
+			this.explanationTextArea.setText("");
+		} else if (selected.getUserObject() instanceof OWLObject
+				&& selected.isLeaf()) {
+			OWLObject object = (OWLObject) selected.getUserObject();
+			DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selected
+					.getParent();
+			OWLOntology ontology = (OWLOntology) parent.getUserObject();
+			DefaultMutableTreeNode reportNode = (DefaultMutableTreeNode) parent
+					.getParent();
+			LintReport report = (LintReport) reportNode.getUserObject();
+			String explanation = report.getExplanation(object, ontology);
+			if (explanation != null) {
+				this.explanationTextArea.setText(explanation);
+			}
+		} else {
+			this.explanationTextArea.setText("");
 		}
 	}
 }

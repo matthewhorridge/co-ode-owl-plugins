@@ -22,9 +22,8 @@
  */
 package uk.ac.manchester.cs.owl.lint;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.semanticweb.owl.lint.Lint;
@@ -43,7 +42,7 @@ import uk.ac.manchester.cs.owl.lint.examples.SingleSubClassLint;
  * Feb 18, 2008
  */
 public class LintReportImpl implements LintReport {
-	private Map<OWLOntology, Set<OWLObject>> matches = new HashMap<OWLOntology, Set<OWLObject>>();
+	private Set<Match> matches = new HashSet<Match>();
 	protected Lint lint;
 
 	/**
@@ -57,7 +56,11 @@ public class LintReportImpl implements LintReport {
 	 * @see org.semanticweb.owl.lint.LintReport#getAffectedOntologies()
 	 */
 	public Set<OWLOntology> getAffectedOntologies() {
-		return this.matches.keySet();
+		Set<OWLOntology> toReturn = new HashSet<OWLOntology>();
+		for (Match match : this.matches) {
+			toReturn.add(match.getOntology());
+		}
+		return toReturn;
 	}
 
 	/**
@@ -65,7 +68,13 @@ public class LintReportImpl implements LintReport {
 	 * @see org.semanticweb.owl.lint.LintReport#getAffectedOWLObjects(org.semanticweb.owl.model.OWLOntology)
 	 */
 	public Set<OWLObject> getAffectedOWLObjects(OWLOntology ontology) {
-		return this.matches.get(ontology);
+		Set<OWLObject> toReturn = new HashSet<OWLObject>();
+		for (Match match : this.matches) {
+			if (match.getOntology().equals(ontology)) {
+				toReturn.add(match.getOWLObject());
+			}
+		}
+		return toReturn;
 	}
 
 	/**
@@ -85,17 +94,26 @@ public class LintReportImpl implements LintReport {
 	 */
 	public void chainPatternReport(PatternReport patternReport) {
 		Set<OWLOntology> ontologies = patternReport.getAffectedOntologies();
-		for (OWLOntology ontology : ontologies) {
-			Set<OWLObject> alreadyAffectedObjects = this.matches.get(ontology);
-			Set<OWLObject> affectedOWLObjects = patternReport
-					.getAffectedOWLObjects(ontology);
-			if (alreadyAffectedObjects == null) {
-				alreadyAffectedObjects = new HashSet<OWLObject>(
-						affectedOWLObjects);
-			} else {
-				alreadyAffectedObjects.retainAll(affectedOWLObjects);
+		if (this.matches.isEmpty()) {
+			for (OWLOntology ontology : ontologies) {
+				Set<OWLObject> affectedOWLObjects = patternReport
+						.getAffectedOWLObjects(ontology);
+				for (OWLObject object : affectedOWLObjects) {
+					this.matches.add(new Match(object, ontology));
+				}
 			}
-			this.matches.put(ontology, alreadyAffectedObjects);
+		} else {
+			for (OWLOntology ontology : ontologies) {
+				Set<OWLObject> affectedOWLObjects = patternReport
+						.getAffectedOWLObjects(ontology);
+				for (Match match : new HashSet<Match>(this.matches)) {
+					if (match.getOntology().equals(ontology)
+							&& !affectedOWLObjects.contains(match
+									.getOWLObject())) {
+						this.matches.remove(match);
+					}
+				}
+			}
 		}
 	}
 
@@ -110,16 +128,11 @@ public class LintReportImpl implements LintReport {
 	public void addPatternReport(PatternReport patternReport) {
 		Set<OWLOntology> ontologies = patternReport.getAffectedOntologies();
 		for (OWLOntology ontology : ontologies) {
-			Set<OWLObject> alreadyAffectedObjects = this.matches.get(ontology);
 			Set<OWLObject> affectedOWLObjects = patternReport
 					.getAffectedOWLObjects(ontology);
-			if (alreadyAffectedObjects == null) {
-				alreadyAffectedObjects = new HashSet<OWLObject>(
-						affectedOWLObjects);
-			} else {
-				alreadyAffectedObjects.addAll(affectedOWLObjects);
+			for (OWLObject object : affectedOWLObjects) {
+				this.matches.add(new Match(object, ontology));
 			}
-			this.matches.put(ontology, alreadyAffectedObjects);
 		}
 	}
 
@@ -137,5 +150,30 @@ public class LintReportImpl implements LintReport {
 
 	public void setLint(SingleSubClassLint lint) {
 		this.lint = lint;
+	}
+
+	public void add(OWLObject object, OWLOntology affectedOntology) {
+		this.matches.add(new Match(object, affectedOntology));
+	}
+
+	public void add(OWLObject object, OWLOntology affectedOntology,
+			String explanation) {
+		this.matches.add(new Match(object, affectedOntology, explanation));
+	}
+
+	public String getExplanation(OWLObject object, OWLOntology affectedOntology) {
+		String toReturn = null;
+		Iterator<Match> it = this.matches.iterator();
+		boolean found = false;
+		Match match = null;
+		while (!found & it.hasNext()) {
+			match = it.next();
+			found = match.getOntology().equals(affectedOntology)
+					&& match.getOWLObject().equals(object);
+		}
+		if (found) {
+			toReturn = match.getExplanation();
+		}
+		return toReturn;
 	}
 }

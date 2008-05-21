@@ -44,6 +44,8 @@ public class LintRenderer extends OWLCellRenderer implements TreeCellRenderer,
 	public LintRenderer(OWLEditorKit owlEditorKit) {
 		super(owlEditorKit);
 		this.owlCellRenderer = new OWLCellRenderer(owlEditorKit);
+		this.owlCellRenderer.setHighlightKeywords(true);
+		this.owlCellRenderer.setWrap(true);
 	}
 
 	@Override
@@ -88,11 +90,11 @@ public class LintRenderer extends OWLCellRenderer implements TreeCellRenderer,
 						hasFocus);
 			} else if (nodeUserObject instanceof LintReport) {
 				toReturn = new JTextPane();
-				((JTextPane) toReturn).setText("Lint name "
-						+ ((LintReport) nodeUserObject).getLint().getName()
-						+ " Affected: "
+				((JTextPane) toReturn).setText(((LintReport) nodeUserObject)
+						.getLint().getName()
+						+ "{"
 						+ ((LintReport) nodeUserObject).getAffectedOntologies()
-								.size());
+								.size() + "}");
 				this.render(tree, toReturn, selected);
 			} else {
 				toReturn = this.defaultTreeCellRenderer

@@ -31,6 +31,7 @@ import org.semanticweb.owl.lint.LintFactory;
 import org.semanticweb.owl.lint.LintManager;
 import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -40,6 +41,12 @@ import org.semanticweb.owl.model.OWLOntology;
  * Feb 13, 2008
  */
 public class LintManagerImpl implements LintManager {
+	private OWLOntologyManager ontologyManager;
+
+	public LintManagerImpl(OWLOntologyManager ontologyManager) {
+		this.ontologyManager = ontologyManager;
+	}
+
 	/**
 	 * @see org.semanticweb.owl.lint.LintManager#run(java.util.Set,
 	 *      java.util.Set)
@@ -57,6 +64,6 @@ public class LintManagerImpl implements LintManager {
 	}
 
 	public LintFactory getLintFactory() {
-		return new LintFactoryImpl();
+		return new LintFactoryImpl(this.ontologyManager);
 	}
 }

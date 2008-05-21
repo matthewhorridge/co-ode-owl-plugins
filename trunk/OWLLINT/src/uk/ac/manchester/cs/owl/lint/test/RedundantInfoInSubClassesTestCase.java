@@ -57,7 +57,8 @@ public class RedundantInfoInSubClassesTestCase extends LintTestCase {
 
 	@Override
 	protected Lint createLint() {
-		return LintManagerFactory.getLintManager().getLintFactory().createLint(
-				new RedundantInfoInSubClassesLintPattern());
+		return LintManagerFactory.getLintManager(this.manager).getLintFactory()
+				.createLint(
+						new RedundantInfoInSubClassesLintPattern(this.manager));
 	}
 }

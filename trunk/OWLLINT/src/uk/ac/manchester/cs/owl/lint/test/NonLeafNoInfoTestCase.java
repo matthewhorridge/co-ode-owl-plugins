@@ -40,8 +40,8 @@ public class NonLeafNoInfoTestCase extends LintTestCase {
 	 */
 	@Override
 	protected Lint createLint() {
-		return LintManagerFactory.getLintManager().getLintFactory().createLint(
-				new NonLeafNoInfoLintPattern());
+		return LintManagerFactory.getLintManager(this.manager).getLintFactory()
+				.createLint(new NonLeafNoInfoLintPattern(this.manager));
 	}
 
 	/**

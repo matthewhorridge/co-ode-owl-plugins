@@ -29,6 +29,7 @@ import org.semanticweb.owl.lint.LintPattern;
 import org.semanticweb.owl.lint.PatternReport;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 import uk.ac.manchester.cs.owl.lint.PatternReportImpl;
@@ -42,6 +43,11 @@ import uk.ac.manchester.cs.owl.lint.PatternReportImpl;
  */
 public abstract class OntologyWiseLintPattern implements LintPattern {
 	protected PatternReportImpl patternReport = null;
+	protected OWLOntologyManager ontologyManager;
+
+	public OntologyWiseLintPattern(OWLOntologyManager ontologyManager) {
+		this.ontologyManager = ontologyManager;
+	}
 
 	/**
 	 * Executes the match one OWLOntology at time
@@ -50,7 +56,8 @@ public abstract class OntologyWiseLintPattern implements LintPattern {
 	 */
 	public PatternReport matches(Set<OWLOntology> targets) throws LintException {
 		this.patternReport = (PatternReportImpl) LintManagerFactory
-				.getLintManager().getLintFactory().createPatternReport(this);
+				.getLintManager(this.ontologyManager).getLintFactory()
+				.createPatternReport(this);
 		for (OWLOntology ontology : targets) {
 			Set<OWLObject> matches = this.matches(ontology);
 			if (!matches.isEmpty()) {

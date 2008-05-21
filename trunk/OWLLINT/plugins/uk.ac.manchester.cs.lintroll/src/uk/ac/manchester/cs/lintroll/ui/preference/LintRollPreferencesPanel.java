@@ -98,6 +98,8 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel {
 	 * @see org.protege.editor.core.plugin.ProtegePluginInstance#initialise()
 	 */
 	public void initialise() throws Exception {
+		LintRollPreferences.setOWLOntologyManager(this.getOWLEditorKit()
+				.getOWLModelManager().getOWLOntologyManager());
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		LintManagerFactory.setPreferredLintManager(new ProtegeLintManager(this
 				.getOWLModelManager()));

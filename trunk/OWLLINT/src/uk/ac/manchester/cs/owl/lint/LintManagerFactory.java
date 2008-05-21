@@ -23,6 +23,7 @@
 package uk.ac.manchester.cs.owl.lint;
 
 import org.semanticweb.owl.lint.LintManager;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -32,20 +33,14 @@ import org.semanticweb.owl.lint.LintManager;
  * Feb 13, 2008
  */
 public class LintManagerFactory {
-	static private LintManager preferredLintManager = new LintManagerImpl();
+	private static LintManager preferredLintManager;
 
-	/**
-	 * @return a new {@link LintManager}
-	 */
-	public static LintManager getLintManager() {
-		return preferredLintManager;
+	public static LintManager getLintManager(OWLOntologyManager ontologyManager) {
+		return preferredLintManager != null ? preferredLintManager
+				: new LintManagerImpl(ontologyManager);
 	}
 
-	/**
-	 * @param preferredLintManager
-	 *            the preferredLintManager to set
-	 */
-	public static void setPreferredLintManager(LintManager preferredLintManager) {
-		LintManagerFactory.preferredLintManager = preferredLintManager;
+	public static void setPreferredLintManager(LintManager lintManager) {
+		preferredLintManager = lintManager;
 	}
 }

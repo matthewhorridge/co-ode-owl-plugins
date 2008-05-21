@@ -20,6 +20,7 @@ public class ProtegeLintManager extends LintManagerImpl implements LintManager {
 	 * @param modelManager
 	 */
 	public ProtegeLintManager(OWLModelManager modelManager) {
+		super(modelManager.getOWLOntologyManager());
 		this.modelManager = modelManager;
 	}
 
