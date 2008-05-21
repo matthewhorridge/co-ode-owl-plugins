@@ -63,8 +63,8 @@ public class SingleSubClassTestCase extends LintTestCase {
 
 	@Override
 	protected Lint createLint() {
-		return LintManagerFactory.getLintManager().getLintFactory().createLint(
-				new SingleSubClassLintPattern());
+		return LintManagerFactory.getLintManager(this.manager).getLintFactory()
+				.createLint(new SingleSubClassLintPattern(this.manager));
 	}
 
 	@Override

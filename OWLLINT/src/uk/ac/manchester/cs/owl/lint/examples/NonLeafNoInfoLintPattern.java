@@ -30,6 +30,7 @@ import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
 
@@ -43,6 +44,10 @@ import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
  * Feb 13, 2008
  */
 public class NonLeafNoInfoLintPattern extends OntologyWiseLintPattern {
+	public NonLeafNoInfoLintPattern(OWLOntologyManager ontologyManager) {
+		super(ontologyManager);
+	}
+
 	@Override
 	public Set<OWLObject> matches(OWLOntology target) {
 		Set<OWLObject> toReturn = new HashSet<OWLObject>();

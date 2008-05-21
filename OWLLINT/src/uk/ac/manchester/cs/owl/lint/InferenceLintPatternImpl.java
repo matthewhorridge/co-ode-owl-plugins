@@ -3,11 +3,9 @@
  */
 package uk.ac.manchester.cs.owl.lint;
 
-import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.lint.InferenceLintPattern;
 import org.semanticweb.owl.lint.LintException;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -15,19 +13,11 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  */
 public class InferenceLintPatternImpl implements InferenceLintPattern {
 	protected OWLReasoner reasoner;
-	protected OWLOntologyManager ontologyManager = OWLManager
-			.createOWLOntologyManager();
 
 	/**
 	 * @param reasoner
 	 * @param ontologyManager
 	 */
-	public InferenceLintPatternImpl(OWLReasoner reasoner,
-			OWLOntologyManager ontologyManager) {
-		this.reasoner = reasoner;
-		this.ontologyManager = ontologyManager;
-	}
-
 	public InferenceLintPatternImpl(OWLReasoner reasoner) {
 		this.reasoner = reasoner;
 	}
@@ -41,12 +31,5 @@ public class InferenceLintPatternImpl implements InferenceLintPattern {
 		} else {
 			throw new LintException("Null reasoner for this pattern");
 		}
-	}
-
-	/**
-	 * @return the ontologyManager
-	 */
-	public OWLOntologyManager getOWLOntologyManager() {
-		return this.ontologyManager;
 	}
 }

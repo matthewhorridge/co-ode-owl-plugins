@@ -52,10 +52,12 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern {
 	protected InferenceLintPattern inferenceLintPattern;
 
 	@SuppressWarnings("unchecked")
-	public SingleSubClassLintPattern() {
+	public SingleSubClassLintPattern(OWLOntologyManager ontologyManager) {
+		super(ontologyManager);
 		try {
-			this.inferenceLintPattern = LintManagerFactory.getLintManager()
-					.getLintFactory().createInferenceLintPattern();
+			this.inferenceLintPattern = LintManagerFactory.getLintManager(
+					ontologyManager).getLintFactory()
+					.createInferenceLintPattern();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -73,14 +75,14 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern {
 		Set<OWLClass> nothing = new HashSet<OWLClass>();
 		try {
 			OWLReasoner reasoner = this.inferenceLintPattern.getOWLReasoner();
-			OWLOntologyManager manager = this.inferenceLintPattern
-					.getOWLOntologyManager();
-			reasoner.loadOntologies(manager.getImportsClosure(ontology));
+			reasoner.loadOntologies(this.ontologyManager
+					.getImportsClosure(ontology));
 			if (!reasoner.isClassified()) {
 				reasoner.classify();
 			}
-			nothing.add(manager.getOWLDataFactory().getOWLNothing());
-			nothing.addAll(reasoner.getEquivalentClasses(manager
+			nothing.add(this.ontologyManager.getOWLDataFactory()
+					.getOWLNothing());
+			nothing.addAll(reasoner.getEquivalentClasses(this.ontologyManager
 					.getOWLDataFactory().getOWLNothing()));
 			if (reasoner instanceof NoOpReasoner) {
 				for (OWLClass cls : ontology.getReferencedClasses()) {

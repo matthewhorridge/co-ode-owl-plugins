@@ -25,6 +25,7 @@ package org.semanticweb.owl.lint;
 import java.util.Set;
 
 import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -59,4 +60,9 @@ public interface Lint {
 	 * @return a human readable description for this Lint
 	 */
 	public String getDescription();
+
+	/**
+	 * @return the ontology manager
+	 */
+	public OWLOntologyManager getOntologyManager();
 }

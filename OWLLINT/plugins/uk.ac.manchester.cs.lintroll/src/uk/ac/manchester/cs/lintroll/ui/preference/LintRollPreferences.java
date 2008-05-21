@@ -24,6 +24,8 @@ package uk.ac.manchester.cs.lintroll.ui.preference;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -38,8 +40,10 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.protege.editor.core.prefs.Preferences;
 import org.protege.editor.core.prefs.PreferencesManager;
+import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.PatternBasedLint;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.lintroll.utils.JarClassLoader;
 import uk.ac.manchester.cs.lintroll.utils.JarResources;
@@ -56,6 +60,8 @@ public class LintRollPreferences {
 	private static Map<Lint, String> lintJarMap = new HashMap<Lint, String>();
 	private static Set<LintRollPreferenceChangeListener> listeners = new HashSet<LintRollPreferenceChangeListener>();
 	private static List<String> loadedJars;
+	private static OWLOntologyManager ontologyManager = OWLManager
+			.createOWLOntologyManager();
 	static {
 		LintRollPreferences.wellKnownLintClassNames = new HashSet<String>();
 		LintRollPreferences.wellKnownLintClassNames.add(Lint.class.getName());
@@ -213,7 +219,10 @@ public class LintRollPreferences {
 						.loadClass(string);
 				if (!wellKnownLintClassNames.contains(string)
 						&& Lint.class.isAssignableFrom(clazz)) {
-					toReturn.add((Lint) clazz.newInstance());
+					Constructor<? extends Object> constructor = clazz
+							.getConstructor(OWLOntologyManager.class);
+					toReturn.add((Lint) constructor
+							.newInstance(ontologyManager));
 				} else {
 					classNames.remove(string);
 				}
@@ -240,7 +249,27 @@ public class LintRollPreferences {
 							"Problem in loading jar: "
 									+ jarName
 									+ " the file has not been found, please restore it");
+		} catch (SecurityException e) {
+			Logger
+					.getLogger(LintRollPreferences.class.getName())
+					.warn(
+							"Impossible to find the expected constructor security access denied ");
+		} catch (NoSuchMethodException e) {
+			Logger.getLogger(LintRollPreferences.class.getName()).warn(
+					"Impossible to find the expected constructor");
+		} catch (IllegalArgumentException e) {
+			Logger
+					.getLogger(LintRollPreferences.class.getName())
+					.warn(
+							"Impossible to invoke the expected constructor illegal argument");
+		} catch (InvocationTargetException e) {
+			Logger.getLogger(LintRollPreferences.class.getName()).warn(
+					"Problem invoking the expected constructor ");
 		}
 		return toReturn;
+	}
+
+	public static void setOWLOntologyManager(OWLOntologyManager ontologyManager) {
+		LintRollPreferences.ontologyManager = ontologyManager;
 	}
 }

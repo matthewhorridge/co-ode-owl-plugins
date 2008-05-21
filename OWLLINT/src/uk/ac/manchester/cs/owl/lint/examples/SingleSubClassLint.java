@@ -29,6 +29,7 @@ import org.semanticweb.owl.lint.LintPattern;
 import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.lint.PatternBasedLint;
 import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 
@@ -41,10 +42,13 @@ import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
  */
 public class SingleSubClassLint implements PatternBasedLint {
 	private PatternBasedLint instance;
+	private OWLOntologyManager ontologyManager;
 
-	public SingleSubClassLint() {
-		this.instance = (PatternBasedLint) LintManagerFactory.getLintManager()
-				.getLintFactory().createLint(new SingleSubClassLintPattern());
+	public SingleSubClassLint(OWLOntologyManager ontologyManager) {
+		this.instance = (PatternBasedLint) LintManagerFactory.getLintManager(
+				ontologyManager).getLintFactory().createLint(
+				new SingleSubClassLintPattern(ontologyManager));
+		this.ontologyManager = ontologyManager;
 	}
 
 	public String getDescription() {
@@ -67,5 +71,9 @@ public class SingleSubClassLint implements PatternBasedLint {
 
 	public void setName(String name) {
 		this.instance.setName(name);
+	}
+
+	public OWLOntologyManager getOntologyManager() {
+		return this.ontologyManager;
 	}
 }

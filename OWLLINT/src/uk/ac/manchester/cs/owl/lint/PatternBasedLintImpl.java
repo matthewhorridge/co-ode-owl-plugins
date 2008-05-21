@@ -33,6 +33,7 @@ import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.lint.PatternBasedLint;
 import org.semanticweb.owl.lint.PatternReport;
 import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -44,8 +45,11 @@ import org.semanticweb.owl.model.OWLOntology;
 public class PatternBasedLintImpl implements PatternBasedLint {
 	protected Set<LintPattern> patterns = new HashSet<LintPattern>();
 	protected String name = null;
+	protected OWLOntologyManager ontologyManager;
 
-	protected PatternBasedLintImpl(LintPattern... lintPatterns) {
+	protected PatternBasedLintImpl(OWLOntologyManager ontologyManager,
+			LintPattern... lintPatterns) {
+		this.ontologyManager = ontologyManager;
 		for (LintPattern lintPattern : lintPatterns) {
 			this.patterns.add(lintPattern);
 		}
@@ -122,5 +126,12 @@ public class PatternBasedLintImpl implements PatternBasedLint {
 		}
 		toReturn += ")";
 		return toReturn;
+	}
+
+	/**
+	 * @return the ontologyManager
+	 */
+	public OWLOntologyManager getOntologyManager() {
+		return this.ontologyManager;
 	}
 }

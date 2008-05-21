@@ -34,10 +34,11 @@ import uk.ac.manchester.cs.owl.lint.PatternBasedLintImpl;
 public interface LintFactory {
 	/**
 	 * Creates a {@link PatternBasedLintImpl} starting from a variable number of
-	 * {@link LintPattern} elements
+	 * {@link LintPattern} elements and an OWLOntologyManager
 	 * 
 	 * 
 	 * @param lintPatterns
+	 * @param ontologyManager
 	 * @return a {@link PatternBasedLintImpl}
 	 */
 	public Lint createLint(LintPattern... lintPatterns);

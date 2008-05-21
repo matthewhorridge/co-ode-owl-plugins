@@ -45,6 +45,11 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  */
 public class LintFactoryImpl implements LintFactory {
 	protected OWLReasoner reasoner;
+	protected OWLOntologyManager ontologyManager;
+
+	public LintFactoryImpl(OWLOntologyManager ontologyManager) {
+		this.ontologyManager = ontologyManager;
+	}
 
 	/**
 	 * Creates a {@link PatternBasedLintImpl} starting from a variable number of
@@ -55,7 +60,7 @@ public class LintFactoryImpl implements LintFactory {
 	 * @return a {@link PatternBasedLintImpl}
 	 */
 	public Lint createLint(LintPattern... lintPatterns) {
-		return new PatternBasedLintImpl(lintPatterns);
+		return new PatternBasedLintImpl(this.ontologyManager, lintPatterns);
 	}
 
 	/**
