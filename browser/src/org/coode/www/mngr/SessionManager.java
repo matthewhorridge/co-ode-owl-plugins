@@ -145,7 +145,7 @@ public class SessionManager {
         server.clearOntologies(); // dump all ontologies and caches
 
         try {
-            File file = getFile(label);
+            File file = getFile(label + OntologyBrowserConstants.SERVER_STATES_EXT);
 
             // we are currently reading the file twice - @@TODO make this much nicer
 

@@ -105,7 +105,7 @@ public class DefaultHTMLPage<O> extends AbstractHTMLDoclet<O> {
     }
 
     protected String getTitle() {
-        return OWLHTMLConstants.ONTOLOGY_BROWSER_LABEL + ": " + title;
+        return OWLHTMLConstants.ONTOLOGY_SERVER_NAME + ": " + title;
     }
 
     public String getID() {

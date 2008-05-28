@@ -71,7 +71,7 @@ public class OWLHTMLConstants extends ServerConstants {
 
     public static final String PARAM_SESSION_LABEL = "session";
 
-    public static String ONTOLOGY_BROWSER_LABEL = "Ontology Browser";
+    public static String ONTOLOGY_SERVER_NAME = "Ontology Browser";
 
 
 
