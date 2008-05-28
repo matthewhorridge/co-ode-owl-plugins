@@ -40,8 +40,4 @@ public class ReasonerResultsDoclet<O extends OWLDescription> extends AbstractOWL
         results = type.getResults(descr, getServer());
         return results;
     }
-
-    public String getID() {
-        return super.getID() + " (" + results.size() + ")";
-    }
 }
