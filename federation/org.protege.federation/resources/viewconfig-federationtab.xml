@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout>
+    <VSNode splits="0.3 0.7">
+
+        <CNode>
+            <Component label="Asserted hierarchy">
+                <Property id="pluginId" value="org.protege.editor.owl.OWLAssertedClassHierarchy"/>
+            </Component>
+        </CNode>
+
+        <CNode>
+            <Component label="DL Query">
+                <Property id="pluginId" value="org.coode.dlquery.OWLDescriptionEditorViewComponent"/>
+            </Component>
+        </CNode>
+
+    </VSNode>
+
+</layout>
+
+<!--<layout>
+    <VSNode splits="1">
+
+        <CNode>
+            <Component label="DL Query">
+                <Property id="pluginId" value="org.protege.federation.FederationViewComponent"/>
+            </Component>
+        </CNode>
+
+    </VSNode>
+
+</layout>                             -->
