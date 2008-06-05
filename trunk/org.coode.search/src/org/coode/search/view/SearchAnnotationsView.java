@@ -1,26 +1,26 @@
 package org.coode.search.view;
 
-import org.protege.editor.owl.ui.view.AbstractActiveOntologyViewComponent;
+import org.coode.search.model.AnnotationFinder;
+import org.protege.editor.owl.ui.frame.AxiomListFrame;
 import org.protege.editor.owl.ui.framelist.OWLFrameList2;
 import org.protege.editor.owl.ui.framelist.OWLFrameListRenderer;
-import org.protege.editor.owl.ui.frame.AxiomListFrame;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.vocab.OWLRDFVocabulary;
+import org.protege.editor.owl.ui.view.AbstractActiveOntologyViewComponent;
+import org.semanticweb.owl.model.*;
 import org.semanticweb.owl.util.SimpleURIShortFormProvider;
-import org.coode.search.model.AnnotationFinder;
+import org.semanticweb.owl.vocab.OWLRDFVocabulary;
 
 import javax.swing.*;
-import javax.swing.Timer;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.DocumentEvent;
-import java.util.*;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -107,9 +107,54 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent {
         }
     };
 
+    private OWLOntologyChangeListener ontChangeListener = new OWLOntologyChangeListener(){
+        public void ontologiesChanged(List<? extends OWLOntologyChange> owlOntologyChanges) throws OWLException {
+            handleOntologyChanges(owlOntologyChanges);
+        }
+    };
+
+    private Runnable searcher = new Runnable(){
+        public void run() {
+            String str = searchField.getText();
+
+            if (str != null && str.length() > 0){
+                if (!regexpCheckbox.isSelected()){
+//                    str = str.toLowerCase();
+                    str = "(?s)(?i)" + str; // ignore newlines and case
+                    str = str.replaceAll("\\*", ".*");
+                    if (!str.endsWith(".*")){
+                        str += ".*";
+                    }
+                    if (!str.startsWith(".*")){
+                        str = ".*" + str;
+                    }
+                }
+            }
+            else{
+                str = null;
+            }
+
+            final boolean filter = filterCheckbox.isSelected();
+            annotURISelector.setEnabled(filter);
+
+            Set<OWLAxiom> axioms = null;
+
+            if (filter){
+                axioms = new AnnotationFinder().getAnnotationAxioms(filterUri, str, getOWLModelManager().getActiveOntologies());
+            }
+            else{
+                axioms = new AnnotationFinder().getAnnotationAxioms(usedURIs, str, getOWLModelManager().getActiveOntologies());
+            }
+            list.setRootObject(axioms);
+            currentSearch = null;
+        }
+    };
+
     // implement a wait after each keypress
     private static final int SEARCH_PAUSE_MILLIS = 1000;
     private Timer timer;
+
+    private Thread currentSearch;
 
 
     protected void initialiseOntologyView() throws Exception {
@@ -132,7 +177,9 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent {
         annotURISelector = new JComboBox();
         annotURISelector.setRenderer(new DefaultListCellRenderer(){
             public Component getListCellRendererComponent(JList jList, Object object, int i, boolean b, boolean b1) {
-                object = new SimpleURIShortFormProvider().getShortForm((URI)object);
+                if (object != null){
+                    object = new SimpleURIShortFormProvider().getShortForm((URI)object);
+                }
                 return super.getListCellRendererComponent(jList, object, i, b, b1);
             }
         });
@@ -148,10 +195,14 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent {
         add(searchPane, BorderLayout.NORTH);
 
         loadCombo();
+
         annotURISelector.addItemListener(annotURISelectionListener);
         searchField.getDocument().addDocumentListener(searchFieldChangeListener);
         filterCheckbox.addActionListener(actionListener);
         regexpCheckbox.addActionListener(actionListener);
+
+        // listen for additional annotations to allow the annotation filter list to be updated
+        getOWLModelManager().addOntologyChangeListener(ontChangeListener);
 
         timer = new Timer(SEARCH_PAUSE_MILLIS, actionListener);
     }
@@ -172,6 +223,7 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent {
     protected void disposeOntologyView() {
         list.dispose();
         annotURISelector.removeItemListener(annotURISelectionListener);
+        getOWLModelManager().removeOntologyChangeListener(ontChangeListener);
         searchField = null;
         annotURISelector = null;
     }
@@ -179,35 +231,40 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent {
     protected synchronized void updateView(OWLOntology activeOntology) throws Exception {
         timer.stop();
 
-        Set<OWLAxiom> axioms = null;
+        if (currentSearch != null && currentSearch.isAlive()){
+            currentSearch.interrupt();
+        }
 
-        String str = searchField.getText();
+        currentSearch = new Thread(searcher);
 
-        if (str != null && str.length() > 0){
-            if (!regexpCheckbox.isSelected()){
-                str = str.toLowerCase();
-                str = "(?s)" + str; // needed to allow newlines to be ignored
-                str = str.replaceAll("\\*", ".*");
-                if (!str.endsWith(".*")){
-                    str += ".*";
+        currentSearch.run();
+    }
+
+    private void handleOntologyChanges(List<? extends OWLOntologyChange> owlOntologyChanges) {
+        for (OWLOntologyChange c : owlOntologyChanges){
+            if (c.getAxiom().getAxiomType().equals(AxiomType.ENTITY_ANNOTATION)){
+                if (c instanceof AddAxiom){
+                    URI uri = ((OWLEntityAnnotationAxiom) c.getAxiom()).getAnnotation().getAnnotationURI();
+
+                    if (!uriSelectorContain(uri)){
+                        annotURISelector.addItem(uri);
+                    }
                 }
-                if (!str.startsWith(".*")){
-                    str = ".*" + str;
+                else if (c instanceof RemoveAxiom){
+                    loadCombo();
+                    return;
                 }
             }
         }
-        else{
-            str = null;
-        }
+    }
 
-        final boolean filter = filterCheckbox.isSelected();
-        annotURISelector.setEnabled(filter);
-        if (filter){
-            axioms = new AnnotationFinder().getAnnotationAxioms(filterUri, str, getOWLModelManager().getActiveOntologies());
+
+    private boolean uriSelectorContain(URI uri) {
+        for (int i=0; i<annotURISelector.getModel().getSize(); i++){
+            if (uri.equals(annotURISelector.getModel().getElementAt(i))){
+                return true;
+            }
         }
-        else{
-            axioms = new AnnotationFinder().getAnnotationAxioms(usedURIs, str, getOWLModelManager().getActiveOntologies());
-        }
-        list.setRootObject(axioms);
+        return false;
     }
 }
