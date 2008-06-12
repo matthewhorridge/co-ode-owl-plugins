@@ -26,7 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
@@ -59,9 +59,11 @@ public class LintRollPreferences {
 	static Set<String> wellKnownLintClassNames;
 	private static Map<Lint, String> lintJarMap = new HashMap<Lint, String>();
 	private static Set<LintRollPreferenceChangeListener> listeners = new HashSet<LintRollPreferenceChangeListener>();
-	private static List<String> loadedJars;
+	private static Set<String> loadedJars;
 	private static OWLOntologyManager ontologyManager = OWLManager
 			.createOWLOntologyManager();
+	private static List<String> invalidJars;
+	private static List<String> loadedJarPrefList;
 	static {
 		LintRollPreferences.wellKnownLintClassNames = new HashSet<String>();
 		LintRollPreferences.wellKnownLintClassNames.add(Lint.class.getName());
@@ -69,6 +71,7 @@ public class LintRollPreferences {
 				.getName());
 		loadedLints = new HashSet<Lint>();
 		selectedLints = new HashSet<Lint>();
+		invalidJars = new ArrayList<String>();
 		preferencesManager = PreferencesManager.getInstance();
 		initPreferences();
 	}
@@ -83,10 +86,12 @@ public class LintRollPreferences {
 	private static void initPreferences() {
 		Preferences prefs = preferencesManager.getPreferencesForSet("LINTROLL",
 				"panelPrefs");
-		loadedJars = prefs.getStringList("loadedJars", new ArrayList<String>());
+		loadedJarPrefList = prefs.getStringList("loadedJars",
+				new ArrayList<String>());
+		loadedJars = new HashSet<String>(loadedJarPrefList);
 		// Just to avoid duplicates
-		Set<String> loadedPrefsSet = new HashSet<String>(loadedJars);
-		for (String loadedString : loadedPrefsSet) {
+		for (String loadedString : loadedJars) {
+			System.out.println("Loading jar " + loadedString);
 			Set<Lint> jarLoadedLints = loadLints(loadedString);
 			for (Lint lint : jarLoadedLints) {
 				addLoadedLint(loadedString, lint);
@@ -144,6 +149,7 @@ public class LintRollPreferences {
 
 	public static void removeLoadedLint(Lint lint) {
 		boolean changed = loadedLints.remove(lint);
+		lintJarMap.remove(lint);
 		if (changed) {
 			for (LintRollPreferenceChangeListener listener : listeners) {
 				listener.handleChange(new LintRollPreferenceChangeEvent(
@@ -208,6 +214,7 @@ public class LintRollPreferences {
 	public static Set<Lint> loadLints(String jarName) {
 		Set<String> classNames = new HashSet<String>();
 		Set<Lint> toReturn = new HashSet<Lint>();
+		Class<? extends Object> clazz = null;
 		try {
 			JarClassLoader cl = new JarClassLoader(jarName);
 			classNames = cl.getClassNames();
@@ -215,33 +222,52 @@ public class LintRollPreferences {
 					new URL[] { new File(jarName).toURL() },
 					LintRollPreferences.class.getClassLoader());
 			for (String string : new HashSet<String>(classNames)) {
-				Class<? extends Object> clazz = urlClassLoader
-						.loadClass(string);
-				if (!wellKnownLintClassNames.contains(string)
-						&& Lint.class.isAssignableFrom(clazz)) {
-					Constructor<? extends Object> constructor = clazz
-							.getConstructor(OWLOntologyManager.class);
-					toReturn.add((Lint) constructor
-							.newInstance(ontologyManager));
-				} else {
-					classNames.remove(string);
+				try {
+					clazz = urlClassLoader.loadClass(string);
+					if (!wellKnownLintClassNames.contains(string)
+							&& Lint.class.isAssignableFrom(clazz)
+							&& !Modifier.isAbstract(clazz.getModifiers())) {
+						Constructor<? extends Object> constructor = clazz
+								.getConstructor(OWLOntologyManager.class);
+						Lint loadedLint = (Lint) constructor
+								.newInstance(ontologyManager);
+						toReturn.add(loadedLint);
+						lintJarMap.put(loadedLint, jarName);
+					} else {
+						classNames.remove(string);
+					}
+				} catch (ClassNotFoundException e) {
+					Logger.getLogger(LintRollPreferences.class.getName())
+							.error("Unable to load class", e);
+				} catch (InstantiationException e) {
+					Logger.getLogger(LintRollPreferences.class.getName())
+							.error("Unable to instantiate lint class", e);
+				} catch (IllegalAccessException e) {
+					Logger.getLogger(LintRollPreferences.class.getName())
+							.error("Unable to instantiate lint class", e);
+				} catch (SecurityException e) {
+					Logger
+							.getLogger(LintRollPreferences.class.getName())
+							.warn(
+									"Impossible to find the expected constructor security access denied ");
+				} catch (NoSuchMethodException e) {
+					Logger.getLogger(LintRollPreferences.class.getName()).warn(
+							"Impossible to find the expected constructor "
+									+ clazz);
+				} catch (IllegalArgumentException e) {
+					Logger.getLogger(LintRollPreferences.class.getName()).warn(
+							"Impossible to invoke the expected constructor illegal argument "
+									+ clazz);
+				} catch (InvocationTargetException e) {
+					Logger.getLogger(LintRollPreferences.class.getName()).warn(
+							"Problem invoking the expected constructor "
+									+ clazz);
 				}
 			}
 			if (!toReturn.isEmpty()) {
 				loadedJars.add(jarName);
+				loadedJarPrefList.add(jarName);
 			}
-		} catch (ClassNotFoundException e) {
-			Logger.getLogger(LintRollPreferences.class.getName()).error(
-					"Unable to load class", e);
-		} catch (InstantiationException e) {
-			Logger.getLogger(LintRollPreferences.class.getName()).error(
-					"Unable to instantiate lint class", e);
-		} catch (IllegalAccessException e) {
-			Logger.getLogger(LintRollPreferences.class.getName()).error(
-					"Unable to instantiate lint class", e);
-		} catch (MalformedURLException e) {
-			Logger.getLogger(LintRollPreferences.class.getName()).error(
-					"Unable to load the selected jar containing the lints", e);
 		} catch (IOException e) {
 			Logger
 					.getLogger(JarResources.class.getName())
@@ -249,27 +275,41 @@ public class LintRollPreferences {
 							"Problem in loading jar: "
 									+ jarName
 									+ " the file has not been found, please restore it");
-		} catch (SecurityException e) {
-			Logger
-					.getLogger(LintRollPreferences.class.getName())
-					.warn(
-							"Impossible to find the expected constructor security access denied ");
-		} catch (NoSuchMethodException e) {
-			Logger.getLogger(LintRollPreferences.class.getName()).warn(
-					"Impossible to find the expected constructor");
-		} catch (IllegalArgumentException e) {
-			Logger
-					.getLogger(LintRollPreferences.class.getName())
-					.warn(
-							"Impossible to invoke the expected constructor illegal argument");
-		} catch (InvocationTargetException e) {
-			Logger.getLogger(LintRollPreferences.class.getName()).warn(
-					"Problem invoking the expected constructor ");
+			loadedJars.add(jarName);
+			invalidJars.add(jarName);
 		}
 		return toReturn;
 	}
 
 	public static void setOWLOntologyManager(OWLOntologyManager ontologyManager) {
 		LintRollPreferences.ontologyManager = ontologyManager;
+	}
+
+	public static void removeJar(String jarName) {
+		for (Lint lint : new HashSet<Lint>(lintJarMap.keySet())) {
+			String lintJarName = lintJarMap.get(lint);
+			if (jarName.compareTo(lintJarName) == 0) {
+				removeLoadedLint(lint);
+				removeSelectedLint(lint);
+				lintJarMap.remove(lint);
+			}
+		}
+		loadedJars.remove(jarName);
+		invalidJars.remove(jarName);
+		// for the preferences to be saved
+		loadedJarPrefList.clear();
+		loadedJarPrefList.addAll(loadedJars);
+	}
+
+	public static Set<String> getLoadedJars() {
+		return new HashSet<String>(loadedJars);
+	}
+
+	public static String getJarName(Lint lint) {
+		return LintRollPreferences.lintJarMap.get(lint);
+	}
+
+	public static boolean isInvalid(String jarName) {
+		return invalidJars.contains(jarName);
 	}
 }
