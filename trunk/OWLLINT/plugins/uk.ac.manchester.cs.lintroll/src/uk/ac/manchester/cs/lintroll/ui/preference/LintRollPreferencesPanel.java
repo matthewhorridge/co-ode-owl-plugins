@@ -25,27 +25,26 @@ package uk.ac.manchester.cs.lintroll.ui.preference;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
-import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.border.LineBorder;
 
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.protege.ProtegeLintManager;
 
-import uk.ac.manchester.cs.lintroll.utils.JarFileFilter;
+import uk.ac.manchester.cs.lintroll.ui.JarListRenderer;
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 
 /**
@@ -54,20 +53,22 @@ import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
  * @author Luigi Iannone
  * 
  */
-public class LintRollPreferencesPanel extends OWLPreferencesPanel {
+public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
+		LintRollPreferenceChangeListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4639367272089721763L;
 	private Map<JCheckBox, Lint> map = new HashMap<JCheckBox, Lint>();
 	private Box box = new Box(BoxLayout.Y_AXIS);
-	private JButton openJarButton = new JButton(new DefaultTreeCellRenderer()
-			.getDefaultOpenIcon());
+	// private JButton openJarButton = new JButton(new DefaultTreeCellRenderer()
+	// .getDefaultOpenIcon());
 	private JButton selectAllButton = new JButton("Select all");
 	private JButton deSelectAllButton = new JButton("De-select all");
 	private JButton invertSelection = new JButton("Invert selection");
-	static {
-	}
+	private JarList jarList;
+	private JPanel holder;
+	private JScrollPane boxPane;
 
 	/**
 	 * @see org.protege.editor.core.ui.preferences.PreferencesPanel#applyChanges()
@@ -92,24 +93,25 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel {
 	public void dispose() throws Exception {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see org.protege.editor.core.plugin.ProtegePluginInstance#initialise()
 	 */
 	public void initialise() throws Exception {
+		// The following line must be the first thing or at least must appear
+		// before the setOntologyManager method
+		LintManagerFactory.setPreferredLintManager(new ProtegeLintManager(this
+				.getOWLModelManager()));
 		LintRollPreferences.setOWLOntologyManager(this.getOWLEditorKit()
 				.getOWLModelManager().getOWLOntologyManager());
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		LintManagerFactory.setPreferredLintManager(new ProtegeLintManager(this
-				.getOWLModelManager()));
 		Set<Lint> loadedLints = LintRollPreferences.getLoadedLints();
 		Set<Lint> selectedLints = LintRollPreferences.getSelectedLints();
 		JToolBar toolBar = new JToolBar();
-		toolBar.add(this.openJarButton);
+		// toolBar.add(this.openJarButton);
 		toolBar.add(this.selectAllButton);
 		toolBar.add(this.deSelectAllButton);
 		toolBar.add(this.invertSelection);
+		toolBar.setFloatable(false);
 		this.initButtons();
 		this.add(toolBar);
 		for (Lint lint : loadedLints) {
@@ -120,38 +122,50 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel {
 			this.box.add(Box.createVerticalStrut(4));
 			checkBox.setOpaque(false);
 		}
-		JPanel holder = new JPanel(new BorderLayout());
-		holder.setBorder(ComponentFactory.createTitledBorder("Loaded Lints"));
-		holder.add(new JScrollPane(this.box));
-		this.add(holder);
+		this.jarList = new JarList(this.getOWLEditorKit());
+		this.jarList.setCellRenderer(new JarListRenderer());
+		for (String jarName : LintRollPreferences.getLoadedJars()) {
+			JarLListItem item = new JarLListItem(jarName);
+			((DefaultListModel) this.jarList.getModel()).addElement(item);
+		}
+		this.holder = new JPanel(new BorderLayout());
+		this.holder.setBorder(ComponentFactory
+				.createTitledBorder("Loaded Lints"));
+		this.boxPane = new JScrollPane(this.box);
+		this.holder.add(this.boxPane);
+		this.add(this.holder);
+		JScrollPane jarListPane = new JScrollPane(this.jarList);
+		jarListPane.setBorder(LineBorder.createGrayLineBorder());
+		this.add(jarListPane);
+		LintRollPreferences.addLintRollPreferenceChangeListener(this);
 	}
 
 	private void initButtons() {
-		this.openJarButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser chooseAJar = new JFileChooser(System
-						.getProperty("user.dir"));
-				chooseAJar.setFileFilter(new JarFileFilter());
-				chooseAJar.showOpenDialog(LintRollPreferencesPanel.this);
-				File selectedJar = chooseAJar.getSelectedFile();
-				if (selectedJar != null) {
-					Set<Lint> lints = LintRollPreferences.loadLints(selectedJar
-							.getAbsolutePath());
-					for (Lint lint : lints) {
-						if (!LintRollPreferences.getLoadedLints()
-								.contains(lint)) {
-							LintRollPreferences.addLoadedLint(lint);
-							JCheckBox cb = new JCheckBox(lint.getName(), false);
-							LintRollPreferencesPanel.this.box.add(cb);
-							LintRollPreferencesPanel.this.box.add(Box
-									.createVerticalStrut(4));
-							cb.setOpaque(false);
-							LintRollPreferencesPanel.this.map.put(cb, lint);
-						}
-					}
-				}
-			}
-		});
+		// this.openJarButton.addActionListener(new ActionListener() {
+		// public void actionPerformed(ActionEvent arg0) {
+		// JFileChooser chooseAJar = new JFileChooser(System
+		// .getProperty("user.dir"));
+		// chooseAJar.setFileFilter(new JarFileFilter());
+		// chooseAJar.showOpenDialog(LintRollPreferencesPanel.this);
+		// File selectedJar = chooseAJar.getSelectedFile();
+		// if (selectedJar != null) {
+		// Set<Lint> lints = LintRollPreferences.loadLints(selectedJar
+		// .getAbsolutePath());
+		// for (Lint lint : lints) {
+		// if (!LintRollPreferences.getLoadedLints()
+		// .contains(lint)) {
+		// LintRollPreferences.addLoadedLint(lint);
+		// JCheckBox cb = new JCheckBox(lint.getName(), false);
+		// LintRollPreferencesPanel.this.box.add(cb);
+		// LintRollPreferencesPanel.this.box.add(Box
+		// .createVerticalStrut(4));
+		// cb.setOpaque(false);
+		// LintRollPreferencesPanel.this.map.put(cb, lint);
+		// }
+		// }
+		// }
+		// }
+		// });
 		this.selectAllButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				for (JCheckBox cb : LintRollPreferencesPanel.this.map.keySet()) {
@@ -173,5 +187,26 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel {
 				}
 			}
 		});
+	}
+
+	@SuppressWarnings("unchecked")
+	public void handleChange(LintRollPreferenceChangeEvent e) {
+		if (e.getType().equals(EventType.LOADED_LINT_CHANGE)) {
+			Set<Lint> loadedLints = (Set<Lint>) e.getSource();
+			this.map.clear();
+			this.holder.remove(this.boxPane);
+			this.box = new Box(BoxLayout.Y_AXIS);
+			for (Lint lint : loadedLints) {
+				JCheckBox checkBox = new JCheckBox(lint.getName(),
+						LintRollPreferences.getSelectedLints().contains(lint));
+				this.map.put(checkBox, lint);
+				this.box.add(checkBox);
+				this.box.add(Box.createVerticalStrut(4));
+				checkBox.setOpaque(false);
+			}
+			this.boxPane = new JScrollPane(this.box);
+			this.holder.add(this.boxPane);
+			this.holder.revalidate();
+		}
 	}
 }

@@ -27,8 +27,6 @@ import java.util.Set;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
-import uk.ac.manchester.cs.owl.lint.examples.SingleSubClassLint;
-
 /**
  * @author Luigi Iannone
  * 
@@ -63,9 +61,9 @@ public interface LintReport {
 	/**
 	 * Sets the Lint originating this report
 	 * 
-	 * @param singleSubClassLint
+	 * @param lint
 	 */
-	void setLint(SingleSubClassLint singleSubClassLint);
+	void setLint(Lint lint);
 
 	/**
 	 * Adds the input OWLObject to the this LintReport for the input ontology

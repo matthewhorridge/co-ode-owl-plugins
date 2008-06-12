@@ -20,27 +20,22 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.cs.owl.lint;
+package uk.ac.manchester.cs.lintroll.ui.preference;
 
-import org.semanticweb.owl.lint.LintManager;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import org.protege.editor.core.ui.list.MListSectionHeader;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 13, 2008
  */
-public class LintManagerFactory {
-	protected static LintManager preferredLintManager;
+public class JarListSectionHeader implements MListSectionHeader {
+	public static final String LABEL = "Loaded jars";
 
-	public static LintManager getLintManager(OWLOntologyManager ontologyManager) {
-		return preferredLintManager != null ? preferredLintManager
-				: new LintManagerImpl(ontologyManager);
+	public boolean canAdd() {
+		return true;
 	}
 
-	public static void setPreferredLintManager(LintManager lintManager) {
-		preferredLintManager = lintManager;
+	public String getName() {
+		return LABEL;
 	}
 }
