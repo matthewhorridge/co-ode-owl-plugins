@@ -13,6 +13,8 @@ img.button {position: relative; top: 8px;}
 .keyword {color: #00B2B2; font-weight: bolder;}
 .comment, .some, .only, .value, .min, .max, .exactly {color: #B200B2; font-weight:bolder;}
 
+div {margin-top: 0;}
+
 div.codebox {overflow: hidden;
     background: #f1f5f9; width: 95%; padding: 5px;
     border-width: 1px; border-style: solid; border-color: #c7cfd5;
@@ -45,9 +47,9 @@ a:hover {text-decoration: underline; color: blue;}
 
 a.subsexpand {color: #555555; font-size: 7pt; text-decoration: underline; line-height: 180%;}
 
-ul {margin-top: 1px; margin-bottom: 1px; margin-left: 10px; padding-left: 5px;}
-li {margin-top: 3px;}
-li.expandable {list-style-type: none; position: relative; margin-left: -21px;}
+ul {margin-top: 1px; margin-bottom: 1px; margin-left: 1.5em; padding-left: 0.5em;}
+li {margin-bottom: 0; margin-top: 2px; border: solid 1px #f1f5f9;}
+li.expandable {list-style-type: none; margin-left: -1.5em;}
 
 p.footer {font-size: 7pt; text-align: right; width: 95%;}
 
