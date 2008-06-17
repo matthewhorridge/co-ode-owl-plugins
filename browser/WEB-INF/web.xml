@@ -39,7 +39,7 @@
     <servlet>
         <servlet-name>QueryExtend</servlet-name>
         <display-name>Query Extend</display-name>
-        <description>Adds a conjuct to the form</description>
+        <description>Adds a conjunct to the form</description>
         <servlet-class>org.coode.www.servlet.QueryExtend</servlet-class>
     </servlet>
     <servlet>

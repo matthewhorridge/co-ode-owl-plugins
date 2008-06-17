@@ -5,12 +5,11 @@ package org.coode.www.doclet;
 
 import org.apache.log4j.Logger;
 import org.coode.html.OWLHTMLServer;
-import org.coode.html.util.URLUtils;
 import org.coode.html.doclet.AbstractOWLDocDoclet;
 import org.coode.html.impl.OWLHTMLConstants;
+import org.coode.html.util.URLUtils;
 
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Set;
 
@@ -32,7 +31,7 @@ public class AutocompleteDoclet extends AbstractOWLDocDoclet {
     private boolean autoSubmitOnAccept;
     private URL submitURL;
     private String initialValue;
-    private String method = "post";
+    private String method = "get";
     private OWLHTMLConstants.LinkTarget target = null;
     private String paramName = "expression";
     private String submitName = "find";

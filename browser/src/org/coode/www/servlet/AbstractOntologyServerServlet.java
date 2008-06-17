@@ -70,8 +70,7 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
         final String sessionLabel = request.getParameter(OWLHTMLConstants.PARAM_SESSION_LABEL);
         final String format = request.getParameter(OntologyBrowserConstants.PARAM_FORMAT);
 
-        // @@TODO this is not good enough - doesn't include params - need to rebuild the URL and fix AbstractSummaryHTMLPage
-        final URL pageURL = new URL(request.getRequestURL().toString());
+        final URL pageURL = buildRequestURL(request);
 
         final OWLHTMLServer server = getServer(request, sessionLabel, pageURL);
 
@@ -117,6 +116,31 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
         }
     }
 
+
+    private URL buildRequestURL(HttpServletRequest request) throws IOException {
+        // requestURL on its own is not good enough - doesn't include params - need to rebuild the URL and fix AbstractSummaryHTMLPage
+        StringBuilder requestURL = new StringBuilder(request.getRequestURL().toString());
+        boolean appendedParams = false;
+
+        String query = request.getQueryString();
+        if (query != null){
+            for (String param : query.split("&")){
+                if (!param.startsWith(OWLHTMLConstants.PARAM_SESSION_LABEL)){
+                    if (appendedParams){
+                        requestURL.append("&");
+                    }
+                    else{
+                        requestURL.append("?");
+                        appendedParams = true;
+                    }
+                    requestURL.append(param);
+                }
+            }
+        }
+        return new URL(requestURL.toString());
+    }
+
+
     private void prepareMenuBar(HTMLDoclet ren, OWLHTMLServer server, URL pageURL) {
         if (ren instanceof NestedHTMLDoclet){
             MenuBarDoclet menuDoclet = (MenuBarDoclet)((NestedHTMLDoclet)ren).getDoclet(MenuBarDoclet.ID);
@@ -129,7 +153,7 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
                                                             OWLHTMLConstants.LinkTarget.subnav,
                                                             server));
                 }
-                
+
                 menuDoclet.addToMenu(new MenuItemDoclet("Help",
                                                         server.getURLScheme().getURLForRelativePage(OntologyBrowserConstants.DOCS_HTML),
                                                         OWLHTMLConstants.LinkTarget._blank,
@@ -166,7 +190,7 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
         }
         for (Object param : requestParams){
             if (!OWLHTMLConstants.PARAM_SESSION_LABEL.equals(param) &&
-                !OntologyBrowserConstants.PARAM_FORMAT.equals(param)){
+                    !OntologyBrowserConstants.PARAM_FORMAT.equals(param)){
                 String[] v = (String[])request.getParameterMap().get(param);
                 params.put(param.toString(), v[0]);
             }
@@ -223,8 +247,8 @@ public abstract class AbstractOntologyServerServlet extends HttpServlet {
 
 
     protected final <N extends OWLNamedObject> OWLEntityIndexHTMLPage createIndexRenderer(String title,
-                                                                                    Set<N> results,
-                                                                                    OWLHTMLServer server) throws OntServerException {
+                                                                                          Set<N> results,
+                                                                                          OWLHTMLServer server) throws OntServerException {
         try {
             OWLEntityIndexHTMLPage<N> ren = new OWLEntityIndexHTMLPage<N>(server);
             if (title != null){
