@@ -40,19 +40,14 @@
             <attribute name="URI" value="&lt;N/A&gt;" />
           </containerElement>
           <containerElement type="library" level="module">
-            <attribute name="method" value="0" />
-            <attribute name="URI" value="/WEB-INF/classes" />
-            <url>jar://$MODULE_DIR$/../owldoc-server/lib/FaCT++OWLAPI-v1.0.0.jar!/</url>
+            <attribute name="method" value="1" />
+            <attribute name="URI" value="/WEB-INF/lib/FaCTPlusPlus.jar" />
+            <url>jar://$MODULE_DIR$/lib/FaCTPlusPlus.jar!/</url>
           </containerElement>
           <containerElement type="library" level="module">
             <attribute name="method" value="1" />
-            <attribute name="URI" value="/WEB-INF/lib/FaCTpp-OWLAPI-v1.1.11.jar" />
-            <url>jar://$MODULE_DIR$/lib/FaCTpp-OWLAPI-v1.1.11.jar!/</url>
-          </containerElement>
-          <containerElement type="library" level="module">
-            <attribute name="method" value="0" />
-            <attribute name="URI" value="/WEB-INF/classes" />
-            <url>jar://$MODULE_DIR$/../owldoc-server/lib/aterm-java-1.6.jar!/</url>
+            <attribute name="URI" value="/WEB-INF/lib/aterm-java-1.6.jar" />
+            <url>jar://$MODULE_DIR$/lib/aterm-java-1.6.jar!/</url>
           </containerElement>
           <containerElement type="library" level="module">
             <attribute name="method" value="0" />
@@ -100,11 +95,6 @@
             <url>jar://$MODULE_DIR$/lib/pellet.jar!/</url>
           </containerElement>
           <containerElement type="library" level="module">
-            <attribute name="method" value="0" />
-            <attribute name="URI" value="/WEB-INF/classes" />
-            <url>jar://$MODULE_DIR$/../owldoc-server/lib/pellet.jar!/</url>
-          </containerElement>
-          <containerElement type="library" level="module">
             <attribute name="method" value="1" />
             <attribute name="URI" value="/WEB-INF/lib/rdfapi.jar" />
             <url>jar://$MODULE_DIR$/lib/rdfapi.jar!/</url>
@@ -120,11 +110,6 @@
             <url>jar://$MODULE_DIR$/lib/relaxngDatatype.jar!/</url>
           </containerElement>
           <containerElement type="library" level="module">
-            <attribute name="method" value="0" />
-            <attribute name="URI" value="/WEB-INF/classes" />
-            <url>jar://$MODULE_DIR$/../owldoc-server/lib/relaxngDatatype.jar!/</url>
-          </containerElement>
-          <containerElement type="library" level="module">
             <attribute name="method" value="1" />
             <attribute name="URI" value="/WEB-INF/lib/suggestor.jar" />
             <url>jar://$MODULE_DIR$/lib/suggestor.jar!/</url>
@@ -137,17 +122,32 @@
           <containerElement type="library" level="module">
             <attribute name="method" value="0" />
             <attribute name="URI" value="/WEB-INF/classes" />
+            <url>jar://$MODULE_DIR$/../owldoc-server/lib/FaCT++OWLAPI-v1.0.0.jar!/</url>
+          </containerElement>
+          <containerElement type="library" level="module">
+            <attribute name="method" value="0" />
+            <attribute name="URI" value="/WEB-INF/classes" />
+            <url>jar://$MODULE_DIR$/../owldoc-server/lib/aterm-java-1.6.jar!/</url>
+          </containerElement>
+          <containerElement type="library" level="module">
+            <attribute name="method" value="0" />
+            <attribute name="URI" value="/WEB-INF/classes" />
+            <url>jar://$MODULE_DIR$/../owldoc-server/lib/pellet.jar!/</url>
+          </containerElement>
+          <containerElement type="library" level="module">
+            <attribute name="method" value="0" />
+            <attribute name="URI" value="/WEB-INF/classes" />
+            <url>jar://$MODULE_DIR$/../owldoc-server/lib/relaxngDatatype.jar!/</url>
+          </containerElement>
+          <containerElement type="library" level="module">
+            <attribute name="method" value="0" />
+            <attribute name="URI" value="/WEB-INF/classes" />
             <url>jar://$MODULE_DIR$/../owldoc-server/lib/xsdlib.jar!/</url>
           </containerElement>
           <containerElement type="library" level="module">
             <attribute name="method" value="0" />
             <attribute name="URI" value="/WEB-INF/classes" />
             <url>jar://$MODULE_DIR$/lib/FaCT++OWLAPI-v1.0.0.jar!/</url>
-          </containerElement>
-          <containerElement type="library" level="module">
-            <attribute name="method" value="1" />
-            <attribute name="URI" value="/WEB-INF/lib/aterm-java-1.6.jar" />
-            <url>jar://$MODULE_DIR$/lib/aterm-java-1.6.jar!/</url>
           </containerElement>
           <containerElement type="module" name="owl1_1">
             <attribute name="method" value="1" />
@@ -271,21 +271,21 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="Tomcat 5.5" level="application_server_libraries" />
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/FaCTpp-OWLAPI-v1.1.11.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
     <orderEntry type="module" module-name="owlhtml" />
     <orderEntry type="module" module-name="owlmanager" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/aterm-java-1.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/FaCTPlusPlus.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

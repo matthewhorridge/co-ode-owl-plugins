@@ -70,7 +70,7 @@ public class DLQueryHTMLPage extends EmptyOWLDocPage {
         this.query = query;
 
         // below is nasty because we have to know ID dlQuerySyntax (which is hardcoded in ACRenderer
-        final URL servletURL = getServer().getBaseURL();
+        final URL servletURL = getServer().getURLScheme().getBaseURL();
 
         String jsAction = "sendQuery(getValueOfElementByID(\"" + DL_QUERY_AC_ID +
                 "\"), getValueOfElementByID(\"dlQuerySyntax\"), \"" + servletURL + "\")";

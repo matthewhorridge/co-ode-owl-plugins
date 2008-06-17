@@ -3,16 +3,15 @@
 */
 package org.coode.html.doclet;
 
+import org.apache.log4j.Logger;
 import org.coode.html.OWLHTMLServer;
-import org.coode.html.util.URLUtils;
 import org.coode.html.hierarchy.TreeFragment;
 import org.coode.html.renderer.OWLHTMLRenderer;
+import org.coode.html.util.URLUtils;
 import org.coode.owl.mngr.ServerConstants;
 import org.semanticweb.owl.model.OWLNamedObject;
-import org.apache.log4j.Logger;
 
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
@@ -86,7 +85,6 @@ public abstract class AbstractHierarchyNodeDoclet<O extends OWLNamedObject> exte
     }
 
     protected void renderExpandLink(O node, URL pageURL, PrintWriter out) {
-        try {
             if (isRenderSubExpandLinksEnabled()){
                 String link = URLUtils.createRelativeURL(pageURL, getServer().getURLScheme().getURLForNamedObject(node));
                 if (!link.contains("?")){
@@ -96,16 +94,11 @@ public abstract class AbstractHierarchyNodeDoclet<O extends OWLNamedObject> exte
                     link += "&";
                 }
 
-                URL expandLinkURL = new URL(link + "expanded=true");
-                out.println(" <a href='" + expandLinkURL + "'>[+]</a>");
+                out.println(" <a href='" + link + "expanded=true'>[+]</a>");
             }
             else{
                 out.println(" +");
             }
-        }
-        catch (MalformedURLException e) {
-            logger.error("Could not render tree expand link for " + node.getURI(), e);
-        }
     }
 
 
