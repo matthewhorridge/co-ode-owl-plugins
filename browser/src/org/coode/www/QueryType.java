@@ -37,7 +37,7 @@ public enum QueryType {
                 case descendants: results.addAll(ModelUtil.filterClasses(r.getDescendantClasses(descr), server)); break;
                 case superclasses: results.addAll(ModelUtil.filterClasses(r.getSuperClasses(descr), server)); break;
                 case ancestors: results.addAll(ModelUtil.filterClasses(r.getAncestorClasses(descr), server)); break;
-                case instances: results.addAll(r.getIndividuals(descr, true)); break;
+                case instances: results.addAll(r.getIndividuals(descr, false)); break;
             }
         }
         catch(OWLReasonerException e){
