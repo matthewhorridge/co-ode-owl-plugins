@@ -265,7 +265,7 @@ public class SessionManager {
         mngr.setSilentMissingImportsHandling(true);
 //        mngr.addMissingImportListener(missingImportsListener);
 
-        OWLHTMLServerImpl server = new OWLHTMLServerImpl(id, mngr, basePath);
+        OWLHTMLServer server = new OWLHTMLServerImpl(id, mngr, basePath);
 
         // use a servlet URL scheme which encodes the names in params
         server.setURLScheme(new RestURLScheme(server));
@@ -274,7 +274,41 @@ public class SessionManager {
         server.registerDescriptionParser(ServerConstants.Syntax.man.toString(), new ManchesterOWLSyntaxParser(server));
         server.registerDescriptionParser(ServerConstants.Syntax.qd.toString(), new QuickDescriptionParser(server));
 
+        boolean defaultsLoaded = false;
+
+        File file = getFile("default" + OntologyBrowserConstants.SERVER_STATES_EXT);
+        if (file.exists()){
+            try {
+                BufferedInputStream in = new BufferedInputStream(new FileInputStream(file));
+                server.getProperties().load(in);
+                in.close();
+                defaultsLoaded = true;
+            }
+            catch (IOException e) {
+                logger.error("Could not load default properties");
+            }
+        }
+
+        if (!defaultsLoaded){
+
+            setupDefaultServerProperties(server);
+
+            try {
+                OutputStream out = new FileOutputStream(file);
+                server.getProperties().save(out);
+            }
+            catch (IOException e) {
+                logger.error("Could not save default properties");
+            }
+        }
+
+        return server;
+    }
+
+
+    private static void setupDefaultServerProperties(OWLHTMLServer server) {
         ServerProperties properties = server.getProperties();
+
         // by default, do not use frames navigation
         properties.set(OWLHTMLConstants.OPTION_CONTENT_WINDOW, null);
 
@@ -294,7 +328,7 @@ public class SessionManager {
         properties.set(OWLHTMLConstants.OPTION_RENDER_PERMALINK, ServerConstants.TRUE);
 
         // default location for DIG reasoner
-        if (basePath.toString().contains("localhost")){ // just to make sure I don't accidentally publish this address
+        if (server.getBaseURL().toString().contains("localhost")){ // just to make sure I don't accidentally publish this address
             properties.set(ServerConstants.OPTION_DIG_REASONER_URL, "http://rpc295.cs.man.ac.uk:8080");
         }
 
@@ -303,9 +337,8 @@ public class SessionManager {
         properties.set(OWLHTMLConstants.OPTION_SHOW_INFERRED_HIERARCHIES, ServerConstants.FALSE);
 
         properties.set(ServerConstants.OPTION_RENDER_SUB_EXPAND_LINKS, ServerConstants.FALSE);
-
-        return server;
     }
+
 
     /**
      * The ID will get notified when a session expires and calls the session manager to cleanup
