@@ -31,26 +31,15 @@
   <component name="ChangeListManager">
     <list default="true" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/browser.iws" afterPath="$PROJECT_DIR$/browser.iws" />
-      <change type="MODIFICATION" beforePath="/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/AbstractHierarchyNodeDoclet.java" afterPath="/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/AbstractHierarchyNodeDoclet.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/mngr/SessionManager.java" afterPath="$PROJECT_DIR$/src/org/coode/www/mngr/SessionManager.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/owlhtml.jar" afterPath="$PROJECT_DIR$/lib/owlhtml.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/owlapi-bin.jar" afterPath="$PROJECT_DIR$/lib/owlapi-bin.jar" />
-      <change type="MODIFICATION" beforePath="/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/lib/owlapi-bin.jar" afterPath="/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/lib/owlapi-bin.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/browser.ipr" afterPath="$PROJECT_DIR$/browser.ipr" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/resources/docs/release-notes.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/page/DLQueryHTMLPage.java" afterPath="$PROJECT_DIR$/src/org/coode/www/page/DLQueryHTMLPage.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/docs/release-notes.html" afterPath="$PROJECT_DIR$/resources/docs/release-notes.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/OntologyBrowserConstants.java" afterPath="$PROJECT_DIR$/src/org/coode/www/OntologyBrowserConstants.java" />
+      <change type="MODIFICATION" beforePath="/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/HierarchyRootDoclet.java" afterPath="/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/HierarchyRootDoclet.java" />
+      <change type="MODIFICATION" beforePath="/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/HierarchyNodeDoclet.java" afterPath="/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/HierarchyNodeDoclet.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/owlmanager.jar" afterPath="$PROJECT_DIR$/lib/owlmanager.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/WEB-INF/web.xml" afterPath="$PROJECT_DIR$/WEB-INF/web.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/docs/bugs.html" afterPath="$PROJECT_DIR$/resources/docs/bugs.html" />
-      <change type="MODIFICATION" beforePath="/Users/drummond/Work/CO-ODE/Code/HTML/owlmanager/lib/owlapi-bin.jar" afterPath="/Users/drummond/Work/CO-ODE/Code/HTML/owlmanager/lib/owlapi-bin.jar" />
-      <change type="MODIFICATION" beforePath="/Users/drummond/Work/CO-ODE/Code/HTML/owlmanager/owlmanager.iml" afterPath="/Users/drummond/Work/CO-ODE/Code/HTML/owlmanager/owlmanager.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/doclet/AutocompleteDoclet.java" afterPath="$PROJECT_DIR$/src/org/coode/www/doclet/AutocompleteDoclet.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/version.txt" afterPath="$PROJECT_DIR$/lib/version.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/coode/www/servlet/AbstractOntologyServerServlet.java" afterPath="$PROJECT_DIR$/src/org/coode/www/servlet/AbstractOntologyServerServlet.java" />
-      <change type="DELETED" beforePath="/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/OWLObjectHierarchyFragmentDoclet.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lib/pellet.jar" afterPath="$PROJECT_DIR$/lib/pellet.jar" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/browser.iml" afterPath="$PROJECT_DIR$/browser.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/docs/index.html" afterPath="$PROJECT_DIR$/resources/docs/index.html" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/lib/FaCTPlusPlus.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/docs/bugs.html" afterPath="$PROJECT_DIR$/resources/docs/bugs.html" />
     </list>
   </component>
   <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
@@ -235,28 +224,31 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="form.js" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/resources/form.js">
+      <file leaf-file-name="version.txt" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/version.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="353" column="0" selection-start="12669" selection-end="12669" vertical-scroll-proportion="0.17087379">
+            <state line="16" column="0" selection-start="357" selection-end="357" vertical-scroll-proportion="0.18640776">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HierarchyNodeSubsDoclet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/HierarchyNodeSubsDoclet.java">
+      <file leaf-file-name="SessionManager.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/coode/www/mngr/SessionManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="79" column="12" selection-start="2675" selection-end="2675" vertical-scroll-proportion="0.792233">
+            <state line="330" column="31" selection-start="12134" selection-end="12134" vertical-scroll-proportion="0.88252425">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="OverallContentsDoclet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/OverallContentsDoclet.java">
+      <file leaf-file-name="release-notes.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/resources/docs/release-notes.html">
+          <provider editor-type-id="HtmlPreview">
+            <state />
+          </provider>
           <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="5" selection-start="562" selection-end="562" vertical-scroll-proportion="0.049514562">
+            <state line="15" column="27" selection-start="408" selection-end="408" vertical-scroll-proportion="0.18595041">
               <folding />
             </state>
           </provider>
@@ -264,71 +256,68 @@
       </file>
       <file leaf-file-name="index.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/resources/docs/index.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="26" selection-start="386" selection-end="386" vertical-scroll-proportion="0.18595041">
-              <folding />
-            </state>
-          </provider>
           <provider editor-type-id="HtmlPreview">
             <state />
+          </provider>
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="15" column="27" selection-start="408" selection-end="408" vertical-scroll-proportion="0.18595041">
+              <folding />
+            </state>
           </provider>
         </entry>
       </file>
       <file leaf-file-name="bugs.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/resources/docs/bugs.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="26" selection-start="386" selection-end="386" vertical-scroll-proportion="0.18595041">
-              <folding />
-            </state>
-          </provider>
           <provider editor-type-id="HtmlPreview">
             <state />
           </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="release-notes.html" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/resources/docs/release-notes.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="34" column="8" selection-start="878" selection-end="878" vertical-scroll-proportion="0.4214876">
-              <folding />
-            </state>
-          </provider>
-          <provider editor-type-id="HtmlPreview">
-            <state />
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="OWLClassHierarchyTreeFragment.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/hierarchy/OWLClassHierarchyTreeFragment.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="54" selection-start="847" selection-end="847" vertical-scroll-proportion="0.058252428">
+            <state line="15" column="27" selection-start="399" selection-end="399" vertical-scroll-proportion="0.18595041">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AbstractTreeFragment.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/hierarchy/AbstractTreeFragment.java">
+      <file leaf-file-name="LoadBookmarksDoclet.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/coode/www/doclet/LoadBookmarksDoclet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="22" selection-start="503" selection-end="503" vertical-scroll-proportion="0.15145631">
+            <state line="73" column="20" selection-start="2698" selection-end="2698" vertical-scroll-proportion="0.77864075">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="HierarchyNodeDoclet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/HierarchyNodeDoclet.java">
+      <file leaf-file-name="LoadFormDoclet.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/coode/www/doclet/LoadFormDoclet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="25" column="85" selection-start="705" selection-end="705" vertical-scroll-proportion="0.15145631">
+            <state line="46" column="24" selection-start="1997" selection-end="1997" vertical-scroll-proportion="0.44271845">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AbstractHierarchyNodeDoclet.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/AbstractHierarchyNodeDoclet.java">
+      <file leaf-file-name="ManageOntologies.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/coode/www/servlet/ManageOntologies.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="97" column="65" selection-start="2892" selection-end="2892" vertical-scroll-proportion="0.79029125">
+            <state line="348" column="33" selection-start="13016" selection-end="13016" vertical-scroll-proportion="1.3504854">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SuggestorManagerAdapter.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/org/coode/www/mngr/SuggestorManagerAdapter.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="41" column="13" selection-start="1549" selection-end="1549" vertical-scroll-proportion="0.3961165">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="OntologyBrowserConstants.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/org/coode/www/OntologyBrowserConstants.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="22" column="0" selection-start="621" selection-end="621" vertical-scroll-proportion="0.23300971">
               <folding />
             </state>
           </provider>
@@ -432,40 +421,6 @@
           <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
         </PATH_ELEMENT>
       </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="browser" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="owlhtml" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="browser" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="owlhtml" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="PsiDirectory:/Users/drummond/Work/CO-ODE/Code/HTML/owlhtml" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-        </PATH_ELEMENT>
-      </PATH>
-      <PATH>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="browser" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-        </PATH_ELEMENT>
-        <PATH_ELEMENT>
-          <option name="myItemId" value="browser" />
-          <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewModuleNode" />
-        </PATH_ELEMENT>
-      </PATH>
     </subPane>
   </component>
   <component name="ProjectReloadState">
@@ -538,6 +493,45 @@
         <option name="Make" value="true" />
       </method>
     </tempConfiguration>
+    <configuration default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local">
+      <option name="WORKING_DIRECTORY" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="8080" />
+      <option name="LOCAL" value="true" />
+      <option name="OPEN_IN_BROWSER" value="true" />
+      <option name="OPEN_IN_BROWSER_URL" value="/" />
+      <option name="COMMON_VM_ARGUMENTS" value="" />
+      <JAVAEE_FACET FACET_ID="browser/web/browser" DEPLOYMENT_SOURCE_NAME="exploded">
+        <option name="CONTEXT_PATH" value="/" />
+        <option name="DEPLOY" value="false" />
+      </JAVAEE_FACET>
+      <option name="DEPLOY_TOMCAT_MANAGER" value="false" />
+      <option name="BASE_DIRECTORY_NAME" value="" />
+      <predefined_log_file id="TOMCAT_LOCALHOST_LOG_ID" enabled="true" />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="/Users/drummond/Work/CO-ODE/Code/OntologyServer" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method>
+        <option name="Make" value="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -567,18 +561,6 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-    </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit" enabled="false" merge="false">
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
@@ -601,44 +583,17 @@
         <option name="Make" value="true" />
       </method>
     </configuration>
-    <configuration default="true" type="Remote" factoryName="Remote">
-      <option name="USE_SOCKET_TRANSPORT" value="true" />
-      <option name="SERVER_MODE" value="false" />
-      <option name="SHMEM_ADDRESS" value="javadebug" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="5005" />
-    </configuration>
-    <configuration default="true" type="Application" factoryName="Application" enabled="false" merge="false">
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
       <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
       <option name="VM_PARAMETERS" />
-      <option name="PROGRAM_PARAMETERS" />
-      <option name="WORKING_DIRECTORY" value="/Users/drummond/Work/CO-ODE/Code/OntologyServer" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="" />
-      <envs />
-      <method>
-        <option name="Make" value="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local">
-      <option name="WORKING_DIRECTORY" />
-      <option name="HOST" value="localhost" />
-      <option name="PORT" value="8080" />
-      <option name="LOCAL" value="true" />
-      <option name="OPEN_IN_BROWSER" value="true" />
-      <option name="OPEN_IN_BROWSER_URL" value="/" />
-      <option name="COMMON_VM_ARGUMENTS" value="" />
-      <JAVAEE_FACET FACET_ID="browser/web/browser" DEPLOYMENT_SOURCE_NAME="exploded">
-        <option name="CONTEXT_PATH" value="/" />
-        <option name="DEPLOY" value="false" />
-      </JAVAEE_FACET>
-      <option name="DEPLOY_TOMCAT_MANAGER" value="false" />
-      <option name="BASE_DIRECTORY_NAME" value="" />
-      <predefined_log_file id="TOMCAT_LOCALHOST_LOG_ID" enabled="true" />
     </configuration>
     <configuration default="false" name="OfflineTestCase" type="Application" factoryName="Application" enabled="false" merge="false">
       <option name="MAIN_CLASS_NAME" value="org.coode.www.test.OfflineTestCase" />
@@ -828,10 +783,10 @@
       </method>
     </configuration>
     <list size="8">
-      <item index="0" class="java.lang.String" itemvalue="Application.OfflineTestCase" />
-      <item index="1" class="java.lang.String" itemvalue="Application.OntologyServer" />
-      <item index="2" class="java.lang.String" itemvalue="Application.OntologyExporter" />
-      <item index="3" class="java.lang.String" itemvalue="Application.ServletURLScheme" />
+      <item index="0" class="java.lang.String" itemvalue="Application.ServletURLScheme" />
+      <item index="1" class="java.lang.String" itemvalue="Application.OfflineTestCase" />
+      <item index="2" class="java.lang.String" itemvalue="Application.OntologyServer" />
+      <item index="3" class="java.lang.String" itemvalue="Application.OntologyExporter" />
       <item index="4" class="java.lang.String" itemvalue="JUnit.OfflineTestCase.testReasonerWithNominals" />
       <item index="5" class="java.lang.String" itemvalue="JUnit.OfflineTestCase.testReasonerWithNominals2" />
       <item index="6" class="java.lang.String" itemvalue="JUnit.testFindSensibleProperties" />
@@ -920,7 +875,7 @@
       <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20096205" order="0" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.31666666" order="1" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="1" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22179487" order="10" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2212963" order="10" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="6" />
       <window_info id="Module Dependencies" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="7" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="11" />
@@ -928,7 +883,7 @@
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="1" />
       <window_info id="Maven projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="3" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" order="12" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24166666" order="2" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24074075" order="2" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" order="2" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" order="0" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39871794" order="4" />
@@ -960,7 +915,7 @@
     <option name="PERFORM_EDIT_IN_BACKGROUND" value="true" />
     <option name="PERFORM_ADD_REMOVE_IN_BACKGROUND" value="true" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="- bugfix: permalinks complaining about missing files&#10;- bugfix: reasoner results returning 2 sets of counts" />
+    <option name="LAST_COMMIT_MESSAGE" value="- look and feel of hierarchies updated for IE" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="REFORMAT_BEFORE_FILE_COMMIT" value="false" />
@@ -990,6 +945,7 @@
     <MESSAGE value="- bookmarks served from a file (caches/custom.bookmarks.xml)" />
     <MESSAGE value="- version info" />
     <MESSAGE value="- bugfix: permalinks complaining about missing files&#10;- bugfix: reasoner results returning 2 sets of counts" />
+    <MESSAGE value="- look and feel of hierarchies updated for IE" />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
@@ -1040,127 +996,125 @@
     <option name="myLastEditedConfigurable" value="Default" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/summary/AbstractSummaryHTMLPage.java">
+    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/AbstractHierarchyNodeDoclet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="0" selection-start="1350" selection-end="1643" vertical-scroll-proportion="1.0277778">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/impl/OWLHTMLServerImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="77" column="19" selection-start="2706" selection-end="2706" vertical-scroll-proportion="0.6323752">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/url/PermalinkURLScheme.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="49" column="56" selection-start="1371" selection-end="1407" vertical-scroll-proportion="1.0277778">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/page/EmptyOWLDocPage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="63" column="35" selection-start="2334" selection-end="2334" vertical-scroll-proportion="1.4676259">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/AbstractHTMLDoclet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="27" selection-start="1177" selection-end="1177" vertical-scroll-proportion="0.5592841">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/coode/www/servlet/AbstractOntologyServerServlet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="266" column="36" selection-start="11413" selection-end="11413" vertical-scroll-proportion="2.9149888">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/form.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="353" column="0" selection-start="12669" selection-end="12669" vertical-scroll-proportion="0.17087379">
+        <state line="97" column="13" selection-start="2878" selection-end="2878" vertical-scroll-proportion="0.8252427">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/HierarchyNodeSubsDoclet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="79" column="12" selection-start="2675" selection-end="2675" vertical-scroll-proportion="0.792233">
+        <state line="26" column="13" selection-start="745" selection-end="745" vertical-scroll-proportion="0.17475729">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/hierarchy/OWLClassHierarchyTreeFragment.java">
+    <entry file="file://$PROJECT_DIR$/resources/default.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="54" selection-start="847" selection-end="847" vertical-scroll-proportion="0.058252428">
+        <state line="65" column="0" selection-start="2225" selection-end="2225" vertical-scroll-proportion="1.1453744">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/hierarchy/AbstractTreeFragment.java">
+    <entry file="file://$PROJECT_DIR$/src/org/coode/www/servlet/QueryReasoner.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="22" selection-start="503" selection-end="503" vertical-scroll-proportion="0.15145631">
+        <state line="60" column="0" selection-start="2464" selection-end="2464" vertical-scroll-proportion="0.689384">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/HierarchyNodeDoclet.java">
+    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlmanager/src/org/coode/owl/mngr/ServerConstants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="85" selection-start="705" selection-end="705" vertical-scroll-proportion="0.15145631">
+        <state line="56" column="59" selection-start="2247" selection-end="2259" vertical-scroll-proportion="0.40582526">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/AbstractHierarchyNodeDoclet.java">
+    <entry file="file://$PROJECT_DIR$/src/log4j.properties">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="97" column="65" selection-start="2892" selection-end="2892" vertical-scroll-proportion="0.79029125">
+        <state line="25" column="0" selection-start="903" selection-end="903" vertical-scroll-proportion="0.29126215">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file:///Users/drummond/Work/CO-ODE/Code/HTML/owlhtml/src/org/coode/html/doclet/OverallContentsDoclet.java">
+    <entry file="file://$PROJECT_DIR$/src/org/coode/www/doclet/LoadBookmarksDoclet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="5" selection-start="562" selection-end="562" vertical-scroll-proportion="0.049514562">
+        <state line="73" column="20" selection-start="2698" selection-end="2698" vertical-scroll-proportion="0.77864075">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/coode/www/doclet/LoadFormDoclet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="24" selection-start="1997" selection-end="1997" vertical-scroll-proportion="0.44271845">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/coode/www/servlet/ManageOntologies.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="348" column="33" selection-start="13016" selection-end="13016" vertical-scroll-proportion="1.3504854">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/coode/www/mngr/SuggestorManagerAdapter.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="13" selection-start="1549" selection-end="1549" vertical-scroll-proportion="0.3961165">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/version.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="0" selection-start="357" selection-end="357" vertical-scroll-proportion="0.18640776">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/coode/www/mngr/SessionManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="330" column="31" selection-start="12134" selection-end="12134" vertical-scroll-proportion="0.88252425">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/docs/release-notes.html">
+      <provider editor-type-id="HtmlPreview">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="27" selection-start="408" selection-end="408" vertical-scroll-proportion="0.18595041">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/docs/index.html">
+      <provider editor-type-id="HtmlPreview">
+        <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="27" selection-start="408" selection-end="408" vertical-scroll-proportion="0.18595041">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/resources/docs/bugs.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="26" selection-start="386" selection-end="386" vertical-scroll-proportion="0.18595041">
-          <folding />
-        </state>
-      </provider>
       <provider editor-type-id="HtmlPreview">
         <state />
+      </provider>
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="27" selection-start="399" selection-end="399" vertical-scroll-proportion="0.18595041">
+          <folding />
+        </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/resources/docs/index.html">
+    <entry file="file://$PROJECT_DIR$/src/org/coode/www/OntologyBrowserConstants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="26" selection-start="386" selection-end="386" vertical-scroll-proportion="0.18595041">
+        <state line="22" column="0" selection-start="621" selection-end="621" vertical-scroll-proportion="0.23300971">
           <folding />
         </state>
-      </provider>
-      <provider editor-type-id="HtmlPreview">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/docs/release-notes.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="34" column="8" selection-start="878" selection-end="878" vertical-scroll-proportion="0.4214876">
-          <folding />
-        </state>
-      </provider>
-      <provider editor-type-id="HtmlPreview">
-        <state />
       </provider>
     </entry>
   </component>
