@@ -1,26 +1,24 @@
 package org.coode.search.view;
 
-import org.coode.search.model.AnnotationFinder;
-import org.protege.editor.owl.ui.frame.AxiomListFrame;
-import org.protege.editor.owl.ui.framelist.OWLFrameList2;
-import org.protege.editor.owl.ui.framelist.OWLFrameListRenderer;
+import org.protege.editor.owl.ui.OWLObjectComparator;
+import org.protege.editor.owl.ui.tree.OWLLinkedObjectTree;
+import org.protege.editor.owl.ui.tree.OWLObjectTreeCellRenderer;
 import org.protege.editor.owl.ui.view.AbstractActiveOntologyViewComponent;
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.util.SimpleURIShortFormProvider;
-import org.semanticweb.owl.vocab.OWLRDFVocabulary;
+import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owl.model.OWLOntology;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.net.URI;
-import java.util.HashSet;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -52,219 +50,119 @@ import java.util.Set;
  * Bio Health Informatics Group<br>
  * Date: Mar 18, 2008<br><br>
  */
-public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent {
+public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent implements ResultsView {
 
-    private URI filterUri = OWLRDFVocabulary.RDFS_LABEL.getURI();
-    private Set<URI> usedURIs = new HashSet<URI>();
+    private List<AnnotationFilterUI> filters = new ArrayList<AnnotationFilterUI>();
 
-    private OWLFrameList2<Set<OWLAxiom>> list;
-    private JCheckBox filterCheckbox;
-    private JCheckBox regexpCheckbox;
-    private JComboBox annotURISelector;
-    private JTextField searchField;
+    private OWLLinkedObjectTree resultsTree;
 
-    private ActionListener actionListener = new ActionListener(){
+    private JComponent filterPanel;
 
-        public void actionPerformed(ActionEvent actionEvent) {
-            try {
-                updateView(getOWLModelManager().getActiveOntology());
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
-    private ItemListener annotURISelectionListener = new ItemListener(){
-        public void itemStateChanged(ItemEvent itemEvent) {
-            try {
-                filterUri = (URI)itemEvent.getItem();
-
-                if (filterCheckbox.isSelected()){
-                    updateView(getOWLModelManager().getActiveOntology());
-                }
-                else{
-                    filterCheckbox.setSelected(true);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    };
-
-    private DocumentListener searchFieldChangeListener = new DocumentListener(){
-
-        public void insertUpdate(DocumentEvent documentEvent) {
-            timer.restart();
-        }
-
-        public void removeUpdate(DocumentEvent documentEvent) {
-            timer.restart();
-        }
-
-        public void changedUpdate(DocumentEvent documentEvent) {
-            timer.restart();
-        }
-    };
-
-    private OWLOntologyChangeListener ontChangeListener = new OWLOntologyChangeListener(){
-        public void ontologiesChanged(List<? extends OWLOntologyChange> owlOntologyChanges) throws OWLException {
-            handleOntologyChanges(owlOntologyChanges);
-        }
-    };
-
-    private Runnable searcher = new Runnable(){
-        public void run() {
-            String str = searchField.getText();
-
-            if (str != null && str.length() > 0){
-                if (!regexpCheckbox.isSelected()){
-//                    str = str.toLowerCase();
-                    str = "(?s)(?i)" + str; // ignore newlines and case
-                    str = str.replaceAll("\\*", ".*");
-                    if (!str.endsWith(".*")){
-                        str += ".*";
-                    }
-                    if (!str.startsWith(".*")){
-                        str = ".*" + str;
-                    }
-                }
-            }
-            else{
-                str = null;
-            }
-
-            final boolean filter = filterCheckbox.isSelected();
-            annotURISelector.setEnabled(filter);
-
-            Set<OWLAxiom> axioms = null;
-
-            if (filter){
-                axioms = new AnnotationFinder().getAnnotationAxioms(filterUri, str, getOWLModelManager().getActiveOntologies());
-            }
-            else{
-                axioms = new AnnotationFinder().getAnnotationAxioms(usedURIs, str, getOWLModelManager().getActiveOntologies());
-            }
-            list.setRootObject(axioms);
-            currentSearch = null;
-        }
-    };
-
-    // implement a wait after each keypress
-    private static final int SEARCH_PAUSE_MILLIS = 1000;
-    private Timer timer;
-
-    private Thread currentSearch;
+    private Map<AnnotationFilterUI, Set<OWLAxiom>> resultsMap = new HashMap<AnnotationFilterUI, Set<OWLAxiom>>();
 
 
     protected void initialiseOntologyView() throws Exception {
         setLayout(new BorderLayout());
 
-        list = new OWLFrameList2<Set<OWLAxiom>>(getOWLEditorKit(), new AxiomListFrame(getOWLEditorKit()));
-        final OWLFrameListRenderer listRenderer = new OWLFrameListRenderer(getOWLEditorKit());
-        listRenderer.setHighlightKeywords(false);
-        listRenderer.setAnnotationRendererEnabled(false);
-        list.setCellRenderer(listRenderer);
+        resultsTree = new OWLLinkedObjectTree(getOWLEditorKit());
+        resultsTree.setDrawNodeSeperators(true);
+        resultsTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("results (0)")));
+        resultsTree.setCellRenderer(new OWLObjectTreeCellRenderer(getOWLEditorKit()));
 
-        add(new JScrollPane(list), BorderLayout.CENTER);
+        add(new JScrollPane(resultsTree), BorderLayout.CENTER);
 
-        JComponent searchPane = new JPanel();
-        searchPane.setLayout(new BoxLayout(searchPane, BoxLayout.LINE_AXIS));
+        filterPanel = new JPanel();
+        filterPanel.setLayout(new BoxLayout(filterPanel, BoxLayout.PAGE_AXIS));
+        add(filterPanel, BorderLayout.NORTH);
 
-        filterCheckbox = new JCheckBox("filter");
-        searchPane.add(filterCheckbox);
-
-        annotURISelector = new JComboBox();
-        annotURISelector.setRenderer(new DefaultListCellRenderer(){
-            public Component getListCellRendererComponent(JList jList, Object object, int i, boolean b, boolean b1) {
-                if (object != null){
-                    object = new SimpleURIShortFormProvider().getShortForm((URI)object);
-                }
-                return super.getListCellRendererComponent(jList, object, i, b, b1);
-            }
-        });
-
-        searchPane.add(annotURISelector);
-
-        searchField = new JTextField();
-        searchPane.add(searchField);
-
-        regexpCheckbox = new JCheckBox("regexp");
-        searchPane.add(regexpCheckbox);
-
-        add(searchPane, BorderLayout.NORTH);
-
-        loadCombo();
-
-        annotURISelector.addItemListener(annotURISelectionListener);
-        searchField.getDocument().addDocumentListener(searchFieldChangeListener);
-        filterCheckbox.addActionListener(actionListener);
-        regexpCheckbox.addActionListener(actionListener);
-
-        // listen for additional annotations to allow the annotation filter list to be updated
-        getOWLModelManager().addOntologyChangeListener(ontChangeListener);
-
-        timer = new Timer(SEARCH_PAUSE_MILLIS, actionListener);
+        addFilter(0);
     }
 
-
-    private void loadCombo() {
-        usedURIs.clear();
-        annotURISelector.removeAllItems();
-        for (OWLOntology ont : getOWLModelManager().getActiveOntologies()){
-            usedURIs.addAll(ont.getAnnotationURIs());
-        }
-        for (URI uri : usedURIs){
-            annotURISelector.addItem(uri);
-        }
-        annotURISelector.setSelectedItem(filterUri);
-    }
 
     protected void disposeOntologyView() {
-        list.dispose();
-        annotURISelector.removeItemListener(annotURISelectionListener);
-        getOWLModelManager().removeOntologyChangeListener(ontChangeListener);
-        searchField = null;
-        annotURISelector = null;
+        for (AnnotationFilterUI filter : filters){
+            filter.dispose();
+        }
     }
+
 
     protected synchronized void updateView(OWLOntology activeOntology) throws Exception {
-        timer.stop();
-
-        if (currentSearch != null && currentSearch.isAlive()){
-            currentSearch.interrupt();
-        }
-
-        currentSearch = new Thread(searcher);
-
-        currentSearch.run();
-    }
-
-    private void handleOntologyChanges(List<? extends OWLOntologyChange> owlOntologyChanges) {
-        for (OWLOntologyChange c : owlOntologyChanges){
-            if (c.getAxiom().getAxiomType().equals(AxiomType.ENTITY_ANNOTATION)){
-                if (c instanceof AddAxiom){
-                    URI uri = ((OWLEntityAnnotationAxiom) c.getAxiom()).getAnnotation().getAnnotationURI();
-
-                    if (!uriSelectorContain(uri)){
-                        annotURISelector.addItem(uri);
-                    }
-                }
-                else if (c instanceof RemoveAxiom){
-                    loadCombo();
-                    return;
-                }
-            }
+        for (AnnotationFilterUI filter : filters){
+            filter.startSearch();
         }
     }
 
 
-    private boolean uriSelectorContain(URI uri) {
-        for (int i=0; i<annotURISelector.getModel().getSize(); i++){
-            if (uri.equals(annotURISelector.getModel().getElementAt(i))){
-                return true;
+    private void addFilter(int index) {
+        final AnnotationFilterUI filter = new AnnotationFilterUI(this, getOWLModelManager());
+        final JComponent filterHolder = new JPanel();
+        filterHolder.setLayout(new BoxLayout(filterHolder, BoxLayout.LINE_AXIS));
+        filterHolder.add(filter);
+        filterHolder.add(new MyButton(new AbstractAction("-"){
+            public void actionPerformed(ActionEvent event) {
+                filters.remove(filter);
+                filterPanel.remove(filterHolder);
+                filterPanel.revalidate();
+                resultsMap.remove(filter);
+                filter.dispose();
+                refresh();
             }
+        }));
+        filterHolder.add(new MyButton(new AbstractAction("+"){
+            public void actionPerformed(ActionEvent event) {
+                // add after the current one
+                addFilter(filters.indexOf(filter)+1);
+            }
+        }));
+
+        filterPanel.add(filterHolder);
+        filters.add(index, filter);
+
+        // bump the earlier ones down
+        for (int i=index+1; i<filters.size(); i++){
+            final Container moveFilterHolder = filters.get(i).getParent();
+            filterPanel.remove(moveFilterHolder);
+            filterPanel.add(moveFilterHolder);
         }
-        return false;
+    }
+
+
+    public void resultsChanged(AnnotationFilterUI filterUI) {
+        resultsMap.put(filterUI, filterUI.getResults());
+        refresh();
+    }
+
+
+    private void refresh() {
+        List<Set<OWLAxiom>> results = new ArrayList<Set<OWLAxiom>>();
+        for (AnnotationFilterUI filter : filters){
+            results.add(resultsMap.get(filter));
+        }
+        resultsTree.setModel(new ResultsTreeModel(results, new OWLObjectComparator(getOWLModelManager())));
+    }
+
+
+    private class MyButton extends JButton {
+
+        public final Border MOUSE_OVER_BORDER = new LineBorder(Color.BLACK, 1);
+        public final Border MOUSE_OUT_BORDER = new EmptyBorder(1, 1, 1, 1);
+        private Color normalBackground;
+
+        public MyButton(AbstractAction action) {
+            super(action);
+            addMouseListener(new MouseAdapter(){
+                public void mouseEntered(MouseEvent event) {
+                    setBorder(MOUSE_OVER_BORDER);
+                    setBackground(Color.DARK_GRAY);
+                }
+                public void mouseExited(MouseEvent event) {
+                    setBorder(MOUSE_OUT_BORDER);
+                    setBackground(normalBackground);
+                }
+            });
+            setPreferredSize(new Dimension(20, 20));
+            setBorder(MOUSE_OUT_BORDER);
+            normalBackground = getBackground();
+        }
     }
 }
