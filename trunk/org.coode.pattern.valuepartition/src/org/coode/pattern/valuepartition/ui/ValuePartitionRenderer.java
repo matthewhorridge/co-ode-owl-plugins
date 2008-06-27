@@ -1,8 +1,8 @@
 package org.coode.pattern.valuepartition.ui;
 
 import org.coode.pattern.ui.AbstractPatternRenderer;
-import org.coode.pattern.valuepartition.ValuePartition;
-import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
+import org.coode.pattern.valuepartition.ValuePartition2;
+import org.protege.editor.owl.model.OWLModelManager;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -34,10 +34,11 @@ import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
  * Bio Health Informatics Group<br>
  * Date: Nov 16, 2007<br><br>
  */
-public class ValuePartitionRenderer extends AbstractPatternRenderer<ValuePartition> {
+public class ValuePartitionRenderer extends AbstractPatternRenderer<ValuePartition2> {
 
-    public String render(ValuePartition pattern) {
-        OWLModelManagerEntityRenderer ren = getOWLEditorKit().getOWLModelManager().getOWLEntityRenderer();
-        return ren.render(pattern.getBaseClass()) + " (" + ren.render(pattern.getProperty()) + ")";
+    public String render(ValuePartition2 pattern) {
+        OWLModelManager mngr = getOWLEditorKit().getOWLModelManager();
+        ValuePartition2.Params p = pattern.getParams();
+        return mngr.getRendering(p.base) + " (" + mngr.getRendering(p.property) + ")";
     }
 }

@@ -2,23 +2,21 @@ package org.coode.pattern.valuepartition.ui;
 
 import org.apache.log4j.Logger;
 import org.coode.pattern.api.PatternDescriptor;
-import org.coode.pattern.api.PatternException;
 import org.coode.pattern.impl.AbstractPatternEditor;
-import org.coode.pattern.valuepartition.EntityCreator;
+import org.coode.pattern.util.PatternUtils;
 import org.coode.pattern.valuepartition.ValuePartition;
+import org.coode.pattern.valuepartition.ValuePartition2;
+import org.coode.pattern.valuepartition.ValuePartitionDescriptor;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProviderListener;
 import org.protege.editor.owl.ui.OWLEntityCreationPanel;
 import org.protege.editor.owl.ui.OWLIcons;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.protege.editor.owl.ui.tree.OWLModelManagerTree;
 import org.protege.editor.owl.ui.tree.OWLObjectTree;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLException;
-import org.semanticweb.owl.model.OWLOntology;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -32,7 +30,6 @@ import java.awt.event.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -60,13 +57,15 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
 
     private boolean syncPropName = true;
 
+    private ValuePartition2.Params params = new ValuePartition2.Params();
+
     private Action addValueAction = new AbstractAction("Add Value", OWLIcons.getIcon("class.add.png")){
         public void actionPerformed(ActionEvent actionEvent) {
             handleAddValue();
         }
     };
 
-    private Action removeValueAction = new AbstractAction("Remove Value", OWLIcons.getIcon("class.delete.png")){
+    private Action removeValueAction = new AbstractAction("Remove Value", OWLIcons.getIcon("class.deleteFromOntologies.png")){
         public void actionPerformed(ActionEvent actionEvent) {
             handleRemoveValue();
         }
@@ -143,15 +142,17 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
 
         add(splitter, BorderLayout.CENTER);
 
-        refresh();
+        setPattern(null);
     }
 
-    protected void refresh() {
-        disableListeners();
+    public void setPattern(ValuePartition p) {
+        disableListeners(p);
 
-        updateValuesWidget();
+        updateValuesWidget(p);
 
-        if (isCreateMode()){
+        if (p == null){
+            params = new ValuePartition2.Params();
+
             Keymap keymap = nameField.getKeymap();
             keymap.removeKeyStrokeBinding(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
 
@@ -161,16 +162,14 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
             redrawPie(Collections.EMPTY_SET);
         }
         else{
-            ValuePartition p = getPattern();
-
-            redrawPie(p.getValues());
+            params = null;//@@TODO p.getParams();
 
             OWLEditorKit eKit = getOWLEditorKit();
             OWLModelManager mngr = eKit.getOWLModelManager();
-            OWLEntityRenderer ren = mngr.getOWLEntityRenderer();
 
-            nameField.setText(ren.render(p.getBaseClass()));
-            propField.setText(ren.render(p.getProperty()));
+            redrawPie(params.values);
+            nameField.setText(mngr.getRendering(params.base));
+            propField.setText(mngr.getRendering(params.property));
             if (!propField.getText().equals("has" + nameField.getText())){
                 syncPropName = false;
             }
@@ -179,14 +178,15 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
             keymap.addActionForKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
                                          updateStringValueAction);
 
-            propFuncCheck.setSelected(p.isFunctional());
+            propFuncCheck.setSelected(params.functional);
 
             // replace the tree
             if (tree != null){
                 valuesPlaceholder.remove(tree);
             }
 
-            OWLObjectHierarchyProvider<OWLClass> provider = new MyValuesProvider(mngr);
+            OWLObjectHierarchyProvider<OWLClass> provider =
+                    new OWLObjectHierarchyProviderAdapter(mngr.getOWLClassHierarchyProvider(), params.values);
             tree = new OWLModelManagerTree<OWLClass>(eKit, provider);
             tree.setRootVisible(false);
 
@@ -194,12 +194,12 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
 //            valuesPlaceholder.validate();
         }
 
-        enableListeners();
+        enableListeners(p);
     }
 
-    private void updateValuesWidget() {
+    private void updateValuesWidget(ValuePartition p) {
 
-        if (isCreateMode()) {
+        if (p == null) {
             if (valuesField == null){
                 valuesWidget.removeAll();
                 valuesField = new JTextArea();
@@ -250,15 +250,14 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
         return actionsPanel;
     }
 
-    private void enableListeners() {
+    private void enableListeners(ValuePartition p) {
 
         propField.addKeyListener(propertyFieldTypingListener);
 
-        if (isCreateMode()){
+        if (p == null){
             nameField.getDocument().addDocumentListener(nameFieldListener);
         }
         else{
-
             propFuncCheck.addChangeListener(functionalBoxListener);
 
             propField.addFocusListener(textFieldFocusListener);
@@ -266,11 +265,11 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
         }
     }
 
-    private void disableListeners() {
+    private void disableListeners(ValuePartition p) {
 
         propField.removeKeyListener(propertyFieldTypingListener);
 
-        if (isCreateMode()){
+        if (p == null){
             nameField.getDocument().removeDocumentListener(nameFieldListener);
         }
         else{
@@ -280,10 +279,6 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
     }
 
     private JComponent createLeftComponent() {
-//        JComponent c = new JPanel();
-//        c.setBackground(Color.GREEN);
-//        c.setOpaque(true);
-//        return c;
         pie = new PieChart();
 
         JPanel leftComponent = new JPanel(new BorderLayout(6, 6));
@@ -317,18 +312,16 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
     }
 
     public ValuePartition createPattern() throws OWLException {
-        ValuePartition vp = new ValuePartition(nameField.getText(),
-                                               propField.getText(),
-                                               createClasses(valuesField.getText()),
-                                               getPatternDescriptor(),
-                                               getOWLEditorKit().getOWLModelManager(),
-                                               new EntityCreator(getOWLEditorKit().getOWLModelManager()));
-        vp.setFunctional(propFuncCheck.isSelected());
-        return vp;
+        final OWLDataFactory df = getOWLEditorKit().getOWLModelManager().getOWLDataFactory();
+        return null; // @@TODO new ValuePartition(params, df, getPatternDescriptor());
     }
 
     public JComponent getFocusComponent() {
         return nameField;
+    }
+
+    public ValuePartitionDescriptor getPatternDescriptor() {
+        return (ValuePartitionDescriptor)super.getPatternDescriptor();
     }
 
     public void disposePatternEditor() {
@@ -337,24 +330,6 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
             tree = null;
         }
         pie = null;
-    }
-
-/////////////////////////////////
-
-    private Set<OWLClass> createClasses(String s) throws PatternException {
-        Set<OWLClass> classes = new HashSet<OWLClass>();
-        OWLOntology ont = getOWLEditorKit().getOWLModelManager().getActiveOntology();
-        OWLDataFactory df = getOWLEditorKit().getOWLModelManager().getOWLDataFactory();
-        String stem = ont.getURI().toString() + "#";
-        for (String line : s.split("\n")) {
-            try {
-                classes.add(df.getOWLClass(new URI(stem + line)));
-            }
-            catch (URISyntaxException e) {
-                throw new PatternException("Could not create class " + stem + line, e);
-            }
-        }
-        return classes;
     }
 
 ////////////////////////////////
@@ -369,9 +344,8 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
             pie.clearValues();
         }
         else {
-            OWLEntityRenderer ren = getOWLEditorKit().getOWLModelManager().getOWLEntityRenderer();
             for (OWLClass value : values) {
-                pie.addValue(10, ren.render(value));
+                pie.addValue(10, getOWLEditorKit().getOWLModelManager().getRendering(value));
             }
         }
         pie.repaint();
@@ -409,17 +383,31 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
 
 ////////////////////////////////////// user input handling
 
+    private void handleChanges() {
+        if (getPattern() != null){
+            final OWLModelManager mngr = getOWLEditorKit().getModelManager();
+            OWLDataFactory df = mngr.getOWLDataFactory();
+//            ValuePartition newVP = new ValuePartition(params, df, getPatternDescriptor());
+//            java.util.List<OWLOntologyChange> changes = ValuePartition.replace(getPattern(), newVP,
+//                                                                                mngr.getActiveOntology(),
+//                                                                                mngr.getActiveOntologies());
+//            setPattern(newVP);
+//            mngr.applyChanges(changes);
+        }
+    }
+
     private void handleAddValue() {
         try {
-            OWLDataFactory df = getOWLEditorKit().getModelManager().getOWLDataFactory();
+            final OWLModelManager mngr = getOWLEditorKit().getModelManager();
+            OWLDataFactory df = mngr.getOWLDataFactory();
             // should the class creation be done in the pattern model?
             OWLEntityCreationPanel.URIShortNamePair pair =
                     OWLEntityCreationPanel.showDialog(getOWLEditorKit(),
                                                       "Add Value",
                                                       OWLEntityCreationPanel.TYPE_CLASS);
             URI uri = new URI(pair.getUri().toString() + "#" + pair.getShortName());
-            OWLClass namedClass = df.getOWLClass(uri);
-            getPattern().addValue(namedClass);
+            params.base = df.getOWLClass(uri);
+            handleChanges();
         }
         catch (URISyntaxException e) {
             logger.error(e);
@@ -429,57 +417,54 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
     private void handleRemoveValue(){
         OWLClass value = (OWLClass)tree.getSelectedOWLObject();
         if (value != null){
-            getPattern().removeValue(value);
+            params.values.remove(value);
+            handleChanges();
         }
     }
 
     private void handlePropertyUpdated(){
-        try {
-            getPattern().setProperty(propField.getText());
-        }
-        catch (OWLException e) {
-            logger.error(e);
-        }
-        finally{
-            propField.transferFocus();
-        }
+        final OWLModelManager mngr = getOWLEditorKit().getOWLModelManager();
+        params.property = PatternUtils.getNamedObjectProperty(propField.getText(),
+                                                              mngr.getActiveOntology(),
+                                                              mngr.getOWLDataFactory());
+        handleChanges();
+        propField.transferFocus();
+    }
+
+    private void handleNameUpdated(){
+        final OWLModelManager mngr = getOWLEditorKit().getOWLModelManager();
+        params.base = PatternUtils.getNamedClass(nameField.getText(),
+                                                 mngr.getActiveOntology(),
+                                                 mngr.getOWLDataFactory());
+        handleChanges();
+        nameField.transferFocus();
+    }
+
+    private void handleFunctionalUpdated() {
+        params.functional = propFuncCheck.isSelected();
+        handleChanges();
     }
 
     private void handlePropertyFocusLost(){
-        if (getPattern() != null){
+        if (params.property != null){
             // revert to current value
-            OWLEntityRenderer ren = getOWLEditorKit().getOWLModelManager().getOWLEntityRenderer();
-            propField.setText(ren.render(getPattern().getProperty()));
+            propField.setText(getOWLEditorKit().getOWLModelManager().getRendering(params.property));
         }
     }
 
     private void handleNameFocusLost(){
-        if (getPattern() != null){
+        if (params.base != null){
             // revert to current value
-            OWLEntityRenderer ren = getOWLEditorKit().getOWLModelManager().getOWLEntityRenderer();
-            nameField.setText(ren.render(getPattern().getBaseClass()));
+            nameField.setText(getOWLEditorKit().getOWLModelManager().getRendering(params.base));
         }
-    }
-
-    private void handleNameUpdated(){
-        try {
-            getPattern().setName(nameField.getText());
-        }
-        catch (OWLException e) {
-            logger.error(e);
-        }
-        finally{
-            nameField.transferFocus();
-        }
-    }
-
-    private void handleFunctionalUpdated() {
-        getPattern().setFunctional(propFuncCheck.isSelected());
     }
 
     private void valuesChanged() {
         try {
-            redrawPie(createClasses(valuesField.getText()));
+            final OWLModelManager mngr = getOWLEditorKit().getOWLModelManager();
+            redrawPie(PatternUtils.createClasses(valuesField.getText(),
+                                                 mngr.getActiveOntology(),
+                                                 mngr.getOWLDataFactory()));
         }
         catch (OWLException e) {
             logger.error(e);
@@ -492,64 +477,15 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
         }
     }
 
-    private class MyValuesProvider implements OWLObjectHierarchyProvider<OWLClass>{
-        private OWLObjectHierarchyProvider<OWLClass> provider;
-
-        public MyValuesProvider(OWLModelManager mngr) {
-            provider = mngr.getOWLClassHierarchyProvider();
-        }
-
-        public void setOntologies(Set<OWLOntology> ontologies) {
-            provider.setOntologies(ontologies);
-        }
-
-        public void dispose() {
-            provider.dispose();
-        }
-
-        public Set<OWLClass> getRoots() {
-            if (getPattern() != null){
-                return getPattern().getValues();
-            }
-            else{
-                return Collections.EMPTY_SET;
-            }
-        }
-
-        public Set<OWLClass> getChildren(OWLClass object) {
-            return provider.getChildren(object);
-        }
-
-        public Set<OWLClass> getDescendants(OWLClass object) {
-            return provider.getDescendants(object);
-        }
-
-        public Set<OWLClass> getParents(OWLClass object) {
-            return provider.getParents(object);
-        }
-
-        public Set<OWLClass> getAncestors(OWLClass object) {
-            return provider.getAncestors(object);
-        }
-
-        public Set<OWLClass> getEquivalents(OWLClass object) {
-            return provider.getEquivalents(object);
-        }
-
-        public Set<java.util.List<OWLClass>> getPathsToRoot(OWLClass object) {
-            return provider.getPathsToRoot(object);
-        }
-
-        public boolean containsReference(OWLClass object) {
-            return provider.containsReference(object);
-        }
-
-        public void addListener(OWLObjectHierarchyProviderListener<OWLClass> owlObjectHierarchyProviderListener) {
-            provider.addListener(owlObjectHierarchyProviderListener);
-        }
-
-        public void removeListener(OWLObjectHierarchyProviderListener<OWLClass> owlObjectHierarchyProviderListener) {
-            provider.removeListener(owlObjectHierarchyProviderListener);
-        }
-    }
+//    private ValuePartition2.Params getParams(OWLOntology ont, OWLDataFactory df) throws OWLException {
+//        ValuePartition2.Params params = new ValuePartition2.Params();
+//
+//        params.superCls = getPatternDescriptor().getDefaultRoot();
+//        params.base = getNamedClass(nameField.getText(), ont, df);
+//        params.roots = createClasses(valuesField.getText());
+//        params.property = getNamedObjectProperty(propField.getText(), ont, df);
+//        params.functional = propFuncCheck.isSelected();
+//
+//        return params;
+//    }
 }

@@ -150,11 +150,10 @@ public class PatternBrowserView extends AbstractPatternView {
         if (EditorPane.showDialog(CREATE_NEW_PATTERN, c,
                                   editor.getFocusComponent(), getOWLWorkspace()) == JOptionPane.OK_OPTION) {
             try {
-                Pattern newPattern = editor.createPattern();
                 final OWLModelManager mngr = getOWLModelManager();
-                List<OWLOntologyChange> changes = newPattern.getChanges(mngr.getOWLOntologyManager(),
-                                                                        mngr.getActiveOntology(),
-                                                                        mngr.getActiveOntologies());
+                Pattern newPattern = editor.createPattern();
+                List<OWLOntologyChange> changes = newPattern.addToOntology(mngr.getActiveOntology(),
+                                                                           mngr.getActiveOntologies());
                 mngr.applyChanges(changes);
                 PatternManagerFactory.getOWLPatternManager().notifyPatternChanged(newPattern);
 
@@ -174,8 +173,7 @@ public class PatternBrowserView extends AbstractPatternView {
         if (selectedPattern != null){
             System.out.println("DELETING: " + selectedPattern);
             final OWLModelManager mngr = getOWLModelManager();
-            mngr.applyChanges(selectedPattern.delete(mngr.getOWLOntologyManager(),
-                                                     mngr.getActiveOntologies()));
+            mngr.applyChanges(selectedPattern.deleteFromOntologies(mngr.getActiveOntologies()));
             patternTree.getSelectionModel().removeTreeSelectionListener(treeSelectionListener);
             patternTreeModel.removePattern(selectedPattern);
             patternTree.getSelectionModel().addTreeSelectionListener(treeSelectionListener);

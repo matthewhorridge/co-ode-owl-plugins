@@ -115,7 +115,7 @@ public class PatternEditorKit {
     class BaseEntityPatternRenderer extends AbstractPatternRenderer{
         public String render(Pattern pattern) {
             if (pattern.getBase() != null){
-                return eKit.getOWLModelManager().getOWLEntityRenderer().render(pattern.getBase());
+                return eKit.getOWLModelManager().getRendering(pattern.getBase());
             }
             else{
                 return pattern.toString();

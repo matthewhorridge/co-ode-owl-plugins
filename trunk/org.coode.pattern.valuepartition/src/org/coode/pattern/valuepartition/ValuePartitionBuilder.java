@@ -1,11 +1,10 @@
 package org.coode.pattern.valuepartition;
 
-import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.protege.editor.owl.model.util.CoveringAxiomFactory;
 import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.util.OWLObjectVisitorAdapter;
 import org.semanticweb.owl.util.OWLEntityCollector;
+import org.semanticweb.owl.util.OWLObjectVisitorAdapter;
 
 import java.util.Set;
 
@@ -23,24 +22,32 @@ import java.util.Set;
  */
 public class ValuePartitionBuilder extends OWLObjectVisitorAdapter {
 
-    private OWLObjectHierarchyProvider<OWLClass> hierarchy;
-    private OWLModelManager mngr;
-    private ValuePartition pattern;
+    private OWLObjectHierarchyProvider<OWLClass> hp;
+    private OWLOntologyManager mngr;
     private ValuePartitionDescriptor descr;
+    private Set<OWLOntology> ontologies;
 
-    public ValuePartitionBuilder(OWLModelManager mngr, ValuePartitionDescriptor descr) {
+    private ValuePartition pattern;
+    
+    public ValuePartitionBuilder(OWLOntologyManager mngr,
+                                 ValuePartitionDescriptor descr,
+                                 Set<OWLOntology> ontologies,
+                                 OWLObjectHierarchyProvider<OWLClass> hp) {
         this.mngr = mngr;
         this.descr = descr;
-        hierarchy = mngr.getOWLClassHierarchyProvider();
+        this.ontologies = ontologies;
+        this.hp = hp;
     }
 
     public void visit(OWLClass cls) {
-        Set<OWLClass> children = hierarchy.getChildren(cls);
-        if (children.size() > 0) {
+        ValuePartition2.Params params = new ValuePartition2.Params();
+        params.base = cls;
+        params.values = hp.getChildren(cls);
+        if (params.values.size() > 0) {
             if (getCoveringAxiom(cls) != null) {
-                OWLObjectProperty prop = getFirstPropInWhichThisClassIsInRange(cls);
-                if (prop != null) {
-                    pattern = new ValuePartition(cls, prop, children, descr, mngr, new EntityCreator(mngr));
+                params.property = getFirstPropInWhichThisClassIsInRange(cls);
+                if (params.property != null) {
+                    //pattern = new ValuePartition(params, mngr.getOWLDataFactory(), descr);
                 }
             }
         }
@@ -51,10 +58,10 @@ public class ValuePartitionBuilder extends OWLObjectVisitorAdapter {
     }
 
     private OWLDescription getCoveringAxiom(OWLClass cls) {
-        CoveringAxiomFactory fac = new CoveringAxiomFactory(mngr.getOWLDataFactory(), hierarchy);
+        CoveringAxiomFactory fac = new CoveringAxiomFactory(mngr.getOWLDataFactory(), hp);
         cls.accept(fac);
         OWLDescription coveringAxiom = fac.getCoveringAxiom();
-        for (OWLOntology ont : mngr.getActiveOntologies()){
+        for (OWLOntology ont : ontologies){
             if (cls.getSuperClasses(ont).contains(coveringAxiom)){
                 return coveringAxiom;
             }
@@ -66,7 +73,7 @@ public class ValuePartitionBuilder extends OWLObjectVisitorAdapter {
     }
 
     private OWLObjectProperty getFirstPropInWhichThisClassIsInRange(OWLClass cls) {
-        for (OWLOntology ont : mngr.getActiveOntologies()){
+        for (OWLOntology ont : ontologies){
             for (OWLObjectProperty prop : ont.getReferencedObjectProperties()) {
                 Set<OWLDescription> ranges = prop.getRanges(ont);
                 for (OWLDescription range : ranges) {

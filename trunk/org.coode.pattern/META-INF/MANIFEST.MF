@@ -20,4 +20,5 @@ Require-Bundle: org.eclipse.equinox.registry,
 Export-Package:
  org.coode.pattern.ui,
  org.coode.pattern.api,
- org.coode.pattern.impl
+ org.coode.pattern.impl,
+ org.coode.pattern.util
