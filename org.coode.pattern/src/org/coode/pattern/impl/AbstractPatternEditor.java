@@ -7,13 +7,10 @@ import org.coode.pattern.api.PatternListener;
 import org.coode.pattern.ui.PatternEditorKit;
 import org.coode.pattern.ui.PatternRenderer;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.OWLException;
-import org.semanticweb.owl.model.OWLOntologyChange;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 /**
  * Author: drummond<br>
@@ -36,7 +33,7 @@ public abstract class AbstractPatternEditor<P extends Pattern> extends JPanel im
 
     private PatternListener l = new PatternListener(){
         public void patternChanged(Pattern pattern) {
-            handleChanges(pattern);
+            handlePatternChanged((P)pattern);
         }
     };
 
@@ -53,10 +50,11 @@ public abstract class AbstractPatternEditor<P extends Pattern> extends JPanel im
 
     /**
      * Only gets called when the editor is not in create mode (ie when it is updating an existing pattern)
+     * @param pattern
      */
-    protected abstract void refresh();
+//    protected abstract void setPattern(P pattern);
 
-    public void setPattern(P pattern){
+    public void handlePatternChanged(P pattern){
         if (pattern != this.pattern){
             if (this.pattern != null){
                 this.pattern.removeChangeListener(l);
@@ -68,9 +66,12 @@ public abstract class AbstractPatternEditor<P extends Pattern> extends JPanel im
                 pattern.addChangeListener(l);
             }
 
-            refresh();
+            // let the specific implementation handle the updates
+            setPattern(pattern);
         }
     }
+
+    protected abstract void setPattern(P pattern);
 
     public final P getPattern() {
         return pattern;
@@ -94,23 +95,12 @@ public abstract class AbstractPatternEditor<P extends Pattern> extends JPanel im
         return PatternEditorKit.getPatternEditorKit(getOWLEditorKit());
     }
 
-    public final boolean isCreateMode() {
-        return pattern == null;
-    }
+//    public final boolean isCreateMode() {
+//        return pattern == null;
+//    }
 
     public final JComponent getComponent() {
         return this;
-    }
-    
-    private void handleChanges(Pattern pattern) {
-        final OWLModelManager mngr = eKit.getOWLModelManager();
-        List<OWLOntologyChange> changes = pattern.getChanges(mngr.getOWLOntologyManager(),
-                                                             mngr.getActiveOntology(),
-                                                             mngr.getActiveOntologies());
-        if (!changes.isEmpty()){
-            mngr.applyChanges(changes);
-        }
-        refresh();
     }
 
     protected void finalize() throws Throwable {

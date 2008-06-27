@@ -2,6 +2,7 @@ package org.coode.pattern.valuepartition;
 
 import org.coode.pattern.impl.AbstractPatternDescriptor;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLObject;
 
 /**
@@ -20,8 +21,15 @@ public class ValuePartitionDescriptor extends AbstractPatternDescriptor<ValuePar
     }
 
     public ValuePartition getPattern(OWLObject owlObject, OWLModelManager mngr) {
-        ValuePartitionBuilder vpBuilder = new ValuePartitionBuilder(mngr, this);
+        ValuePartitionBuilder vpBuilder = new ValuePartitionBuilder(mngr.getOWLOntologyManager(),
+                                                                    this,
+                                                                    mngr.getActiveOntologies(),
+                                                                    mngr.getOWLClassHierarchyProvider());
         owlObject.accept(vpBuilder);
         return vpBuilder.getValuePartition();
+    }
+
+    public OWLClass getDefaultRoot() {
+        return null;  //@@TODO implement body
     }
 }

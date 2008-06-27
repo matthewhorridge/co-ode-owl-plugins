@@ -18,15 +18,15 @@ import javax.swing.*;
  */
 public interface PatternEditor<P extends Pattern> {
 
-    void setPattern(P pattern);
+    void handlePatternChanged(P pattern);
 
-    P getPattern();
+//    P getPattern();
 
     P createPattern() throws OWLException;
 
     PatternDescriptor<P> getPatternDescriptor();
 
-    boolean isCreateMode();
+//    boolean isCreateMode();
 
     JComponent getComponent();
 

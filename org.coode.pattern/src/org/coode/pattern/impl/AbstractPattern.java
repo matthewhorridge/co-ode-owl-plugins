@@ -4,7 +4,10 @@ import org.coode.pattern.api.Pattern;
 import org.coode.pattern.api.PatternDescriptor;
 import org.coode.pattern.api.PatternListener;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Author: Nick Drummond<br>
@@ -18,13 +21,13 @@ import java.util.*;
  * code made available under Mozilla Public License (http://www.mozilla.org/MPL/MPL-1.1.html)<br>
  * copyright 2006, The University of Manchester<br>
  */
-public abstract class AbstractPattern implements Pattern {
+public abstract class AbstractPattern<P extends Pattern> implements Pattern<P> {
 
-    private final PatternDescriptor descr;
+    private final PatternDescriptor<P> descr;
 
     private Set<PatternListener> listeners = new HashSet<PatternListener>();
 
-    public AbstractPattern(PatternDescriptor descr) {
+    public AbstractPattern(PatternDescriptor<P> descr) {
         this.descr = descr;
     }
 
@@ -33,7 +36,7 @@ public abstract class AbstractPattern implements Pattern {
      *
      * @return the pattern descriptor for the given pattern
      */
-    public PatternDescriptor getDescriptor() {
+    public PatternDescriptor<P> getDescriptor() {
         return descr;
     }
 

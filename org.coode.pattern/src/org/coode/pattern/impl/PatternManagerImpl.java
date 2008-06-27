@@ -1,17 +1,18 @@
 package org.coode.pattern.impl;
 
-import org.coode.pattern.ui.PatternSelectionModel;
+import org.apache.log4j.Logger;
 import org.coode.pattern.api.*;
+import org.coode.pattern.ui.PatternSelectionModel;
+import org.eclipse.core.runtime.IExtension;
+import org.protege.editor.core.ProtegeApplication;
+import org.protege.editor.core.plugin.AbstractPluginLoader;
 import org.protege.editor.core.plugin.PluginExtensionMatcher;
 import org.protege.editor.core.plugin.PluginParameterExtensionMatcher;
-import org.protege.editor.core.plugin.AbstractPluginLoader;
-import org.apache.log4j.Logger;
-import org.eclipse.core.runtime.IExtension;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Author: drummond<br>
@@ -58,8 +59,7 @@ class PatternManagerImpl extends AbstractPluginLoader<PatternPlugin> implements 
                 registerPattern(patternDescriptor);
             }
             catch (Exception e) {
-                e.printStackTrace();
-                logger.error(e);
+                ProtegeApplication.getErrorLog().handleError(Thread.currentThread(), e);
             }
         }
     }

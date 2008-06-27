@@ -1,7 +1,6 @@
 package org.coode.pattern.api;
 
 import org.semanticweb.owl.model.*;
-import org.coode.pattern.api.PatternDescriptor;
 
 import java.util.List;
 import java.util.Set;
@@ -15,9 +14,9 @@ import java.util.Set;
  * nick.drummond@cs.manchester.ac.uk<br>
  * www.cs.man.ac.uk/~drummond<br><br>
  */
-public interface Pattern {
+public interface Pattern<P extends Pattern> {
 
-    PatternDescriptor getDescriptor();
+    PatternDescriptor<P> getDescriptor();
 
     boolean isValid();
 
@@ -25,13 +24,11 @@ public interface Pattern {
 
     List getParts();
 
-    OWLObject toOWL(OWLOntology ont, OWLDataFactory df);
+    Set<OWLAxiom> toOWL(OWLOntology ont, OWLDataFactory df);
 
-//    String getLabel();
+    List<OWLOntologyChange> addToOntology(OWLOntology activeOnt, Set<OWLOntology> activeOnts);
 
-    List<OWLOntologyChange> getChanges(OWLOntologyManager mngr, OWLOntology activeOnt, Set<OWLOntology> activeOnts);
-
-    List<OWLOntologyChange> delete(OWLOntologyManager mngr, Set<OWLOntology> onts);
+    List<OWLOntologyChange> deleteFromOntologies(Set<OWLOntology> onts);
 
     void addChangeListener(PatternListener l);
 

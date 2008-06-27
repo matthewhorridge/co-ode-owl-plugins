@@ -67,7 +67,7 @@ public class PatternEditorView extends AbstractPatternView {
             }
 
             if (currentPatternEditor != null){
-                currentPatternEditor.setPattern(pattern);
+                currentPatternEditor.handlePatternChanged(pattern);
             }
 
             // if an editor is showing and is for a different type of pattern, remove it

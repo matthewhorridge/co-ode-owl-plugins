@@ -47,7 +47,7 @@ public class EntityEditor extends AbstractPatternEditor {
     protected void initialise(OWLEditorKit eKit, PatternDescriptor descr) {
     }
 
-    protected void refresh() {
+    public void setPattern(Pattern pattern) {
         removeAll();
 
         editor = OWLEntityViewFactory.createView(getPattern().getBase(), getOWLEditorKit().getOWLWorkspace());

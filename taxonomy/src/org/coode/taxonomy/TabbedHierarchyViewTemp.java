@@ -1,52 +1,36 @@
+/*
+* Copyright (C) 2007, University of Manchester
+*/
 package org.coode.taxonomy;
 
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.protege.editor.owl.ui.OWLEntityComparator;
 import org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent;
 import org.semanticweb.owl.model.OWLClass;
 
 import javax.swing.*;
 import java.awt.*;
-
-/*
- * Copyright (C) 2007, University of Manchester
- *
- * Modifications to the initial code base are copyright of their
- * respective authors, or their employers as appropriate.  Authorship
- * of the modifications may be determined from the ChangeLog placed at
- * the end of this file.
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
-
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
-
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Author: Nick Drummond<br>
- * http://www.cs.man.ac.uk/~drummond<br><br>
+ * http://www.cs.man.ac.uk/~drummond/<br><br>
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Jul 10, 2007<br><br>
- * <p/>
- * 
- * Shows a tab indented tree of descendants for the selected class
+ * Date: Jan 16, 2008<br><br>
+ *
+ * Used to generate inf/asserted hierarchy of classes - sorted URIs
  */
-public class TabbedHierarchyView extends AbstractOWLClassViewComponent {
+public class TabbedHierarchyViewTemp extends AbstractOWLClassViewComponent {
 
     private JTextArea namesComponent;
 
     // convenience class for querying the asserted subsumption hierarchy directly
-    private OWLObjectHierarchyProvider<OWLClass> assertedHierarchyProvider;
+    private OWLObjectHierarchyProvider<OWLClass> hp;
+
+    private OWLEntityComparator<OWLClass> owlEntityComparator;
 
     // create the GUI
     public void initialiseClassView() throws Exception {
@@ -61,7 +45,9 @@ public class TabbedHierarchyView extends AbstractOWLClassViewComponent {
     protected OWLClass updateView(OWLClass selectedClass) {
         namesComponent.setText("");
         if (selectedClass != null){
-            assertedHierarchyProvider = getOWLModelManager().getOWLClassHierarchyProvider();
+            hp = getOWLModelManager().getOWLClassHierarchyProvider();
+//            hp = getOWLModelManager().getInferredOWLClassHierarchyProvider();
+            owlEntityComparator = new OWLEntityComparator<OWLClass>(getOWLModelManager());
             render(selectedClass, 0);
         }
         return selectedClass;
@@ -72,10 +58,14 @@ public class TabbedHierarchyView extends AbstractOWLClassViewComponent {
         for (int i=0; i<indent; i++){
             namesComponent.append("\t");
         }
-        namesComponent.append(getOWLModelManager().getRendering(selectedClass));
+        namesComponent.append(selectedClass.getURI().toString());
         namesComponent.append("\n");
+
+
         // the hierarchy provider gets subclasses for us
-        for (OWLClass sub: assertedHierarchyProvider.getChildren(selectedClass)){
+        final java.util.List<OWLClass> children = new ArrayList<OWLClass>(hp.getChildren(selectedClass));
+        Collections.sort(children, owlEntityComparator);
+        for (OWLClass sub: children){
             render(sub, indent+1);
         }
     }
