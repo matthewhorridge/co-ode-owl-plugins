@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.coode.annotate.prefs.AnnotationViewPrefs;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.util.OWLAxiomVisitorAdapter;
 
 import java.io.IOException;
 import java.net.URI;
@@ -58,8 +57,6 @@ public class AnnotateViewModel {
     private final OWLModelManager mngr;
 
     private OWLEntity currentEntity;
-
-    private boolean needsRefresh;
 
     private OWLOntologyChangeListener ontChangeListener = new OWLOntologyChangeListener(){
         public void ontologiesChanged(List<? extends OWLOntologyChange> list) throws OWLException {
@@ -119,22 +116,13 @@ public class AnnotateViewModel {
     }
 
     private void handleOntologyChanges(List<? extends OWLOntologyChange> changes) {
-        needsRefresh = false;
-
         for (OWLOntologyChange change : changes){
-            OWLAxiom ax = change.getAxiom();
-            ax.accept(new OWLAxiomVisitorAdapter(){
-                public void visit(OWLEntityAnnotationAxiom owlEntityAnnotationAxiom) {
-                    if (owlEntityAnnotationAxiom.getSubject().equals(currentEntity)){
-                        needsRefresh = true;
-                    }
-                }
-            });
-        }
-
-        if (needsRefresh){
-            refresh();
-            needsRefresh = false;
+            if (change.isAxiomChange() &&
+                change.getAxiom() instanceof OWLEntityAnnotationAxiom &&
+                ((OWLEntityAnnotationAxiom)change.getAxiom()).getSubject().equals(currentEntity)){
+                refresh();
+                return;
+            }
         }
     }
 
