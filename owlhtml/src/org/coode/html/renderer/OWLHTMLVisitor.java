@@ -3,20 +3,21 @@
 */
 package org.coode.html.renderer;
 
-import org.semanticweb.owl.util.OWLObjectVisitorAdapter;
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.vocab.Namespaces;
-import org.semanticweb.owl.vocab.OWLRestrictedDataRangeFacetVocabulary;
+import org.apache.log4j.Logger;
+import org.coode.html.impl.OWLHTMLConstants;
 import org.coode.html.url.NamedObjectURLRenderer;
 import org.coode.html.util.URLUtils;
-import org.coode.html.impl.OWLHTMLConstants;
 import org.coode.owl.mngr.NamedObjectShortFormProvider;
-import org.apache.log4j.Logger;
+import org.coode.owl.util.ModelUtil;
+import org.semanticweb.owl.model.*;
+import org.semanticweb.owl.util.OWLObjectVisitorAdapter;
+import org.semanticweb.owl.vocab.Namespaces;
+import org.semanticweb.owl.vocab.OWLRestrictedDataRangeFacetVocabulary;
 
-import java.io.Writer;
 import java.io.IOException;
-import java.net.URL;
+import java.io.Writer;
 import java.net.URI;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -30,6 +31,19 @@ import java.util.*;
 public class OWLHTMLVisitor  extends OWLObjectVisitorAdapter {
 
     private Logger logger = Logger.getLogger(getClass().getName());
+
+    // These should match the css class names
+    private static final String CSS_DEPRECATED = "deprecated";
+    private static final String CSS_ACTIVE_ENTITY = "active-entity";
+    private static final String CSS_KEYWORD = "keyword";
+    private static final String CSS_ONTOLOGY_URI = "ontology-uri";
+    private static final String CSS_ACTIVE_ONTOLOGY_URI = "active-ontology-uri";
+    private static final String CSS_SOME = "some";
+    private static final String CSS_ONLY = "only";
+    private static final String CSS_VALUE = "value";
+    private static final String CSS_LITERAL = "literal";
+    private static final String CSS_ANNOTATION_URI = "annotation-uri";
+
 
     private Writer out;
 
@@ -99,9 +113,9 @@ public class OWLHTMLVisitor  extends OWLObjectVisitorAdapter {
     public void visit(OWLOntology ontology) {
         final URL urlForOntology = urlRenderer.getURLForNamedObject(ontology);
         String link = urlForOntology.toString();
-        String cssClass = "ontology-uri";
+        String cssClass = CSS_ONTOLOGY_URI;
         if (activeOntology != null && ontology.equals(activeOntology)){
-            cssClass = "active-ontology-uri";
+            cssClass = CSS_ACTIVE_ONTOLOGY_URI;
         }
 
         boolean writeLink = false;
@@ -181,19 +195,19 @@ public class OWLHTMLVisitor  extends OWLObjectVisitorAdapter {
 
     public void visit(OWLObjectSomeRestriction desc) {
         desc.getProperty().accept(this);
-        writeKeyword(" some ", "some");
+        writeKeyword(" some ", CSS_SOME);
         writeOp(desc.getFiller());
     }
 
     public void visit(OWLObjectAllRestriction desc) {
         desc.getProperty().accept(this);
-        writeKeyword(" only ", "only");
+        writeKeyword(" only ", CSS_ONLY);
         writeOp(desc.getFiller());
     }
 
     public void visit(OWLObjectValueRestriction desc) {
         desc.getProperty().accept(this);
-        writeKeyword(" value ", "value");
+        writeKeyword(" value ", CSS_VALUE);
         writeOp(desc.getValue());
     }
 
@@ -266,19 +280,19 @@ public class OWLHTMLVisitor  extends OWLObjectVisitorAdapter {
 
     public void visit(OWLDataSomeRestriction desc) {
         desc.getProperty().accept(this);
-        writeKeyword(" some ", "some");
+        writeKeyword(" some ", CSS_SOME);
         writeOp(desc.getFiller());
     }
 
     public void visit(OWLDataAllRestriction desc) {
         desc.getProperty().accept(this);
-        writeKeyword(" only ", "only");
+        writeKeyword(" only ", CSS_ONLY);
         writeOp(desc.getFiller());
     }
 
     public void visit(OWLDataValueRestriction desc) {
         desc.getProperty().accept(this);
-        writeKeyword(" value ", "value");
+        writeKeyword(" value ", CSS_VALUE);
         writeOp(desc.getValue());
     }
 
@@ -427,7 +441,7 @@ public class OWLHTMLVisitor  extends OWLObjectVisitorAdapter {
     }
 
     public void visit(OWLUntypedConstant node) {
-        write("<span class='literal'>\"");
+        write("<span class='" + CSS_LITERAL + "'>\"");
         writeLiteralContents(node.getLiteral());
         write("\"");
         final String lang = node.getLang();
@@ -438,7 +452,7 @@ public class OWLHTMLVisitor  extends OWLObjectVisitorAdapter {
     }
 
     public void visit(OWLTypedConstant node) {
-        write("<span class='literal'>\"");
+        write("<span class='" + CSS_LITERAL + "'>\"");
         writeLiteralContents(node.getLiteral());
         write("\"</span> (");
         node.getDataType().accept(this);
@@ -656,7 +670,7 @@ public class OWLHTMLVisitor  extends OWLObjectVisitorAdapter {
 
     // add a span to allow for css highlighting
     private void writeKeyword(String keyword) {
-        write("<span class='keyword'>" + keyword + "</span>");
+        write("<span class='" + CSS_KEYWORD + "'>" + keyword + "</span>");
     }
 
     // add a span to allow for css highlighting
@@ -690,18 +704,27 @@ public class OWLHTMLVisitor  extends OWLObjectVisitorAdapter {
 
         String name = getName(entity);
 
+        Set<String> cssClasses = new HashSet<String>();
+        if (ModelUtil.isDeprecated(entity, ontologies)){
+            cssClasses.add(CSS_DEPRECATED);
+        }
+
         if (pageURL == null){
             final URL urlForTarget = urlRenderer.getURLForNamedObject(entity);
             write("<a href=\"" + urlForTarget + "\"");
             if (targetWindow != null){
                 write(" target=\"" + targetWindow + "\"");
             }
+            writeCSSClasses(cssClasses);
             write(" title=\"" + uri + "\">" + name + "</a>");
         }
         else{
             OWLNamedObject currentTarget = urlRenderer.getNamedObjectForURL(pageURL);
             if (currentTarget != null && currentTarget.equals(entity)){
-                write("<span class='active-entity'>" + name + "</span>");
+                cssClasses.add(CSS_ACTIVE_ENTITY);
+                write("<span");
+                writeCSSClasses(cssClasses);
+                write(">" + name + "</span>");
             }
             else{
                 final URL urlForTarget = urlRenderer.getURLForNamedObject(entity);
@@ -709,10 +732,12 @@ public class OWLHTMLVisitor  extends OWLObjectVisitorAdapter {
                 if (targetWindow != null){
                     write(" target=\"" + targetWindow + "\"");
                 }
+                writeCSSClasses(cssClasses);
                 write(" title=\"" + uri + "\">" + name + "</a>");
             }
         }
     }
+
 
     private void writeCardinalityRestriction(OWLCardinalityRestriction desc, String cardinalityType) {
         desc.getProperty().accept(this);
@@ -779,7 +804,22 @@ public class OWLHTMLVisitor  extends OWLObjectVisitorAdapter {
         if (annotLabel == null){
             annotLabel = uri.toString();
         }
-        write("<span class='annotation-uri'>" + annotLabel + ":</span> ");
+        write("<span class='" + CSS_ANNOTATION_URI + "'>" + annotLabel + ":</span> ");
         annotation.getAnnotationValue().accept(this);
+    }
+
+    private void writeCSSClasses(Set<String> cssClasses) {
+        if (!cssClasses.isEmpty()){
+            boolean started = false;
+            write(" class='");
+            for (String cls : cssClasses){
+                if (started){
+                    write(" ");
+                }
+                write(cls);
+                started = true;
+            }
+            write("'");
+        }
     }
 }
