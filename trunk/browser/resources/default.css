@@ -8,8 +8,10 @@ img.button {position: relative; top: 8px;}
 .literal {color: green;}
 .annotation-uri {color: gray;}
 .ontology-uri {color: #990099;}
+
 .active-ontology-uri {color: #330033;}
 .active-entity {color: darkblue; font-weight: bold;}
+.deprecated {color: #222222; text-decoration: line-through;}
 
 /* keywords - default cyan */
 .keyword {color: #00B2B2; font-weight: bolder;}

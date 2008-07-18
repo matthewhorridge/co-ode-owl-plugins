@@ -3,6 +3,8 @@ package org.coode.owl.util;
 import org.coode.owl.mngr.OWLServer;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.model.OWLEntity;
+import org.semanticweb.owl.model.OWLOntology;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -20,6 +22,10 @@ import java.util.Set;
  * copyright 2006, The University of Manchester<br>
  */
 public class ModelUtil {
+
+    public static boolean isDeprecated(OWLEntity entity, Set<OWLOntology> ontologies){
+        return false; // there is currently no implementation of deprecated in the OWL API
+    }
 
     public static Set<OWLClass> filterClasses(Set<Set<OWLClass>> original, OWLServer server) {
         Set<OWLClass> result = new HashSet<OWLClass>();
