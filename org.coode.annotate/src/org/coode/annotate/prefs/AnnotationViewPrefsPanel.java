@@ -13,9 +13,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -216,14 +215,12 @@ public class AnnotationViewPrefsPanel extends OWLPreferencesPanel {
 
 
     private void handleImport() {
-        Set<String> extensions = new HashSet<String>();
-        extensions.add(TEMPLATE_EXT);
         JFrame f = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, getParent());
         if (f == null) {
             f = new JFrame();
         }
 
-        File importFile = UIUtil.openFile(f, "Import a template file for your annotations", extensions);
+        File importFile = UIUtil.openFile(f, "Import a template file for your annotations", Collections.EMPTY_SET);
         try {
             FileInputStream inStream = new FileInputStream(importFile);
             List<String> rows = AnnotationViewPrefs.parseStream(inStream);
@@ -238,14 +235,12 @@ public class AnnotationViewPrefsPanel extends OWLPreferencesPanel {
     }
 
     private void handleExport() {
-        Set<String> extensions = new HashSet<String>();
-        extensions.add(TEMPLATE_EXT);
         JFrame f = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, getParent());
         if (f == null) {
             f = new JFrame();
         }
 
-        File importFile = UIUtil.saveFile(f, "Export a template file for your annotations", extensions);
+        File importFile = UIUtil.saveFile(f, "Export a template file for your annotations", Collections.EMPTY_SET);
         try {
             PrintStream outStream = new PrintStream(new FileOutputStream(importFile));
             for (String row : getValuesFromTable()){
