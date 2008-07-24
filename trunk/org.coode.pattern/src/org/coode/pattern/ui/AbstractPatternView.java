@@ -89,7 +89,7 @@ public abstract class AbstractPatternView extends AbstractOWLViewComponent {
     protected final void changeSelection(Pattern pattern) {
         getPatternManager().getPatternSelectionModel().setSelectedPattern(pattern, this);
         if (pattern != null && pattern.getBase() != null){
-            getOWLEditorKit().getOWLWorkspace().getOWLSelectionModel().setSelectedEntity(pattern.getBase());
+            getOWLEditorKit().getWorkspace().getOWLSelectionModel().setSelectedEntity(pattern.getBase());
         }
     }
 
@@ -106,7 +106,7 @@ public abstract class AbstractPatternView extends AbstractOWLViewComponent {
         final PatternSelectionModel sModel = getPatternManager().getPatternSelectionModel();
         sModel.setSelectedPart(pattern, part, this);
         if (part instanceof OWLEntity){
-            getOWLEditorKit().getOWLWorkspace().getOWLSelectionModel().setSelectedEntity((OWLEntity)part);
+            getOWLEditorKit().getWorkspace().getOWLSelectionModel().setSelectedEntity((OWLEntity)part);
         }
     }
 

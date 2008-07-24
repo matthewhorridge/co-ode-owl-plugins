@@ -1,14 +1,8 @@
 package org.coode.search.view;
 
-import org.protege.editor.owl.ui.frame.OWLFrame;
-import org.protege.editor.owl.ui.frame.OWLFrameSection;
-import org.protege.editor.owl.ui.frame.OWLFrameListener;
-import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-
-import java.util.List;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -43,6 +37,6 @@ import java.util.List;
 public class OWLSearchAnnotationsFrame extends AbstractOWLFrame<OWLOntology> {
 
     public OWLSearchAnnotationsFrame(OWLEditorKit eKit) {
-        super(eKit.getOWLModelManager().getOWLOntologyManager());
+        super(eKit.getModelManager().getOWLOntologyManager());
     }
 }

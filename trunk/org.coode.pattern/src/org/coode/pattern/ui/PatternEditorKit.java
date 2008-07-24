@@ -109,13 +109,13 @@ public class PatternEditorKit {
     }
 
     public OWLEntityRenderer getOWLEntityRenderer(){
-        return eKit.getOWLModelManager().getOWLEntityRenderer();
+        return eKit.getModelManager().getOWLEntityRenderer();
     }
 
     class BaseEntityPatternRenderer extends AbstractPatternRenderer{
         public String render(Pattern pattern) {
             if (pattern.getBase() != null){
-                return eKit.getOWLModelManager().getRendering(pattern.getBase());
+                return eKit.getModelManager().getRendering(pattern.getBase());
             }
             else{
                 return pattern.toString();

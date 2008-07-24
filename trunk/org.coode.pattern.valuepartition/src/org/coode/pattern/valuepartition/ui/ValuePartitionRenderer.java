@@ -37,7 +37,7 @@ import org.protege.editor.owl.model.OWLModelManager;
 public class ValuePartitionRenderer extends AbstractPatternRenderer<ValuePartition2> {
 
     public String render(ValuePartition2 pattern) {
-        OWLModelManager mngr = getOWLEditorKit().getOWLModelManager();
+        OWLModelManager mngr = getOWLEditorKit().getModelManager();
         ValuePartition2.Params p = pattern.getParams();
         return mngr.getRendering(p.base) + " (" + mngr.getRendering(p.property) + ")";
     }

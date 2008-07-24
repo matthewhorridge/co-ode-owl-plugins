@@ -165,7 +165,7 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
             params = null;//@@TODO p.getParams();
 
             OWLEditorKit eKit = getOWLEditorKit();
-            OWLModelManager mngr = eKit.getOWLModelManager();
+            OWLModelManager mngr = eKit.getModelManager();
 
             redrawPie(params.values);
             nameField.setText(mngr.getRendering(params.base));
@@ -312,7 +312,7 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
     }
 
     public ValuePartition createPattern() throws OWLException {
-        final OWLDataFactory df = getOWLEditorKit().getOWLModelManager().getOWLDataFactory();
+        final OWLDataFactory df = getOWLEditorKit().getModelManager().getOWLDataFactory();
         return null; // @@TODO new ValuePartition(params, df, getPatternDescriptor());
     }
 
@@ -345,7 +345,7 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
         }
         else {
             for (OWLClass value : values) {
-                pie.addValue(10, getOWLEditorKit().getOWLModelManager().getRendering(value));
+                pie.addValue(10, getOWLEditorKit().getModelManager().getRendering(value));
             }
         }
         pie.repaint();
@@ -423,7 +423,7 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
     }
 
     private void handlePropertyUpdated(){
-        final OWLModelManager mngr = getOWLEditorKit().getOWLModelManager();
+        final OWLModelManager mngr = getOWLEditorKit().getModelManager();
         params.property = PatternUtils.getNamedObjectProperty(propField.getText(),
                                                               mngr.getActiveOntology(),
                                                               mngr.getOWLDataFactory());
@@ -432,7 +432,7 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
     }
 
     private void handleNameUpdated(){
-        final OWLModelManager mngr = getOWLEditorKit().getOWLModelManager();
+        final OWLModelManager mngr = getOWLEditorKit().getModelManager();
         params.base = PatternUtils.getNamedClass(nameField.getText(),
                                                  mngr.getActiveOntology(),
                                                  mngr.getOWLDataFactory());
@@ -448,20 +448,20 @@ public class ValuePartitionEditor extends AbstractPatternEditor<ValuePartition> 
     private void handlePropertyFocusLost(){
         if (params.property != null){
             // revert to current value
-            propField.setText(getOWLEditorKit().getOWLModelManager().getRendering(params.property));
+            propField.setText(getOWLEditorKit().getModelManager().getRendering(params.property));
         }
     }
 
     private void handleNameFocusLost(){
         if (params.base != null){
             // revert to current value
-            nameField.setText(getOWLEditorKit().getOWLModelManager().getRendering(params.base));
+            nameField.setText(getOWLEditorKit().getModelManager().getRendering(params.base));
         }
     }
 
     private void valuesChanged() {
         try {
-            final OWLModelManager mngr = getOWLEditorKit().getOWLModelManager();
+            final OWLModelManager mngr = getOWLEditorKit().getModelManager();
             redrawPie(PatternUtils.createClasses(valuesField.getText(),
                                                  mngr.getActiveOntology(),
                                                  mngr.getOWLDataFactory()));
