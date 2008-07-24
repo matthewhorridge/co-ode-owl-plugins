@@ -50,7 +50,7 @@ public class EntityEditor extends AbstractPatternEditor {
     public void setPattern(Pattern pattern) {
         removeAll();
 
-        editor = OWLEntityViewFactory.createView(getPattern().getBase(), getOWLEditorKit().getOWLWorkspace());
+        editor = OWLEntityViewFactory.createView(getPattern().getBase(), getOWLEditorKit().getWorkspace());
 
         add(editor, BorderLayout.CENTER);
     }

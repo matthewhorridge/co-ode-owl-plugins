@@ -1,7 +1,7 @@
 package uk.ac.manchester.gong.opl.protege;
 
-import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 import org.protege.editor.owl.model.OWLWorkspace;
+import org.protege.editor.owl.ui.action.ProtegeOWLAction;
 
 import java.awt.event.ActionEvent;
 /*
@@ -37,7 +37,7 @@ import java.awt.event.ActionEvent;
  */
 public class OPLAction extends ProtegeOWLAction {
     public void actionPerformed(ActionEvent actionEvent) {
-        getOWLEditorKit().getOWLWorkspace().showResultsView("uk.ac.manchester.gong.opl.OPLView", true, OWLWorkspace.BOTTOM_RESULTS_VIEW);
+        getOWLEditorKit().getWorkspace().showResultsView("uk.ac.manchester.gong.opl.OPLView", true, OWLWorkspace.BOTTOM_RESULTS_VIEW);
     }
 
     public void initialise() throws Exception {

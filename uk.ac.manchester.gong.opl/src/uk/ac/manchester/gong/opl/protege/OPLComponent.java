@@ -1,7 +1,13 @@
 package uk.ac.manchester.gong.opl.protege;
 
-import uk.ac.manchester.gong.opl.ReasonerFactory;
+import org.protege.editor.core.ui.view.DisposableAction;
+import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.inference.NoOpReasoner;
+import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owl.util.NamespaceUtil;
 import uk.ac.manchester.gong.opl.OPLInstructionsProcessor;
+import uk.ac.manchester.gong.opl.ReasonerFactory;
 import uk.ac.manchester.gong.opl.io.OPLReader;
 
 import javax.swing.*;
@@ -11,14 +17,6 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.Map;
-import java.util.HashMap;
-
-import org.protege.editor.owl.model.inference.NoOpReasoner;
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.core.ui.view.DisposableAction;
-import org.semanticweb.owl.util.NamespaceUtil;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -73,7 +71,7 @@ public class OPLComponent extends JComponent {
 
         init();
 
-        ReasonerFactory.setOWLModelManager(eKit.getOWLModelManager());
+        ReasonerFactory.setOWLModelManager(eKit.getModelManager());
 
     }
 
@@ -85,9 +83,9 @@ public class OPLComponent extends JComponent {
 
         NamespaceUtil nsUtil = new NamespaceUtil();
 
-        OWLOntology activeOnt = eKit.getOWLModelManager().getActiveOntology();
+        OWLOntology activeOnt = eKit.getModelManager().getActiveOntology();
         String nsText = nsUtil.generatePrefix(activeOnt.getURI().toString()) + " " + activeOnt.getURI() + "\n";
-        for (OWLOntology ont : eKit.getOWLModelManager().getActiveOntologies()){
+        for (OWLOntology ont : eKit.getModelManager().getActiveOntologies()){
             if (!ont.equals(activeOnt)){
                 nsText += nsUtil.generatePrefix(activeOnt.getURI().toString()) + " " + ont.getURI() + "\n";
             }
@@ -98,8 +96,8 @@ public class OPLComponent extends JComponent {
 
 
     private void handleProcessAction() {
-        if (eKit.getOWLModelManager().getReasoner() instanceof NoOpReasoner){
-            JOptionPane.showMessageDialog(eKit.getOWLWorkspace(), "Please select a reasoner first");
+        if (eKit.getModelManager().getReasoner() instanceof NoOpReasoner){
+            JOptionPane.showMessageDialog(eKit.getWorkspace(), "Please select a reasoner first");
         }
         else{
             process();
@@ -108,7 +106,7 @@ public class OPLComponent extends JComponent {
 
     private void process(){
         try {
-            OWLOntologyManager mngr = eKit.getOWLModelManager().getOWLOntologyManager();
+            OWLOntologyManager mngr = eKit.getModelManager().getOWLOntologyManager();
 
             BufferedReader in = new BufferedReader(new StringReader(textPanel.getText()));
             OPLReader r = new OPLReader(in);
