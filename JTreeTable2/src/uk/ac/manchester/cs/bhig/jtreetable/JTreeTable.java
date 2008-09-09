@@ -98,7 +98,9 @@ public class JTreeTable<R> extends JComponent {
         JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
                                              treeComponent,
                                              tableScrollPane);
-        splitter.setDividerLocation(0.3);
+        splitter.setResizeWeight(0.3);
+        splitter.setBackground(Color.WHITE);
+        splitter.setOneTouchExpandable(true);
         add(splitter, BorderLayout.CENTER);
 
         setVisible(true);
@@ -149,7 +151,7 @@ public class JTreeTable<R> extends JComponent {
 
         final DefaultTableColumnModel dummyColumnModel = new DefaultTableColumnModel();
         final TableColumn tc = new TableColumn();
-        tc.setHeaderValue(treeTitle);
+        tc.setHeaderValue(getTreeTitle());
         dummyColumnModel.addColumn(tc);
 
         // hack creates table that is never used to ensure the header UI is consistent
@@ -175,6 +177,11 @@ public class JTreeTable<R> extends JComponent {
         treeHolder.add(treeHeader, BorderLayout.NORTH);
         treeHolder.add(treeScrollPane, BorderLayout.CENTER);
         return treeHolder;
+    }
+
+
+    protected String getTreeTitle() {
+        return treeTitle;
     }
 
 
