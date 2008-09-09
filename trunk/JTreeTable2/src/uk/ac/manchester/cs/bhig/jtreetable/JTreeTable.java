@@ -218,11 +218,14 @@ public class JTreeTable<R> extends JComponent {
         // rowAtPoint doesn't appear to calculate correctly with custom heights, so do it by hand
         public int rowAtPoint(Point point) {
             int rowYPos = 0; int row = -1;
-            while (rowYPos < point.y){
+            while (row < getRowCount() && rowYPos < point.y){
                 row++;
                 rowYPos += getRowHeight(row);
             }
-            return row;
+            if (row < getRowCount()){
+                return row;
+            }
+            return -1;
         }
 
 
@@ -238,7 +241,7 @@ public class JTreeTable<R> extends JComponent {
             return editor;
         }
 
-        
+
     }
 
     /**
