@@ -68,7 +68,7 @@ public class TemplateRow {
     public TemplateRow(OWLAnnotationAxiom<OWLEntity> annotAxiom, TemplateModel model) {
         this(annotAxiom.getSubject(), annotAxiom.getAnnotation().getAnnotationURI(),  model);
         this.annotAxiom = annotAxiom;
-        setValue(annotAxiom.getAnnotation().getAnnotationValue());
+        reload(annotAxiom.getAnnotation().getAnnotationValue());
     }
 
     // when the editor exists without a supporting axiom
@@ -122,21 +122,33 @@ public class TemplateRow {
 
     // all of this should be here or in the model
     public void setValue(OWLObject value) {
+        reload(value);
+        updateAnnotation();
+    }
+
+
+    private void reload(OWLObject value) {
         String type = model.getComponentType(uri);
         if (TemplateModel.TEXT.equals(type) || TemplateModel.MULTILINE.equals(type)){
             if (value == null){
                 ((JTextComponent) getEditor()).setText("");
             }
             else{
-                ((JTextComponent) getEditor()).setText(value.toString());
+                String rendering;
+                if (value instanceof OWLConstant){
+                    rendering = ((OWLConstant)value).getLiteral();
+                }
+                else{
+                    rendering = value.toString();
+                }
+                ((JTextComponent) getEditor()).setText(rendering);
             }
         }
         else if (TemplateModel.ENTITY.equals(type)){
             ((JComboBox) getEditor()).setSelectedItem(value);
         }
-
-        updateAnnotation();
     }
+
 
     // all of this should be here or in the model
     public OWLConstant getValue() {
