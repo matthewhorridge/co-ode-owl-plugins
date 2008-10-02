@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+  <plugin>
+  	<extension id="OPPLView"
+			point="org.protege.editor.core.application.ViewComponent">
+  		<label value="OPPL"/>
+  		<class value="org.coode.oppl.protege.ui.OPPLView"/>
+		<headerColor value="@org.protege.ontologycolor"/>
+        <category value="@org.protege.ontologycategory"/>
+  	</extension>
+  	<!-- TABS -->
+  	<extension id="OPPLTab"
+                point="org.protege.editor.core.application.WorkspaceTab">
+        <label value="OPPL Tab"/>
+        <class value="org.coode.oppl.protege.ui.OPPLTab"/>
+        <editorKitId value="OWLEditorKit"/>
+        <index value="L"/>
+        
+    </extension>
+    
+  </plugin>

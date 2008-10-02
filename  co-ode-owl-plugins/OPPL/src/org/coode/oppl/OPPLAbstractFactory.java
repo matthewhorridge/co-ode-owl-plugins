@@ -1,0 +1,57 @@
+/**
+ * Copyright (C) 2008, University of Manchester
+ *
+ * Modifications to the initial code base are copyright of their
+ * respective authors, or their employers as appropriate.  Authorship
+ * of the modifications may be determined from the ChangeLog placed at
+ * the end of this file.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+package org.coode.oppl;
+
+import org.coode.oppl.variablemansyntax.NullReasonerException;
+import org.coode.oppl.variablemansyntax.VariableScopeChecker;
+import org.protege.editor.owl.model.entity.OWLEntityFactory;
+import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
+import org.semanticweb.owl.expression.OWLEntityChecker;
+
+/**
+ * @author Luigi Iannone
+ * 
+ */
+public interface OPPLAbstractFactory {
+	/**
+	 * @return the OWLEntityChecker used by the factory
+	 */
+	OWLEntityChecker getOWLEntityChecker();
+
+	/**
+	 * @return the VariableScopeChecker used by the factory
+	 * @throws NullReasonerException
+	 *             if no reasoner is available for checking the scope
+	 */
+	VariableScopeChecker getVariableScopeChecker() throws OPPLException;
+
+	/**
+	 * @return the OWLEntityRenderer instance used by this factory
+	 */
+	OWLEntityRenderer getOWLEntityRenderer();
+
+	/**
+	 * @return the OWLEntityFactory used by this factory
+	 */
+	OWLEntityFactory getOWLEntityFactory();
+}

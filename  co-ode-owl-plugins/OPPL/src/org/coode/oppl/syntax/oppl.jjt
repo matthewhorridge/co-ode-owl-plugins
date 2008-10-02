@@ -1,0 +1,710 @@
+/**
+* JJTree file
+*/
+
+options {
+	VISITOR=true;
+  JDK_VERSION = "1.5";
+    MULTI=true;
+    NODE_PREFIX="OPPL";
+    
+   /* DEBUG_PARSER=true; */
+    
+}
+ 
+PARSER_BEGIN(OPPLParser) 
+package org.coode.oppl.syntax;
+import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableImpl;
+import org.coode.oppl.variablemansyntax.VariableScopes.Direction;
+import org.coode.oppl.variablemansyntax.generated.*;
+import org.coode.oppl.OPPLAbstractFactory;
+import org.coode.oppl.OPPLFactory;
+import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.model.OWLObjectProperty;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.semanticweb.owl.util.BidirectionalShortFormProvider;
+import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
+import org.semanticweb.owl.util.SimpleShortFormProvider;
+import org.coode.oppl.variablemansyntax.VariableManchesterSyntaxExpressionChecker;
+import org.semanticweb.owl.inference.OWLReasoner;
+import org.semanticweb.owl.util.ReferencedEntitySetProvider;
+import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcher;
+
+import org.semanticweb.owl.model.OWLOntologyManager;
+import java.util.ArrayList;
+import java.util.*;
+import org.semanticweb.owl.expression.ParserException;
+import org.semanticweb.owl.apibinding.OWLManager;
+import org.semanticweb.owl.model.OWLOntology;
+import java.net.URI;
+import java.io.Reader;
+import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owl.model.OWLDataPropertyExpression;
+import org.coode.oppl.variablemansyntax.ExpressionParser;
+import org.coode.oppl.variablemansyntax.VariableShortFormEntityChecker;
+import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
+import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
+import org.coode.oppl.variablemansyntax.VariableScope;
+import org.coode.oppl.variablemansyntax.VariableScopes;
+import org.coode.oppl.OPPLException;
+import org.coode.oppl.utils.*;
+
+public class OPPLParser {
+	private static OWLOntologyManager owlOntologyManager;
+	private static ConstraintSystem constraintSystem;
+	private static OPPLAbstractFactory opplFactory = null;
+	private static List completions = new ArrayList();
+	static private AutoCompleterMatcher matcher=null;
+	
+	public static List getCompletions(){
+		return completions; 
+	}
+	
+	static public void setAutoCompleterMatcher(AutoCompleterMatcher matcher){
+		OPPLParser.matcher = matcher;
+	}
+	
+	public static OPPLAbstractFactory getOPPLFactory(){
+		if(opplFactory ==null){
+			opplFactory = new OPPLFactory(owlOntologyManager,
+			constraintSystem, owlOntologyManager.getOWLDataFactory(), constraintSystem.getReasoner());
+		}
+		return opplFactory;
+	}
+	
+	public static void setOPPLFactory(OPPLAbstractFactory opplFactory){
+		OPPLParser.opplFactory = opplFactory;
+	}
+	
+	public static ConstraintSystem getConstraintSystem(){
+		return constraintSystem;
+	}
+	
+	public static  OWLDataFactory getOWLDataFactory(){
+		return owlOntologyManager.getOWLDataFactory();
+	}
+	
+	public static OWLOntologyManager getOWLOntologyManager(){
+		return owlOntologyManager;
+	}
+	
+	public static void setReasoner(OWLReasoner reasoner){
+		constraintSystem.setReasoner(reasoner);
+	}
+	
+   public OPPLParser(java.io.InputStream in, OWLOntologyManager owlOntologyManager, ConstraintSystem constraintSystem){
+   	this(in);
+   	OPPLParser.owlOntologyManager = owlOntologyManager;
+   	OPPLParser.constraintSystem = constraintSystem;
+   } 
+   
+   	public static void ReInit(Reader reader,
+			OWLOntologyManager ontologyManager, ConstraintSystem cs) {
+		ReInit(reader);
+		owlOntologyManager = ontologyManager;
+		constraintSystem = cs;
+	
+	}
+   
+   	public OPPLParser(Reader reader, OWLOntologyManager ontologyManager,
+			ConstraintSystem cs) {
+		this(reader);
+		owlOntologyManager = ontologyManager;
+		constraintSystem = cs;
+	}    
+  public static void main(String args[]) {
+    System.out.println("Reading from standard input...");
+    System.out.print("Enter an expression :");
+    String ontologyPhysicalURI = args[0];
+	OWLOntologyManager ontologyManager = OWLManager
+				.createOWLOntologyManager();
+    
+    try {
+	  OWLOntology ontology = ontologyManager.loadOntology(URI
+					.create(ontologyPhysicalURI));
+	  ConstraintSystem constraintSystem = new ConstraintSystem(ontology,
+					ontologyManager);
+	  new OPPLParser(System.in, ontologyManager, constraintSystem);			    	
+      SimpleNode n = OPPLParser.Start();
+      n.dump("");
+      System.out.println("Thank you.");
+    } catch (Exception e) {
+      System.out.println("Oops.");
+      System.out.println(e.getMessage());
+      e.printStackTrace();
+    }
+  }
+}
+PARSER_END(OPPLParser)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+}
+TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL:
+        <DECIMAL_LITERAL> (["l","L"])?
+      | <HEX_LITERAL> (["l","L"])?
+      | <OCTAL_LITERAL> (["l","L"])?
+  >
+|  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+|  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+|  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+}
+TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER: "?"<LETTER> (<LETTER>|<DIGIT>)* >
+|  < #LETTER: ["_","a"-"z","A"-"Z"] >
+|  < #DIGIT: ["0"-"9"] >
+}
+
+
+
+
+TOKEN:/* OPPL FUNCTIONS*/
+{
+	<CREATE: "Create"|"create">
+}
+
+TOKEN :/* VARIABLE TYPES*/
+{
+	<VARIABLETYPE: "CLASS" | "OBJECTPROPERTY" | "DATAPROPERTY" | "INDIVIDUAL" | "CONSTANT">
+	
+}
+
+
+TOKEN: /* OPPL SYNTAX*/
+{
+	<SELECT: "SELECT"> |<WHERE: "WHERE"> | <ACTIONS: "ADD" | "REMOVE"> |<BEGIN: "BEGIN"> |<END: "END">
+}
+
+TOKEN: /*PUNCTUATION*/
+{
+	
+	<COMMA:",">
+	| <SEMICOLON: ";">
+	| <COLON: ":">
+	| <OPENPARENTHESYS: "(">
+	| <CLOSEDPARENTHESYS: ")">
+	| <QUOTE: "\"">
+	| <POWER: "^">
+	| <OPENCURLYBRACKETS: "{">
+	| <CLOSEDCURLYBRACKETS: "}">
+	| <OPENSQUAREYBRACKETS: "[">
+	| <CLOSEDSQUAREBRACKETS: "]">
+	
+}
+
+TOKEN: /* CONSTRAINT SYNTAX*/
+{
+	<NEQ: "!=">
+}
+
+TOKEN: /* CREATED ENTITIES */
+{
+	<GENERATEDENTITY: "!"<ENTITYNAMES>>
+}
+
+TOKEN : /* MANSYNTAX KEYWORDS */
+{
+	<SUBCLASSOF: "SubClassOf" | "subClassOf">
+	|<EQUIVALENTTO: "EquivalentTo" | "equivalentTo">
+	|<DISJOINTWITH: "DisjointWith" | "disjointWith">
+	|<DISJOINT_UNION_OF: "DisjointUnionOf">
+	|<FUNCTIONAL: "Functional">
+	|<INVERSE: "inv">
+	|<INVERSE_FUNCTIONAL: "InverseFunctional">
+	|<SUB_PROPERTY_OF: "SubPropertyOf" | "subPropertyOf">
+	|<SYMMETRIC: "Symmetric">
+	|<TRANSITIVE: "Transitive">
+	
+}
+
+TOKEN : /* VARIABLE SCOPE OTHER DIRECTIONS */
+{
+	<OTHERDIRECTION: <SUPERCLASSOF> |<SUPER_PROPERTY_OF> |<INSTANCE_OF>>
+	| <#SUPERCLASSOF: "SuperClassOf">
+	|<#SUPER_PROPERTY_OF: "SuperPropertyOf">
+	|<#INSTANCE_OF: "InstanceOf">
+}
+
+
+
+TOKEN :/* VARIABLE ATTRIBUTES*/
+{
+	<VARIABLEATTRIBUTE: "RENDERING">
+}
+
+TOKEN : /* MANSYNTAX ENTITY NAMES */
+{
+	<ENTITYNAMES : <LETTER> (<LETTER>|<DIGIT>)*>
+}
+
+TOKEN: /* LITERALS*/
+{
+	<LITERAL: <QUOTE><ENTITYNAMES><QUOTE><POWER><POWER><ENTITYNAMES>(<COLON> <ENTITYNAMES>)?>
+}
+
+
+
+SimpleNode Start():{}
+{
+  (VariableDeclaration())?(Query())?(Actions())?";"
+  { 
+  	jjtThis.setConstraintSystem(constraintSystem);
+  	return jjtThis; 
+  	}
+}
+
+void VariableDeclaration() #void :{}
+{
+	VariableDefinition(){
+		completions.clear();
+		completions.add(",");
+		completions.add("SELECT");
+	}
+	(<COMMA>{
+		completions.clear();
+	} VariableDefinition()
+	{
+		completions.clear();
+		completions.add(",");
+		completions.add("SELECT");
+	}
+	)*
+}
+
+void Actions():{}
+{
+	<BEGIN> Action() (<COMMA> Action())*<END>
+}	
+
+void VariableDefinition():{Token variableNameToken;
+						   Token variableTypeToken; 
+						   VariableType variableType=null;
+						   VariableScope variableScope;
+						   Token directionToken=null;
+						   VariableScopes.Direction direction=null;
+						   Variable v=null;}
+{
+	LOOKAHEAD(4)
+	variableNameToken= <IDENTIFIER> <COLON>
+	{
+		completions.clear();
+		completions.addAll(EnumSet.allOf(VariableType.class));
+	}  
+	variableTypeToken= <VARIABLETYPE>
+	{
+		variableType = VariableType.getVariableType(variableTypeToken.image);
+	}
+	"=" v = opplFunction(variableNameToken.image,variableType){
+		jjtn000.setVariable(v);
+	}
+	
+	|LOOKAHEAD(4)
+	variableNameToken= <IDENTIFIER> <COLON>
+	{
+		completions.clear();
+		completions.addAll(EnumSet.allOf(VariableType.class));
+	}  
+	variableTypeToken= <VARIABLETYPE>
+	{
+		try{
+			variableType = VariableType.getVariableType(variableTypeToken.image);    
+                	jjtn000.setVariable(OPPLParser.getConstraintSystem().createVariable(variableNameToken.image,variableType ));
+		}catch(OPPLException e){
+			throw new ParseException(e.getMessage());
+		}
+		
+	}
+	<OPENSQUAREYBRACKETS>{
+		completions.clear();
+		completions.addAll(EnumSet.allOf(VariableScopes.Direction.class));
+	}  
+	direction = direction()		 
+	variableScope = typeScope(direction, variableType)
+	<CLOSEDSQUAREBRACKETS>{
+		jjtThis.getVariable().setVariableScope(variableScope, getOPPLFactory().getVariableScopeChecker());
+	}
+	| 
+	variableNameToken= <IDENTIFIER> <COLON> 
+	{
+		completions.clear();
+		completions.addAll(EnumSet.allOf(VariableType.class));
+	}
+	variableTypeToken = <VARIABLETYPE>{
+		completions.clear();
+		try{
+			variableType = VariableType.getVariableType(variableTypeToken.image);    
+			jjtn000.setVariable(OPPLParser.getConstraintSystem().createVariable(variableNameToken.image,variableType ));
+		}catch(OPPLException e){
+			throw new ParseException(e.getMessage());
+		}		
+	}
+	
+}
+
+
+Variable opplFunction(String name,VariableType type) #void:{GeneratedValue value=null;}{
+	<CREATE><OPENPARENTHESYS>value = stringOperation()<CLOSEDPARENTHESYS>{
+		try{
+			return getConstraintSystem().createGeneratedVariable(name,type, value);
+		}catch(OPPLException e){
+			throw new ParseException(e.getMessage());
+		}
+	}
+}
+
+
+
+
+GeneratedValue stringOperation() #void:{GeneratedValue result=null;}
+{
+	result = stringConcat(){
+		return result;
+	}
+}
+
+GeneratedValue stringConcat() #void:{GeneratedValue aGeneratedValue;
+									Token link;String string;
+									List<GeneratedValue> components = new ArrayList<GeneratedValue>();}
+{
+
+	aGeneratedValue = generatedValue(){
+		components.add(aGeneratedValue);
+	} ("+"  aGeneratedValue = generatedValue(){		
+		components.add(aGeneratedValue);
+	})*{
+		if(components.size()==1){
+			return aGeneratedValue;
+		}else{
+			return new ConcatGeneratedValues(components);	
+		}
+		
+	}
+}
+
+GeneratedValue generatedValue() #void:{Token valueToken;Token variableNameToken;Token variableAttributeToken;}
+{
+	<QUOTE>valueToken = <ENTITYNAMES><QUOTE>{		
+		return new ConstantGeneratedValue(valueToken.image);
+	}
+	|
+	variableNameToken = <IDENTIFIER>"." variableAttributeToken = <VARIABLEATTRIBUTE>{
+		String attributeString = variableAttributeToken.image;
+		String variableName = variableNameToken.image;
+		Variable v = getConstraintSystem().getVariable(variableName);
+		if(v !=null){
+			try{
+				VariableGeneratedValue.Attribute attribute = VariableGeneratedValue.Attribute.parse(attributeString);
+				return new VariableGeneratedValue(v,attribute);
+			}catch(OPPLException e){
+				
+				throw new ParseException(e.getMessage());
+			}
+		}else{
+			throw new ParseException("Invalid variable name: "+variableName);
+		}
+	}
+}
+
+VariableScopes.Direction direction() #void: {Token t=null;}
+{
+	<SUBCLASSOF>{
+		return Direction.SUBCLASSOF;
+	}
+	| <SUB_PROPERTY_OF>{
+		return Direction.SUBPROPERTYOF;
+	} 
+	| t = <OTHERDIRECTION>{
+		return Direction.getDirection(t.image);
+	}
+}
+
+
+JAVACODE
+VariableScope typeScope(VariableScopes.Direction direction, VariableType variableType){
+		Token t;
+		String manSyntaxString = "";
+		VariableScope toReturn = null;
+		try {
+			while (true) {
+				t = getToken(1);
+				if (t.kind == COMMA || t.kind == CLOSEDSQUAREBRACKETS
+						|| t.kind == SEMICOLON || t.kind == BEGIN
+						|| t.kind == END || t.kind == WHERE || t.kind == EOF) {
+					break;
+				} else {
+					manSyntaxString += t.image + " ";
+					t = getNextToken();
+				}
+			}
+			manSyntaxString = manSyntaxString.trim();
+			completions.clear();
+			ManchesterOWLSyntaxEditorParser parser = new ManchesterOWLSyntaxEditorParser(
+					getOWLDataFactory(), manSyntaxString);
+			parser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
+			toReturn = parseScope(direction,variableType,parser);
+				
+		} catch (ParserException e) {
+			if(matcher!=null){
+				
+				int lastIndexOfWhiteSpace = manSyntaxString.lastIndexOf(" ");
+				String word = lastIndexOfWhiteSpace == -1 ? manSyntaxString
+						: manSyntaxString.substring(lastIndexOfWhiteSpace).trim();
+				Set<OWLObject> matches = matcher
+						.getMatches(word, e.isClassNameExpected(), e
+								.isObjectPropertyNameExpected(), e
+								.isDataPropertyNameExpected(), e
+								.isIndividualNameExpected(), e
+								.isDatatypeNameExpected());
+				List kwMatches = new ArrayList(matches.size() + 10);
+				for (String s : e.getExpectedKeywords()) {
+					if (word.matches("(\\s)*") || s.toLowerCase().startsWith(word.toLowerCase())) {
+						kwMatches.add(s);
+					}
+				}
+				
+				completions.addAll(kwMatches);
+				completions.addAll(matches);
+				completions.addAll(OPPLVariableMatcher.matches(word,constraintSystem,e.isClassNameExpected(), e
+								.isObjectPropertyNameExpected(), e
+								.isDataPropertyNameExpected(), e
+								.isIndividualNameExpected(),false ));
+				}
+			throw new ParseException("Failed to parse the description "
+					+ manSyntaxString + " error: " + e.getMessage());
+		}
+		String expression = manSyntaxString+"**";	
+        ManchesterOWLSyntaxEditorParser completerParser = new ManchesterOWLSyntaxEditorParser(getOWLDataFactory(),expression);
+        completerParser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
+        try{
+        	
+        	parseScope(direction,variableType,completerParser);
+		} catch (ParserException e) {
+				if(matcher!=null){
+				
+				int lastIndexOfWhiteSpace = expression.lastIndexOf(" ");
+				String word = lastIndexOfWhiteSpace == -1 ? ""
+						: manSyntaxString.substring(lastIndexOfWhiteSpace).trim();
+				
+				List kwMatches = new ArrayList(10);
+				for (String s : e.getExpectedKeywords()) {
+					if (word.matches("(\\s)*") || s.toLowerCase().startsWith(word.toLowerCase())) {
+						kwMatches.add(s);
+					}
+				}
+				completions.addAll(kwMatches);
+				
+				}
+			
+		}
+		return toReturn;
+}
+
+JAVACODE
+VariableScope parseScope(VariableScopes.Direction direction,
+			VariableType variableType, ManchesterOWLSyntaxEditorParser parser)
+			throws ParserException {
+		VariableScope scope = null;
+		switch (variableType) {
+		case CLASS:
+			OWLDescription description = parser.parseDescription();
+			if (direction.equals(Direction.SUBCLASSOF)) {
+				scope = VariableScopes.buildSubClassVariableScope(description);
+			} else {
+				scope = VariableScopes
+						.buildSuperClassVariableScope(description);
+			}
+			break;
+		case OBJECTPROPERTY:
+			OWLObjectProperty objectProperty = (OWLObjectProperty) parser
+					.parseObjectPropertyExpression();
+			if (direction.equals(Direction.SUPERPROPERTYOF)) {
+				scope = VariableScopes
+						.buildSuperPropertyVariableScope(objectProperty);
+			} else {
+				scope = VariableScopes
+						.buildSubPropertyVariableScope(objectProperty);
+			}
+			break;
+		case DATAPROPERTY:
+			OWLDataProperty dataProperty = parser.parseDataProperty();
+			if (direction.equals(Direction.SUPERPROPERTYOF)) {
+				scope = VariableScopes
+						.buildSuperPropertyVariableScope(dataProperty);
+			} else {
+				scope = VariableScopes
+						.buildSubPropertyVariableScope(dataProperty);
+			}
+			break;
+		case INDIVIDUAL:
+			description = parser.parseDescription();
+			scope = VariableScopes.buildIndividualVariableScope(description);
+			break;
+		default:
+			break;
+		}
+		return scope;
+	}
+
+
+void Constraint():{Token t;OWLObject owlObject;Variable variable;}
+{
+	t = <IDENTIFIER> {
+		variable = OPPLParser.getConstraintSystem().getVariable(t.image);
+		if(variable!=null){
+			jjtThis.setVariable(variable);
+		}else{
+			throw new ParseException("Undeclared variable "+t.image);
+		}
+	} 
+	<NEQ> owlObject = OWLExpression(variable){
+		jjtThis.setExpression(owlObject);
+	}
+	
+}
+
+JAVACODE
+OWLObject OWLExpression(Variable v) 
+{
+		Token t;
+		String manSyntaxString="";
+		while(true){
+			t = getToken(1);
+			if (t.kind==COMMA || t.kind==SEMICOLON || t.kind==BEGIN || t.kind==END || t.kind == WHERE || t.kind == EOF){
+				break;
+			}else{
+				manSyntaxString += t.image+" ";
+				t = getNextToken();
+			}
+		}
+
+	VariableType type = v.getType();
+	manSyntaxString = manSyntaxString.trim();
+	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, OPPLParser.getConstraintSystem(),OPPLParser.getOWLDataFactory(), OPPLParser.getOWLOntologyManager());
+	 
+	try{
+	OWLObject toReturn = type.accept(expressionParser);
+	return toReturn;
+	} catch(Exception e){
+		
+		throw new ParseException(e.getMessage());
+	}
+	
+}
+
+VariableType variableType() #void:{Token t;}
+{
+	t = <VARIABLETYPE> {
+		return VariableType.getVariableType(t.image);
+	}
+}
+
+void Query():{OWLAxiom axiom;}
+{
+	<SELECT>{
+		completions.clear();
+	} axiom = Clause(){
+		jjtThis.addAxiom(axiom);
+	}("," axiom = Clause(){
+		jjtThis.addAxiom(axiom);
+	})* (<WHERE> Constraint() (<COMMA> Constraint())*)? 
+}
+
+void Action():{Token t;OWLAxiom axiom;}
+{
+	t=<ACTIONS>{
+		jjtThis.setActionType(t.image);
+	} axiom = Clause(){
+		jjtThis.setAxiom(axiom);
+	}
+}
+
+JAVACODE
+OWLAxiom Clause(){
+	OWLAxiom toReturn =null;
+	String manSyntaxString="";
+	Token t;
+		while(true){
+			t = getToken(1);
+			if (t.kind==COMMA || t.kind==SEMICOLON || t.kind==BEGIN || t.kind==END || t.kind == WHERE || t.kind == EOF){
+				break;
+			}else{
+				manSyntaxString += t.image+" ";
+				t = getNextToken();
+			}
+		}
+	manSyntaxString = manSyntaxString.trim();	
+	VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(OPPLParser.getOWLDataFactory(), manSyntaxString, OPPLParser.getConstraintSystem()
+					);
+	parser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
+	try{
+		toReturn = parser.parseAxiom();
+		
+	}catch(ParserException e){
+		if(matcher!=null){
+				
+				int lastIndexOfWhiteSpace = manSyntaxString.lastIndexOf(" ");
+				String word = lastIndexOfWhiteSpace == -1 ? manSyntaxString
+						: manSyntaxString.substring(lastIndexOfWhiteSpace).trim();
+				Set<OWLObject> matches = matcher
+						.getMatches(word, e.isClassNameExpected(), e
+								.isObjectPropertyNameExpected(), e
+								.isDataPropertyNameExpected(), e
+								.isIndividualNameExpected(), e
+								.isDatatypeNameExpected());
+				List kwMatches = new ArrayList(matches.size() + 10);
+				for (String s : e.getExpectedKeywords()) {
+					if (word.matches("(\\s)*") || s.toLowerCase().startsWith(word.toLowerCase())) {
+						kwMatches.add(s);
+					}
+				}
+				completions.addAll(kwMatches);
+				completions.addAll(matches);
+								completions.addAll(OPPLVariableMatcher.matches(word,constraintSystem,e.isClassNameExpected(), e
+								.isObjectPropertyNameExpected(), e
+								.isDataPropertyNameExpected(), e
+								.isIndividualNameExpected(),false ));
+				}
+		throw new ParseException(e.getMessage());
+	}
+	String expression = manSyntaxString+"**";	
+        VariableManchesterOWLSyntaxParser completerParser = new VariableManchesterOWLSyntaxParser(OPPLParser.getOWLDataFactory(), expression, OPPLParser.getConstraintSystem()
+					);
+        completerParser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
+        try{
+        	
+        	completerParser.parseAxiom();
+		} catch (ParserException e) {
+				if(matcher!=null){
+				
+				int lastIndexOfWhiteSpace = expression.lastIndexOf(" ");
+				String word = lastIndexOfWhiteSpace == -1 ? ""
+						: manSyntaxString.substring(lastIndexOfWhiteSpace).trim();
+				
+				List kwMatches = new ArrayList(10);
+				for (String s : e.getExpectedKeywords()) {
+					if (word.matches("(\\s)*") || s.toLowerCase().startsWith(word.toLowerCase())) {
+						kwMatches.add(s);
+					}
+				}
+				completions.addAll(kwMatches);
+				
+				}
+			
+		}
+		return toReturn;
+}
+
