@@ -59,7 +59,6 @@ public class JTreeTable<R> extends JComponent {
 
     private CellEditorFactory editorFactory = null;
 
-
     public JTreeTable(JTree tree, TreeTableModel<R> model) {
         this.tree = tree;
 
@@ -71,7 +70,7 @@ public class JTreeTable<R> extends JComponent {
         table.setFont(tree.getFont());
 
         // share a selection model
-        ListToTreeSelectionModelWrapper selectionWrapper = new ListToTreeSelectionModelWrapper();
+        ListToTreeSelectionModelWrapper selectionWrapper = new ListToTreeSelectionModelWrapper(tree);
         tree.setSelectionModel(selectionWrapper);
         table.setSelectionModel(selectionWrapper.getListSelectionModel());
         selectionWrapper.addTreeSelectionListener(new TreeSelectionListener(){
@@ -86,12 +85,18 @@ public class JTreeTable<R> extends JComponent {
         JComponent treeComponent = createTreeComponent();
 
         tableScrollPane = new JScrollPane(table);
+        tableScrollPane.getVerticalScrollBar().setPreferredSize(new Dimension(0, 0));
         tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         // sync the 2 scrollpanes in the vertical axis
         tableScrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener(){
             public void adjustmentValueChanged(AdjustmentEvent event) {
                 syncScrollers(tableScrollPane, treeScrollPane);
+            }
+        });
+        treeScrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener(){
+            public void adjustmentValueChanged(AdjustmentEvent event) {
+                syncScrollers(treeScrollPane, tableScrollPane);
             }
         });
 
@@ -110,7 +115,6 @@ public class JTreeTable<R> extends JComponent {
     private void syncScrollers(JScrollPane source, JScrollPane target) {
         int y = source.getViewport().getViewPosition().y;
         target.getViewport().setViewPosition(new Point(target.getViewport().getViewPosition().x, y));
-
     }
 
 
@@ -165,11 +169,13 @@ public class JTreeTable<R> extends JComponent {
             }
         });
 
+        
+
         tree.setScrollsOnExpand(true);
         treeScrollPane = new JScrollPane(tree);
         Border scrollPaneBorder = treeScrollPane.getBorder(); // we'll use this outside
         treeScrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
-        treeScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+//        treeScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
         treeScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         JComponent treeHolder = new JPanel(new BorderLayout());
@@ -249,98 +255,5 @@ public class JTreeTable<R> extends JComponent {
         }
 
 
-    }
-
-    /**
-     * ListToTreeSelectionModelWrapper extends DefaultTreeSelectionModel
-     * to listen for changes in the ListSelectionModel it maintains. Once
-     * a change in the ListSelectionModel happens, the paths are updated
-     * in the DefaultTreeSelectionModel.
-     */
-    class ListToTreeSelectionModelWrapper extends DefaultTreeSelectionModel {
-
-        /**
-         * Set to true when we are updating the ListSelectionModel.
-         */
-        protected boolean updatingListSelectionModel;
-
-        public ListToTreeSelectionModelWrapper() {
-            super();
-            listSelectionModel.addListSelectionListener(new ListSelectionListener() {
-                public void valueChanged(ListSelectionEvent e) {
-                    if (!e.getValueIsAdjusting()){
-                        updateSelectedPathsFromSelectedRows();
-                    }
-                }
-            });
-        }
-
-        /**
-         * Returns the list selection model. ListToTreeSelectionModelWrapper
-         * listens for changes to this model and updates the selected paths
-         * accordingly.
-         */
-        ListSelectionModel getListSelectionModel() {
-            return listSelectionModel;
-        }
-
-        /**
-         * This is overridden to set <code>updatingListSelectionModel</code>
-         * and message super. This is the only place DefaultTreeSelectionModel
-         * alters the ListSelectionModel.
-         */
-        public void resetRowSelection() {
-            if (!updatingListSelectionModel) {
-                updatingListSelectionModel = true;
-                try {
-                    super.resetRowSelection();
-                }
-                finally {
-                    updatingListSelectionModel = false;
-                }
-            }
-            // Notice how we don't message super if
-            // updatingListSelectionModel is true. If
-            // updatingListSelectionModel is true, it implies the
-            // ListSelectionModel has already been updated and the
-            // paths are the only thing that needs to be updated.
-        }
-
-        /**
-         * If <code>updatingListSelectionModel</code> is false, this will
-         * reset the selected paths from the selected rows in the list
-         * selection model.
-         */
-        protected void updateSelectedPathsFromSelectedRows() {
-            if (!updatingListSelectionModel) {
-                updatingListSelectionModel = true;
-                try {
-                    int min = listSelectionModel.getMinSelectionIndex();
-                    int max = listSelectionModel.getMaxSelectionIndex();
-
-                    if (min != -1 && max != -1) {
-                        boolean firstHasBeenSet = false; // hack required to clear the selection (as clearSelection does not work)
-                        for (int counter = min; counter <= max; counter++) {
-                            if (listSelectionModel.isSelectedIndex(counter)) {
-                                TreePath selPath = getTree().getPathForRow(counter);
-
-                                if (selPath != null) {
-                                    if (firstHasBeenSet) {
-                                        addSelectionPath(selPath);
-                                    }
-                                    else {
-                                        setSelectionPath(selPath);
-                                        firstHasBeenSet = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                finally {
-                    updatingListSelectionModel = false;
-                }
-            }
-        }
     }
 }
