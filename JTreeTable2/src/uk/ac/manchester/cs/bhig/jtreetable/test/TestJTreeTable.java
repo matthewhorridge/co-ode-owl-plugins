@@ -9,6 +9,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 /*
@@ -90,6 +91,8 @@ public class TestJTreeTable {
 
         final JTreeTable treeTable = new JTreeTable(tree, model);
 
+        treeTable.setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+
         treeTable.setFont(tree.getFont().deriveFont(24.0f));
         
         JComponent panel = new JPanel(new BorderLayout(6, 6));
@@ -114,6 +117,8 @@ public class TestJTreeTable {
 
 
         showConfirmDialog(null, "Test JTreeTable", panel, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        System.exit(0);
     }
 
     
