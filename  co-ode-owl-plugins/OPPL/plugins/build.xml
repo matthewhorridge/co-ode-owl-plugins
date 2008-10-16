@@ -46,7 +46,7 @@
           target: release              
          ================================= -->
     <target name="release" depends="bundle" description="Prepares the bundle for the web release">
-    	<copyfile dest="${releasejardest}" src="${jardest}"/>
+    	<copy tofile="${releasejardest}" file="${jardest}"/>
         
     </target>
 

@@ -40,14 +40,12 @@ public class ActionListItem implements MListItem {
 		this.axiomChange = axiomChange;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see org.protege.editor.core.ui.list.MListItem#getTooltip()
 	 */
 	public String getTooltip() {
 		String addOrRemove = this.axiomChange instanceof AddAxiom ? "ADD "
-				: "ROMOVE ";
+				: "REMOVE ";
 		return addOrRemove + " the axiom from the active ontology";
 	}
 

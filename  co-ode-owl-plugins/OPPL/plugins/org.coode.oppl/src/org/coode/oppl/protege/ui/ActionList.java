@@ -31,6 +31,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.border.Border;
 
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owl.model.AddAxiom;
@@ -46,10 +47,13 @@ public class ActionList extends MList {
 	 */
 	private static final long serialVersionUID = 6135780833694887712L;
 
-	public ActionList(OWLEditorKit owlEditorKit) {
+	public ActionList(OWLEditorKit owlEditorKit,
+			ConstraintSystem constraintSystem) {
 		super();
 		this.setModel(new ActionListModel());
-		this.setCellRenderer(new AffectedAxiomRenderer(owlEditorKit));
+		VariableAxiomRenderer variableAxiomRenderer = new VariableAxiomRenderer(
+				owlEditorKit, constraintSystem);
+		this.setCellRenderer(variableAxiomRenderer);
 	}
 
 	@Override

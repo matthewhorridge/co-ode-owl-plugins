@@ -170,10 +170,15 @@ public enum VariableType implements OWLEntityVisitorEx<VariableType> {
 		return OBJECTPROPERTY;
 	}
 
-	public static VariableType getVariableType(OWLEntity entity) {
-		VariableType aVariableType = EnumSet.allOf(VariableType.class)
-				.iterator().next();
-		return entity.accept(aVariableType);
+	public static VariableType getVariableType(OWLObject owlObject) {
+		if (owlObject instanceof OWLEntity) {
+			OWLEntity entity = (OWLEntity) owlObject;
+			VariableType aVariableType = EnumSet.allOf(VariableType.class)
+					.iterator().next();
+			return entity.accept(aVariableType);
+		} else {
+			return CONSTANT;
+		}
 	}
 
 	static class CompatibilityChecker implements OWLEntityVisitorEx<Boolean> {

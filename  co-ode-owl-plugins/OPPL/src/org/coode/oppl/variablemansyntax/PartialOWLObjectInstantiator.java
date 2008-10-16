@@ -120,15 +120,16 @@ import org.semanticweb.owl.model.SWRLSameAsAtom;
  * @author Luigi Iannone
  * 
  */
-public class OWLObjectInstatiator implements OWLObjectVisitorEx<OWLObject> {
+public class PartialOWLObjectInstantiator implements
+		OWLObjectVisitorEx<OWLObject> {
 	// OWLDescriptionVisitorEx<OWLDescription>,
 	// OWLPropertyExpressionVisitorEx<OWLObjectPropertyExpression> {
 	protected BindingNode bindingNode;
 	protected ConstraintSystem constraintSystem;
 	protected OWLDataFactory dataFactory;
 
-	public OWLObjectInstatiator(BindingNode bindingNode, ConstraintSystem cs,
-			OWLDataFactory dataFactory) {
+	public PartialOWLObjectInstantiator(BindingNode bindingNode,
+			ConstraintSystem cs, OWLDataFactory dataFactory) {
 		this.bindingNode = bindingNode;
 		this.constraintSystem = cs;
 		this.dataFactory = dataFactory;
@@ -454,8 +455,9 @@ public class OWLObjectInstatiator implements OWLObjectVisitorEx<OWLObject> {
 		if (this.constraintSystem.isVariable(desc)) {
 			Variable variable = this.constraintSystem
 					.getVariable(desc.getURI());
-			toReturn = (OWLDescription) this.bindingNode
+			OWLDescription assignmentValue = (OWLDescription) this.bindingNode
 					.getAssignmentValue(variable);
+			toReturn = assignmentValue == null ? desc : assignmentValue;
 		} else {
 			toReturn = desc;
 		}
@@ -638,8 +640,9 @@ public class OWLObjectInstatiator implements OWLObjectVisitorEx<OWLObject> {
 		if (this.constraintSystem.isVariable(node)) {
 			Variable variable = this.constraintSystem.getVariable(node
 					.toString());
-			toReturn = (OWLConstant) this.bindingNode
+			OWLConstant assignmentValue = (OWLConstant) this.bindingNode
 					.getAssignmentValue(variable);
+			toReturn = assignmentValue == null ? node : assignmentValue;
 		}
 		return toReturn;
 	}
@@ -649,8 +652,9 @@ public class OWLObjectInstatiator implements OWLObjectVisitorEx<OWLObject> {
 		if (this.constraintSystem.isVariable(node)) {
 			Variable variable = this.constraintSystem.getVariable(node
 					.toString().trim());
-			toReturn = (OWLConstant) this.bindingNode
+			OWLConstant assignmentValue = (OWLConstant) this.bindingNode
 					.getAssignmentValue(variable);
+			toReturn = assignmentValue == null ? node : assignmentValue;
 		}
 		return toReturn;
 	}
@@ -664,8 +668,9 @@ public class OWLObjectInstatiator implements OWLObjectVisitorEx<OWLObject> {
 		if (this.constraintSystem.isVariable(property)) {
 			Variable variable = this.constraintSystem.getVariable(property
 					.getURI());
-			toReturn = (OWLObjectProperty) this.bindingNode
+			OWLObjectProperty assignmentValue = (OWLObjectProperty) this.bindingNode
 					.getAssignmentValue(variable);
+			toReturn = assignmentValue == null ? property : assignmentValue;
 		}
 		return toReturn;
 	}
@@ -682,8 +687,9 @@ public class OWLObjectInstatiator implements OWLObjectVisitorEx<OWLObject> {
 		if (this.constraintSystem.isVariable(property)) {
 			Variable variable = this.constraintSystem.getVariable(property
 					.getURI());
-			toReturn = (OWLDataProperty) this.bindingNode
+			OWLDataProperty assignmentValue = (OWLDataProperty) this.bindingNode
 					.getAssignmentValue(variable);
+			toReturn = assignmentValue == null ? property : assignmentValue;
 		}
 		return toReturn;
 	}
@@ -693,8 +699,9 @@ public class OWLObjectInstatiator implements OWLObjectVisitorEx<OWLObject> {
 		if (this.constraintSystem.isVariable(individual)) {
 			Variable variable = this.constraintSystem.getVariable(individual
 					.getURI());
-			toReturn = (OWLIndividual) this.bindingNode
+			OWLIndividual assignmentValue = (OWLIndividual) this.bindingNode
 					.getAssignmentValue(variable);
+			toReturn = assignmentValue == null ? individual : assignmentValue;
 		}
 		return toReturn;
 	}

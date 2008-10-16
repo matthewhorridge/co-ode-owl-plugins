@@ -34,6 +34,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -42,6 +44,7 @@ import org.coode.oppl.ChangeExtractor;
 import org.coode.oppl.protege.model.OPPLStatementModelChangeListener;
 import org.coode.oppl.protege.model.ProtegeOPPLStatementModel;
 import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.VariableManchesterSyntaxExpressionChecker;
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -91,7 +94,10 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	protected void initialiseOWLView() throws Exception {
 		this.setLayout(new BorderLayout());
 		JPanel statementPanel = new JPanel(new BorderLayout());
-		this.affectedAxioms = new ActionList(this.getOWLEditorKit());
+		this.affectedAxioms = new ActionList(this.getOWLEditorKit(),
+				new ConstraintSystem(this.getOWLEditorKit().getModelManager()
+						.getActiveOntology(), this.getOWLEditorKit()
+						.getModelManager().getOWLOntologyManager()));
 		this.instantiatedAxiomsList = new MList();
 		OWLCellRenderer cellRenderer = new OWLCellRenderer(this
 				.getOWLEditorKit());
@@ -117,7 +123,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		statementPanel.add(this.evaluate, BorderLayout.SOUTH);
 		this.add(statementPanel, BorderLayout.NORTH);
 		// Effects GUI portion
-		JPanel effects = new JPanel(new BorderLayout());
+		JSplitPane effects = new JSplitPane();
 		JScrollPane affectedScrollPane = ComponentFactory
 				.createScrollPane(this.affectedAxioms);
 		JScrollPane instantiatedScrollPane = ComponentFactory
@@ -126,8 +132,8 @@ public class OPPLView extends AbstractOWLViewComponent implements
 				.createTitledBorder("Instantiated axioms: "));
 		affectedScrollPane.setBorder(ComponentFactory
 				.createTitledBorder("Affected axioms:"));
-		effects.add(affectedScrollPane, BorderLayout.WEST);
-		effects.add(instantiatedScrollPane, BorderLayout.CENTER);
+		effects.add(affectedScrollPane, JSplitPane.LEFT);
+		effects.add(instantiatedScrollPane, JSplitPane.RIGHT);
 		this.add(effects, BorderLayout.CENTER);
 		this.add(this.execute, BorderLayout.SOUTH);
 		this.statementModel = new ProtegeOPPLStatementModel(this
@@ -177,9 +183,20 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.evaluate.setEnabled(newState);
 		ListModel model = this.affectedAxioms.getModel();
 		((DefaultListModel) model).clear();
-		this.instantiatedAxiomsList.setModel(new DefaultListModel());
-		this.statementModel.setOPPLStatement(this.opplStatementExpressionEditor
-				.getText());
+		if (newState) {
+			this.instantiatedAxiomsList.setModel(new DefaultListModel());
+			this.statementModel
+					.setOPPLStatement(this.opplStatementExpressionEditor
+							.getText());
+			ConstraintSystem constraintSystem = this.statementModel
+					.getOpplStatement().getConstraintSystem();
+			ListCellRenderer cellRenderer = this.affectedAxioms
+					.getCellRenderer();
+			if (cellRenderer instanceof VariableAxiomRenderer) {
+				((VariableAxiomRenderer) cellRenderer)
+						.setConstraintSystem(constraintSystem);
+			}
+		}
 	}
 
 	public void ontologiesChanged(List<? extends OWLOntologyChange> changes)
@@ -206,11 +223,11 @@ public class OPPLView extends AbstractOWLViewComponent implements
 					.getModel();
 			model.clear();
 			for (OWLAxiomChange axiomChange : changes) {
-				if (!model.contains(axiomChange)) {
-					model.addAction(axiomChange);
-				}
+				model.addAction(axiomChange);
 			}
 			this.revalidate();
+			System.out.println("Size: "
+					+ this.affectedAxioms.getModel().getSize());
 			this.updateInstantiatedAxioms();
 		}
 	}

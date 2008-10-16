@@ -25,7 +25,7 @@
      xmlns:owl2="http://www.w3.org/2006/12/owl2#">
     <owl:Ontology rdf:about="">
         <patterns:Hierarchy rdf:datatype="&xsd;string"
-            >?root:CLASS , ?children:CLASS BEGIN ADD ?children subClassOf ?root ADD ?children disjointWith ?children END;  Hierarchy with ?root as root and ?children as children all disjoint</patterns:Hierarchy>
+            >?root:CLASS , ?children:CLASS BEGIN ADD ?children subClassOf ?root, ADD ?children disjointWith ?children END;  Hierarchy with ?root as root and ?children as children all disjoint</patterns:Hierarchy>
         <patterns:FreeMenu rdf:datatype="&xsd;string"
             >?x:CLASS BEGIN ADD $thisClass SubClassOf contains only ($Free(?x) ) END;  A ?x free menu</patterns:FreeMenu>
         <patterns:Free rdf:datatype="&xsd;string"

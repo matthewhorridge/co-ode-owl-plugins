@@ -29,7 +29,6 @@ import org.coode.oppl.variablemansyntax.ProtegeScopeVariableChecker;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.entity.OWLEntityFactory;
-import org.protege.editor.owl.model.parser.ProtegeOWLEntityChecker;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLDataFactory;
@@ -60,7 +59,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	 * @see org.coode.oppl.OPPLAbstractFactory#getOWLEntityChecker()
 	 */
 	public OWLEntityChecker getOWLEntityChecker() {
-		return new ProtegeOWLEntityChecker(this.modelManager);
+		return new RenderingOWLEntityChecker(this.modelManager);
 	}
 
 	/**

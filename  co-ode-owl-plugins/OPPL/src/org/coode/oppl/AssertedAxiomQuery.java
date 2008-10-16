@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.OWLObjectInstatiator;
+import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.PossibleValueExtractor;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
@@ -110,53 +110,57 @@ public class AssertedAxiomQuery implements AxiomQuery {
 		Set<BindingNode> holdingAssignments = new HashSet<BindingNode>();
 		for (OWLOntology ontology : this.ontologies) {
 			for (OWLAxiom ontologyAxiom : ontology.getAxioms()) {
-				Set<BindingNode> leaves = null;
-				if (this.constraintSystem.getLeaves() == null) {
-					for (Variable variable : axiomVariables) {
-						this.extractPossibleValues(variable, ontologyAxiom);
-					}
-					BindingNode bindingNode = new BindingNode(
-							new HashSet<Assignment>(), axiomVariables);
-					LeafBrusher leafBrusher = new LeafBrusher();
-					bindingNode.accept(leafBrusher);
-					leaves = leafBrusher.getLeaves();
-				} else {
-					leaves = new HashSet<BindingNode>(this.constraintSystem
-							.getLeaves());
-					// Expand the leaves for possible new variables introduce by
-					// this new axiom
-					for (BindingNode leaf : new HashSet<BindingNode>(leaves)) {
-						Set<Variable> unassignedVariables = new HashSet<Variable>(
-								axiomVariables);
-						unassignedVariables.removeAll(leaf
-								.getAssignedVariables());
-						if (!unassignedVariables.isEmpty()) {
-							for (Variable variable : unassignedVariables) {
-								this.extractPossibleValues(variable,
-										ontologyAxiom);
-							}
-							BindingNode bindingNode = new BindingNode(leaf
-									.getAssignments(), unassignedVariables);
-							LeafBrusher leafBrusher = new LeafBrusher();
-							bindingNode.accept(leafBrusher);
-							Set<BindingNode> newLeaves = leafBrusher
-									.getLeaves();
-							if (!newLeaves.isEmpty()) {
-								leaves.remove(leaf);
-								leaves.addAll(newLeaves);
+				if (ontologyAxiom.getClass().isAssignableFrom(axiom.getClass())) {
+					Set<BindingNode> leaves = null;
+					if (this.constraintSystem.getLeaves() == null) {
+						for (Variable variable : axiomVariables) {
+							this.extractPossibleValues(variable, ontologyAxiom);
+						}
+						BindingNode bindingNode = new BindingNode(
+								new HashSet<Assignment>(), axiomVariables);
+						LeafBrusher leafBrusher = new LeafBrusher();
+						bindingNode.accept(leafBrusher);
+						leaves = leafBrusher.getLeaves();
+					} else {
+						leaves = new HashSet<BindingNode>(this.constraintSystem
+								.getLeaves());
+						// Expand the leaves for possible new variables introduce by
+						// this new axiom
+						for (BindingNode leaf : new HashSet<BindingNode>(leaves)) {
+							Set<Variable> unassignedVariables = new HashSet<Variable>(
+									axiomVariables);
+							unassignedVariables.removeAll(leaf
+									.getAssignedVariables());
+							if (!unassignedVariables.isEmpty()) {
+								for (Variable variable : unassignedVariables) {
+									this.extractPossibleValues(variable,
+											ontologyAxiom);
+								}
+								BindingNode bindingNode = new BindingNode(leaf
+										.getAssignments(), unassignedVariables);
+								LeafBrusher leafBrusher = new LeafBrusher();
+								bindingNode.accept(leafBrusher);
+								Set<BindingNode> newLeaves = leafBrusher
+										.getLeaves();
+								if (!newLeaves.isEmpty()) {
+									leaves.remove(leaf);
+									leaves.addAll(newLeaves);
+								}
 							}
 						}
 					}
-				}
-				for (BindingNode leaf : new HashSet<BindingNode>(leaves)) {
-					if (leaf.getAssignedVariables().containsAll(axiomVariables)) {
-						OWLObjectInstatiator objectInstatiator = new OWLObjectInstatiator(
-								leaf, this.constraintSystem, this.dataFactory);
-						OWLAxiom instantiatedAxiom = (OWLAxiom) axiom
-								.accept(objectInstatiator);
-						if (this.locateAxiom(instantiatedAxiom)) {
-							holdingAssignments.add(leaf);
-							this.instantiatedAxioms.add(instantiatedAxiom);
+					for (BindingNode leaf : new HashSet<BindingNode>(leaves)) {
+						if (leaf.getAssignedVariables().containsAll(
+								axiomVariables)) {
+							OWLObjectInstantiator objectInstatiator = new OWLObjectInstantiator(
+									leaf, this.constraintSystem,
+									this.dataFactory);
+							OWLAxiom instantiatedAxiom = (OWLAxiom) axiom
+									.accept(objectInstatiator);
+							if (this.locateAxiom(instantiatedAxiom)) {
+								holdingAssignments.add(leaf);
+								this.instantiatedAxioms.add(instantiatedAxiom);
+							}
 						}
 					}
 				}

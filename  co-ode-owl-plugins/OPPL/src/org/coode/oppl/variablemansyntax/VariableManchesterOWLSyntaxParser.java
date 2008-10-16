@@ -286,7 +286,7 @@ public class VariableManchesterOWLSyntaxParser extends
 	public OWLObjectPropertyAxiom parseObjectPropertyAxiom()
 			throws ParserException {
 		String tok = this.getToken().getToken();
-		if (tok.equals(ManchesterOWLSyntax.FUNCTIONAL.toString())) {
+		if (tok.compareToIgnoreCase(ManchesterOWLSyntax.FUNCTIONAL.toString()) == 0) {
 			this.consumeToken();
 			String open = this.consumeToken();
 			if (!open.equals("(")) {
@@ -300,7 +300,8 @@ public class VariableManchesterOWLSyntaxParser extends
 			}
 			return this.getDataFactory().getOWLFunctionalObjectPropertyAxiom(
 					prop);
-		} else if (tok.equals(ManchesterOWLSyntax.TRANSITIVE.toString())) {
+		} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.TRANSITIVE
+				.toString()) == 0) {
 			this.consumeToken();
 			String open = this.consumeToken();
 			if (!open.equals("(")) {
@@ -314,7 +315,8 @@ public class VariableManchesterOWLSyntaxParser extends
 			}
 			return this.getDataFactory().getOWLTransitiveObjectPropertyAxiom(
 					prop);
-		} else if (tok.equals(ManchesterOWLSyntax.SYMMETRIC.toString())) {
+		} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.SYMMETRIC
+				.toString()) == 0) {
 			this.consumeToken();
 			String open = this.consumeToken();
 			if (!open.equals("(")) {
@@ -328,7 +330,8 @@ public class VariableManchesterOWLSyntaxParser extends
 			}
 			return this.getDataFactory().getOWLSymmetricObjectPropertyAxiom(
 					prop);
-		} else if (tok.equals(ManchesterOWLSyntax.REFLEXIVE.toString())) {
+		} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.REFLEXIVE
+				.toString()) == 0) {
 			this.consumeToken();
 			String open = this.consumeToken();
 			if (!open.equals("(")) {
@@ -342,7 +345,8 @@ public class VariableManchesterOWLSyntaxParser extends
 			}
 			return this.getDataFactory().getOWLReflexiveObjectPropertyAxiom(
 					prop);
-		} else if (tok.equals(ManchesterOWLSyntax.IRREFLEXIVE.toString())) {
+		} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.IRREFLEXIVE
+				.toString()) == 0) {
 			this.consumeToken();
 			String open = this.consumeToken();
 			if (!open.equals("(")) {
@@ -356,7 +360,8 @@ public class VariableManchesterOWLSyntaxParser extends
 			}
 			return this.getDataFactory().getOWLIrreflexiveObjectPropertyAxiom(
 					prop);
-		} else if (tok.equals(ManchesterOWLSyntax.ANTI_SYMMETRIC.toString())) {
+		} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.ANTI_SYMMETRIC
+				.toString()) == 0) {
 			this.consumeToken();
 			String open = this.consumeToken();
 			if (!open.equals("(")) {
@@ -374,38 +379,43 @@ public class VariableManchesterOWLSyntaxParser extends
 			OWLObjectPropertyExpression property = this
 					.parseObjectPropertyExpression();
 			tok = this.consumeToken();
-			if (tok.equals(ManchesterOWLSyntax.EQUIVALENT_TO.toString())) {
+			if (tok.compareToIgnoreCase(ManchesterOWLSyntax.EQUIVALENT_TO
+					.toString()) == 0) {
 				Set<OWLObjectPropertyExpression> equivalentProperties = this
 						.parseObjectPropertyList();
 				equivalentProperties.add(property);
 				return this.getDataFactory()
 						.getOWLEquivalentObjectPropertiesAxiom(
 								equivalentProperties);
-			} else if (tok.equals(ManchesterOWLSyntax.DISJOINT_WITH.toString())) {
+			} else if (tok
+					.compareToIgnoreCase(ManchesterOWLSyntax.DISJOINT_WITH
+							.toString()) == 0) {
 				Set<OWLObjectPropertyExpression> disjointProperties = this
 						.parseObjectPropertyList();
 				disjointProperties.add(property);
 				return this
 						.getDataFactory()
 						.getOWLDisjointObjectPropertiesAxiom(disjointProperties);
-			} else if (tok.equals(ManchesterOWLSyntax.SUB_PROPERTY_OF
-					.toString())) {
+			} else if (tok
+					.compareToIgnoreCase(ManchesterOWLSyntax.SUB_PROPERTY_OF
+							.toString()) == 0) {
 				OWLObjectPropertyExpression superProperty = this
 						.parseObjectPropertyExpression();
 				return this.getDataFactory().getOWLSubObjectPropertyAxiom(
 						property, superProperty);
-			} else if (tok.equalsIgnoreCase(ManchesterOWLSyntax.DOMAIN
-					.toString())) {
+			} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.DOMAIN
+					.toString()) == 0) {
 				OWLDescription domain = this.parseDescription();
 				return this.getDataFactory().getOWLObjectPropertyDomainAxiom(
 						property, domain);
-			} else if (tok.equalsIgnoreCase(ManchesterOWLSyntax.RANGE
-					.toString())) {
+			} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.RANGE
+					.toString()) == 0) {
 				OWLDescription range = this.parseDescription();
 				return this.getDataFactory().getOWLObjectPropertyRangeAxiom(
 						property, range);
-			} else if (tok.equals(ManchesterOWLSyntax.INVERSE_FUNCTIONAL
-					.toString())) {
+			} else if (tok
+					.compareToIgnoreCase(ManchesterOWLSyntax.INVERSE_FUNCTIONAL
+							.toString()) == 0) {
 				String open = this.consumeToken();
 				if (!open.equals("(")) {
 					this.throwException("(");
@@ -418,7 +428,8 @@ public class VariableManchesterOWLSyntaxParser extends
 				}
 				return this.getDataFactory()
 						.getOWLInverseFunctionalObjectPropertyAxiom(prop);
-			} else if (tok.equals(ManchesterOWLSyntax.INVERSE_OF.toString())) {
+			} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.INVERSE_OF
+					.toString()) == 0) {
 				String open = this.consumeToken();
 				if (!open.equals("(")) {
 					this.throwException("(");
@@ -493,12 +504,12 @@ public class VariableManchesterOWLSyntaxParser extends
 				return this.getDataFactory()
 						.getOWLObjectPropertyAssertionAxiom(individual,
 								objectProperty, filler);
+			} else if (tok.compareToIgnoreCase("InstanceOf") == 0) {
+				this.consumeToken();
+				OWLDescription description = this.parseDescription();
+				return this.getDataFactory().getOWLClassAssertionAxiom(
+						individual, description);
 			}
-		} else {
-			OWLDescription description = this.parseDescription();
-			OWLIndividual individual = this.parseIndividual();
-			return this.getDataFactory().getOWLClassAssertionAxiom(individual,
-					description);
 		}
 		return null;
 	}

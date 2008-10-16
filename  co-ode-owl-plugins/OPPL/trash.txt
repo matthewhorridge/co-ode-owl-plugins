@@ -125,3 +125,30 @@ BEGIN
  ADD ?indicantObservation equivalentTo !Observation that !observes some ?indicant 
 END;
 
+ ?clinHolder:CLASS[subClassOf Clin_holder], ?indicant:CLASS[subClassOf Indicant], ?observation:CLASS=create(?indicant.RENDERING+"Observation")
+BEGIN 
+ADD ?observation subClassOf Clinical_observation_act, 
+ADD !observes subPropertyOf clinical_properties, 
+ADD ?observation subClassOf !observes some ?indicant, 
+REMOVE ?clinHolder equivalentTo ?clinHolder
+                         and references some ?indicant, 
+ADD ?clinHolder equivalentTo ?clinHolder
+                         and !observes some ?indicant
+                         and references some Clinical_observation_act
+END;
+
+ ?country:INDIVIDUAL[instanceOf Country], ?adiacentCountry:INDIVIDUAL[instanceOf Country]
+BEGIN 
+REMOVE ?country adjacentTo ?adiacentCountry, 
+ADD ?country instanceOf hasLandBoundary some (LandBoundaryFragment
+                                          and boundaryOf value ?adiacentCountry)
+END;
+
+ ?country:INDIVIDUAL[instanceOf Country], ?adiacentCountry:INDIVIDUAL[instanceOf Country]
+SELECT  ?country adjacentTo ?adiacentCountry
+BEGIN 
+REMOVE ?country adjacentTo ?adiacentCountry, 
+ADD ?country instanceOf hasLandBoundary some (LandBoundaryFragment
+                                          and boundaryOf value ?adiacentCountry)
+END;
+
