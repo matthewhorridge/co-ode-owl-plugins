@@ -97,8 +97,9 @@ public class GeneratedVariable implements Variable {
 			VariableScopeChecker variableScopeChecker) {
 	}
 
-	public void addPossibleBinding(OWLObject object)
+	public boolean addPossibleBinding(OWLObject object)
 			throws OWLReasonerException {
+		return false;
 	}
 
 	public void clearBindings() {
@@ -183,7 +184,8 @@ public class GeneratedVariable implements Variable {
 				+ "#" + aValue);
 	}
 
-	public void removePossibleBinding(OWLObject object) {
+	public boolean removePossibleBinding(OWLObject object) {
+		return false;
 	}
 
 	public static GeneratedVariable buildGeneratedVariable(String name,

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.OWLObjectInstatiator;
+import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
@@ -52,7 +52,7 @@ public class ActionFactory {
 		OWLAxiomChange axiomChange = null;
 		if (leaves != null) {
 			for (BindingNode bindingNode : leaves) {
-				OWLObjectInstatiator instatiator = new OWLObjectInstatiator(
+				OWLObjectInstantiator instatiator = new OWLObjectInstantiator(
 						bindingNode, cs, owlDataFactory);
 				OWLAxiom instantiatedAxiom = (OWLAxiom) axiom
 						.accept(instatiator);

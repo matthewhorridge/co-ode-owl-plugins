@@ -234,9 +234,9 @@ TOKEN : /* MANSYNTAX KEYWORDS */
 TOKEN : /* VARIABLE SCOPE OTHER DIRECTIONS */
 {
 	<OTHERDIRECTION: <SUPERCLASSOF> |<SUPER_PROPERTY_OF> |<INSTANCE_OF>>
-	| <#SUPERCLASSOF: "SuperClassOf">
-	|<#SUPER_PROPERTY_OF: "SuperPropertyOf">
-	|<#INSTANCE_OF: "InstanceOf">
+	| <#SUPERCLASSOF: "SuperClassOf"|"superClassOf">
+	|<#SUPER_PROPERTY_OF: "SuperPropertyOf"|"superPropertyOf">
+	|<#INSTANCE_OF: "InstanceOf"|"instanceOf">
 }
 
 

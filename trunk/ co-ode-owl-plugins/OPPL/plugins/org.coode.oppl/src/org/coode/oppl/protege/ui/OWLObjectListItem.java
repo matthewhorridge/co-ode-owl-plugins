@@ -22,39 +22,46 @@
  */
 package org.coode.oppl.protege.ui;
 
-import java.awt.Component;
-
-import javax.swing.JList;
-import javax.swing.ListCellRenderer;
-
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-import org.semanticweb.owl.model.OWLAxiomChange;
+import org.protege.editor.core.ui.list.MListItem;
+import org.semanticweb.owl.model.OWLObject;
 
 /**
  * @author Luigi Iannone
  * 
  */
-public class AffectedAxiomRenderer implements ListCellRenderer {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 6631014357184600262L;
-	private OWLCellRenderer owlRenderer;
+public class OWLObjectListItem implements MListItem {
+	private final OWLObject owlObject;
 
-	public AffectedAxiomRenderer(OWLEditorKit owlEditorKit) {
-		this.owlRenderer = new OWLCellRenderer(owlEditorKit);
+	/**
+	 * @param owlObject
+	 */
+	public OWLObjectListItem(OWLObject owlObject) {
+		this.owlObject = owlObject;
 	}
 
-	public Component getListCellRendererComponent(JList list, Object value,
-			int index, boolean isSelected, boolean cellHasFocus) {
-		OWLAxiomChange change = ((ActionListItem) value).getAxiomChange();
-		this.owlRenderer.setTransparent();
-		this.owlRenderer.setHighlightKeywords(true);
-		this.owlRenderer.setWrap(true);
-		Component listCellRendererComponent = this.owlRenderer
-				.getListCellRendererComponent(list, change.getAxiom(), index,
-						isSelected, cellHasFocus);
-		return listCellRendererComponent;
+	public String getTooltip() {
+		return this.owlObject.toString();
+	}
+
+	public boolean handleDelete() {
+		return false;
+	}
+
+	public void handleEdit() {
+	}
+
+	public boolean isDeleteable() {
+		return false;
+	}
+
+	public boolean isEditable() {
+		return false;
+	}
+
+	/**
+	 * @return the owlObject
+	 */
+	public OWLObject getOwlObject() {
+		return this.owlObject;
 	}
 }

@@ -62,13 +62,16 @@ public final class VariableImpl implements InputVariable {
 		return this.type;
 	}
 
-	public void addPossibleBinding(OWLObject owlObject)
+	public boolean addPossibleBinding(OWLObject owlObject)
 			throws OWLReasonerException {
 		if (this.variableScopeChecker == null
 				|| this.variableScope == null
 				|| this.variableScope.check(owlObject,
 						this.variableScopeChecker)) {
 			this.possibleBindings.add(owlObject);
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -81,8 +84,8 @@ public final class VariableImpl implements InputVariable {
 		return this.possibleBindings;
 	}
 
-	public void removePossibleBinding(OWLObject uri) {
-		this.possibleBindings.remove(uri);
+	public boolean removePossibleBinding(OWLObject uri) {
+		return this.possibleBindings.remove(uri);
 	}
 
 	@Override

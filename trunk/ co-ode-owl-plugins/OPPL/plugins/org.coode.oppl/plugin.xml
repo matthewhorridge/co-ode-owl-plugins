@@ -7,6 +7,13 @@
 		<headerColor value="@org.protege.ontologycolor"/>
         <category value="@org.protege.ontologycategory"/>
   	</extension>
+  	<extension id="OPPLMacroView"
+			point="org.protege.editor.core.application.ViewComponent">
+  		<label value="OPPL Macros"/>
+  		<class value="org.coode.oppl.protege.ui.OPPLMacroView"/>
+		<headerColor value="@org.protege.ontologycolor"/>
+        <category value="@org.protege.ontologycategory"/>
+  	</extension>  	
   	<!-- TABS -->
   	<extension id="OPPLTab"
                 point="org.protege.editor.core.application.WorkspaceTab">

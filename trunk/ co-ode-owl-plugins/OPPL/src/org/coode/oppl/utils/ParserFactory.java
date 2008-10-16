@@ -93,6 +93,8 @@ public class ParserFactory {
 			OPPLParser.ReInit(new StringReader(formulaBody), manager
 					.getOWLOntologyManager(), cs);
 		}
+		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager, OPPLParser
+				.getConstraintSystem(), manager.getOWLDataFactory()));
 		OPPLParser
 				.setAutoCompleterMatcher(new AutoCompleterMatcherImpl(manager));
 		return parser;

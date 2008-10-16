@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.OWLObjectInstatiator;
+import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
@@ -120,7 +120,7 @@ public class InferredAxiomQuery implements AxiomQuery {
 		bindingNode.accept(leafBrusher);
 		Set<BindingNode> leaves = leafBrusher.getLeaves();
 		for (BindingNode leaf : new HashSet<BindingNode>(leaves)) {
-			OWLObjectInstatiator instantiator = new OWLObjectInstatiator(leaf,
+			OWLObjectInstantiator instantiator = new OWLObjectInstantiator(leaf,
 					this.constraintSystem, this.dataFactory);
 			OWLAxiom instatiatedAxiom = (OWLAxiom) axiom.accept(instantiator);
 			if (this.locateAxiom(instatiatedAxiom)) {

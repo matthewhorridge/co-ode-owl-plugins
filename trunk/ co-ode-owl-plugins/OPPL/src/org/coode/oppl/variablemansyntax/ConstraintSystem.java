@@ -131,7 +131,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 
 	public Variable createVariable(String name, VariableType type)
 			throws OPPLException {
-		if (name.matches("\\?([a-zA-Z])+")) {
+		if (name.matches("\\?([\\p{Alnum}[-_]])+")) {
 			VariableImpl newVariable = new VariableImpl(name.trim(), type);
 			this.variables.put(name, newVariable);
 			return newVariable;

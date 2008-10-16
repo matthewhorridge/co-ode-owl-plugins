@@ -73,7 +73,7 @@ public interface Variable {
 	 * @param object
 	 * @throws OWLReasonerException
 	 */
-	void addPossibleBinding(OWLObject object) throws OWLReasonerException;
+	boolean addPossibleBinding(OWLObject object) throws OWLReasonerException;
 
 	/**
 	 * @return the currently possible values that a Variable can assume
@@ -86,7 +86,7 @@ public interface Variable {
 	 * 
 	 * @param object
 	 */
-	void removePossibleBinding(OWLObject object);
+	boolean removePossibleBinding(OWLObject object);
 
 	/**
 	 * Empties the set of current possible values for the Variable

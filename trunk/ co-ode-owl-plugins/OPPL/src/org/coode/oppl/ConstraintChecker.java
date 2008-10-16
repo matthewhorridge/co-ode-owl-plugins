@@ -23,7 +23,7 @@
 package org.coode.oppl;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.OWLObjectInstatiator;
+import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.model.OWLDataFactory;
@@ -56,7 +56,7 @@ public class ConstraintChecker implements ConstraintVisitor<Boolean> {
 	 */
 	public Boolean visit(Constraint c) {
 		OWLObject expression = c.getExpression();
-		OWLObjectInstatiator instantiator = new OWLObjectInstatiator(
+		OWLObjectInstantiator instantiator = new OWLObjectInstantiator(
 				this.bindingNode, this.constraintSystem, this.dataFactory);
 		OWLObject instantiatedObject = expression.accept(instantiator);
 		Variable variable = c.getVariable();
