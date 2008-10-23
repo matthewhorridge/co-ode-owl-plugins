@@ -195,7 +195,7 @@ public class GeneratedVariable implements Variable {
 
 	@Override
 	public String toString() {
-		return this.name + ":" + this.type;
+		return this.name + ":" + this.type + "=" + this.value.toString();
 	}
 
 	public <P> P accept(VariableVisitor<P> visitor) {

@@ -20,58 +20,35 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oppl;
+package org.coode.oppl.protege;
 
-import java.io.StringWriter;
-
+import org.coode.oppl.Constraint;
+import org.coode.oppl.protege.ui.ShortFormVariableOWLEntityRenderer;
+import org.coode.oppl.protege.ui.VariableOWLObjectRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.Variable;
-import org.semanticweb.owl.model.OWLObject;
-
-import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
+import org.protege.editor.owl.model.OWLModelManager;
 
 /**
  * @author Luigi Iannone
  * 
  */
-public class Constraint {
-	protected Variable variable;
-	protected OWLObject expression;
+public class ProtegeConstraint extends Constraint {
+	private ShortFormVariableOWLEntityRenderer entityRenderer;
+	private final VariableOWLObjectRenderer variableOWLObjectRenderer;
 
-	/**
-	 * @param variable
-	 * @param expression
-	 */
-	public Constraint(Variable variable, OWLObject expression) {
-		this.variable = variable;
-		this.expression = expression;
+	public ProtegeConstraint(Constraint constraint, OWLModelManager modelManager) {
+		super(constraint.getVariable(), constraint.getExpression());
+		this.variableOWLObjectRenderer = new VariableOWLObjectRenderer(
+				modelManager);
 	}
 
-	/**
-	 * @return the variable
-	 */
-	public Variable getVariable() {
-		return this.variable;
-	}
-
-	/**
-	 * @return the expression
-	 */
-	public OWLObject getExpression() {
-		return this.expression;
-	}
-
-	public <O> O accept(ConstraintVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
+	@Override
 	public String toString(ConstraintSystem constraintSystem) {
-		StringWriter writer = new StringWriter();
-		ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
-				writer);
-		renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
-				constraintSystem));
-		this.expression.accept(renderer);
-		return this.variable.getName() + " != " + writer.toString();
+		this.entityRenderer = new ShortFormVariableOWLEntityRenderer(
+				constraintSystem);
+		return this.variable.getName()
+				+ " != "
+				+ this.variableOWLObjectRenderer.render(this.getExpression(),
+						this.entityRenderer);
 	}
 }

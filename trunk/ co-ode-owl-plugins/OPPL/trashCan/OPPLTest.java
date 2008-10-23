@@ -35,7 +35,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.coode.oppl.ChangeExtractor;
-import org.coode.oppl.syntax.OPPLStart;
+import org.coode.oppl.OPPLScript;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasoner;
@@ -132,7 +132,7 @@ public class OPPLTest extends TestCase {
 		for (OPPLTestStart test : this.tests) {
 			OWLOntology ontology = test.getOWLOntology();
 			changeExtractor = new ChangeExtractor(ontology, ontologyManager);
-			OPPLStart statement = test.getStatement();
+			OPPLScript statement = test.getStatement();
 			statement.jjtAccept(changeExtractor, null);
 			List<OWLAxiomChange> changes = changeExtractor.getChanges();
 			Set<OWLAxiom> changeAxioms = new HashSet<OWLAxiom>();

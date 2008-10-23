@@ -24,22 +24,10 @@ package org.coode.oppl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import org.coode.oppl.syntax.Node;
-import org.coode.oppl.syntax.OPPLAction;
-import org.coode.oppl.syntax.OPPLActions;
-import org.coode.oppl.syntax.OPPLClause;
-import org.coode.oppl.syntax.OPPLConstraint;
-import org.coode.oppl.syntax.OPPLOWLExpression;
 import org.coode.oppl.syntax.OPPLParser;
-import org.coode.oppl.syntax.OPPLParserVisitor;
-import org.coode.oppl.syntax.OPPLQuery;
-import org.coode.oppl.syntax.OPPLStart;
-import org.coode.oppl.syntax.OPPLVariableDefinition;
-import org.coode.oppl.syntax.OPPLparseScope;
-import org.coode.oppl.syntax.OPPLtypeScope;
-import org.coode.oppl.syntax.SimpleNode;
+import org.coode.oppl.variablemansyntax.Variable;
+import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLOntology;
@@ -51,7 +39,8 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  * @author Luigi Iannone
  * 
  */
-public class ChangeExtractor implements OPPLParserVisitor {
+public class ChangeExtractor implements
+		OPPLScriptVisitorEx<List<OWLAxiomChange>> {
 	protected OWLOntologyManager ontologyManager;
 	protected OWLOntology ontology;
 	protected List<OWLAxiomChange> changes = new ArrayList<OWLAxiomChange>();
@@ -65,99 +54,138 @@ public class ChangeExtractor implements OPPLParserVisitor {
 		this.ontologyManager = ontologyManager;
 	}
 
-	/**
-	 * @see org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.SimpleNode,
-	 *      java.lang.Object)
-	 */
-	public Object visit(SimpleNode node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLStart,
-	 *      java.lang.Object)
-	 */
-	public Object visit(OPPLStart node, Object data) {
-		return node.childrenAccept(this, data);
-	}
-
-	/**
-	 * @see org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLActions,
-	 *      java.lang.Object)
-	 */
-	public Object visit(OPPLActions node, Object data) {
-		return node.childrenAccept(this, data);
-	}
-
-	/**
-	 * @see org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLVariableDefinition,
-	 *      java.lang.Object)
-	 */
-	public Object visit(OPPLVariableDefinition node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLQuery,
-	 *      java.lang.Object)
-	 */
-	public Object visit(OPPLQuery node, Object data) {
-		Set<OWLAxiom> axioms = node.getAxioms();
-		for (OWLAxiom axiom : axioms) {
-			OPPLParser.getConstraintSystem().addAxiom(axiom);
-		}
-		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-			Node child = node.jjtGetChild(i);
-			if (child instanceof OPPLConstraint) {
-				Constraint c = (Constraint) child.jjtAccept(this, data);
+	public List<OWLAxiomChange> visit(OPPLQuery q, List<OWLAxiomChange> p) {
+		if (q != null) {
+			List<OWLAxiom> axioms = q.getAssertedAxioms();
+			for (OWLAxiom axiom : axioms) {
+				OPPLParser.getConstraintSystem().addAssertedAxiom(axiom);
+			}
+			axioms = q.getAxioms();
+			for (OWLAxiom axiom : axioms) {
+				OPPLParser.getConstraintSystem().addAxiom(axiom);
+			}
+			for (Constraint c : q.getConstraints()) {
 				OPPLParser.getConstraintSystem().addConstraint(c);
 			}
 		}
 		return null;
 	}
 
-	/**
-	 * @see org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLAction,
-	 *      java.lang.Object)
-	 */
-	public Object visit(OPPLAction node, Object data) {
-		String action = node.getAction();
-		OWLAxiom axiom = node.getAxiom();
-		this.changes.addAll(ActionFactory.createChange(ActionType
-				.valueOf(action), axiom, OPPLParser.getConstraintSystem(),
-				this.ontologyManager.getOWLDataFactory(), this.ontology));
-		return this.changes;
-	}
-
-	/**
-	 * @see org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLClause,
-	 *      java.lang.Object)
-	 */
-	public Object visit(OPPLClause node, Object data) {
+	public List<OWLAxiomChange> visit(Variable v, List<OWLAxiomChange> p) {
 		return null;
 	}
 
-	/**
-	 * @return the changes
-	 */
-	public List<OWLAxiomChange> getChanges() {
-		return this.changes;
+	public List<OWLAxiomChange> visitActions(List<OWLAxiomChange> changes,
+			List<OWLAxiomChange> p) {
+		p = new ArrayList<OWLAxiomChange>();
+		for (OWLAxiomChange change : changes) {
+			String action = change instanceof AddAxiom ? "ADD" : "REMOVE";
+			p.addAll(ActionFactory.createChange(ActionType.valueOf(action),
+					change.getAxiom(), OPPLParser.getConstraintSystem(),
+					this.ontologyManager.getOWLDataFactory(), this.ontology));
+		}
+		return p;
 	}
-
-	public Object visit(OPPLConstraint node, Object data) {
-		Constraint c = new Constraint(node.getVariable(), node.getExpression());
-		return c;
-	}
-
-	public Object visit(OPPLOWLExpression node, Object data) {
-		return null;
-	}
-
-	public Object visit(OPPLtypeScope node, Object data) {
-		return null;
-	}
-
-	public Object visit(OPPLparseScope node, Object data) {
-		return null;
-	}
+	// /**
+	// * @see
+	// org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.SimpleNode,
+	// * java.lang.Object)
+	// */
+	// public Object visit(SimpleNode node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLStart,
+	// * java.lang.Object)
+	// */
+	// public Object visit(OPPLStart node, Object data) {
+	// return node.childrenAccept(this, data);
+	// }
+	//
+	// /**
+	// * @see
+	// org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLActions,
+	// * java.lang.Object)
+	// */
+	// public Object visit(OPPLActions node, Object data) {
+	// return node.childrenAccept(this, data);
+	// }
+	//
+	// /**
+	// * @see
+	// org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLVariableDefinition,
+	// * java.lang.Object)
+	// */
+	// public Object visit(OPPLVariableDefinition node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLQuery,
+	// * java.lang.Object)
+	// */
+	// public Object visit(OPPLQuery node, Object data) {
+	// Set<OWLAxiom> axioms = node.getAxioms();
+	// for (OWLAxiom axiom : axioms) {
+	// OPPLParser.getConstraintSystem().addAxiom(axiom);
+	// }
+	// for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+	// Node child = node.jjtGetChild(i);
+	// if (child instanceof OPPLConstraint) {
+	// Constraint c = (Constraint) child.jjtAccept(this, data);
+	// OPPLParser.getConstraintSystem().addConstraint(c);
+	// }
+	// }
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLAction,
+	// * java.lang.Object)
+	// */
+	// public Object visit(OPPLAction node, Object data) {
+	// String action = node.getAction();
+	// OWLAxiom axiom = node.getAxiom();
+	// this.changes.addAll(ActionFactory.createChange(ActionType
+	// .valueOf(action), axiom, OPPLParser.getConstraintSystem(),
+	// this.ontologyManager.getOWLDataFactory(), this.ontology));
+	// return this.changes;
+	// }
+	//
+	// /**
+	// * @see
+	// org.coode.oppl.syntax.OPPLParserVisitor#visit(org.coode.oppl.syntax.OPPLClause,
+	// * java.lang.Object)
+	// */
+	// public Object visit(OPPLClause node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @return the changes
+	// */
+	// public List<OWLAxiomChange> getChanges() {
+	// return this.changes;
+	// }
+	//
+	// public Object visit(OPPLConstraint node, Object data) {
+	// Constraint c = new Constraint(node.getVariable(), node.getExpression());
+	// return c;
+	// }
+	//
+	// public Object visit(OPPLOWLExpression node, Object data) {
+	// return null;
+	// }
+	//
+	// public Object visit(OPPLtypeScope node, Object data) {
+	// return null;
+	// }
+	//
+	// public Object visit(OPPLparseScope node, Object data) {
+	// return null;
+	// }
 }

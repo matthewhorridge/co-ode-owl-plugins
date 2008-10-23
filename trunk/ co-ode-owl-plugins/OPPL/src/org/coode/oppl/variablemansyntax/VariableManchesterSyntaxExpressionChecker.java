@@ -22,7 +22,7 @@
  */
 package org.coode.oppl.variablemansyntax;
 
-import org.coode.oppl.protege.model.ProtegeOPPLStatementModel;
+import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.syntax.TokenMgrError;
@@ -36,7 +36,7 @@ import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
  * 
  */
 public class VariableManchesterSyntaxExpressionChecker implements
-		OWLExpressionChecker<ProtegeOPPLStatementModel> {
+		OWLExpressionChecker<OPPLScript> {
 	protected OWLEditorKit owlEditorKit;
 
 	public VariableManchesterSyntaxExpressionChecker(OWLEditorKit owlEditorKit) {
@@ -60,14 +60,11 @@ public class VariableManchesterSyntaxExpressionChecker implements
 	/**
 	 * @see org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker#createObject(java.lang.String)
 	 */
-	public ProtegeOPPLStatementModel createObject(String text)
+	public OPPLScript createObject(String text)
 			throws OWLExpressionParserException {
 		this.initParser(text);
 		try {
-			OPPLParser.Start();
-			ProtegeOPPLStatementModel statementModel = new ProtegeOPPLStatementModel(
-					this.owlEditorKit.getModelManager());
-			statementModel.setOPPLStatement(text);
+			OPPLScript statementModel = OPPLParser.Start();
 			return statementModel;
 		} catch (ParseException e) {
 			throw new OWLExpressionParserException(e);

@@ -44,4 +44,9 @@ public class ConcatGeneratedValues extends AggregatedGeneratedValue {
 		}
 		return toReturn;
 	}
+
+	@Override
+	protected String getAggregatorSymbol() {
+		return "+";
+	}
 }

@@ -113,16 +113,15 @@ import org.semanticweb.owl.vocab.OWLRestrictedDataRangeFacetVocabulary;
 import org.semanticweb.owl.vocab.XSDVocabulary;
 
 /**
- * Author: Matthew Horridge<br>
+ * Author: Luigi Iannone<br>
  * The University Of Manchester<br>
  * Medical Informatics Group<br>
- * Date: Apr 2, 2006<br>
+ * Date: Oct 15, 2008<br>
  * <br>
- * <p/> matthew.horridge@cs.man.ac.uk<br>
- * www.cs.man.ac.uk/~horridgm<br>
  * <br>
- * <p/> A renderer that renders objects using the Manchester OWL Syntax. Axiom
- * level OWLObjects are rendered in Manchester "style"
+ * <p/> A renderer that renders objects possibly containing variables using the
+ * Manchester OWL Syntax. Axiom level OWLObjects are rendered in Manchester
+ * "style"
  */
 public class VariableOWLObjectRenderer implements OWLObjectVisitor,
 		OWLObjectRenderer {

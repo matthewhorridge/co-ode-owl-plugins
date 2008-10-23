@@ -20,58 +20,46 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oppl;
-
-import java.io.StringWriter;
+package org.coode.oppl.protege.ui;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
-import org.semanticweb.owl.model.OWLObject;
+import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
+import org.semanticweb.owl.model.OWLEntity;
 
-import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
+public class VariableOWLEntityRenderer implements OWLEntityRenderer {
+	private final ConstraintSystem constraintSystem;
+	private final OWLModelManager modelManager;
 
-/**
- * @author Luigi Iannone
- * 
- */
-public class Constraint {
-	protected Variable variable;
-	protected OWLObject expression;
-
-	/**
-	 * @param variable
-	 * @param expression
-	 */
-	public Constraint(Variable variable, OWLObject expression) {
-		this.variable = variable;
-		this.expression = expression;
+	public String render(OWLEntity entity) {
+		Variable variable = this.getConstraintSystem().getVariable(
+				entity.getURI());
+		return variable != null ? variable.getName() : this.getModelManager()
+				.getRendering(entity);
 	}
 
 	/**
-	 * @return the variable
+	 * @param constraintSystem
+	 * @param modelManager
 	 */
-	public Variable getVariable() {
-		return this.variable;
+	public VariableOWLEntityRenderer(ConstraintSystem constraintSystem,
+			OWLModelManager modelManager) {
+		this.constraintSystem = constraintSystem;
+		this.modelManager = modelManager;
 	}
 
 	/**
-	 * @return the expression
+	 * @return the modelManager
 	 */
-	public OWLObject getExpression() {
-		return this.expression;
+	public OWLModelManager getModelManager() {
+		return this.modelManager;
 	}
 
-	public <O> O accept(ConstraintVisitor<O> visitor) {
-		return visitor.visit(this);
-	}
-
-	public String toString(ConstraintSystem constraintSystem) {
-		StringWriter writer = new StringWriter();
-		ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
-				writer);
-		renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
-				constraintSystem));
-		this.expression.accept(renderer);
-		return this.variable.getName() + " != " + writer.toString();
+	/**
+	 * @return the constraintSystem
+	 */
+	public ConstraintSystem getConstraintSystem() {
+		return this.constraintSystem;
 	}
 }

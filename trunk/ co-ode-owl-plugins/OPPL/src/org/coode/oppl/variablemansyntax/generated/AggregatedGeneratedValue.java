@@ -180,4 +180,18 @@ public abstract class AggregatedGeneratedValue implements GeneratedValue {
 		}
 		return this.aggregateValues(toAggregate);
 	}
+
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		boolean first = true;
+		for (GeneratedValue value2Aggregate : this.getValues2Aggregate()) {
+			String aggregator = first ? "" : this.getAggregatorSymbol() + " ";
+			buffer.append(aggregator);
+			buffer.append(value2Aggregate.toString());
+		}
+		return buffer.toString();
+	}
+
+	protected abstract String getAggregatorSymbol();
 }

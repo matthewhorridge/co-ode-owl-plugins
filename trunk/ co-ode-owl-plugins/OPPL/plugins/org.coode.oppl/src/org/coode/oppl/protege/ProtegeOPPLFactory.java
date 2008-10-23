@@ -22,16 +22,27 @@
  */
 package org.coode.oppl.protege;
 
+import java.io.StringWriter;
+import java.util.List;
+
 import org.coode.oppl.OPPLAbstractFactory;
 import org.coode.oppl.OPPLException;
+import org.coode.oppl.OPPLQuery;
+import org.coode.oppl.OPPLQueryImpl;
+import org.coode.oppl.OPPLScript;
+import org.coode.oppl.OPPLScriptImpl;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.ProtegeScopeVariableChecker;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.expression.OWLEntityChecker;
+import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLDataFactory;
+
+import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
 /**
  * @author Luigi Iannone
@@ -85,5 +96,29 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	 */
 	public OWLEntityFactory getOWLEntityFactory() {
 		return this.modelManager.getOWLEntityFactory();
+	}
+
+	public OPPLScript buildOPPLScript(ConstraintSystem constraintSystem,
+			List<Variable> variables, OPPLQuery opplQuery,
+			List<OWLAxiomChange> actions) {
+		ProtegeOPPLScript toReturn = new ProtegeOPPLScript(new OPPLScriptImpl(
+				constraintSystem, variables, opplQuery, actions),
+				this.modelManager);
+		return toReturn;
+	}
+
+	public OPPLQuery buildNewQuery() {
+		OPPLQuery opplQuery = new OPPLQueryImpl();
+		return new ProtegeOPPLQuery(opplQuery, this.modelManager);
+	}
+
+	public ManchesterOWLSyntaxObjectRenderer getOWLObjectRenderer(
+			StringWriter writer) {
+		ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
+				writer);
+		renderer
+				.setShortFormProvider(new ProtegeSimpleVariableShortFormProvider(
+						this.modelManager, this.constraintSystem));
+		return renderer;
 	}
 }

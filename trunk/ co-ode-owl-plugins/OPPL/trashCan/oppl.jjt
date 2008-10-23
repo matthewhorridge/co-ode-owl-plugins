@@ -19,8 +19,13 @@ import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.VariableImpl;
 import org.coode.oppl.variablemansyntax.VariableScopes.Direction;
 import org.coode.oppl.variablemansyntax.generated.*;
-import org.coode.oppl.*;
-import org.semanticweb.owl.model.*;
+import org.coode.oppl.OPPLAbstractFactory;
+import org.coode.oppl.OPPLFactory;
+import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.model.OWLObjectProperty;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.semanticweb.owl.util.BidirectionalShortFormProvider;
 import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
@@ -35,9 +40,11 @@ import java.util.ArrayList;
 import java.util.*;
 import org.semanticweb.owl.expression.ParserException;
 import org.semanticweb.owl.apibinding.OWLManager;
+import org.semanticweb.owl.model.OWLOntology;
 import java.net.URI;
 import java.io.Reader;
-
+import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owl.model.OWLDataPropertyExpression;
 import org.coode.oppl.variablemansyntax.ExpressionParser;
 import org.coode.oppl.variablemansyntax.VariableShortFormEntityChecker;
 import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
@@ -123,8 +130,8 @@ public class OPPLParser {
 	  ConstraintSystem constraintSystem = new ConstraintSystem(ontology,
 					ontologyManager);
 	  new OPPLParser(System.in, ontologyManager, constraintSystem);			    	
-      OPPLScript n = OPPLParser.Start();
-      
+      SimpleNode n = OPPLParser.Start();
+      n.dump("");
       System.out.println("Thank you.");
     } catch (Exception e) {
       System.out.println("Oops.");
@@ -179,7 +186,7 @@ TOKEN :/* VARIABLE TYPES*/
 
 TOKEN: /* OPPL SYNTAX*/
 {
-	<SELECT: "SELECT"> |<WHERE: "WHERE">| <ASSERTED: "ASSERTED"> | <ADD: "ADD"> | <REMOVE: "REMOVE"> |<BEGIN: "BEGIN"> |<END: "END">
+	<SELECT: "SELECT"> |<WHERE: "WHERE"> | <ACTIONS: "ADD" | "REMOVE"> |<BEGIN: "BEGIN"> |<END: "END">
 }
 
 TOKEN: /*PUNCTUATION*/
@@ -251,54 +258,39 @@ TOKEN: /* LITERALS*/
 
 
 
-OPPLScript Start():{
-	List<Variable> variables= new ArrayList<Variable>();
-	OPPLQuery opplQuery=null;
-	List<OWLAxiomChange> actions = new ArrayList<OWLAxiomChange>();
-}
+SimpleNode Start():{}
 {
-  (variables = VariableDeclaration())?(opplQuery = query())?(actions = Actions())?";"
+  (VariableDeclaration())?(Query())?(Actions())?";"
   { 
-  	
-  	return getOPPLFactory().buildOPPLScript(constraintSystem, variables, opplQuery, actions); 
+  	jjtThis.setConstraintSystem(constraintSystem);
+  	return jjtThis; 
   	}
 }
 
-List<Variable> VariableDeclaration() #void :{List<Variable> toReturn = new ArrayList<Variable>(); Variable v;}
+void VariableDeclaration() #void :{}
 {
-	v =VariableDefinition(){
-		toReturn.add(v);
+	VariableDefinition(){
 		completions.clear();
 		completions.add(",");
 		completions.add("SELECT");
 	}
 	(<COMMA>{
 		completions.clear();
-	} v = VariableDefinition()
+	} VariableDefinition()
 	{
-		toReturn.add(v);
 		completions.clear();
 		completions.add(",");
 		completions.add("SELECT");
 	}
-	)*{
-		return toReturn;
-	}
+	)*
 }
 
-List<OWLAxiomChange> Actions():{List<OWLAxiomChange> toReturn = new ArrayList<OWLAxiomChange>(); OWLAxiomChange action;}
+void Actions():{}
 {
-	<BEGIN> action = Action(){
-		toReturn.add(action);
-	} (<COMMA> action = Action(){
-		toReturn.add(action);
-	}
-	)*<END>{
-		return toReturn;
-	}
+	<BEGIN> Action() (<COMMA> Action())*<END>
 }	
 
-Variable VariableDefinition():{Token variableNameToken;
+void VariableDefinition():{Token variableNameToken;
 						   Token variableTypeToken; 
 						   VariableType variableType=null;
 						   VariableScope variableScope;
@@ -317,7 +309,7 @@ Variable VariableDefinition():{Token variableNameToken;
 		variableType = VariableType.getVariableType(variableTypeToken.image);
 	}
 	"=" v = opplFunction(variableNameToken.image,variableType){
-		return v;
+		jjtn000.setVariable(v);
 	}
 	
 	|LOOKAHEAD(4)
@@ -330,7 +322,7 @@ Variable VariableDefinition():{Token variableNameToken;
 	{
 		try{
 			variableType = VariableType.getVariableType(variableTypeToken.image);    
-            v =  OPPLParser.getConstraintSystem().createVariable(variableNameToken.image,variableType);
+                	jjtn000.setVariable(OPPLParser.getConstraintSystem().createVariable(variableNameToken.image,variableType ));
 		}catch(OPPLException e){
 			throw new ParseException(e.getMessage());
 		}
@@ -343,8 +335,7 @@ Variable VariableDefinition():{Token variableNameToken;
 	direction = direction()		 
 	variableScope = typeScope(direction, variableType)
 	<CLOSEDSQUAREBRACKETS>{
-		v.setVariableScope(variableScope, getOPPLFactory().getVariableScopeChecker());
-		return v;
+		jjtThis.getVariable().setVariableScope(variableScope, getOPPLFactory().getVariableScopeChecker());
 	}
 	| 
 	variableNameToken= <IDENTIFIER> <COLON> 
@@ -356,7 +347,7 @@ Variable VariableDefinition():{Token variableNameToken;
 		completions.clear();
 		try{
 			variableType = VariableType.getVariableType(variableTypeToken.image);    
-			return OPPLParser.getConstraintSystem().createVariable(variableNameToken.image,variableType);
+			jjtn000.setVariable(OPPLParser.getConstraintSystem().createVariable(variableNameToken.image,variableType ));
 		}catch(OPPLException e){
 			throw new ParseException(e.getMessage());
 		}		
@@ -569,16 +560,18 @@ VariableScope parseScope(VariableScopes.Direction direction,
 	}
 
 
-Constraint Constraint():{Token t;OWLObject owlObject;Variable variable;}
+void Constraint():{Token t;OWLObject owlObject;Variable variable;}
 {
 	t = <IDENTIFIER> {
 		variable = OPPLParser.getConstraintSystem().getVariable(t.image);
-		if(variable==null){
+		if(variable!=null){
+			jjtThis.setVariable(variable);
+		}else{
 			throw new ParseException("Undeclared variable "+t.image);
 		}
 	} 
 	<NEQ> owlObject = OWLExpression(variable){
-		return new Constraint(variable, owlObject);
+		jjtThis.setExpression(owlObject);
 	}
 	
 }
@@ -619,44 +612,23 @@ VariableType variableType() #void:{Token t;}
 	}
 }
 
-OPPLQuery query():{OWLAxiom axiom; OPPLQuery toReturn = getOPPLFactory().buildNewQuery();Constraint c;}
+void Query():{OWLAxiom axiom;}
 {
 	<SELECT>{
 		completions.clear();
-	} queryAtom(toReturn)
-	
-	(<COMMA>{
-		completions.clear();
-	} queryAtom(toReturn))*  
-	(<WHERE> c=Constraint(){
-		toReturn.addConstraint(c);
-	}
-	 (<COMMA> c=Constraint(){
-		toReturn.addConstraint(c);
-	} 
-	 )*)?
-	{
-		return toReturn;
-	}
+	} axiom = Clause(){
+		jjtThis.addAxiom(axiom);
+	}("," axiom = Clause(){
+		jjtThis.addAxiom(axiom);
+	})* (<WHERE> Constraint() (<COMMA> Constraint())*)? 
 }
 
-void queryAtom(OPPLQuery query) #void: {OWLAxiom axiom;}
+void Action():{Token t;OWLAxiom axiom;}
 {
-	<ASSERTED> axiom = Clause(){
-		query.addAssertedAxiom(axiom);
-	}
-	| axiom = Clause(){
-		query.addAxiom(axiom);
-	}
-}
-
-OWLAxiomChange Action():{Token t;OWLAxiom axiom;}
-{
-	<ADD> axiom = Clause(){
-		return new AddAxiom(constraintSystem.getOntology(), axiom);
-	}
-	|<REMOVE> axiom = Clause(){
-		return new RemoveAxiom(constraintSystem.getOntology(), axiom);
+	t=<ACTIONS>{
+		jjtThis.setActionType(t.image);
+	} axiom = Clause(){
+		jjtThis.setAxiom(axiom);
 	}
 }
 
