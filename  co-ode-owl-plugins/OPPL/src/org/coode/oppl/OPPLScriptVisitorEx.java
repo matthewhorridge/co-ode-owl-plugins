@@ -24,43 +24,17 @@ package org.coode.oppl;
 
 import java.util.List;
 
-import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.InputVariable;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLAxiomChange;
 
 /**
- * Generic interface representing an OPPL Script
- * 
  * @author Luigi Iannone
  * 
  */
-public interface OPPLScript {
-	/**
-	 * @return the List of the variables declared in this OPPLScript
-	 */
-	public List<Variable> getVariables();
+public interface OPPLScriptVisitorEx<P> {
+	public P visit(OPPLQuery q, P p);
 
-	/**
-	 * @return the List of the InputVariable elements
-	 */
-	public List<InputVariable> getInputVariables();
+	public P visit(Variable v, P p);
 
-	/**
-	 * @return the ConstraintSystem used by this OPPLScript
-	 */
-	public ConstraintSystem getConstraintSystem();
-
-	/**
-	 * @return the appropriate rendering of this OPPLScript
-	 */
-	public String render();
-
-	public List<OWLAxiomChange> getActions();
-
-	public OPPLQuery getQuery();
-
-	void accept(OPPLScriptVisitor visitor);
-
-	<P> P accept(OPPLScriptVisitorEx<P> visitor);
+	public P visitActions(List<OWLAxiomChange> changes, P p);
 }

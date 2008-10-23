@@ -20,47 +20,30 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oppl;
+package org.coode.oppl.syntax;
 
-import java.util.List;
-
-import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.InputVariable;
-import org.coode.oppl.variablemansyntax.Variable;
-import org.semanticweb.owl.model.OWLAxiomChange;
 
 /**
- * Generic interface representing an OPPL Script
- * 
  * @author Luigi Iannone
  * 
  */
-public interface OPPLScript {
-	/**
-	 * @return the List of the variables declared in this OPPLScript
-	 */
-	public List<Variable> getVariables();
-
-	/**
-	 * @return the List of the InputVariable elements
-	 */
-	public List<InputVariable> getInputVariables();
-
-	/**
-	 * @return the ConstraintSystem used by this OPPLScript
-	 */
-	public ConstraintSystem getConstraintSystem();
-
-	/**
-	 * @return the appropriate rendering of this OPPLScript
-	 */
-	public String render();
-
-	public List<OWLAxiomChange> getActions();
-
-	public OPPLQuery getQuery();
-
-	void accept(OPPLScriptVisitor visitor);
-
-	<P> P accept(OPPLScriptVisitorEx<P> visitor);
+public class Utils {
+	public static String readString(int... delimiterTokenKinds) {
+		String toReturn = "";
+		while (true) {
+			Token token = OPPLParser.getToken(1);
+			boolean found = false;
+			for (int i = 0; !found && i < delimiterTokenKinds.length; i++) {
+				found = token.kind == OPPLParser.EOF
+						|| delimiterTokenKinds[i] == token.kind;
+			}
+			if (found) {
+				break;
+			} else {
+				toReturn += token.image;
+				OPPLParser.getNextToken();
+			}
+		}
+		return toReturn;
+	}
 }

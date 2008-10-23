@@ -104,7 +104,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	private Set<OWLOntology> ontologies;
 	private Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
 	private Set<BindingNode> leaves = null;
-	private OWLDataFactory dataFactory;
+	private final OWLDataFactory dataFactory;
 	private Set<Constraint> constraints = new HashSet<Constraint>();
 	private OWLReasoner reasoner = null;
 	private final Set<OWLAxiom> instantiatedAxioms = new HashSet<OWLAxiom>();
@@ -158,6 +158,20 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 					this.ontologies, this, this.dataFactory)
 					: new InferredAxiomQuery(this.ontologies, this,
 							this.dataFactory, this.reasoner);
+			axiom.accept(query);
+			this.instantiatedAxioms.clear();
+			this.instantiatedAxioms.addAll(query.getInstantiations());
+			System.out.println("Current size: "
+					+ this.instantiatedAxioms.size());
+		}
+	}
+
+	private void updateBindingsAssertedAxiom(OWLAxiom axiom) {
+		if (this.isVariableAxiom(axiom)) {
+			System.out.println("Initial size: "
+					+ (this.leaves == null ? "empty" : this.leaves.size()));
+			AxiomQuery query = new AssertedAxiomQuery(this.ontologies, this,
+					this.dataFactory);
 			axiom.accept(query);
 			this.instantiatedAxioms.clear();
 			this.instantiatedAxioms.addAll(query.getInstantiations());
@@ -514,5 +528,17 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	 */
 	public Set<OWLAxiom> getInstantiatedAxioms() {
 		return this.instantiatedAxioms;
+	}
+
+	public void addAssertedAxiom(OWLAxiom axiom) {
+		this.axioms.add(axiom);
+		this.updateBindingsAssertedAxiom(axiom);
+	}
+
+	/**
+	 * @return the dataFactory
+	 */
+	public OWLDataFactory getDataFactory() {
+		return this.dataFactory;
 	}
 }

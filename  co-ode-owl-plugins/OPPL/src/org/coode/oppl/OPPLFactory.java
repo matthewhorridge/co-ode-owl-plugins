@@ -22,12 +22,14 @@
  */
 package org.coode.oppl;
 
+import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.protege.editor.owl.model.entity.OWLEntityCreationException;
 import org.protege.editor.owl.model.entity.OWLEntityCreationSet;
@@ -38,6 +40,7 @@ import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.expression.ShortFormEntityChecker;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.model.AddAxiom;
+import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLDataProperty;
@@ -49,6 +52,8 @@ import org.semanticweb.owl.model.OWLOntologyChange;
 import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
 import org.semanticweb.owl.util.SimpleShortFormProvider;
+
+import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
 /**
  * @author Luigi Iannone
@@ -186,5 +191,25 @@ public class OPPLFactory implements OPPLAbstractFactory {
 
 	public OWLEntityFactory getOWLEntityFactory() {
 		return new EntityFactory();
+	}
+
+	public OPPLScript buildOPPLScript(ConstraintSystem constraintSystem,
+			List<Variable> variables, OPPLQuery opplQuery,
+			List<OWLAxiomChange> actions) {
+		return new OPPLScriptImpl(constraintSystem, variables, opplQuery,
+				actions);
+	}
+
+	public OPPLQuery buildNewQuery() {
+		return new OPPLQueryImpl();
+	}
+
+	public ManchesterOWLSyntaxObjectRenderer getOWLObjectRenderer(
+			StringWriter writer) {
+		ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
+				writer);
+		renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
+				this.constraintSystem));
+		return renderer;
 	}
 }

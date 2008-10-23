@@ -22,11 +22,19 @@
  */
 package org.coode.oppl;
 
+import java.io.StringWriter;
+import java.util.List;
+
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.NullReasonerException;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.expression.OWLEntityChecker;
+import org.semanticweb.owl.model.OWLAxiomChange;
+
+import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
 /**
  * @author Luigi Iannone
@@ -54,4 +62,25 @@ public interface OPPLAbstractFactory {
 	 * @return the OWLEntityFactory used by this factory
 	 */
 	OWLEntityFactory getOWLEntityFactory();
+
+	/**
+	 * @param constraintSystem
+	 * @param variables
+	 * @param opplQuery
+	 * @param actions
+	 * @return an instance of OPPLScript on the input ConstraintSystem with the
+	 *         input Variable instances the input OPPLQuery and the input set of
+	 *         actions
+	 */
+	OPPLScript buildOPPLScript(ConstraintSystem constraintSystem,
+			List<Variable> variables, OPPLQuery opplQuery,
+			List<OWLAxiomChange> actions);
+
+	/**
+	 * @return a new blank OPPLQuery instance
+	 */
+	OPPLQuery buildNewQuery();
+
+	public ManchesterOWLSyntaxObjectRenderer getOWLObjectRenderer(
+			StringWriter writer);
 }

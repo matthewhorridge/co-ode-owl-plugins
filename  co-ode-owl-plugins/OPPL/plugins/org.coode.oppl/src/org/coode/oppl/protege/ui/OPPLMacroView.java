@@ -351,8 +351,7 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 							.singleton(new Assignment(variable, object)),
 							new HashSet<Variable>());
 					PartialOWLObjectInstantiator instantiator = new PartialOWLObjectInstantiator(
-							bindingNode, this.constraintSystem, this
-									.getOWLDataFactory());
+							bindingNode, this.constraintSystem);
 					OWLAxiom instantiatedAxiom = (OWLAxiom) axiom
 							.accept(instantiator);
 					OWLAxiomChange newAxiomChange = change instanceof AddAxiom ? new AddAxiom(

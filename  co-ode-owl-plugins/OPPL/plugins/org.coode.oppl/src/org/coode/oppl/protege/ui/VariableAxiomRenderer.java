@@ -29,13 +29,10 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
-import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
 /**
@@ -43,16 +40,6 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public class VariableAxiomRenderer implements ListCellRenderer {
-	class VariableOWLEntityRenderer implements OWLEntityRenderer {
-		public String render(OWLEntity entity) {
-			Variable variable = VariableAxiomRenderer.this.constraintSystem
-					.getVariable(entity.getURI());
-			return variable != null ? variable.getName()
-					: VariableAxiomRenderer.this.owlEditorKit.getModelManager()
-							.getRendering(entity);
-		}
-	}
-
 	class VariableAxiomOWLCellRenderer extends OWLCellRenderer {
 		public VariableAxiomOWLCellRenderer(OWLEditorKit owlEditorKit) {
 			super(owlEditorKit);
@@ -73,9 +60,9 @@ public class VariableAxiomRenderer implements ListCellRenderer {
 	 * 
 	 */
 	private static final long serialVersionUID = 6631014357184600262L;
-	private OWLEditorKit owlEditorKit;
-	private ConstraintSystem constraintSystem;
-	private final VariableOWLEntityRenderer renderer = new VariableOWLEntityRenderer();
+	OWLEditorKit owlEditorKit;
+	ConstraintSystem constraintSystem;
+	private final VariableOWLEntityRenderer renderer;
 	private final VariableOWLObjectRenderer objectRenderer;
 	private final DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
 	private final VariableAxiomOWLCellRenderer variableAxiomOWLCellRenderer;
@@ -90,6 +77,8 @@ public class VariableAxiomRenderer implements ListCellRenderer {
 				owlEditorKit);
 		this.variableAxiomOWLCellRenderer.setWrap(true);
 		this.variableAxiomOWLCellRenderer.setHighlightKeywords(true);
+		this.renderer = new VariableOWLEntityRenderer(this.constraintSystem,
+				this.owlEditorKit.getModelManager());
 	}
 
 	/**

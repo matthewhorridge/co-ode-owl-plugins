@@ -35,20 +35,19 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.coode.oppl.ChangeExtractor;
-import org.coode.oppl.protege.model.OPPLStatementModelChangeListener;
-import org.coode.oppl.protege.model.ProtegeOPPLStatementModel;
+import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.VariableManchesterSyntaxExpressionChecker;
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
+import org.protege.editor.owl.model.description.OWLExpressionParserException;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
@@ -66,24 +65,22 @@ import org.semanticweb.owl.model.OWLOntologyChangeListener;
  * 
  */
 public class OPPLView extends AbstractOWLViewComponent implements
-		OPPLStatementModelChangeListener,
 		InputVerificationStatusChangedListener, OWLOntologyChangeListener,
 		OWLModelManagerListener {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1897093057453176659L;
-	private ExpressionEditor<ProtegeOPPLStatementModel> opplStatementExpressionEditor;
+	private ExpressionEditor<OPPLScript> opplStatementExpressionEditor;
 	private JButton evaluate = new JButton("Evaluate");
 	private JButton execute = new JButton("Execute");
-	private ProtegeOPPLStatementModel statementModel;
+	// private ProtegeOPPLStatementModel statementModel;
 	private ActionList affectedAxioms;
 	private MList instantiatedAxiomsList;
 
-	public void handleChange() {
-		this.evaluate.setEnabled(this.statementModel.isValid());
-	}
-
+	// public void handleChange() {
+	// this.evaluate.setEnabled(this.statementModel.isValid());
+	// }
 	@Override
 	protected void disposeOWLView() {
 		this.getOWLEditorKit().getModelManager().removeListener(this);
@@ -107,7 +104,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.getOWLEditorKit().getModelManager().addListener(this);
 		this.getOWLModelManager().getOWLOntologyManager()
 				.addOntologyChangeListener(this);
-		this.opplStatementExpressionEditor = new ExpressionEditor<ProtegeOPPLStatementModel>(
+		this.opplStatementExpressionEditor = new ExpressionEditor<OPPLScript>(
 				this.getOWLEditorKit(),
 				new VariableManchesterSyntaxExpressionChecker(this
 						.getOWLEditorKit()));
@@ -136,9 +133,9 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		effects.add(instantiatedScrollPane, JSplitPane.RIGHT);
 		this.add(effects, BorderLayout.CENTER);
 		this.add(this.execute, BorderLayout.SOUTH);
-		this.statementModel = new ProtegeOPPLStatementModel(this
-				.getOWLEditorKit().getModelManager());
-		this.statementModel.addChangeListener(this);
+		// this.statementModel = new ProtegeOPPLStatementModel(this
+		// .getOWLEditorKit().getModelManager());
+		// this.statementModel.addChangeListener(this);
 		this.evaluate.setEnabled(false);
 		this.execute.setEnabled(false);
 		this.evaluate.addActionListener(new ActionListener() {
@@ -183,19 +180,19 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.evaluate.setEnabled(newState);
 		ListModel model = this.affectedAxioms.getModel();
 		((DefaultListModel) model).clear();
+		this.instantiatedAxiomsList.setModel(new DefaultListModel());
 		if (newState) {
-			this.instantiatedAxiomsList.setModel(new DefaultListModel());
-			this.statementModel
-					.setOPPLStatement(this.opplStatementExpressionEditor
-							.getText());
-			ConstraintSystem constraintSystem = this.statementModel
-					.getOpplStatement().getConstraintSystem();
-			ListCellRenderer cellRenderer = this.affectedAxioms
-					.getCellRenderer();
-			if (cellRenderer instanceof VariableAxiomRenderer) {
-				((VariableAxiomRenderer) cellRenderer)
-						.setConstraintSystem(constraintSystem);
-			}
+			// this.statementModel
+			// .setOPPLStatement(this.opplStatementExpressionEditor
+			// .getText());
+			// ConstraintSystem constraintSystem = this.statementModel
+			// .getOpplStatement().getConstraintSystem();
+			// ListCellRenderer cellRenderer = this.affectedAxioms
+			// .getCellRenderer();
+			// if (cellRenderer instanceof VariableAxiomRenderer) {
+			// ((VariableAxiomRenderer) cellRenderer)
+			// .setConstraintSystem(constraintSystem);
+			// }
 		}
 	}
 
@@ -214,11 +211,12 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		ChangeExtractor changeExtractor = new ChangeExtractor(OPPLView.this
 				.getOWLEditorKit().getModelManager().getActiveOntology(), this
 				.getOWLEditorKit().getModelManager().getOWLOntologyManager());
-		if (this.statementModel != null
-				&& this.statementModel.getOpplStatement() != null) {
-			this.statementModel.getOpplStatement().jjtAccept(changeExtractor,
-					null);
-			List<OWLAxiomChange> changes = changeExtractor.getChanges();
+		OPPLScript statementModel;
+		try {
+			statementModel = this.opplStatementExpressionEditor.createObject();
+			System.out.println(statementModel.toString());
+			List<OWLAxiomChange> changes = statementModel
+					.accept(changeExtractor);
 			ActionListModel model = (ActionListModel) OPPLView.this.affectedAxioms
 					.getModel();
 			model.clear();
@@ -228,36 +226,40 @@ public class OPPLView extends AbstractOWLViewComponent implements
 			this.revalidate();
 			System.out.println("Size: "
 					+ this.affectedAxioms.getModel().getSize());
-			this.updateInstantiatedAxioms();
+			this.updateInstantiatedAxioms(statementModel);
+		} catch (OWLExpressionParserException e) {
+			e.printStackTrace();
+		} catch (OWLException e) {
+			e.printStackTrace();
 		}
 	}
 
-	private void updateInstantiatedAxioms() {
-		if (this.statementModel != null
-				&& this.statementModel.getOpplStatement() != null) {
-			Set<OWLAxiom> instantiatedAxioms = this.statementModel
-					.getOpplStatement().getConstraintSystem()
-					.getInstantiatedAxioms();
-			DefaultListModel model = new DefaultListModel();
-			for (OWLAxiom axiom : instantiatedAxioms) {
-				model.addElement(axiom);
-			}
-			this.instantiatedAxiomsList.setModel(model);
-			this.revalidate();
+	private void updateInstantiatedAxioms(OPPLScript statementModel) {
+		Set<OWLAxiom> instantiatedAxioms = statementModel.getConstraintSystem()
+				.getInstantiatedAxioms();
+		DefaultListModel model = new DefaultListModel();
+		for (OWLAxiom axiom : instantiatedAxioms) {
+			model.addElement(axiom);
 		}
+		this.instantiatedAxiomsList.setModel(model);
+		this.revalidate();
 	}
 
 	public void handleChange(OWLModelManagerChangeEvent event) {
-		this.statementModel.setOPPLStatement(this.opplStatementExpressionEditor
-				.getText());
-		if (event.getType().equals(EventType.REASONER_CHANGED)
-				&& this.statementModel.isValid()) {
+		if (event.getType().equals(EventType.REASONER_CHANGED)) {
 			OPPLParser.setReasoner(this.getOWLEditorKit().getModelManager()
 					.getReasoner());
 			ActionListModel model = (ActionListModel) OPPLView.this.affectedAxioms
 					.getModel();
 			model.clear();
-			this.evaluate.setEnabled(this.statementModel.isValid());
+			try {
+				this.opplStatementExpressionEditor.createObject();
+				this.evaluate.setEnabled(true);
+			} catch (OWLExpressionParserException e) {
+				this.evaluate.setEnabled(false);
+			} catch (OWLException e) {
+				this.evaluate.setEnabled(false);
+			}
 		}
 	}
 
