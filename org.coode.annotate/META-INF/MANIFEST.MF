@@ -6,7 +6,7 @@ Bundle-Category: protege
 Bundle-Description: An alternative to the annotations view with configurable fields
 Bundle-Vendor: The CO-ODE Group
 Bundle-DocURL: http://www.co-ode.org
-http://www.co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.annotate/update.properties
+Update-Url: http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.annotate/update.properties
 Bundle-ClassPath: .
 Import-Package: org.osgi.framework,
  org.apache.log4j
