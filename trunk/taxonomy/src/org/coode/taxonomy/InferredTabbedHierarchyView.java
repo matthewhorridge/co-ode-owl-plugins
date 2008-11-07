@@ -23,7 +23,7 @@ import java.util.Collections;
  *
  * Used to generate inf/asserted hierarchy of classes - sorted URIs
  */
-public class TabbedHierarchyViewTemp extends AbstractOWLClassViewComponent {
+public class InferredTabbedHierarchyView extends AbstractOWLClassViewComponent {
 
     private JTextArea namesComponent;
 
@@ -45,8 +45,7 @@ public class TabbedHierarchyViewTemp extends AbstractOWLClassViewComponent {
     protected OWLClass updateView(OWLClass selectedClass) {
         namesComponent.setText("");
         if (selectedClass != null){
-            hp = getOWLModelManager().getOWLClassHierarchyProvider();
-//            hp = getOWLModelManager().getInferredOWLClassHierarchyProvider();
+            hp = getOWLModelManager().getInferredOWLClassHierarchyProvider();
             owlEntityComparator = new OWLEntityComparator<OWLClass>(getOWLModelManager());
             render(selectedClass, 0);
         }
