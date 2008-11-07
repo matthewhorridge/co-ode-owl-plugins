@@ -100,12 +100,14 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
         filterHolder.add(filter);
         filterHolder.add(new MyButton(new AbstractAction("-"){
             public void actionPerformed(ActionEvent event) {
-                filters.remove(filter);
-                filterPanel.remove(filterHolder);
-                filterPanel.revalidate();
-                resultsMap.remove(filter);
-                filter.dispose();
-                refresh();
+                if (filters.size() > 1){
+                    filters.remove(filter);
+                    filterPanel.remove(filterHolder);
+                    filterPanel.revalidate();
+                    resultsMap.remove(filter);
+                    filter.dispose();
+                    refresh();
+                }
             }
         }));
         filterHolder.add(new MyButton(new AbstractAction("+"){
@@ -124,6 +126,8 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
             filterPanel.remove(moveFilterHolder);
             filterPanel.add(moveFilterHolder);
         }
+
+        validate();
     }
 
 
