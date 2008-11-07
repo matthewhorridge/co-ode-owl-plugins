@@ -1,0 +1,15 @@
+An example plugin that displays the subclasses of the current selection as a tab indented list.
+
+See how this plugin was written:
+http://www.co-ode.org/downloads/protege-x/plugin-code-example.php
+
+
+Version info
+------------
+
+v1.0.3 (7th Nov 2008)
+- auto-update activated
+
+
+See also:
+http://www.co-ode.org/downloads/protege-x/plugins/#taxonomyCP
