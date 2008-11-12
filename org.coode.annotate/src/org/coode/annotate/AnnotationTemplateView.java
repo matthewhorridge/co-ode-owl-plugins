@@ -3,11 +3,13 @@ package org.coode.annotate;
 import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.util.URIShortFormProvider;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.net.URI;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -58,6 +60,11 @@ public class AnnotationTemplateView extends AbstractOWLSelectionViewComponent {
         setLayout(new BorderLayout());
         model = new TemplateModel(getOWLModelManager());
         form = new Template(model);
+        form.setURIShortFormProvider(new URIShortFormProvider(){
+            public String getShortForm(URI uri) {
+                return getOWLModelManager().getURIRendering(uri);
+            }
+        });
         JScrollPane scroller = new JScrollPane(form);
         add(scroller, BorderLayout.CENTER);
         addHierarchyListener(hListener);

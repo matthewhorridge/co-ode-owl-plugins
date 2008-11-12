@@ -7,6 +7,10 @@ Useful when developing in a consortium and some standard metadata set should alw
 Version info
 ------------
 
+v1.0.5 (11th Nov 2008)
+- OBO annotation URI labels recognized
+
+
 v1.0.4 (6th Nov 2008)
 - auto-update activated
 

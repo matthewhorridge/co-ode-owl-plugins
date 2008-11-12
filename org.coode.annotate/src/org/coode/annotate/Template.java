@@ -4,6 +4,7 @@ import org.protege.editor.core.ui.util.Icons;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.util.SimpleURIShortFormProvider;
+import org.semanticweb.owl.util.URIShortFormProvider;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +47,7 @@ public class Template extends JComponent implements Scrollable {
 
     private TemplateModel model;
 
-    SimpleURIShortFormProvider uriShortFormProvider;
+    URIShortFormProvider uriShortFormProvider;
 
     private TemplateModelListener modelListener = new TemplateModelListener(){
         public void modelStructureChanged() {
@@ -141,6 +142,12 @@ public class Template extends JComponent implements Scrollable {
     public boolean getScrollableTracksViewportHeight() {
         return false;
     }
+
+
+    public void setURIShortFormProvider(URIShortFormProvider sfp) {
+        uriShortFormProvider = sfp;
+    }
+
 
     class RemoveAxiomListener extends MouseAdapter {
 
