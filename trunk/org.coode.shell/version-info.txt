@@ -10,5 +10,5 @@ v1.0.0 (14th Nov 2008)
 - support for scripting with protege 4.0
 
 
-See also: http://www.co-ode.org/downloads/protege-x/plugins/#beanshell
+See also: http://www.co-ode.org/downloads/protege-x/plugins/#scripting
 See also: http://www.beanshell.org
