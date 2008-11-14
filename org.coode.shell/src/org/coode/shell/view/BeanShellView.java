@@ -1,18 +1,10 @@
 package org.coode.shell.view;
 
-import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.core.plugin.PluginUtilities;
-import org.eclipse.osgi.framework.internal.core.OSGi;
-import org.eclipse.core.internal.registry.osgi.OSGIUtils;
-import bsh.util.JConsole;
 import bsh.Interpreter;
-import bsh.EvalError;
+import bsh.util.JConsole;
+import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
-import java.awt.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.File;/*
+import java.awt.*;/*
 * Copyright (C) 2007, University of Manchester
 *
 * Modifications to the initial code base are copyright of their
@@ -43,7 +35,7 @@ import java.io.File;/*
  * Bio Health Informatics Group<br>
  * Date: Jun 18, 2008<br><br>
  */
-public class BeanShellView extends AbstractOWLViewComponent {
+public class    BeanShellView extends AbstractOWLViewComponent {
 
 
     protected void initialiseOWLView() throws Exception {
@@ -55,8 +47,9 @@ public class BeanShellView extends AbstractOWLViewComponent {
         interpreter.set("mngr", getOWLModelManager());
 
         interpreter.eval("import org.protege.editor.core.*;");
-        interpreter.eval("import org.semanticweb.owl.model.*;");
-        
+        interpreter.eval("import org.semanticweb.owl.model.*;"); // for all OWL constructs
+        interpreter.eval("import org.protege.editor.owl.ui.*;"); // for UIHelper etc
+
         new Thread(interpreter).start();
 
         add(console, BorderLayout.CENTER);
