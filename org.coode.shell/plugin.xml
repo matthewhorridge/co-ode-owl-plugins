@@ -1,0 +1,11 @@
+<?xml version="1.0" ?>
+
+<plugin>
+
+    <extension id="BeanShellView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Bean Shell"/>
+        <class value="org.coode.shell.view.BeanShellView"/>
+    </extension>
+
+</plugin>
