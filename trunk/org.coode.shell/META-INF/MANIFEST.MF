@@ -1,12 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: BeanShell
-Bundle-SymbolicName: org.coode.script;singleton:=true
+Bundle-SymbolicName: org.coode.shell;singleton:=true
 Bundle-Category: protege
 Bundle-Description: A scripting shell view
 Bundle-Vendor: The CO-ODE Group
 Bundle-DocURL: http://www.co-ode.org
-Update-Url: http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.script/update.properties
+Update-Url: http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.shell/update.properties
 Bundle-ClassPath: .,lib/bsh-2.0b4.jar
 Import-Package: org.osgi.framework,
  org.apache.log4j
