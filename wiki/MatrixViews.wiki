@@ -9,15 +9,21 @@ Several spreadsheet-style views of an ontology, including existential fillers, i
 
   * Navigate by fully functioning class/property tree
   * Add/remove columns to customize
-  * Drag and drop to add columns and values.
+  * Comma-separate values in a list for quick editing
+  * Drag and drop properties on the matrices to add columns
+  * Drag and drop classes on the matrices to add fillers, domains and ranges
   * Filter annotation columns by language (to allow translation-style view)
 
 == Screenshots ==
 
 <a href="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-existential.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-existential.png" width="400" /></a>
+*Using the existential matrix to quickly add existential restrictions*
 
 <a href="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-properties.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-properties.png" width="400" /></a>
+*Using the object properties matrix to select characteristics*
 
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-translation.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-translation.png" width="400" /></a>
+*Using several annotation columns with different language filters for quick translation tasks*
 
 == Find the plugins ==
 
