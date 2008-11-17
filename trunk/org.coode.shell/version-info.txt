@@ -1,14 +1,18 @@
-Get access to the P4 API directly through scripting.
+<html>
+<body>
+<p>Get access to the P4 API directly through scripting.
 The following variables are available:
-eKit = the OWLEditorKit for the current window
-mngr = the OWLModelManager for the current window
+<p><b>eKit</b> the OWLEditorKit for the current window
+<p><b>mngr</b> the OWLModelManager for the current window
 
-Version info
-------------
+<p><a href="http://code.google.com/p/co-ode-owl-plugins/wiki/BeanshellView">Documentation</a>
 
-v1.0.0 (14th Nov 2008)
-- support for scripting with protege 4.0
+<h3>Version info</h3>
 
+<h3>v1.0.0 (14th Nov 2008)</h3>
+<ul><li>support for scripting with protege 4.0</li></ul>
 
-See also: http://www.co-ode.org/downloads/protege-x/plugins/#shell
-See also: http://www.beanshell.org
+<p>See also: <a href="http://www.beanshell.org">http://www.beanshell.org</a>
+
+</body>
+</html>
