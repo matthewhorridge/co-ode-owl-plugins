@@ -1,18 +1,20 @@
-A view that can be configured to show a set of standard annotation fields for every class/property/individual.
+<html>
+<body>
+<p>A view that can be configured to show a set of standard annotation fields for every class/property/individual.
 This makes it quicker to annotate as they are always in the same order,
 editable inline and easy to navigate through (Ctrl-Tab/Shift-Ctrl-Tab).
-Useful when developing in a consortium and some standard metadata set should always be entered.
 
+<p>Useful when developing in a consortium and some standard metadata set should always be entered.
 
-Version info
-------------
+<p><a href="http://code.google.com/p/co-ode-owl-plugins/wiki/AnnotationTemplate">Documentation</a>
 
-v1.0.5 (11th Nov 2008)
-- OBO annotation URI labels recognized
+<h3>Version info</h3>
 
+<h4>>v1.0.5 (11th Nov 2008)</h4>
+<ul><li>OBO annotation URI labels recognized</li></ul>
 
-v1.0.4 (6th Nov 2008)
-- auto-update activated
+<h4>v1.0.4 (6th Nov 2008)</h4>
+<ul><li>auto-update activated</li></ul>
 
-
-See also: http://www.co-ode.org/downloads/protege-x/plugins/#annotate
+</body>
+</hmtl>
