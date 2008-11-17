@@ -5,7 +5,7 @@
 == Description ==
 The popular OWLViz has been ported over to Protégé 4.0. Implemented as a view, the subsumption graph can now be shown on any tab. In addition, a new imports graph is available to help understand the import dependencies within highly modularised ontologies.
 
-OWLViz requires installation of third party libraries - Graphviz.
+OWLViz requires installation of third party libraries - if you get a warning message, please install [http://graphviz.org/ Graphviz].
 
 == Features ==
 
@@ -15,9 +15,9 @@ OWLViz requires installation of third party libraries - Graphviz.
 
 == Screenshots ==
 
-<a href="http://localhost/~drummond/www.co-ode.org/downloads/protege-x/plugins/images/owlviz.png"><img src="http://localhost/~drummond/www.co-ode.org/downloads/protege-x/plugins/images/owlviz.png" width="400" /></a>
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/owlviz.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/owlviz.png" width="400" /></a>
 
-<a href="http://localhost/~drummond/www.co-ode.org/downloads/protege-x/plugins/images/owlviz-imports.png"><img src="http://localhost/~drummond/www.co-ode.org/downloads/protege-x/plugins/images/owlviz-imports.png" width="400" /></a>
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/owlviz-imports.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/owlviz-imports.png" width="400" /></a>
 
 == Find the plugins ==
 
