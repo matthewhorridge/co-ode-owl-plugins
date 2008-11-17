@@ -43,10 +43,14 @@ All of the matrices are implemented as views so you can add them into your own c
 ==== Object Property Views ====
 ===== Object property features =====
 
-= Download =
+== Download ==
 
 [http://code.google.com/p/co-ode-owl-plugins/downloads/list?q=matrix download]
 
 == Author ==
 
-Nick Drummond
+Nick Drummond, The University of Manchester
+
+== License ==
+
+LGPL
