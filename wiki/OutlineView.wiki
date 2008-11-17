@@ -1,0 +1,40 @@
+#summary Navigate your ontology structure using various properties
+
+= Outline/Existential View =
+
+== Description ==
+The subsumption hierarchy is not the only "axis" on which an ontology relies. Many other axis (such as partOf) can be useful for navigation.
+
+=== Outline View ===
+Follows existential (and appropriate cardinality) restrictions to build up a view of the current class by its structure.
+
+=== Existential Tree view ===
+A simplified version that shows the tree along a specified property.
+
+
+== Features ==
+  * Filter out whether to show all inherited restrictions
+  * Filter min cardinality 0 restrictions
+
+== Screenshots ==
+
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/outline.png.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/outline.png" width="400" /></a>
+
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/existentialtree.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/existentialtree.png" width="400" /></a>
+
+
+== Find the plugin ==
+
+Find them under the *View | Class views* menu
+
+== Download ==
+
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=existential download]
+
+== Author ==
+
+Nick Drummond, The University of Manchester
+
+== License ==
+
+LGPL
