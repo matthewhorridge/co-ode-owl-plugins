@@ -7,7 +7,7 @@ Load excel or CSV files and generate classes from the content. Provide rules to 
 
 == Screenshots ==
 
-<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/excel.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/excel.png" width="300" /></a>
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/excel.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/excel.png" width="400" /></a>
 
 == Find the plugin ==
 
