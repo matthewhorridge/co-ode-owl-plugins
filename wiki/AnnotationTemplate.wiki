@@ -25,7 +25,7 @@ Find the view under the *View | Misc views | Annotate View* menu
 
 == Download ==
 
-[http://code.google.com/p/co-ode-owl-plugins/downloads/annotate?q=change download]
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=annotate download]
 
 == Author ==
 
