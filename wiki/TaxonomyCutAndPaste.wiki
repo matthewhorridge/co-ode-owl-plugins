@@ -1,0 +1,35 @@
+#summary Show the class hierarchy in plain text
+
+= Outline/Existential View =
+
+== Description ==
+Sometimes, all you need is a quick extract of a part of your hierarchy for a paper or presentation.
+These 2 very simple views provide a quick way to extract parts of your hierarchy into text form.
+
+A small tutorial shows how these views were created.
+
+=== Tabbed Subclasses view ===
+Shows a tab-indented list of your asserted class hierarchy from the currently selected class
+
+=== Decendant Names view ===
+Does the same without indentation. Just cut and paste into your favourite applications.
+
+== Screenshots ==
+
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/tabbed.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/tabbed.png" width="400" /></a>
+
+== Find the plugin ==
+
+Find them under the *View | Class views* menu
+
+== Download ==
+
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=taxonomy download]
+
+== Author ==
+
+Nick Drummond, The University of Manchester
+
+== License ==
+
+LGPL
