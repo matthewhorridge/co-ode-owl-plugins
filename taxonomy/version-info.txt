@@ -1,15 +1,17 @@
-An example plugin that displays the subclasses of the current selection as a tab indented list.
+<html>
+<body>
+<p>An example plugin that displays the subclasses of the current selection as a tab indented list.
 
-See how this plugin was written:
-http://www.co-ode.org/downloads/protege-x/plugin-code-example.php
+<p>See how this plugin was written:
+<br><a href="http://www.co-ode.org/downloads/protege-x/plugin-code-example.php
+">how to write a plugin</a>
 
+<p><a href="http://code.google.com/p/co-ode-owl-plugins/wiki/TaxonomyCutAndPaste">Documentation</a>
 
-Version info
-------------
+<h3>Version info</h3>
 
-v1.0.3 (7th Nov 2008)
-- auto-update activated
+<h4>v1.0.3 (7th Nov 2008)</h4>
+<ul><li>auto-update activated</li></ul>
 
-
-See also:
-http://www.co-ode.org/downloads/protege-x/plugins/#taxonomyCP
+</body>
+</html>
