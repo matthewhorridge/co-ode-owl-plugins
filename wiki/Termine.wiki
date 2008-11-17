@@ -5,6 +5,10 @@
 == Description ==
 The Protégé TerMine plugin uses text mining tools to extract candidate terms from a corpus of text and provides an interface for rapidly bringing these terms into an OWL ontology. It currently uses the [http://www.nactem.ac.uk/software/termine/ TerMine] term extraction tool provided by NaCTeM to extract concepts from text. The plugin accesses TerMine via a Web Service over the Internet.
 
+== Documentation ==
+
+[http://www.co-ode.org/downloads/protege-x/plugins/termine-docs.pdf Full documentation]
+
 == Screenshots ==
 
 <a href="http://www.co-ode.org/downloads/protege-x/plugins/images/termine.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/termine.png" width="400" /></a>
