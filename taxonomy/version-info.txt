@@ -1,5 +1,6 @@
 <html>
 <body>
+<h2>Taxonomy cut and paste</h2>
 <p>An example plugin that displays the subclasses of the current selection as a tab indented list.
 
 <p>See how this plugin was written:

@@ -1,5 +1,6 @@
 <html>
 <body>
+<h2>Annotation Search</h2>
 <p>A view for searching entity annotations for a string or regular expression match.
  Can also be used with no string specified, just the annotation URI, for finding
   deprecated entities, or TODO items. The entity name at the start of each result
