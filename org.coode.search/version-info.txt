@@ -1,12 +1,17 @@
-A view for searching entity annotations for a string or regular expression match. Can also be used with no string specified, just the annotation URI, for finding deprecated entities, or TODO items. The entity name at the start of each result is a link that can be clicked for easy navigation.
+<html>
+<body>
+<p>A view for searching entity annotations for a string or regular expression match.
+ Can also be used with no string specified, just the annotation URI, for finding
+  deprecated entities, or TODO items. The entity name at the start of each result
+   is a link that can be clicked for easy navigation.
 
+<p><a href="http://code.google.com/p/co-ode-owl-plugins/wiki/AnnotationSearch">Documentation</a>
 
-Version info
-------------
+<h3>Version info</h3>
 
-v1.0.3 (7th Nov 2008)
-- auto-update activated
-- multiple search filters
+<h4>v1.0.3 (7th Nov 2008)</h4>
+<ul><li>auto-update activated</li>
+<li>multiple search filters</li></ul>
 
-
-See also: http://www.co-ode.org/downloads/protege-x/plugins/#search
+</body>
+</html>
