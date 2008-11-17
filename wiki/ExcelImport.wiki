@@ -1,0 +1,26 @@
+#summary Get data from a spreadsheet into your ontology
+
+= Excel Import =
+
+== Description ==
+Load excel or CSV files and generate classes from the content. Provide rules to create restrictions between columns.
+
+== Screenshots ==
+
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/excel.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/excel.png" width="300" /></a>
+
+== Find the plugin ==
+
+Find it under the *Tabs* menu
+
+== Download ==
+
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=excel download]
+
+== Author ==
+
+Jay Kola, CLEF, The University of Manchester
+
+== License ==
+
+LGPL
