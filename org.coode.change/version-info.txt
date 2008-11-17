@@ -1,11 +1,17 @@
-When writing plugins, particularly those that perform refactoring, it is useful to be able to verify the changes that have been applied to the model. This view provides a very straightforward list of changesets and the axioms that have been added and removed.
+<html>
+<body>
+<p>When writing plugins, particularly those that perform refactoring,
+ it is useful to be able to verify the changes that have been applied to the model.
+  This view provides a very straightforward list of changesets and the axioms that
+  have been added and removed.
+
+<p><a href="http://code.google.com/p/co-ode-owl-plugins//wiki/ChangeView">Documentation</a>
 
 
-Version info
-------------
+<h3>Version info</h3>
 
-v1.0.1 (7th Nov 2008)
-- auto-update activated
+<h4>v1.0.1 (7th Nov 2008)</h4>
+<ul></li>auto-update activated</li></ul>
 
-
-See also: http://www.co-ode.org/downloads/protege-x/plugins/#change
+</body>
+</html>
