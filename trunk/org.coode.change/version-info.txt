@@ -1,5 +1,6 @@
 <html>
 <body>
+<h2>Change View</h2>
 <p>When writing plugins, particularly those that perform refactoring,
  it is useful to be able to verify the changes that have been applied to the model.
   This view provides a very straightforward list of changesets and the axioms that

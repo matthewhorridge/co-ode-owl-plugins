@@ -1,5 +1,6 @@
 <html>
 <body>
+<h2>Beanshell View</h2>
 <p>Get access to the P4 API directly through scripting.
 The following variables are available:
 <p><b>eKit</b> the OWLEditorKit for the current window
