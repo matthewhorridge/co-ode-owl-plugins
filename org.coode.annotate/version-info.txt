@@ -10,7 +10,7 @@ editable inline and easy to navigate through (Ctrl-Tab/Shift-Ctrl-Tab).
 
 <h3>Version info</h3>
 
-<h4>>v1.0.5 (11th Nov 2008)</h4>
+<h4>v1.0.5 (11th Nov 2008)</h4>
 <ul><li>OBO annotation URI labels recognized</li></ul>
 
 <h4>v1.0.4 (6th Nov 2008)</h4>
