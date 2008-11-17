@@ -1,4 +1,4 @@
-#A spreadsheet-style view for P4
+#summary Spreadsheet-style views for your ontology
 
 = Matrix Views =
 
@@ -12,6 +12,13 @@ Several spreadsheet-style views of an ontology, including existential fillers, i
   * Drag and drop to add columns and values.
   * Filter annotation columns by language (to allow translation-style view)
 
+== Screenshots ==
+
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-existential.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-existential.png" width="400" /></a>
+
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-properties.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-properties.png" width="400" /></a>
+
+
 == Find the plugins ==
 
 === Tabs menu ===
@@ -23,7 +30,7 @@ Two default tab layouts are provided:
 
 === Views menu ===
 
-Several views are implemented:
+All of the matrices are implemented as views so you can add them into your own custom tabs:
 
 ==== Class Views ====
 ===== Class annotations =====
