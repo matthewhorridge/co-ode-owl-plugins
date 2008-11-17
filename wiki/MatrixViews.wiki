@@ -1,0 +1,45 @@
+#A spreadsheet-style view for P4
+
+= Matrix Views =
+
+== Description ==
+Several spreadsheet-style views of an ontology, including existential fillers, individual relationships and an object properties view.
+
+== Features ==
+
+  * Navigate by fully functioning class/property tree
+  * Add/remove columns to customize
+  * Drag and drop to add columns and values.
+  * Filter annotation columns by language (to allow translation-style view)
+
+== Find the plugins ==
+
+=== Tabs menu ===
+
+Two default tab layouts are provided:
+
+  * Matrix
+  * Property Matrix
+
+=== Views menu ===
+
+Several views are implemented:
+
+==== Class Views ====
+===== Class annotations =====
+===== Class existentials (asserted and inferred hierarchies) =====
+
+==== Individual Views ====
+===== Class membership =====
+===== Individual relationships =====
+
+==== Object Property Views ====
+===== Object property features =====
+
+= Download =
+
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?q=matrix download]
+
+== Author ==
+
+Nick Drummond
