@@ -16,7 +16,7 @@ Useful when developing in a consortium and some standard metadata set should alw
 
 == Screenshots ==
 
-<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/annotate.png.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/annotate.png" width="400" /></a>
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/annotate.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/annotate.png" width="400" /></a>
 
 
 == Find the plugin ==
