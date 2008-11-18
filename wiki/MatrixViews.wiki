@@ -22,9 +22,6 @@ Several spreadsheet-style views of an ontology, including existential fillers, i
 <a href="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-properties.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-properties.png" width="400" /></a>
 *Using the object properties matrix to select characteristics*
 
-<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-translation.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-translation.png" width="400" /></a>
-*Using several annotation columns with different language filters for quick translation tasks*
-
 == Find the plugins ==
 
 === Tabs menu ===
@@ -42,12 +39,37 @@ All of the matrices are implemented as views so you can add them into your own c
 ===== Class annotations =====
 ===== Class existentials (asserted and inferred hierarchies) =====
 
+For highly compositional ontologies a lot of time can be saved by using the *Class Existential Matrix* to add multiple superclass restrictions on classes.
+
+  * Add property columns to the matrix, either by *drag and drop* or using the toolbar
+
 ==== Individual Views ====
 ===== Class membership =====
 ===== Individual relationships =====
 
 ==== Object Property Views ====
 ===== Object property features =====
+
+== Quick Start ==
+
+=== Translation ===
+
+To aid multilingual label generation for entities, all matrix views allow filtering by language.
+To set up a view as below, follow these steps:
+
+  # Enable one of the matrix tabs or add a matrix view to a current tab
+  # Press the top left button on the menu bar *Add annotation column to matrix*. A dialog will appear.
+  # Select the annotation URI in which you will create your labels
+  # Select a language you will be adding labels for
+  # Press OK
+  # If you want to provide multiple translations or compare against an existing translation repeat from step 2, but select a different language
+  # Open up your hierarchy and select the first cell you wish to edit
+  # When entered, return drops to the next entity and you can start typing immediately
+
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-translation.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-translation.png" width="400" /></a>
+
+*Using several annotation columns with different language filters for quick translation tasks*
+
 
 == Download ==
 
