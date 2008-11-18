@@ -22,7 +22,7 @@ Several spreadsheet-style views of an ontology, including existential fillers, i
 <a href="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-properties.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/matrix-properties.png" width="400" /></a>
 *Using the object properties matrix to select characteristics*
 
-== Find the plugins ==
+== The plugins ==
 
 === Tabs menu ===
 
@@ -41,7 +41,17 @@ All of the matrices are implemented as views so you can add them into your own c
 
 For highly compositional ontologies a lot of time can be saved by using the *Class Existential Matrix* to add multiple superclass restrictions on classes.
 
-  * Add property columns to the matrix, either by *drag and drop* or using the toolbar
+If the column is *some p* and the row is *ClassA* and the cell contains an entry *ClassB* then the following axiom exists in the ontology:
+
+  * if ClassB is plain (can be edited) this means *subClassOf(ClassA, p some ClassB)*
+  * if ClassB is *bold* (not affected by editing) this means *equivalentClass(ClassA, X and (p some ClassB))*
+  * if ClassB is (bracketed) (not affected by editing) this means *subClassOf(AncestorA, p some ClassB)* ie that it is inherited
+
+Multiple values in cells are separated by commas and each value is a filler for a separate sub/equivalent class restriction.
+
+  * Add property columns to the matrix, either by *drag and drop* or using the toolbar *add object property column to matrix*
+  * Some cells may already contain values. There can be several fillers in one cell.  Neither of these is affected by editing. Normal entries are editable.
+  * Edit/add values by (double) clicking in a cell. If the property is functional and has a very narrow range specified then a dropdown will appear. In most cases a text editor will be available. Multiple values can be entered by comma separating them.
 
 ==== Individual Views ====
 ===== Class membership =====
