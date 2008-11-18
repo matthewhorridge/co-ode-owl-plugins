@@ -37,6 +37,8 @@ All of the matrices are implemented as views so you can add them into your own c
 
 ==== Class Views ====
 ===== Class annotations =====
+
+----
 ===== Class existentials (asserted and inferred hierarchies) =====
 
 For highly compositional ontologies a lot of time can be saved by using the *Class Existential Matrix* to add multiple superclass restrictions on classes.
@@ -70,6 +72,7 @@ subClassOf(ClassA, p some *ClassD*)
 subClassOf(SuperA, p some *ClassE*)            shows up as inherited for all subs of SuperA
 
 
+----
 ==== Individual Views ====
 ===== Class membership =====
 ===== Individual relationships =====
