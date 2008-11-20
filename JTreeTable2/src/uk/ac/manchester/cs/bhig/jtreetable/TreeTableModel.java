@@ -54,7 +54,5 @@ public interface TreeTableModel<R> extends TableModel{
 
     Object getColumnObjectAtModelIndex(int index);
 
-    Object getColumnObjectFromPhysicalIndex(int index);
-
     int getModelIndexOfColumn(Object tc);
 }

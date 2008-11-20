@@ -74,12 +74,15 @@ public abstract class AbstractTreeTableModel<T> implements TreeTableModel<T> {
 
     public boolean addColumn(Object o) {
         final int modelIndex = nextColumnModelIndex++;
-        colIndex.put(o, modelIndex);
-        final TableColumn tc = new TableColumn();
-        tc.setHeaderValue(o);
-        tc.setModelIndex(modelIndex);
-        columnModel.addColumn(tc);
-        return true;
+        if (!colIndex.containsKey(o)){
+            colIndex.put(o, modelIndex);
+            final TableColumn tc = new TableColumn();
+            tc.setHeaderValue(o);
+            tc.setModelIndex(modelIndex);
+            columnModel.addColumn(tc);
+            return true;
+        }
+        return false;
     }
 
 
