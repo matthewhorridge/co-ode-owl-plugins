@@ -49,19 +49,20 @@ For highly compositional ontologies a lot of time can be saved by using the *Cla
   # Some cells may already contain values. There can be several fillers in one cell. See below for the meaning of the highlighting.
   # Add values by dragging classes onto the cell or edit by clicking in a cell to start a text editor.
 
+The column specifies the property and the restriction type.
 
 if a cell value is
-  * plain - filler of a someValuesFrom in a subclass (can be edited)
-  * *bold* - filler of a someValuesFrom in an equivalent class (not affected by editing)
+  * plain - filler of a restriction in a subclass (can be edited)
+  * *bold* - filler of a restriction in an equivalent class (not affected by editing)
   * (bracketed) - this means it is an inherited from an ancestor (not affected by editing)
 
 Multiple values in cells are separated by commas and each value is a filler for a separate sub/equivalent class restriction.
 
 *Eg*
 
-||                 || p (some) || q (only)
+||                 || p (some) || q (only) ||
 ||SuperA    || ClassE  ||  ||
-||--ClassA ||*ClassB*  ClassC, ClassD (ClassE) || ClassF
+||--ClassA ||*ClassB*  ClassC, ClassD (ClassE) || ClassF ||
 
 Then the ontology contains:
 
@@ -73,7 +74,7 @@ subClassOf(ClassA, p some *ClassD*)
 
 subClassOf(SuperA, p some *ClassE*)            shows up as inherited for all subs of SuperA
 
-subClassOf(ClassA, p only *ClassF)
+subClassOf(ClassA, q only *ClassF)
 
 
 ----
