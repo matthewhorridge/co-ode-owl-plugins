@@ -84,10 +84,12 @@ public abstract class AbstractTreeTableModel<T> implements TreeTableModel<T> {
 
 
     public void removeColumn(Object o) {
+        int modelIndex = colIndex.get(o);
         colIndex.remove(o);
+
         for (Enumeration it = columnModel.getColumns(); it.hasMoreElements();){
             TableColumn tc = (TableColumn)it.nextElement();
-            if (tc.getHeaderValue().equals(o)){
+            if (tc.getModelIndex() == modelIndex){
                 columnModel.removeColumn(tc);
             }
         }
@@ -106,6 +108,12 @@ public abstract class AbstractTreeTableModel<T> implements TreeTableModel<T> {
             }
         }
         return null;
+    }
+
+
+    public Object getColumnObjectFromPhysicalIndex(int index) {
+        index = columnModel.getColumn(index).getModelIndex();
+        return getColumnObjectAtModelIndex(index);
     }
 
 
