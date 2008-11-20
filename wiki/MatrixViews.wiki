@@ -8,11 +8,13 @@ Several spreadsheet-style views of an ontology, including existential fillers, i
 == Features ==
 
   * Navigate by fully functioning class/property tree
-  * Add/remove columns to customize
+  * Add/remove columns to customize - show any combination of annotations/properties/features
   * Comma-separate values in a list for quick editing
-  * Drag and drop properties on the matrices to add columns
+  * Drag and drop object or data properties on the matrices to add columns
   * Drag and drop classes on the matrices to add fillers, domains and ranges
   * Filter annotation columns by language (to allow translation-style view)
+  * Filter property columns by restriction type (some or only supported)
+  * Full class expressions supported in editors
 
 == Screenshots ==
 
@@ -39,13 +41,13 @@ All of the matrices are implemented as views so you can add them into your own c
 ===== Class annotations =====
 
 ----
-===== Class existentials (asserted and inferred hierarchies) =====
+===== Class matrix (asserted and inferred hierarchies) - previously Class Existential MAtrix =====
 
-For highly compositional ontologies a lot of time can be saved by using the *Class Existential Matrix* to add multiple superclass restrictions on classes.
+For highly compositional ontologies a lot of time can be saved by using the *Class Matrix* to add multiple superclass restrictions on classes.
 
-  # Add property columns to the matrix, either by *drag and drop* or using the toolbar *add object property column to matrix*
-  # Some cells may already contain values. There can be several fillers in one cell.  Neither of these is affected by editing. Normal entries are editable.
-  # Edit/add values by (double) clicking in a cell. If the property is functional and has a very narrow range specified then a dropdown will appear. In most cases a text editor will be available.
+  # Add property columns to the matrix, either by *drag and drop* or using the toolbar *add object/data property column to matrix*. Dnd will default to *some* restrictions, but with the add button you can specify this.
+  # Some cells may already contain values. There can be several fillers in one cell. See below for the meaning of the highlighting.
+  # Add values by dragging classes onto the cell or edit by clicking in a cell to start a text editor.
 
 
 if a cell value is
@@ -57,9 +59,9 @@ Multiple values in cells are separated by commas and each value is a filler for 
 
 *Eg*
 
-||                 || p some ||
-||SuperA    || ClassE  ||
-||--ClassA ||*ClassB*  ClassC, ClassD (ClassE) ||
+||                 || p (some) || q (only)
+||SuperA    || ClassE  ||  ||
+||--ClassA ||*ClassB*  ClassC, ClassD (ClassE) || ClassF
 
 Then the ontology contains:
 
@@ -71,14 +73,20 @@ subClassOf(ClassA, p some *ClassD*)
 
 subClassOf(SuperA, p some *ClassE*)            shows up as inherited for all subs of SuperA
 
+subClassOf(ClassA, p only *ClassF)
+
 
 ----
 ==== Individual Views ====
 ===== Class membership =====
-===== Individual relationships =====
+===== Property Assertions - previously Individual Relationships =====
 
 ==== Object Property Views ====
-===== Object property features =====
+===== Object property matrix =====
+
+==== Data Property Views ====
+===== Data property matrix =====
+
 
 == Quick Start ==
 
