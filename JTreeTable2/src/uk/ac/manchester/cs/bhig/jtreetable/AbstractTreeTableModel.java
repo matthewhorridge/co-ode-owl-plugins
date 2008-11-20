@@ -118,7 +118,11 @@ public abstract class AbstractTreeTableModel<T> implements TreeTableModel<T> {
 
 
     public int getModelIndexOfColumn(Object o) {
-        return colIndex.get(o);
+        Integer index = colIndex.get(o);
+        if (index == null){
+            index = -1;
+        }
+        return index;
     }
 
 
