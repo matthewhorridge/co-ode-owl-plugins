@@ -107,8 +107,9 @@ public class TestJTreeTable {
             public void actionPerformed(ActionEvent event) {
                 int col = treeTable.getTable().getSelectedColumn();
                 if (col >= 0){
-                    TableColumn tc = treeTable.getTable().getColumnModel().getColumn(col);
-                    treeTable.getTable().getColumnModel().removeColumn(tc);
+                    int modelIndex = treeTable.getTable().convertColumnIndexToModel(col);
+                    Object colObj = treeTable.getModel().getColumnObjectAtModelIndex(modelIndex);
+                    treeTable.getModel().removeColumn(colObj);
                 }
             }
         });
