@@ -67,6 +67,23 @@ First make sure a reasoner has been selected and the ontology is classified.
 
 Note the use of OWLReasonerAdapter as the reasoners return equivalence sets.
 
+=== Find all named equivalent classes ===
+
+First make sure a reasoner has been selected and the ontology is classified.
+
+{{{
+  r = mngr.getReasoner();
+  onts = mngr.getActiveOntologies();
+  for (OWLOntology ont : onts){
+    for (OWLClass c : ont.getReferencedClasses()){
+      eq = r.getEquivalentClasses(c);
+      if (eq.size() > 1){
+        print(eq);
+      }
+    }
+  }
+}}}
+
 == Find the plugin ==
 
 The beanshell is a view plugin. Find it under the *View | Misc views | Bean Shell* menu
