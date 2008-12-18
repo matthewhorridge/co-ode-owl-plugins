@@ -22,7 +22,6 @@
  */
 package org.coode.oppl.variablemansyntax.bindingtree;
 
-import org.coode.oppl.HashCode;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -65,7 +64,7 @@ public class Assignment {
 
 	@Override
 	public int hashCode() {
-		return HashCode.hashCode(this);
+		return this.assignedVariable.hashCode() * this.assignment.hashCode();
 	}
 
 	@Override

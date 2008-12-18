@@ -44,7 +44,7 @@ import org.semanticweb.owl.model.RemoveAxiom;
  * 
  */
 public class ActionFactory {
-	public static List<OWLAxiomChange> createChange(ActionType actionType,
+	public static List<OWLAxiomChange> createChanges(ActionType actionType,
 			OWLAxiom axiom, ConstraintSystem cs, OWLDataFactory owlDataFactory,
 			OWLOntology ontology) {
 		Set<OWLAxiomChange> toReturn = new HashSet<OWLAxiomChange>();
@@ -82,5 +82,24 @@ public class ActionFactory {
 			toReturn.add(axiomChange);
 		}
 		return new ArrayList<OWLAxiomChange>(toReturn);
+	}
+
+	/**
+	 * @param actionType
+	 * @param axiom
+	 * @param cs
+	 * @param owlDataFactory
+	 * @param ontologies
+	 * @return the List of OWLAxiomChange
+	 */
+	public static List<OWLAxiomChange> createChanges(ActionType actionType,
+			OWLAxiom axiom, ConstraintSystem cs, OWLDataFactory owlDataFactory,
+			Set<OWLOntology> ontologies) {
+		List<OWLAxiomChange> toReturn = new ArrayList<OWLAxiomChange>();
+		for (OWLOntology ontology : ontologies) {
+			toReturn.addAll(createChanges(actionType, axiom, cs,
+					owlDataFactory, ontology));
+		}
+		return toReturn;
 	}
 }

@@ -10,7 +10,7 @@
   <property name="releasedownloads" location="/Users/luigi/Documents/workspace/PROTEGEDOCS/WebContent/oppl/downloads" />	
   <property name="releasejardest" location="${releasedownloads}/org.coode.oppl.jar"/>
   <property name="releasezipsourcedest" location="${releasedownloads}/org.coode.oppl-src.zip"/>	
-  
+  <property name="updateProperty" location="${basedir}/plugins/org.coode.oppl/update.properties"/>
 	
   <target name="init"> 
     <echo message="---------------Building the Bundle-------------"/>
@@ -26,6 +26,11 @@
   	<delete dir="${dist}/configuration/org.eclipse.core.runtime"/>
   	<delete dir="${dist}/configuration/org.eclipse.osgi"/>
   	<mkdir dir="${classes}/lib"/>
+  	<copy todir="${classes}/lib">
+  		<fileset dir="${basedir}/lib">
+  			<include name="*.jar"/> 
+  		</fileset>
+  	</copy>
   	<delete>
   		<fileset dir="${dist}/configuration/">
   			<include name="*.log"/>
@@ -47,7 +52,8 @@
          ================================= -->
     <target name="release" depends="bundle" description="Prepares the bundle for the web release">
     	<copy tofile="${releasejardest}" file="${jardest}"/>
-        
+        <copy todir="${releasedownloads}" file="${updateProperty}"/>
+    	
     </target>
 
 	

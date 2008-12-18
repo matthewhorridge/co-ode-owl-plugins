@@ -22,21 +22,18 @@
  */
 package org.coode.oppl.protege.ui;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Insets;
 
-import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
-import javax.swing.border.Border;
 
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
-import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.owl.OWLEditorKit;
 
@@ -45,26 +42,47 @@ import org.protege.editor.owl.OWLEditorKit;
  * 
  */
 public class VariableList extends MList {
-	class VariableListCellRenderer implements ListCellRenderer {
-		private final DefaultListCellRenderer defaultCellRenderer = new DefaultListCellRenderer();
+	class VariableListCellRenderer extends DefaultListCellRenderer {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -6717057306871665492L;
 
+		// private final DefaultListCellRenderer defaultCellRenderer = new
+		// DefaultListCellRenderer();
+		@Override
 		public Component getListCellRendererComponent(JList list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus) {
+			JLabel label = (JLabel) super.getListCellRendererComponent(list,
+					value, index, isSelected, cellHasFocus);
 			if (value instanceof VariableListItem) {
 				Variable variable = ((VariableListItem) value).getVariable();
 				VariableScope variableScope = variable.getVariableScope();
-				String variableScopeString = variableScope == null ? "" : "["
-						+ variableScope.getDirection()
-						+ " "
-						+ VariableList.this.owlEditorKit.getModelManager()
-								.getRendering(variableScope.getScopingObject())
-						+ "] ";
-				return this.defaultCellRenderer.getListCellRendererComponent(
-						list, variableScopeString + variable.getName(), index,
-						isSelected, cellHasFocus);
+				String variableScopeString = variableScope == null ? ""
+						: "["
+								+ new StringBuilder()
+										.append(variableScope.getDirection())
+										.append(" ")
+										.append(
+												VariableList.this.owlEditorKit
+														.getModelManager()
+														.getRendering(
+																variableScope
+																		.getScopingObject()))
+										.append("] ").toString();
+				label
+						.setIcon(new ImageIcon(
+								this
+										.getClass()
+										.getClassLoader()
+										.getResource(
+												variable instanceof GeneratedVariable ? "cog.png"
+														: "user-icon.gif")));
+				label.setText(variable.getName().startsWith("?_") ? variable
+						.getName().replaceAll("\\?_", "$") : variable.getName()
+						+ ":" + variable.getType() + variableScopeString);
 			}
-			return this.defaultCellRenderer.getListCellRendererComponent(list,
-					value, index, isSelected, cellHasFocus);
+			return label;
 		}
 	}
 
@@ -82,15 +100,6 @@ public class VariableList extends MList {
 	}
 
 	@Override
-	protected Border createListItemBorder(JList list, Object value, int index,
-			boolean isSelected, boolean cellHasFocus) {
-		Border border = super.createListItemBorder(list, value, index,
-				isSelected, cellHasFocus);
-		return BorderFactory.createCompoundBorder(border, new VariableBorder(
-				((VariableListItem) value).getVariable()));
-	}
-
-	@Override
 	protected void handleDelete() {
 		super.handleDelete();
 		DefaultListModel model = (DefaultListModel) this.getModel();
@@ -100,35 +109,7 @@ public class VariableList extends MList {
 		}
 	}
 
-	private static class VariableBorder implements Border {
-		private Variable variable;
-
-		public VariableBorder(Variable axiomChange) {
-			this.variable = axiomChange;
-		}
-
-		public Insets getBorderInsets(Component c) {
-			return new Insets(0, c.getFontMetrics(c.getFont()).getStringBounds(
-					VariableType.OBJECTPROPERTY.toString(), c.getGraphics())
-					.getBounds().width + 8, 0, 0);
-		}
-
-		public boolean isBorderOpaque() {
-			return false;
-		}
-
-		String getString() {
-			return this.variable.getType().toString();
-		}
-
-		public void paintBorder(Component c, Graphics g, int x, int y,
-				int width, int height) {
-			Color oldColor = g.getColor();
-			g.setColor(Color.DARK_GRAY);
-			g.drawString(this.getString(), x + 4, y + 2
-					+ g.getFontMetrics().getAscent()
-					+ g.getFontMetrics().getLeading());
-			g.setColor(oldColor);
-		}
+	public ListCellRenderer getVariableListCellRenderer() {
+		return this.variableListCellRenderer;
 	}
 }

@@ -26,7 +26,6 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.coode.oppl.HashCode;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -96,7 +95,7 @@ public final class VariableImpl implements InputVariable {
 
 	@Override
 	public int hashCode() {
-		return HashCode.hashCode(this);
+		return this.getName().hashCode();
 	}
 
 	public void clearBindings() {
@@ -121,5 +120,6 @@ public final class VariableImpl implements InputVariable {
 	 * @see org.coode.oppl.variablemansyntax.Variable#accept(org.coode.oppl.variablemansyntax.Variable.PlainVariableVisitor)
 	 */
 	public void accept(PlainVariableVisitor visitor) {
+		visitor.visit(this);
 	}
 }

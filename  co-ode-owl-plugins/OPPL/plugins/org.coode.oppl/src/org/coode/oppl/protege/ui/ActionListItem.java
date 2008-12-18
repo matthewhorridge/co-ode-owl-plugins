@@ -31,13 +31,18 @@ import org.semanticweb.owl.model.OWLAxiomChange;
  * 
  */
 public class ActionListItem implements MListItem {
-	protected OWLAxiomChange axiomChange;
+	private OWLAxiomChange axiomChange;
+	private final boolean isDeleteable;
+	private final boolean isEditable;
 
 	/**
 	 * @param axiomChange
 	 */
-	public ActionListItem(OWLAxiomChange axiomChange) {
+	public ActionListItem(OWLAxiomChange axiomChange, boolean isEditable,
+			boolean isDeleteable) {
 		this.axiomChange = axiomChange;
+		this.isDeleteable = isDeleteable;
+		this.isEditable = isEditable;
 	}
 
 	/**
@@ -46,35 +51,37 @@ public class ActionListItem implements MListItem {
 	public String getTooltip() {
 		String addOrRemove = this.axiomChange instanceof AddAxiom ? "ADD "
 				: "REMOVE ";
-		return addOrRemove + " the axiom from the active ontology";
+		String toFrom = this.axiomChange instanceof AddAxiom ? " to "
+				: " from ";
+		return addOrRemove + " the axiom" + toFrom
+				+ this.axiomChange.getOntology().getURI().toString();
 	}
 
 	/**
 	 * @see org.protege.editor.core.ui.list.MListItem#handleDelete()
 	 */
 	public boolean handleDelete() {
-		return false;
+		return true;
 	}
 
 	/**
 	 * @see org.protege.editor.core.ui.list.MListItem#handleEdit()
 	 */
 	public void handleEdit() {
-		// TODO Auto-generated method stub
 	}
 
 	/**
 	 * @see org.protege.editor.core.ui.list.MListItem#isDeleteable()
 	 */
 	public boolean isDeleteable() {
-		return true;
+		return this.isDeleteable;
 	}
 
 	/**
 	 * @see org.protege.editor.core.ui.list.MListItem#isEditable()
 	 */
 	public boolean isEditable() {
-		return false;
+		return this.isEditable;
 	}
 
 	/**

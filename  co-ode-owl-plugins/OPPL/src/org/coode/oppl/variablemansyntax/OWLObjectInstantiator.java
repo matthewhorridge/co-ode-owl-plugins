@@ -452,8 +452,9 @@ public class OWLObjectInstantiator implements OWLObjectVisitorEx<OWLObject> {
 		if (this.constraintSystem.isVariable(desc)) {
 			Variable variable = this.constraintSystem
 					.getVariable(desc.getURI());
-			toReturn = (OWLDescription) this.bindingNode
+			OWLDescription assignmentValue = (OWLDescription) this.bindingNode
 					.getAssignmentValue(variable);
+			toReturn = assignmentValue == null ? desc : assignmentValue;
 		} else {
 			toReturn = desc;
 		}
@@ -662,8 +663,9 @@ public class OWLObjectInstantiator implements OWLObjectVisitorEx<OWLObject> {
 		if (this.constraintSystem.isVariable(property)) {
 			Variable variable = this.constraintSystem.getVariable(property
 					.getURI());
-			toReturn = (OWLObjectProperty) this.bindingNode
+			OWLObjectProperty assignmentValue = (OWLObjectProperty) this.bindingNode
 					.getAssignmentValue(variable);
+			toReturn = assignmentValue == null ? property : assignmentValue;
 		}
 		return toReturn;
 	}
@@ -680,8 +682,9 @@ public class OWLObjectInstantiator implements OWLObjectVisitorEx<OWLObject> {
 		if (this.constraintSystem.isVariable(property)) {
 			Variable variable = this.constraintSystem.getVariable(property
 					.getURI());
-			toReturn = (OWLDataProperty) this.bindingNode
+			OWLDataProperty assignmentValue = (OWLDataProperty) this.bindingNode
 					.getAssignmentValue(variable);
+			toReturn = assignmentValue == null ? property : assignmentValue;
 		}
 		return toReturn;
 	}
@@ -691,8 +694,9 @@ public class OWLObjectInstantiator implements OWLObjectVisitorEx<OWLObject> {
 		if (this.constraintSystem.isVariable(individual)) {
 			Variable variable = this.constraintSystem.getVariable(individual
 					.getURI());
-			toReturn = (OWLIndividual) this.bindingNode
+			OWLIndividual assignmentValue = (OWLIndividual) this.bindingNode
 					.getAssignmentValue(variable);
+			toReturn = assignmentValue == null ? individual : assignmentValue;
 		}
 		return toReturn;
 	}

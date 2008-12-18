@@ -35,8 +35,12 @@ public class VariableOWLEntityRenderer implements OWLEntityRenderer {
 	public String render(OWLEntity entity) {
 		Variable variable = this.getConstraintSystem().getVariable(
 				entity.getURI());
-		return variable != null ? variable.getName() : this.getModelManager()
-				.getRendering(entity);
+		return variable != null ? this.renderVariable(variable) : this
+				.getModelManager().getRendering(entity);
+	}
+
+	private String renderVariable(Variable variable) {
+		return this.constraintSystem.render(variable);
 	}
 
 	/**

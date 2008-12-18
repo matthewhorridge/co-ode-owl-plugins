@@ -40,8 +40,10 @@ public class ActionListModel extends DefaultListModel {
 	 */
 	private static final long serialVersionUID = -5708452398843328281L;
 
-	public void addAction(OWLAxiomChange axiomChange) {
-		this.addElement(new ActionListItem(axiomChange));
+	public void addAction(OWLAxiomChange axiomChange, boolean isEditable,
+			boolean isDeleteable) {
+		this.addElement(new ActionListItem(axiomChange, isEditable,
+				isDeleteable));
 	}
 
 	public List<OWLAxiomChange> getOWLAxiomChanges() {

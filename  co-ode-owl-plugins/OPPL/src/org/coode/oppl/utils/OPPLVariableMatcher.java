@@ -47,11 +47,11 @@ public class OPPLVariableMatcher {
 	 *         String from the input ConstraintSystem, provided thei type has to
 	 *         be included.
 	 */
-	public static Set<Variable> matches(String name, ConstraintSystem cs,
-			boolean matchClasses, boolean matchObjectProperties,
-			boolean matchDataProperties, boolean matchIndividuals,
-			boolean matchConstants) {
-		Set<Variable> variables = cs.getVariables();
+	public static Set<Variable> matches(String name,
+			ConstraintSystem constraintSystem, boolean matchClasses,
+			boolean matchObjectProperties, boolean matchDataProperties,
+			boolean matchIndividuals, boolean matchConstants) {
+		Set<Variable> variables = constraintSystem.getVariables();
 		Set<Variable> toReturn = new HashSet<Variable>(variables.size());
 		for (Variable variable : variables) {
 			switch (variable.getType()) {

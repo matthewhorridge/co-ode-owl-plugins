@@ -22,7 +22,6 @@
  */
 package org.coode.oppl.syntax;
 
-
 /**
  * @author Luigi Iannone
  * 
@@ -40,7 +39,7 @@ public class Utils {
 			if (found) {
 				break;
 			} else {
-				toReturn += token.image;
+				toReturn += token.image + " ";
 				OPPLParser.getNextToken();
 			}
 		}

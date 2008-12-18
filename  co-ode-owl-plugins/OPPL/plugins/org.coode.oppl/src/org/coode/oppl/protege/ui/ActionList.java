@@ -46,10 +46,11 @@ public class ActionList extends MList {
 	 * 
 	 */
 	private static final long serialVersionUID = 6135780833694887712L;
+	private final OWLEditorKit owlEditorKit;
 
 	public ActionList(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
-		super();
+		this.owlEditorKit = owlEditorKit;
 		this.setModel(new ActionListModel());
 		VariableAxiomRenderer variableAxiomRenderer = new VariableAxiomRenderer(
 				owlEditorKit, constraintSystem);
@@ -104,5 +105,10 @@ public class ActionList extends MList {
 					+ g.getFontMetrics().getLeading());
 			g.setColor(oldColor);
 		}
+	}
+
+	public void setConstraintSystem(ConstraintSystem constraintSystem) {
+		this.setCellRenderer(new VariableAxiomRenderer(this.owlEditorKit,
+				constraintSystem));
 	}
 }

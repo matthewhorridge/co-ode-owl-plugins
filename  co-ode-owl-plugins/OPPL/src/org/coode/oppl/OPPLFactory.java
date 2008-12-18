@@ -27,7 +27,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
@@ -48,6 +47,7 @@ import org.semanticweb.owl.model.OWLDeclarationAxiom;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLIndividual;
 import org.semanticweb.owl.model.OWLObjectProperty;
+import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyChange;
 import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
@@ -66,7 +66,8 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		 * @return
 		 */
 		private URI buildURI(String shortName) {
-			URI uri = OPPLParser.getConstraintSystem().getOntology().getURI();
+			URI uri = OPPLFactory.this.getConstraintSystem().getOntology()
+					.getURI();
 			String baseURIString = uri.toString();
 			URI owlClassURI = URI.create(baseURIString + "#" + shortName);
 			return owlClassURI;
@@ -100,7 +101,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 
 		private <T extends OWLEntity> boolean isValidNewID(String shortName,
 				URI baseURI, Class<T> type) {
-			return baseURI.equals(OPPLParser.getConstraintSystem()
+			return baseURI.equals(OPPLFactory.this.getConstraintSystem()
 					.getOntology().getURI());
 		}
 
@@ -140,6 +141,12 @@ public class OPPLFactory implements OPPLAbstractFactory {
 			}
 			return null;
 		}
+
+		public <T extends OWLEntity> OWLEntityCreationSet<T> preview(
+				Class<T> type, String shortName, URI baseURI)
+				throws OWLEntityCreationException {
+			return this.createOWLEntity(type, shortName, baseURI);
+		}
 	}
 
 	private OWLOntologyManager ontologyManager;
@@ -147,6 +154,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	private OWLDataFactory dataFactory;
 	private VariableScopeChecker variableScopeChecker = null;
 	private OWLReasoner reasoner;
+	private OWLOntology ontology;
 
 	/**
 	 * @param ontologyManager
@@ -154,10 +162,10 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	 * @param dataFactory
 	 */
 	public OPPLFactory(OWLOntologyManager ontologyManager,
-			ConstraintSystem constraintSystem, OWLDataFactory dataFactory,
+			OWLOntology ontology, OWLDataFactory dataFactory,
 			OWLReasoner reasoner) {
 		this.ontologyManager = ontologyManager;
-		this.constraintSystem = constraintSystem;
+		this.ontology = ontology;
 		this.dataFactory = dataFactory;
 		this.reasoner = reasoner;
 	}
@@ -200,16 +208,31 @@ public class OPPLFactory implements OPPLAbstractFactory {
 				actions);
 	}
 
-	public OPPLQuery buildNewQuery() {
-		return new OPPLQueryImpl();
+	public OPPLQuery buildNewQuery(ConstraintSystem constraintSystem) {
+		return new OPPLQueryImpl(constraintSystem);
 	}
 
 	public ManchesterOWLSyntaxObjectRenderer getOWLObjectRenderer(
 			StringWriter writer) {
 		ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
 				writer);
-		renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
-				this.constraintSystem));
+		renderer.setShortFormProvider(new SimpleVariableShortFormProvider(this
+				.getConstraintSystem()));
 		return renderer;
+	}
+
+	/**
+	 * @return the constraintSystem
+	 */
+	private final ConstraintSystem getConstraintSystem() {
+		return this.constraintSystem == null ? this.createConstraintSystem()
+				: this.constraintSystem;
+	}
+
+	public ConstraintSystem createConstraintSystem() {
+		this.constraintSystem = this.reasoner == null ? new ConstraintSystem(
+				this.ontology, this.ontologyManager) : new ConstraintSystem(
+				this.ontology, this.ontologyManager, this.reasoner);
+		return this.constraintSystem;
 	}
 }

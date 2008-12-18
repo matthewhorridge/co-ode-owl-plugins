@@ -146,7 +146,7 @@ public class OPPLScriptImpl implements OPPLScript {
 		}
 		OPPLQuery opplQuery = this.getQuery();
 		if (this.query != null) {
-			buffer.append(opplQuery.toString(this.constraintSystem));
+			buffer.append(opplQuery.toString());
 		}
 		if (this.getActions().size() > 0) {
 			buffer.append(" BEGIN ");
@@ -195,7 +195,7 @@ public class OPPLScriptImpl implements OPPLScript {
 		}
 		OPPLQuery opplQuery = this.getQuery();
 		if (this.query != null) {
-			buffer.append(opplQuery.render(this.constraintSystem));
+			buffer.append(opplQuery.render());
 		}
 		if (this.getActions().size() > 0) {
 			buffer.append(" BEGIN ");
@@ -216,5 +216,9 @@ public class OPPLScriptImpl implements OPPLScript {
 			buffer.append(" END;");
 		}
 		return buffer.toString();
+	}
+
+	public void addVariable(Variable variable) {
+		this.variables.add(variable);
 	}
 }

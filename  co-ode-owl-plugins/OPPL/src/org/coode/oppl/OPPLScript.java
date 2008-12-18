@@ -36,6 +36,8 @@ import org.semanticweb.owl.model.OWLAxiomChange;
  * 
  */
 public interface OPPLScript {
+	public void addVariable(Variable variable);
+
 	/**
 	 * @return the List of the variables declared in this OPPLScript
 	 */
