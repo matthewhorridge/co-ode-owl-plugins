@@ -120,7 +120,7 @@ public class ProtegeOPPLScript implements OPPLScript {
 		buffer.append(" ");
 		OPPLQuery opplQuery = this.getQuery();
 		if (this.getQuery() != null) {
-			buffer.append(opplQuery.toString(this.getConstraintSystem()));
+			buffer.append(opplQuery.toString());
 		}
 		if (this.getActions().size() > 0) {
 			buffer.append(" BEGIN ");
@@ -142,5 +142,9 @@ public class ProtegeOPPLScript implements OPPLScript {
 
 	public String render() {
 		return this.opplScript.render();
+	}
+
+	public void addVariable(Variable variable) {
+		this.opplScript.addVariable(variable);
 	}
 }

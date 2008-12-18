@@ -79,7 +79,16 @@ public interface OPPLAbstractFactory {
 	/**
 	 * @return a new blank OPPLQuery instance
 	 */
-	OPPLQuery buildNewQuery();
+	OPPLQuery buildNewQuery(ConstraintSystem constraintSystem);
+
+	/**
+	 * Creates a fresh instance of ConstraintSystem
+	 * 
+	 * 
+	 * 
+	 * @return the created ConstraintSystem
+	 */
+	ConstraintSystem createConstraintSystem();
 
 	public ManchesterOWLSyntaxObjectRenderer getOWLObjectRenderer(
 			StringWriter writer);

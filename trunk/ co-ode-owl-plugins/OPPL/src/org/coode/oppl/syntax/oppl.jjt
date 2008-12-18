@@ -49,10 +49,14 @@ import org.coode.oppl.utils.*;
 
 public class OPPLParser {
 	private static OWLOntologyManager owlOntologyManager;
-	private static ConstraintSystem constraintSystem;
+	//private static ConstraintSystem constraintSystem;
 	private static OPPLAbstractFactory opplFactory = null;
 	private static List completions = new ArrayList();
 	static private AutoCompleterMatcher matcher=null;
+	private static OWLOntology ontology;
+	private static OWLReasoner reasoner;
+	
+	  
 	
 	public static List getCompletions(){
 		return completions; 
@@ -65,7 +69,7 @@ public class OPPLParser {
 	public static OPPLAbstractFactory getOPPLFactory(){
 		if(opplFactory ==null){
 			opplFactory = new OPPLFactory(owlOntologyManager,
-			constraintSystem, owlOntologyManager.getOWLDataFactory(), constraintSystem.getReasoner());
+			ontology, owlOntologyManager.getOWLDataFactory(), reasoner);
 		}
 		return opplFactory;
 	}
@@ -74,9 +78,7 @@ public class OPPLParser {
 		OPPLParser.opplFactory = opplFactory;
 	}
 	
-	public static ConstraintSystem getConstraintSystem(){
-		return constraintSystem;
-	}
+
 	
 	public static  OWLDataFactory getOWLDataFactory(){
 		return owlOntologyManager.getOWLDataFactory();
@@ -87,28 +89,32 @@ public class OPPLParser {
 	}
 	
 	public static void setReasoner(OWLReasoner reasoner){
-		constraintSystem.setReasoner(reasoner);
+		OPPLParser.reasoner = reasoner;
 	}
 	
-   public OPPLParser(java.io.InputStream in, OWLOntologyManager owlOntologyManager, ConstraintSystem constraintSystem){
+   public OPPLParser(java.io.InputStream in, OWLOntologyManager owlOntologyManager, OWLOntology ontology, OWLReasoner reasoner){
    	this(in);
-   	OPPLParser.owlOntologyManager = owlOntologyManager;
-   	OPPLParser.constraintSystem = constraintSystem;
+   		OPPLParser.owlOntologyManager = owlOntologyManager;
+   		OPPLParser.ontology = ontology;
+   		OPPLParser.reasoner = reasoner;
+   		
    } 
    
    	public static void ReInit(Reader reader,
-			OWLOntologyManager ontologyManager, ConstraintSystem cs) {
+			OWLOntologyManager ontologyManager, OWLOntology ontology, OWLReasoner reasoner){
 		ReInit(reader);
 		owlOntologyManager = ontologyManager;
-		constraintSystem = cs;
+		OPPLParser.ontology = ontology;
+   		OPPLParser.reasoner = reasoner;
 	
 	}
    
    	public OPPLParser(Reader reader, OWLOntologyManager ontologyManager,
-			ConstraintSystem cs) {
+			OWLOntology ontology, OWLReasoner reasoner) {
 		this(reader);
 		owlOntologyManager = ontologyManager;
-		constraintSystem = cs;
+		OPPLParser.ontology = ontology;
+   		OPPLParser.reasoner = reasoner;
 	}    
   public static void main(String args[]) {
     System.out.println("Reading from standard input...");
@@ -120,9 +126,8 @@ public class OPPLParser {
     try {
 	  OWLOntology ontology = ontologyManager.loadOntology(URI
 					.create(ontologyPhysicalURI));
-	  ConstraintSystem constraintSystem = new ConstraintSystem(ontology,
-					ontologyManager);
-	  new OPPLParser(System.in, ontologyManager, constraintSystem);			    	
+
+	  new OPPLParser(System.in, ontologyManager, ontology,null);			    	
       OPPLScript n = OPPLParser.Start();
       
       System.out.println("Thank you.");
@@ -157,17 +162,22 @@ TOKEN : /* LITERALS */
 }
 TOKEN : /* IDENTIFIERS */
 {
-  < IDENTIFIER: "?"<LETTER> (<LETTER>|<DIGIT>)* >
-|  < #LETTER: ["_","a"-"z","A"-"Z"] >
+  < IDENTIFIER: "?" <NAME> >
+  /*| "?" <LETTER> (<LETTER>|<DIGIT>)*> */ 
+ | <#NAME:  <LETTER> (<LETTER>|<DIGIT>)*>  
+|  < #LETTER: ["_","a"-"z","A"-"Z", "ˆ"-""] >
 |  < #DIGIT: ["0"-"9"] >
 }
 
 
 
 
-TOKEN:/* OPPL FUNCTIONS*/
+TOKEN[IGNORE_CASE]:/* OPPL FUNCTIONS*/
 {
-	<CREATE: "Create"|"create">
+	
+	<CREATE:   "create">
+	| <CREATEINTERSECTION: "CreateIntersection">
+	| <CREATEUNION: "CreateUnion">
 }
 
 TOKEN :/* VARIABLE TYPES*/
@@ -177,7 +187,7 @@ TOKEN :/* VARIABLE TYPES*/
 }
 
 
-TOKEN: /* OPPL SYNTAX*/
+TOKEN[IGNORE_CASE]: /* OPPL SYNTAX*/
 {
 	<SELECT: "SELECT"> |<WHERE: "WHERE">| <ASSERTED: "ASSERTED"> | <ADD: "ADD"> | <REMOVE: "REMOVE"> |<BEGIN: "BEGIN"> |<END: "END">
 }
@@ -209,7 +219,7 @@ TOKEN: /* CREATED ENTITIES */
 	<GENERATEDENTITY: "!"<ENTITYNAMES>>
 }
 
-TOKEN : /* MANSYNTAX KEYWORDS */
+TOKEN: /* MANSYNTAX KEYWORDS */
 {
 	<SUBCLASSOF: "SubClassOf" | "subClassOf">
 	|<EQUIVALENTTO: "EquivalentTo" | "equivalentTo">
@@ -236,7 +246,8 @@ TOKEN : /* VARIABLE SCOPE OTHER DIRECTIONS */
 
 TOKEN :/* VARIABLE ATTRIBUTES*/
 {
-	<VARIABLEATTRIBUTE: "RENDERING">
+	<RENDERINGVARIABLEATTRIBUTE: "RENDERING">
+	|<VALUESVARIABLEATTRIBUTE: "VALUES">
 }
 
 TOKEN : /* MANSYNTAX ENTITY NAMES */
@@ -249,24 +260,30 @@ TOKEN: /* LITERALS*/
 	<LITERAL: <QUOTE><ENTITYNAMES><QUOTE><POWER><POWER><ENTITYNAMES>(<COLON> <ENTITYNAMES>)?>
 }
 
+OPPLScript Start():{}
+{
+	{
+	return parse(null);
+	}
+}
 
-
-OPPLScript Start():{
+OPPLScript parse(ConstraintSystem cs):{
 	List<Variable> variables= new ArrayList<Variable>();
 	OPPLQuery opplQuery=null;
 	List<OWLAxiomChange> actions = new ArrayList<OWLAxiomChange>();
+	ConstraintSystem constraintSystem = cs==null? getOPPLFactory().createConstraintSystem():cs;
 }
 {
-  (variables = VariableDeclaration())?(opplQuery = query())?(actions = Actions())?";"
+  (variables = VariableDeclaration(constraintSystem))?(opplQuery = query(constraintSystem))?(actions = Actions(constraintSystem))?";"
   { 
   	
   	return getOPPLFactory().buildOPPLScript(constraintSystem, variables, opplQuery, actions); 
   	}
 }
 
-List<Variable> VariableDeclaration() #void :{List<Variable> toReturn = new ArrayList<Variable>(); Variable v;}
+List<Variable> VariableDeclaration(ConstraintSystem constraintSystem) #void :{List<Variable> toReturn = new ArrayList<Variable>(); Variable v;}
 {
-	v =VariableDefinition(){
+	v =VariableDefinition(constraintSystem){
 		toReturn.add(v);
 		completions.clear();
 		completions.add(",");
@@ -274,7 +291,7 @@ List<Variable> VariableDeclaration() #void :{List<Variable> toReturn = new Array
 	}
 	(<COMMA>{
 		completions.clear();
-	} v = VariableDefinition()
+	} v = VariableDefinition(constraintSystem)
 	{
 		toReturn.add(v);
 		completions.clear();
@@ -286,11 +303,11 @@ List<Variable> VariableDeclaration() #void :{List<Variable> toReturn = new Array
 	}
 }
 
-List<OWLAxiomChange> Actions():{List<OWLAxiomChange> toReturn = new ArrayList<OWLAxiomChange>(); OWLAxiomChange action;}
+List<OWLAxiomChange> Actions(ConstraintSystem constraintSystem):{List<OWLAxiomChange> toReturn = new ArrayList<OWLAxiomChange>(); OWLAxiomChange action;}
 {
-	<BEGIN> action = Action(){
+	<BEGIN> action = Action(constraintSystem){
 		toReturn.add(action);
-	} (<COMMA> action = Action(){
+	} (<COMMA> action = Action(constraintSystem){
 		toReturn.add(action);
 	}
 	)*<END>{
@@ -298,7 +315,7 @@ List<OWLAxiomChange> Actions():{List<OWLAxiomChange> toReturn = new ArrayList<OW
 	}
 }	
 
-Variable VariableDefinition():{Token variableNameToken;
+Variable VariableDefinition(ConstraintSystem constraintSystem):{Token variableNameToken;
 						   Token variableTypeToken; 
 						   VariableType variableType=null;
 						   VariableScope variableScope;
@@ -316,7 +333,7 @@ Variable VariableDefinition():{Token variableNameToken;
 	{
 		variableType = VariableType.getVariableType(variableTypeToken.image);
 	}
-	"=" v = opplFunction(variableNameToken.image,variableType){
+	"=" v = opplFunction(variableNameToken.image,variableType,constraintSystem){
 		return v;
 	}
 	
@@ -330,7 +347,7 @@ Variable VariableDefinition():{Token variableNameToken;
 	{
 		try{
 			variableType = VariableType.getVariableType(variableTypeToken.image);    
-            v =  OPPLParser.getConstraintSystem().createVariable(variableNameToken.image,variableType);
+            v =  constraintSystem.createVariable(variableNameToken.image,variableType);
 		}catch(OPPLException e){
 			throw new ParseException(e.getMessage());
 		}
@@ -341,7 +358,7 @@ Variable VariableDefinition():{Token variableNameToken;
 		completions.addAll(EnumSet.allOf(VariableScopes.Direction.class));
 	}  
 	direction = direction()		 
-	variableScope = typeScope(direction, variableType)
+	variableScope = typeScope(direction, variableType,constraintSystem)
 	<CLOSEDSQUAREBRACKETS>{
 		v.setVariableScope(variableScope, getOPPLFactory().getVariableScopeChecker());
 		return v;
@@ -356,7 +373,7 @@ Variable VariableDefinition():{Token variableNameToken;
 		completions.clear();
 		try{
 			variableType = VariableType.getVariableType(variableTypeToken.image);    
-			return OPPLParser.getConstraintSystem().createVariable(variableNameToken.image,variableType);
+			return constraintSystem.createVariable(variableNameToken.image,variableType);
 		}catch(OPPLException e){
 			throw new ParseException(e.getMessage());
 		}		
@@ -365,34 +382,63 @@ Variable VariableDefinition():{Token variableNameToken;
 }
 
 
-Variable opplFunction(String name,VariableType type) #void:{GeneratedValue value=null;}{
-	<CREATE><OPENPARENTHESYS>value = stringOperation()<CLOSEDPARENTHESYS>{
+Variable opplFunction(String name,VariableType type, ConstraintSystem constraintSystem) #void:{GeneratedValue<String> value=null; 
+	CollectionGeneratedValue<? extends OWLObject> collection=null;}{
+	<CREATE><OPENPARENTHESYS> 
+		value = stringOperation(constraintSystem)<CLOSEDPARENTHESYS>{
 		try{
-			return getConstraintSystem().createGeneratedVariable(name,type, value);
+			return constraintSystem.createStringGeneratedVariable(name,type, value);
 		}catch(OPPLException e){
 			throw new ParseException(e.getMessage());
+		}
+	}
+	|<CREATEINTERSECTION><OPENPARENTHESYS>collection = set(type,constraintSystem) 
+	<CLOSEDPARENTHESYS>{
+		return constraintSystem.createIntersectionGeneratedVariable(name,type,(CollectionGeneratedValue<OWLClass>) collection);
+	}
+	|<CREATEUNION><OPENPARENTHESYS> collection = set(type,constraintSystem)
+	<CLOSEDPARENTHESYS>{
+		return constraintSystem.createUnionGeneratedVariable(name,type,(CollectionGeneratedValue<OWLClass>) collection);
+	} 
+}
+
+CollectionGeneratedValue<? extends OWLObject> set(VariableType type,ConstraintSystem constraintSystem) #void:{
+	Token variableNameToken=null;}
+{
+	variableNameToken = <IDENTIFIER>"."<VALUESVARIABLEATTRIBUTE>{
+		String variableName = variableNameToken.image;
+		Variable v = constraintSystem.getVariable(variableName);
+		if(v !=null){
+				if(type == v.getType()){			
+					VariableGeneratedValue.Attribute attribute = VariableGeneratedValue.Attribute.VALUES;
+					return (CollectionGeneratedValue<? extends OWLObject> )attribute.getVariableGeneratedValue(v, constraintSystem);
+				}else{
+					throw new ParseException("Type mismatch "+type+" needed instead of the actual "+v.getType());
+				}
+			
+		}else{
+			throw new ParseException("Invalid variable name: "+variableName);
 		}
 	}
 }
 
 
 
-
-GeneratedValue stringOperation() #void:{GeneratedValue result=null;}
+GeneratedValue<String> stringOperation(ConstraintSystem constraintSystem) #void:{GeneratedValue result=null;}
 {
-	result = stringConcat(){
+	result = stringConcat(constraintSystem){
 		return result;
 	}
 }
 
-GeneratedValue stringConcat() #void:{GeneratedValue aGeneratedValue;
+GeneratedValue<String> stringConcat(ConstraintSystem constraintSystem) #void:{GeneratedValue aGeneratedValue;
 									Token link;String string;
-									List<GeneratedValue> components = new ArrayList<GeneratedValue>();}
+									List<GeneratedValue<String>> components = new ArrayList<GeneratedValue<String>>();}
 {
 
-	aGeneratedValue = generatedValue(){
+	aGeneratedValue = generatedValue(constraintSystem){
 		components.add(aGeneratedValue);
-	} ("+"  aGeneratedValue = generatedValue(){		
+	} ("+"  aGeneratedValue = generatedValue(constraintSystem){		
 		components.add(aGeneratedValue);
 	})*{
 		if(components.size()==1){
@@ -404,20 +450,20 @@ GeneratedValue stringConcat() #void:{GeneratedValue aGeneratedValue;
 	}
 }
 
-GeneratedValue generatedValue() #void:{Token valueToken;Token variableNameToken;Token variableAttributeToken;}
+GeneratedValue generatedValue(ConstraintSystem constraintSystem) #void:{Token valueToken;Token variableNameToken;Token variableAttributeToken;}
 {
 	<QUOTE>valueToken = <ENTITYNAMES><QUOTE>{		
-		return new ConstantGeneratedValue(valueToken.image);
+		return new ConstantStringGeneratedValue(valueToken.image);
 	}
 	|
-	variableNameToken = <IDENTIFIER>"." variableAttributeToken = <VARIABLEATTRIBUTE>{
+	variableNameToken = <IDENTIFIER>"." variableAttributeToken = <RENDERINGVARIABLEATTRIBUTE>{
 		String attributeString = variableAttributeToken.image;
 		String variableName = variableNameToken.image;
-		Variable v = getConstraintSystem().getVariable(variableName);
+		Variable v = constraintSystem.getVariable(variableName);
 		if(v !=null){
 			try{
 				VariableGeneratedValue.Attribute attribute = VariableGeneratedValue.Attribute.parse(attributeString);
-				return new VariableGeneratedValue(v,attribute);
+				return attribute.getVariableGeneratedValue(v, constraintSystem);
 			}catch(OPPLException e){
 				
 				throw new ParseException(e.getMessage());
@@ -443,7 +489,7 @@ VariableScopes.Direction direction() #void: {Token t=null;}
 
 
 JAVACODE
-VariableScope typeScope(VariableScopes.Direction direction, VariableType variableType){
+VariableScope typeScope(VariableScopes.Direction direction, VariableType variableType, ConstraintSystem constraintSystem){
 		Token t;
 		String manSyntaxString = "";
 		VariableScope toReturn = null;
@@ -569,22 +615,22 @@ VariableScope parseScope(VariableScopes.Direction direction,
 	}
 
 
-Constraint Constraint():{Token t;OWLObject owlObject;Variable variable;}
+AbstractConstraint Constraint(ConstraintSystem constraintSystem):{Token t;OWLObject owlObject;Variable variable;}
 {
 	t = <IDENTIFIER> {
-		variable = OPPLParser.getConstraintSystem().getVariable(t.image);
+		variable = constraintSystem.getVariable(t.image);
 		if(variable==null){
 			throw new ParseException("Undeclared variable "+t.image);
 		}
 	} 
-	<NEQ> owlObject = OWLExpression(variable){
-		return new Constraint(variable, owlObject);
+	<NEQ> owlObject = OWLExpression(variable, constraintSystem){
+		return new InequalityConstraint(variable, owlObject,constraintSystem);
 	}
 	
 }
 
 JAVACODE
-OWLObject OWLExpression(Variable v) 
+OWLObject OWLExpression(Variable v, ConstraintSystem constraintSystem) 
 {
 		Token t;
 		String manSyntaxString="";
@@ -600,7 +646,7 @@ OWLObject OWLExpression(Variable v)
 
 	VariableType type = v.getType();
 	manSyntaxString = manSyntaxString.trim();
-	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, OPPLParser.getConstraintSystem(),OPPLParser.getOWLDataFactory(), OPPLParser.getOWLOntologyManager());
+	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, constraintSystem,OPPLParser.getOWLDataFactory(), OPPLParser.getOWLOntologyManager());
 	 
 	try{
 	OWLObject toReturn = type.accept(expressionParser);
@@ -619,19 +665,22 @@ VariableType variableType() #void:{Token t;}
 	}
 }
 
-OPPLQuery query():{OWLAxiom axiom; OPPLQuery toReturn = getOPPLFactory().buildNewQuery();Constraint c;}
+OPPLQuery query(ConstraintSystem constraintSystem):{
+	OWLAxiom axiom; 
+	OPPLQuery toReturn = getOPPLFactory().buildNewQuery(constraintSystem);
+	AbstractConstraint c;}
 {
 	<SELECT>{
 		completions.clear();
-	} queryAtom(toReturn)
+	} queryAtom(toReturn,constraintSystem)
 	
 	(<COMMA>{
 		completions.clear();
-	} queryAtom(toReturn))*  
-	(<WHERE> c=Constraint(){
+	} queryAtom(toReturn,constraintSystem))*  
+	(<WHERE> c=Constraint(constraintSystem){
 		toReturn.addConstraint(c);
 	}
-	 (<COMMA> c=Constraint(){
+	 (<COMMA> c=Constraint(constraintSystem){
 		toReturn.addConstraint(c);
 	} 
 	 )*)?
@@ -640,28 +689,28 @@ OPPLQuery query():{OWLAxiom axiom; OPPLQuery toReturn = getOPPLFactory().buildNe
 	}
 }
 
-void queryAtom(OPPLQuery query) #void: {OWLAxiom axiom;}
+void queryAtom(OPPLQuery query, ConstraintSystem constraintSystem) #void: {OWLAxiom axiom;}
 {
-	<ASSERTED> axiom = Clause(){
+	<ASSERTED> axiom = Clause(constraintSystem){
 		query.addAssertedAxiom(axiom);
 	}
-	| axiom = Clause(){
+	| axiom = Clause(constraintSystem){
 		query.addAxiom(axiom);
 	}
 }
 
-OWLAxiomChange Action():{Token t;OWLAxiom axiom;}
+OWLAxiomChange Action(ConstraintSystem constraintSystem):{Token t;OWLAxiom axiom;}
 {
-	<ADD> axiom = Clause(){
+	<ADD> axiom = Clause(constraintSystem){
 		return new AddAxiom(constraintSystem.getOntology(), axiom);
 	}
-	|<REMOVE> axiom = Clause(){
+	|<REMOVE> axiom = Clause(constraintSystem){
 		return new RemoveAxiom(constraintSystem.getOntology(), axiom);
 	}
 }
 
 JAVACODE
-OWLAxiom Clause(){
+OWLAxiom Clause(ConstraintSystem constraintSystem){
 	OWLAxiom toReturn =null;
 	String manSyntaxString="";
 	Token t;
@@ -675,7 +724,7 @@ OWLAxiom Clause(){
 			}
 		}
 	manSyntaxString = manSyntaxString.trim();	
-	VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(OPPLParser.getOWLDataFactory(), manSyntaxString, OPPLParser.getConstraintSystem()
+	VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(OPPLParser.getOWLDataFactory(), manSyntaxString, constraintSystem
 					);
 	parser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
 	try{
@@ -709,7 +758,7 @@ OWLAxiom Clause(){
 		throw new ParseException(e.getMessage());
 	}
 	String expression = manSyntaxString+"**";	
-        VariableManchesterOWLSyntaxParser completerParser = new VariableManchesterOWLSyntaxParser(OPPLParser.getOWLDataFactory(), expression, OPPLParser.getConstraintSystem()
+        VariableManchesterOWLSyntaxParser completerParser = new VariableManchesterOWLSyntaxParser(OPPLParser.getOWLDataFactory(), expression, constraintSystem
 					);
         completerParser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
         try{

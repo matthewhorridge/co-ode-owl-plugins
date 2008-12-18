@@ -30,7 +30,6 @@ import javax.swing.ListCellRenderer;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLObject;
@@ -40,30 +39,13 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public class VariableAxiomRenderer implements ListCellRenderer {
-	class VariableAxiomOWLCellRenderer extends OWLCellRenderer {
-		public VariableAxiomOWLCellRenderer(OWLEditorKit owlEditorKit) {
-			super(owlEditorKit);
-		}
-
-		@Override
-		protected String getRendering(Object object) {
-			if (object instanceof OWLObject) {
-				return VariableAxiomRenderer.this.objectRenderer
-						.render((OWLObject) object,
-								VariableAxiomRenderer.this.renderer);
-			}
-			return super.getRendering(object);
-		}
-	}
-
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6631014357184600262L;
-	OWLEditorKit owlEditorKit;
-	ConstraintSystem constraintSystem;
-	private final VariableOWLEntityRenderer renderer;
-	private final VariableOWLObjectRenderer objectRenderer;
+	private OWLEditorKit owlEditorKit;
+	private ConstraintSystem constraintSystem;
+	VariableOWLEntityRenderer renderer;
 	private final DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
 	private final VariableAxiomOWLCellRenderer variableAxiomOWLCellRenderer;
 
@@ -71,14 +53,13 @@ public class VariableAxiomRenderer implements ListCellRenderer {
 			ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
-		this.objectRenderer = new VariableOWLObjectRenderer(owlEditorKit
-				.getModelManager());
-		this.variableAxiomOWLCellRenderer = new VariableAxiomOWLCellRenderer(
-				owlEditorKit);
-		this.variableAxiomOWLCellRenderer.setWrap(true);
-		this.variableAxiomOWLCellRenderer.setHighlightKeywords(true);
+		new VariableOWLObjectRenderer(owlEditorKit.getModelManager());
 		this.renderer = new VariableOWLEntityRenderer(this.constraintSystem,
 				this.owlEditorKit.getModelManager());
+		this.variableAxiomOWLCellRenderer = new VariableAxiomOWLCellRenderer(
+				owlEditorKit, this.renderer);
+		this.variableAxiomOWLCellRenderer.setWrap(true);
+		this.variableAxiomOWLCellRenderer.setHighlightKeywords(true);
 	}
 
 	/**
@@ -87,6 +68,8 @@ public class VariableAxiomRenderer implements ListCellRenderer {
 	 */
 	public void setConstraintSystem(ConstraintSystem constraintSystem) {
 		this.constraintSystem = constraintSystem;
+		this.renderer = new VariableOWLEntityRenderer(constraintSystem,
+				this.owlEditorKit.getModelManager());
 	}
 
 	public Component getListCellRendererComponent(JList list, Object value,

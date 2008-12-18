@@ -40,7 +40,6 @@ import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLAxiomChange;
-import org.semanticweb.owl.model.OWLDataFactory;
 
 import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
@@ -51,7 +50,6 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
 public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	private OWLModelManager modelManager;
 	private ConstraintSystem constraintSystem;
-	private OWLDataFactory dataFacotry;
 	private ProtegeScopeVariableChecker variableScopeVariableChecker = null;
 
 	/**
@@ -59,11 +57,8 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	 * @param constraintSystem
 	 * @param dataFactory
 	 */
-	public ProtegeOPPLFactory(OWLModelManager modelManager,
-			ConstraintSystem constraintSystem, OWLDataFactory dataFactory) {
+	public ProtegeOPPLFactory(OWLModelManager modelManager) {
 		this.modelManager = modelManager;
-		this.constraintSystem = constraintSystem;
-		this.dataFacotry = dataFactory;
 	}
 
 	/**
@@ -107,8 +102,8 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 		return toReturn;
 	}
 
-	public OPPLQuery buildNewQuery() {
-		OPPLQuery opplQuery = new OPPLQueryImpl();
+	public OPPLQuery buildNewQuery(ConstraintSystem constraintSystem) {
+		OPPLQuery opplQuery = new OPPLQueryImpl(constraintSystem);
 		return new ProtegeOPPLQuery(opplQuery, this.modelManager);
 	}
 
@@ -118,7 +113,23 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 				writer);
 		renderer
 				.setShortFormProvider(new ProtegeSimpleVariableShortFormProvider(
-						this.modelManager, this.constraintSystem));
+						this.modelManager, this.getConstraintSystem()));
 		return renderer;
+	}
+
+	public ConstraintSystem createConstraintSystem() {
+		this.constraintSystem = new ConstraintSystem(this.modelManager
+				.getActiveOntology(),
+				this.modelManager.getOWLOntologyManager(), this.modelManager
+						.getReasoner());
+		return this.constraintSystem;
+	}
+
+	/**
+	 * @return the constraintSystem
+	 */
+	private ConstraintSystem getConstraintSystem() {
+		return this.constraintSystem == null ? this.createConstraintSystem()
+				: this.constraintSystem;
 	}
 }

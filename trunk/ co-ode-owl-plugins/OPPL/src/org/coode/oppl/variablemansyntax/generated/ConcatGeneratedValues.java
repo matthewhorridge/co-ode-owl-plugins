@@ -28,8 +28,8 @@ import java.util.List;
  * @author Luigi Iannone
  * 
  */
-public class ConcatGeneratedValues extends AggregatedGeneratedValue {
-	public ConcatGeneratedValues(List<GeneratedValue> values2Aggregate) {
+public class ConcatGeneratedValues extends AggregatedGeneratedValue<String> {
+	public ConcatGeneratedValues(List<GeneratedValue<String>> values2Aggregate) {
 		super(values2Aggregate);
 	}
 

@@ -41,7 +41,15 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
 public class OPPLQueryImpl implements OPPLQuery {
 	private final List<OWLAxiom> axioms = new ArrayList<OWLAxiom>();
 	private final List<OWLAxiom> assertedAxioms = new ArrayList<OWLAxiom>();
-	private final Set<Constraint> constraints = new HashSet<Constraint>();
+	private final Set<AbstractConstraint> constraints = new HashSet<AbstractConstraint>();
+	private final ConstraintSystem constraintSystem;
+
+	/**
+	 * @param constraintSystem
+	 */
+	public OPPLQueryImpl(ConstraintSystem constraintSystem) {
+		this.constraintSystem = constraintSystem;
+	}
 
 	/**
 	 * 
@@ -59,9 +67,9 @@ public class OPPLQueryImpl implements OPPLQuery {
 	}
 
 	/**
-	 * @see org.coode.oppl.OPPLQuery#addConstraint(org.coode.oppl.Constraint)
+	 * @see org.coode.oppl.OPPLQuery#addConstraint(org.coode.oppl.InequalityConstraint)
 	 */
-	public void addConstraint(Constraint constraint) {
+	public void addConstraint(AbstractConstraint constraint) {
 		this.constraints.add(constraint);
 	}
 
@@ -79,11 +87,12 @@ public class OPPLQueryImpl implements OPPLQuery {
 		return this.assertedAxioms;
 	}
 
-	public List<Constraint> getConstraints() {
-		return new ArrayList<Constraint>(this.constraints);
+	public List<AbstractConstraint> getConstraints() {
+		return new ArrayList<AbstractConstraint>(this.constraints);
 	}
 
-	public String toString(ConstraintSystem constraintSystem) {
+	@Override
+	public String toString() {
 		StringBuffer buffer = new StringBuffer("SELECT ");
 		boolean first = true;
 		for (OWLAxiom axiom : this.getAssertedAxioms()) {
@@ -92,7 +101,7 @@ public class OPPLQueryImpl implements OPPLQuery {
 			ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
 					writer);
 			renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
-					constraintSystem));
+					this.constraintSystem));
 			first = false;
 			buffer.append(commaString);
 			axiom.accept(renderer);
@@ -104,7 +113,7 @@ public class OPPLQueryImpl implements OPPLQuery {
 			ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
 					writer);
 			renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
-					constraintSystem));
+					this.constraintSystem));
 			first = false;
 			buffer.append(commaString);
 			axiom.accept(renderer);
@@ -113,16 +122,16 @@ public class OPPLQueryImpl implements OPPLQuery {
 		if (this.getConstraints().size() > 0) {
 			buffer.append(" WHERE ");
 			first = true;
-			for (Constraint c : this.getConstraints()) {
+			for (AbstractConstraint c : this.getConstraints()) {
 				String commaString = first ? "" : ", ";
 				buffer.append(commaString);
-				buffer.append(c.toString(constraintSystem));
+				buffer.append(c.toString());
 			}
 		}
 		return buffer.toString();
 	}
 
-	public String render(ConstraintSystem constraintSystem) {
+	public String render() {
 		StringBuffer buffer = new StringBuffer("SELECT ");
 		boolean first = true;
 		for (OWLAxiom axiom : this.getAssertedAxioms()) {
@@ -131,7 +140,7 @@ public class OPPLQueryImpl implements OPPLQuery {
 			ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
 					writer);
 			renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
-					constraintSystem));
+					this.getConstraintSystem()));
 			first = false;
 			buffer.append(commaString);
 			axiom.accept(renderer);
@@ -150,12 +159,19 @@ public class OPPLQueryImpl implements OPPLQuery {
 		if (this.getConstraints().size() > 0) {
 			buffer.append(" WHERE ");
 			first = true;
-			for (Constraint c : this.getConstraints()) {
+			for (AbstractConstraint c : this.getConstraints()) {
 				String commaString = first ? "" : ", ";
 				buffer.append(commaString);
-				buffer.append(c.toString(constraintSystem));
+				buffer.append(c.toString());
 			}
 		}
 		return buffer.toString();
+	}
+
+	/**
+	 * @return the constraintSystem
+	 */
+	public ConstraintSystem getConstraintSystem() {
+		return this.constraintSystem;
 	}
 }

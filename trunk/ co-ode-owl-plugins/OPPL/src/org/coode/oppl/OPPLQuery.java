@@ -36,15 +36,17 @@ public interface OPPLQuery {
 
 	void addAxiom(OWLAxiom axiom);
 
-	void addConstraint(Constraint constraint);
+	void addConstraint(AbstractConstraint constraint);
 
 	List<OWLAxiom> getAxioms();
 
 	List<OWLAxiom> getAssertedAxioms();
 
-	List<Constraint> getConstraints();
+	List<AbstractConstraint> getConstraints();
 
-	String toString(ConstraintSystem constraintSystem);
+	String toString();
 
-	String render(ConstraintSystem constraintSystem);
+	String render();
+
+	ConstraintSystem getConstraintSystem();
 }

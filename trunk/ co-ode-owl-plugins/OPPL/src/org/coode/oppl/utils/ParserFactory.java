@@ -26,9 +26,9 @@ import java.io.StringReader;
 
 import org.coode.oppl.protege.ProtegeOPPLFactory;
 import org.coode.oppl.syntax.OPPLParser;
-import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcherImpl;
+import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
@@ -40,26 +40,14 @@ public class ParserFactory {
 	static OPPLParser parser = null;
 
 	public static OPPLParser initParser(String formulaBody,
-			OWLOntology ontology, OWLOntologyManager ontologyManager) {
+			OWLOntology ontology, OWLOntologyManager ontologyManager,
+			OWLReasoner reasoner) {
 		if (parser == null) {
 			parser = new OPPLParser(new StringReader(formulaBody),
-					ontologyManager, new ConstraintSystem(ontology,
-							ontologyManager));
+					ontologyManager, ontology, reasoner);
 		} else {
 			OPPLParser.ReInit(new StringReader(formulaBody), ontologyManager,
-					new ConstraintSystem(ontology, ontologyManager));
-		}
-		return parser;
-	}
-
-	public static OPPLParser initParser(String formulaBody,
-			OWLOntologyManager ontologyManager, ConstraintSystem cs) {
-		if (parser == null) {
-			parser = new OPPLParser(new StringReader(formulaBody),
-					ontologyManager, cs);
-		} else {
-			OPPLParser.ReInit(new StringReader(formulaBody), ontologyManager,
-					cs);
+					ontology, reasoner);
 		}
 		return parser;
 	}
@@ -68,33 +56,14 @@ public class ParserFactory {
 			OWLModelManager manager) {
 		if (parser == null) {
 			parser = new OPPLParser(new StringReader(formulaBody), manager
-					.getOWLOntologyManager(), new ConstraintSystem(manager
-					.getActiveOntology(), manager.getOWLOntologyManager(),
-					manager.getReasoner()));
+					.getOWLOntologyManager(), manager.getActiveOntology(),
+					manager.getReasoner());
 		} else {
 			OPPLParser.ReInit(new StringReader(formulaBody), manager
-					.getOWLOntologyManager(), new ConstraintSystem(manager
-					.getActiveOntology(), manager.getOWLOntologyManager(),
-					manager.getReasoner()));
+					.getOWLOntologyManager(), manager.getActiveOntology(),
+					manager.getReasoner());
 		}
-		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager, OPPLParser
-				.getConstraintSystem(), manager.getOWLDataFactory()));
-		OPPLParser
-				.setAutoCompleterMatcher(new AutoCompleterMatcherImpl(manager));
-		return parser;
-	}
-
-	public static OPPLParser initParser(String formulaBody,
-			OWLModelManager manager, ConstraintSystem cs) {
-		if (parser == null) {
-			parser = new OPPLParser(new StringReader(formulaBody), manager
-					.getOWLOntologyManager(), cs);
-		} else {
-			OPPLParser.ReInit(new StringReader(formulaBody), manager
-					.getOWLOntologyManager(), cs);
-		}
-		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager, OPPLParser
-				.getConstraintSystem(), manager.getOWLDataFactory()));
+		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager));
 		OPPLParser
 				.setAutoCompleterMatcher(new AutoCompleterMatcherImpl(manager));
 		return parser;

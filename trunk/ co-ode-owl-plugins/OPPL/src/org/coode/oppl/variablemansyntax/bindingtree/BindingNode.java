@@ -43,7 +43,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 			BindingNode.this.unassignedVariables.add(v);
 		}
 
-		public void visit(GeneratedVariable v) {
+		public void visit(GeneratedVariable<?> v) {
 		}
 	}
 
@@ -69,12 +69,20 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	}
 
 	public boolean isLeaf() {
-		return this.unassignedVariables.isEmpty();
+		boolean found = false;
+		Iterator<Variable> it = this.unassignedVariables.iterator();
+		while (!found && it.hasNext()) {
+			found = !it.next().getPossibleBindings().isEmpty();
+		}
+		return this.unassignedVariables.isEmpty() || !found;
 	}
 
 	@Override
 	public String toString() {
-		return this.assignments + "\n" + this.unassignedVariables;
+		return this.assignments
+				+ "\n"
+				+ (this.unassignedVariables.isEmpty() ? ""
+						: this.unassignedVariables);
 	}
 
 	public OWLObject getAssignmentValue(Variable variable) {
@@ -153,7 +161,15 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 		return toReturn;
 	}
 
-	public OWLObject visit(GeneratedVariable v) {
+	public OWLObject visit(GeneratedVariable<?> v) {
 		return v.getGeneratedOWLObject(this);
+	}
+
+	/**
+	 * @return true if the Binding node has got no assigned variable nor to
+	 *         assign variables
+	 */
+	public boolean isEmpty() {
+		return this.assignments.isEmpty() && this.unassignedVariables.isEmpty();
 	}
 }

@@ -22,6 +22,9 @@
  */
 package org.coode.oppl.variablemansyntax;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
@@ -29,7 +32,9 @@ import org.coode.oppl.syntax.TokenMgrError;
 import org.coode.oppl.utils.ParserFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.description.OWLExpressionParserException;
+import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
+import org.semanticweb.owl.inference.OWLReasoner;
 
 /**
  * @author Luigi Iannone
@@ -37,7 +42,8 @@ import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
  */
 public class VariableManchesterSyntaxExpressionChecker implements
 		OWLExpressionChecker<OPPLScript> {
-	protected OWLEditorKit owlEditorKit;
+	private OWLEditorKit owlEditorKit;
+	private OPPLScript lastCheckedObject = null;
 
 	public VariableManchesterSyntaxExpressionChecker(OWLEditorKit owlEditorKit) {
 		this.owlEditorKit = owlEditorKit;
@@ -47,13 +53,35 @@ public class VariableManchesterSyntaxExpressionChecker implements
 	 * @see org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker#check(java.lang.String)
 	 */
 	public void check(String text) throws OWLExpressionParserException {
+		this.lastCheckedObject = null;
 		this.initParser(text);
 		try {
-			OPPLParser.Start();
+			OPPLScript statementModel = OPPLParser.Start();
+			OWLReasoner reasoner = this.owlEditorKit.getModelManager()
+					.getReasoner();
+			if (reasoner == null || reasoner instanceof NoOpReasoner) {
+				List<InputVariable> variables = statementModel
+						.getInputVariables();
+				Iterator<InputVariable> iterator = variables.iterator();
+				boolean found = false;
+				InputVariable v = null;
+				while (!found && iterator.hasNext()) {
+					v = iterator.next();
+					found = v.getVariableScope() != null;
+				}
+				if (found) {
+					throw new OWLExpressionParserException(
+							new Exception(
+									"Variable "
+											+ v.toString()
+											+ " has got a scope restriction and there is no Reasoner activated to check"));
+				}
+			}
+			this.lastCheckedObject = statementModel;
 		} catch (ParseException e) {
 			throw new OWLExpressionParserException(e);
-		} catch (TokenMgrError e) {
-			throw new OWLExpressionParserException(e);
+		} catch (TokenMgrError tme) {
+			throw new OWLExpressionParserException(tme);
 		}
 	}
 
@@ -62,15 +90,8 @@ public class VariableManchesterSyntaxExpressionChecker implements
 	 */
 	public OPPLScript createObject(String text)
 			throws OWLExpressionParserException {
-		this.initParser(text);
-		try {
-			OPPLScript statementModel = OPPLParser.Start();
-			return statementModel;
-		} catch (ParseException e) {
-			throw new OWLExpressionParserException(e);
-		} catch (TokenMgrError tme) {
-			throw new OWLExpressionParserException(tme);
-		}
+		this.check(text);
+		return this.lastCheckedObject;
 	}
 
 	/**

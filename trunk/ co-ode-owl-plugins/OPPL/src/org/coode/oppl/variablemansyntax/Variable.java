@@ -42,13 +42,13 @@ public interface Variable {
 	public interface VariableVisitor<P extends Object> {
 		P visit(InputVariable v);
 
-		P visit(GeneratedVariable v);
+		P visit(GeneratedVariable<?> v);
 	}
 
 	public interface PlainVariableVisitor {
 		void visit(InputVariable v);
 
-		void visit(GeneratedVariable v);
+		void visit(GeneratedVariable<?> v);
 	}
 
 	/**

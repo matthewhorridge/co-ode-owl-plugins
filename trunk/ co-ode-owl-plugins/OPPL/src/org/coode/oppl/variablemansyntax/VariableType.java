@@ -31,6 +31,7 @@ import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLConstant;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLDataType;
+import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLEntityVisitorEx;
 import org.semanticweb.owl.model.OWLIndividual;
@@ -171,11 +172,15 @@ public enum VariableType implements OWLEntityVisitorEx<VariableType> {
 	}
 
 	public static VariableType getVariableType(OWLObject owlObject) {
+		// Shortened for brevity, a visitor is more appropriate, but there you
+		// go
 		if (owlObject instanceof OWLEntity) {
 			OWLEntity entity = (OWLEntity) owlObject;
 			VariableType aVariableType = EnumSet.allOf(VariableType.class)
 					.iterator().next();
 			return entity.accept(aVariableType);
+		} else if (owlObject instanceof OWLDescription) {
+			return CLASS;
 		} else {
 			return CONSTANT;
 		}

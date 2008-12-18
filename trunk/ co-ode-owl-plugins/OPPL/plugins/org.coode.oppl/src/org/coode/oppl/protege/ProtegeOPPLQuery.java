@@ -25,7 +25,7 @@ package org.coode.oppl.protege;
 import java.io.StringWriter;
 import java.util.List;
 
-import org.coode.oppl.Constraint;
+import org.coode.oppl.AbstractConstraint;
 import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.SimpleVariableShortFormProvider;
 import org.coode.oppl.protege.ui.ShortFormVariableOWLEntityRenderer;
@@ -42,7 +42,6 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
  */
 public class ProtegeOPPLQuery implements OPPLQuery {
 	private final OPPLQuery opplQuery;
-	private final OWLModelManager modelManager;
 	private final VariableOWLObjectRenderer variableOWLObjectRenderer;
 	private ShortFormVariableOWLEntityRenderer entityRenderer;
 
@@ -52,7 +51,6 @@ public class ProtegeOPPLQuery implements OPPLQuery {
 	 */
 	public ProtegeOPPLQuery(OPPLQuery opplQuery, OWLModelManager modelManager) {
 		this.opplQuery = opplQuery;
-		this.modelManager = modelManager;
 		this.variableOWLObjectRenderer = new VariableOWLObjectRenderer(
 				modelManager);
 	}
@@ -72,9 +70,9 @@ public class ProtegeOPPLQuery implements OPPLQuery {
 	}
 
 	/**
-	 * @see org.coode.oppl.OPPLQuery#addConstraint(org.coode.oppl.Constraint)
+	 * @see org.coode.oppl.OPPLQuery#addConstraint(org.coode.oppl.InequalityConstraint)
 	 */
-	public void addConstraint(Constraint constraint) {
+	public void addConstraint(AbstractConstraint constraint) {
 		this.opplQuery.addConstraint(constraint);
 	}
 
@@ -95,14 +93,15 @@ public class ProtegeOPPLQuery implements OPPLQuery {
 	/**
 	 * @see org.coode.oppl.OPPLQuery#getConstraints()
 	 */
-	public List<Constraint> getConstraints() {
+	public List<AbstractConstraint> getConstraints() {
 		return this.opplQuery.getConstraints();
 	}
 
 	/**
 	 * @see org.coode.oppl.OPPLQuery#toString(org.coode.oppl.variablemansyntax.ConstraintSystem)
 	 */
-	public String toString(ConstraintSystem constraintSystem) {
+	@Override
+	public String toString() {
 		StringBuffer buffer = new StringBuffer("SELECT ");
 		boolean first = true;
 		for (OWLAxiom axiom : this.getAssertedAxioms()) {
@@ -111,7 +110,7 @@ public class ProtegeOPPLQuery implements OPPLQuery {
 			ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
 					writer);
 			renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
-					constraintSystem));
+					this.opplQuery.getConstraintSystem()));
 			first = false;
 			buffer.append(commaString);
 			axiom.accept(renderer);
@@ -120,7 +119,7 @@ public class ProtegeOPPLQuery implements OPPLQuery {
 		for (OWLAxiom axiom : this.getAxioms()) {
 			String commaString = first ? "" : ", ";
 			this.entityRenderer = new ShortFormVariableOWLEntityRenderer(
-					constraintSystem);
+					this.opplQuery.getConstraintSystem());
 			first = false;
 			buffer.append(commaString);
 			buffer.append(this.variableOWLObjectRenderer.render(axiom,
@@ -129,16 +128,20 @@ public class ProtegeOPPLQuery implements OPPLQuery {
 		if (this.getConstraints().size() > 0) {
 			buffer.append(" WHERE ");
 			first = true;
-			for (Constraint c : this.getConstraints()) {
+			for (AbstractConstraint c : this.getConstraints()) {
 				String commaString = first ? "" : ", ";
 				buffer.append(commaString);
-				buffer.append(c.toString(constraintSystem));
+				buffer.append(c.toString());
 			}
 		}
 		return buffer.toString();
 	}
 
-	public String render(ConstraintSystem constraintSystem) {
-		return this.opplQuery.render(constraintSystem);
+	public String render() {
+		return this.opplQuery.render();
+	}
+
+	public ConstraintSystem getConstraintSystem() {
+		return this.opplQuery.getConstraintSystem();
 	}
 }

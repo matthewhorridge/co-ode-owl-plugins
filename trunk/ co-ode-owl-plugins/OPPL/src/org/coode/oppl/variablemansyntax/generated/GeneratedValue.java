@@ -36,16 +36,16 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
  * @author Luigi Iannone
  * 
  */
-public interface GeneratedValue {
+public interface GeneratedValue<N> {
 	/**
 	 * @return the List of generated values
 	 */
-	List<String> getGeneratedValues();
+	List<N> getGeneratedValues();
 
 	/**
 	 * @param node
 	 * @return the generated value determined by the assignments in the input
 	 *         node, it may be null
 	 */
-	String getGeneratedValue(BindingNode node);
+	N getGeneratedValue(BindingNode node);
 }

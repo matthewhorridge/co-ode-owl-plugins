@@ -27,5 +27,5 @@ package org.coode.oppl;
  * 
  */
 public interface ConstraintVisitor<O extends Object> {
-	O visit(Constraint c);
+	O visit(InequalityConstraint c);
 }

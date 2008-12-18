@@ -34,27 +34,30 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public class LeafBrusher implements BindingVisitor {
-	private Set<BindingNode> leaves = new HashSet<BindingNode>();
+	private Set<BindingNode> leaves = null;
 
 	/**
 	 * @see org.coode.oppl.variablemansyntax.bindingtree.BindingVisitor#visit(org.coode.oppl.variablemansyntax.bindingtree.BindingNode)
 	 */
 	public void visit(BindingNode bindingNode) {
-		Set<BindingNode> nodes = new HashSet<BindingNode>();
-		nodes.add(bindingNode);
-		boolean allLeaves = bindingNode.isLeaf();
-		while (!allLeaves) {
-			for (BindingNode generatedChild : new HashSet<BindingNode>(nodes)) {
-				if (!generatedChild.isLeaf()) {
-					nodes.remove(generatedChild);
-					Set<BindingNode> generatedChildren = this
-							.generateChildren(generatedChild);
-					nodes.addAll(generatedChildren);
+		if (!bindingNode.isEmpty()) {
+			Set<BindingNode> nodes = new HashSet<BindingNode>();
+			nodes.add(bindingNode);
+			boolean allLeaves = bindingNode.isLeaf();
+			while (!allLeaves) {
+				for (BindingNode generatedChild : new HashSet<BindingNode>(
+						nodes)) {
+					if (!generatedChild.isLeaf()) {
+						nodes.remove(generatedChild);
+						Set<BindingNode> generatedChildren = this
+								.generateChildren(generatedChild);
+						nodes.addAll(generatedChildren);
+					}
+					allLeaves = this.allLeaves(nodes);
 				}
-				allLeaves = this.allLeaves(nodes);
 			}
+			this.leaves = nodes;
 		}
-		this.leaves = nodes;
 	}
 
 	/**

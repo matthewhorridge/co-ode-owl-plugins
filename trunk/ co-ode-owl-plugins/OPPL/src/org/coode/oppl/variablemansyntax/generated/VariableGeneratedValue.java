@@ -23,64 +23,292 @@
 package org.coode.oppl.variablemansyntax.generated;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
+import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owl.model.OWLConstant;
+import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLEntity;
+import org.semanticweb.owl.model.OWLIndividual;
 import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLObjectProperty;
 
 /**
  * @author Luigi Iannone
  * 
  */
-public class VariableGeneratedValue implements GeneratedValue {
+public abstract class VariableGeneratedValue<N> implements GeneratedValue<N> {
+	private static class RenderingAttributeGenerator implements
+			AttributeGenerator<String> {
+		final static OWLEntityRenderer entityRenderer = OPPLParser
+				.getOPPLFactory().getOWLEntityRenderer();
+		private static RenderingAttributeGenerator instance = null;
+
+		public static RenderingAttributeGenerator getInstance() {
+			if (instance == null) {
+				instance = new RenderingAttributeGenerator();
+			}
+			return instance;
+		}
+
+		public String getValue(OWLObject object) {
+			String toReturn = null;
+			if (object instanceof OWLEntity) {
+				toReturn = entityRenderer.render((OWLEntity) object);
+			} else {
+				toReturn = object.toString();
+			}
+			return toReturn;
+		}
+
+		public List<String> getValues(Variable variable) {
+			List<String> toReturn = new ArrayList<String>();
+			Set<OWLObject> possibleBindings = variable.getPossibleBindings();
+			for (OWLObject object : possibleBindings) {
+				if (object instanceof OWLEntity) {
+					toReturn.add(entityRenderer.render((OWLEntity) object));
+				} else {
+					toReturn.add(object.toString());
+				}
+			}
+			return toReturn;
+		}
+	}
+
+	public interface AttributeGenerator<N> {
+		/**
+		 * @author Luigi Iannone
+		 * 
+		 */
+		List<N> getValues(Variable aVariable);
+
+		N getValue(OWLObject object);
+	}
+
 	public enum Attribute {
 		RENDERING("RENDERING") {
 			@Override
-			protected String getValue(OWLObject object) {
-				String toReturn = null;
-				if (object instanceof OWLEntity) {
-					toReturn = entityRenderer.render((OWLEntity) object);
-				} else {
-					toReturn = object.toString();
-				}
-				return toReturn;
-			}
-
-			@Override
-			protected List<String> getValues(Variable variable) {
-				List<String> toReturn = new ArrayList<String>();
-				Set<OWLObject> possibleBindings = variable
-						.getPossibleBindings();
-				for (OWLObject object : possibleBindings) {
-					if (object instanceof OWLEntity) {
-						toReturn.add(entityRenderer.render((OWLEntity) object));
-					} else {
-						toReturn.add(object.toString());
+			public VariableGeneratedValue<?> getVariableGeneratedValue(
+					Variable variable, ConstraintSystem constraintSystem) {
+				return new VariableGeneratedValue<String>(variable, this) {
+					@Override
+					public String getGeneratedValue(BindingNode node) {
+						return RenderingAttributeGenerator.getInstance()
+								.getValue(
+										node.getAssignmentValue(this
+												.getVariable()));
 					}
+
+					@Override
+					public List<String> getGeneratedValues() {
+						return RenderingAttributeGenerator.getInstance()
+								.getValues(this.getVariable());
+					}
+				};
+			}
+		},
+		VALUES("VALUES") {
+			@Override
+			public VariableGeneratedValue<?> getVariableGeneratedValue(
+					Variable variable, final ConstraintSystem constraintSystem) {
+				switch (variable.getType()) {
+				case CLASS:
+					return new CollectionGeneratedValue<OWLClass>(variable,
+							this, constraintSystem) {
+						@Override
+						public Collection<OWLClass> getGeneratedValue(
+								BindingNode node) {
+							Set<OWLClass> toReturn = new HashSet<OWLClass>();
+							Set<BindingNode> leaves = constraintSystem
+									.getLeaves();
+							if (leaves != null && !leaves.isEmpty()) {
+								for (BindingNode bindingNode : leaves) {
+									OWLClass assignmentValue = (OWLClass) bindingNode
+											.getAssignmentValue(this
+													.getVariable());
+									if (assignmentValue != null) {
+										toReturn.add(assignmentValue);
+									}
+								}
+							} else {
+								toReturn = null;
+							}
+							return toReturn == null || toReturn.isEmpty() ? null
+									: toReturn;
+						}
+
+						@Override
+						public List<Collection<OWLClass>> getGeneratedValues() {
+							Collection<OWLClass> generatedValue = this
+									.getGeneratedValue(null);
+							return generatedValue == null ? new ArrayList<Collection<OWLClass>>()
+									: new ArrayList<Collection<OWLClass>>(
+											Collections
+													.singleton(generatedValue));
+						}
+					};
+				case OBJECTPROPERTY:
+					return new CollectionGeneratedValue<OWLObjectProperty>(
+							variable, this, constraintSystem) {
+						@Override
+						public Collection<OWLObjectProperty> getGeneratedValue(
+								BindingNode node) {
+							Set<OWLObjectProperty> toReturn = new HashSet<OWLObjectProperty>();
+							Set<BindingNode> leaves = constraintSystem
+									.getLeaves();
+							if (leaves != null && !leaves.isEmpty()) {
+								for (BindingNode bindingNode : leaves) {
+									OWLObjectProperty assignmentValue = (OWLObjectProperty) bindingNode
+											.getAssignmentValue(this
+													.getVariable());
+									if (assignmentValue != null) {
+										toReturn.add(assignmentValue);
+									}
+								}
+							} else {
+								toReturn = null;
+							}
+							return toReturn == null || toReturn.isEmpty() ? null
+									: toReturn;
+						}
+
+						@Override
+						public List<Collection<OWLObjectProperty>> getGeneratedValues() {
+							Collection<OWLObjectProperty> generatedValue = this
+									.getGeneratedValue(null);
+							return generatedValue == null ? new ArrayList<Collection<OWLObjectProperty>>()
+									: new ArrayList<Collection<OWLObjectProperty>>(
+											Collections
+													.singleton(generatedValue));
+						}
+					};
+				case DATAPROPERTY:
+					return new CollectionGeneratedValue<OWLDataProperty>(
+							variable, this, constraintSystem) {
+						@Override
+						public Collection<OWLDataProperty> getGeneratedValue(
+								BindingNode node) {
+							Set<OWLDataProperty> toReturn = new HashSet<OWLDataProperty>();
+							Set<BindingNode> leaves = constraintSystem
+									.getLeaves();
+							if (leaves != null && !leaves.isEmpty()) {
+								for (BindingNode bindingNode : leaves) {
+									OWLDataProperty assignmentValue = (OWLDataProperty) bindingNode
+											.getAssignmentValue(this
+													.getVariable());
+									if (assignmentValue != null) {
+										toReturn.add(assignmentValue);
+									}
+								}
+							} else {
+								toReturn = null;
+							}
+							return toReturn == null || toReturn.isEmpty() ? null
+									: toReturn;
+						}
+
+						@Override
+						public List<Collection<OWLDataProperty>> getGeneratedValues() {
+							Collection<OWLDataProperty> generatedValue = this
+									.getGeneratedValue(null);
+							return generatedValue == null ? new ArrayList<Collection<OWLDataProperty>>()
+									: new ArrayList<Collection<OWLDataProperty>>(
+											Collections
+													.singleton(generatedValue));
+						}
+					};
+				case INDIVIDUAL:
+					return new CollectionGeneratedValue<OWLIndividual>(
+							variable, this, constraintSystem) {
+						@Override
+						public Collection<OWLIndividual> getGeneratedValue(
+								BindingNode node) {
+							Set<OWLIndividual> toReturn = new HashSet<OWLIndividual>();
+							Set<BindingNode> leaves = constraintSystem
+									.getLeaves();
+							if (leaves != null && !leaves.isEmpty()) {
+								for (BindingNode bindingNode : leaves) {
+									OWLIndividual assignmentValue = (OWLIndividual) bindingNode
+											.getAssignmentValue(this
+													.getVariable());
+									if (assignmentValue != null) {
+										toReturn.add(assignmentValue);
+									}
+								}
+							} else {
+								toReturn = null;
+							}
+							return toReturn == null || toReturn.isEmpty() ? null
+									: toReturn;
+						}
+
+						@Override
+						public List<Collection<OWLIndividual>> getGeneratedValues() {
+							Collection<OWLIndividual> generatedValue = this
+									.getGeneratedValue(null);
+							return generatedValue == null ? new ArrayList<Collection<OWLIndividual>>()
+									: new ArrayList<Collection<OWLIndividual>>(
+											Collections
+													.singleton(generatedValue));
+						}
+					};
+				case CONSTANT:
+					return new CollectionGeneratedValue<OWLConstant>(variable,
+							this, constraintSystem) {
+						@Override
+						public Collection<OWLConstant> getGeneratedValue(
+								BindingNode node) {
+							Set<OWLConstant> toReturn = new HashSet<OWLConstant>();
+							Set<BindingNode> leaves = constraintSystem
+									.getLeaves();
+							if (leaves != null && !leaves.isEmpty()) {
+								for (BindingNode bindingNode : leaves) {
+									OWLConstant assignmentValue = (OWLConstant) bindingNode
+											.getAssignmentValue(this
+													.getVariable());
+									if (assignmentValue != null) {
+										toReturn.add(assignmentValue);
+									}
+								}
+							} else {
+								toReturn = null;
+							}
+							return toReturn == null || toReturn.isEmpty() ? null
+									: toReturn;
+						}
+
+						@Override
+						public List<Collection<OWLConstant>> getGeneratedValues() {
+							Collection<OWLConstant> generatedValue = this
+									.getGeneratedValue(null);
+							return generatedValue == null ? new ArrayList<Collection<OWLConstant>>()
+									: new ArrayList<Collection<OWLConstant>>(
+											Collections
+													.singleton(generatedValue));
+						}
+					};
+				default:
+					break;
 				}
-				return toReturn;
+				return null;
 			}
 		};
 		private final String attribute;
-		final static OWLEntityRenderer entityRenderer = OPPLParser
-				.getOPPLFactory().getOWLEntityRenderer();
 
 		private Attribute(String s) {
 			this.attribute = s;
 		}
-
-		/**
-		 * @param variable
-		 * @return the possible values given the input Variable
-		 */
-		protected abstract List<String> getValues(Variable variable);
 
 		@Override
 		public String toString() {
@@ -106,12 +334,8 @@ public class VariableGeneratedValue implements GeneratedValue {
 			return toReturn;
 		}
 
-		/**
-		 * @param object
-		 * @return the value resulting from a Variable assuming as value the
-		 *         input object
-		 */
-		protected abstract String getValue(OWLObject object);
+		public abstract VariableGeneratedValue<?> getVariableGeneratedValue(
+				Variable variable, ConstraintSystem constraintSystem);
 	}
 
 	private final Variable variable;
@@ -126,24 +350,31 @@ public class VariableGeneratedValue implements GeneratedValue {
 		this.attribute = attribute;
 	}
 
-	/**
-	 * @see org.coode.oppl.variablemansyntax.generated.GeneratedValue#getGeneratedValues()
-	 */
-	public List<String> getGeneratedValues() {
-		return this.attribute.getValues(this.variable);
-	}
+	public abstract List<N> getGeneratedValues();
+
+	public abstract N getGeneratedValue(BindingNode node);
 
 	@Override
 	public String toString() {
 		return this.variable.getName() + "." + this.attribute;
 	}
 
-	public String getGeneratedValue(BindingNode node) {
-		OWLObject assignmentValue = node.getAssignmentValue(this.variable);
-		String toReturn = null;
-		if (assignmentValue != null) {
-			toReturn = this.attribute.getValue(assignmentValue);
-		}
-		return toReturn;
+	/**
+	 * @return the attribute
+	 */
+	public final Attribute getAttribute() {
+		return this.attribute;
+	}
+
+	/**
+	 * @return the variable
+	 */
+	public final Variable getVariable() {
+		return this.variable;
+	}
+
+	public VariableGeneratedValue<?> replaceVariable(Variable v,
+			ConstraintSystem constraintSystem) {
+		return this.attribute.getVariableGeneratedValue(v, constraintSystem);
 	}
 }

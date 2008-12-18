@@ -114,14 +114,26 @@ public class InferredAxiomQuery implements AxiomQuery {
 		for (Variable variable : axiomVariables) {
 			this.extractPossibleValues(variable);
 		}
-		BindingNode bindingNode = new BindingNode(new HashSet<Assignment>(),
-				axiomVariables);
-		LeafBrusher leafBrusher = new LeafBrusher();
-		bindingNode.accept(leafBrusher);
-		Set<BindingNode> leaves = leafBrusher.getLeaves();
+		Set<BindingNode> preExistingLeaves = this.constraintSystem.getLeaves();
+		Set<BindingNode> leaves;
+		if (preExistingLeaves == null) {
+			BindingNode bindingNode = new BindingNode(
+					new HashSet<Assignment>(), axiomVariables);
+			LeafBrusher leafBrusher = new LeafBrusher();
+			bindingNode.accept(leafBrusher);
+			leaves = leafBrusher.getLeaves();
+		} else {
+			leaves = new HashSet<BindingNode>(preExistingLeaves);
+			for (BindingNode preExistingLeaf : preExistingLeaves) {
+				LeafBrusher leafBrusher = new LeafBrusher();
+				preExistingLeaf.accept(leafBrusher);
+				leaves.remove(preExistingLeaf);
+				leaves.addAll(leafBrusher.getLeaves());
+			}
+		}
 		for (BindingNode leaf : new HashSet<BindingNode>(leaves)) {
-			OWLObjectInstantiator instantiator = new OWLObjectInstantiator(leaf,
-					this.constraintSystem, this.dataFactory);
+			OWLObjectInstantiator instantiator = new OWLObjectInstantiator(
+					leaf, this.constraintSystem, this.dataFactory);
 			OWLAxiom instatiatedAxiom = (OWLAxiom) axiom.accept(instantiator);
 			if (this.locateAxiom(instatiatedAxiom)) {
 				this.instantiatedAxioms.add(instatiatedAxiom);

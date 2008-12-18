@@ -138,17 +138,38 @@ ADD ?clinHolder equivalentTo ?clinHolder
 END;
 
  ?country:INDIVIDUAL[instanceOf Country], ?adiacentCountry:INDIVIDUAL[instanceOf Country]
+SELECT ASSERTED  ?country adjacentTo ?adiacentCountry
 BEGIN 
 REMOVE ?country adjacentTo ?adiacentCountry, 
 ADD ?country instanceOf hasLandBoundary some (LandBoundaryFragment
                                           and boundaryOf value ?adiacentCountry)
 END;
 
- ?country:INDIVIDUAL[instanceOf Country], ?adiacentCountry:INDIVIDUAL[instanceOf Country]
-SELECT  ?country adjacentTo ?adiacentCountry
-BEGIN 
-REMOVE ?country adjacentTo ?adiacentCountry, 
-ADD ?country instanceOf hasLandBoundary some (LandBoundaryFragment
-                                          and boundaryOf value ?adiacentCountry)
+
+?x:CLASS, ?y:CLASS
+SELECT ?x subClassOf gender,
+?y subClassOf gender
+WHERE ?x!=?y, ?y!=gender
+BEGIN
+ADD ?x disjointWith ?y
 END;
 
+?x:CLASS,?y:CLASS,?z:CLASS[subClassOf CCO_Y0000001]
+SELECT
+?x subClassOf participates_in some ?z,
+?y subClassOf participates_in some ?z
+WHERE ?x!=?y
+BEGIN
+ADD ?z subClassOf has_participant only (?x or ?y),
+ADD ?z subClassOf has_participant some ?x,
+ADD ?z subClassOf has_participant some ?y,
+REMOVE ?x subClassOf participates_in some ?z,
+REMOVE ?y subClassOf participates_in some ?z
+END;
+
+
+?x:OBJECTPROPERTY, ?y:OBJECTPROPERTY
+SELECT ?y subPropertyOf ?x, Transitive: ?y, Transitive: ?x
+BEGIN 
+REMOVE Transitive: ?y
+END;

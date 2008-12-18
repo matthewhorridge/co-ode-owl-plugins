@@ -27,15 +27,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ManchesterVariableSyntax;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
-import org.protege.editor.owl.model.entity.OWLEntityCreationException;
-import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -43,10 +40,10 @@ import org.semanticweb.owl.model.OWLObject;
  * @author Luigi Iannone
  * 
  */
-public class GeneratedVariable implements Variable {
+public abstract class GeneratedVariable<N> implements Variable {
 	private final String name;
 	private final VariableType type;
-	private final GeneratedValue value;
+	private GeneratedValue<N> value;
 
 	/**
 	 * @param name
@@ -54,7 +51,7 @@ public class GeneratedVariable implements Variable {
 	 * @param value
 	 */
 	public GeneratedVariable(String name, VariableType type,
-			GeneratedValue value) {
+			GeneratedValue<N> value) {
 		this.name = name;
 		this.type = type;
 		this.value = value;
@@ -107,8 +104,8 @@ public class GeneratedVariable implements Variable {
 
 	public Set<OWLObject> getPossibleBindings() {
 		Set<OWLObject> toReturn = new HashSet<OWLObject>();
-		List<String> generatedValues = this.value.getGeneratedValues();
-		for (String value : generatedValues) {
+		List<N> generatedValues = this.value.getGeneratedValues();
+		for (N value : generatedValues) {
 			toReturn.add(this.generateObject(value));
 		}
 		return toReturn;
@@ -120,82 +117,15 @@ public class GeneratedVariable implements Variable {
 	 *         the input BindingNode, it may return null
 	 */
 	public OWLObject getGeneratedOWLObject(BindingNode bindingNode) {
-		String generatedValue = this.value.getGeneratedValue(bindingNode);
+		N generatedValue = this.value.getGeneratedValue(bindingNode);
 		return generatedValue == null ? null : this
 				.generateObject(generatedValue);
 	}
 
-	private OWLObject generateObject(String aValue) {
-		OWLObject value = null;
-		OWLEntityFactory entityFactory = OPPLParser.getOPPLFactory()
-				.getOWLEntityFactory();
-		switch (this.type) {
-		case CLASS:
-			try {
-				value = entityFactory.createOWLClass(aValue, null)
-						.getOWLEntity();
-			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOWLDataFactory().getOWLClass(
-						this.buildURI(aValue));
-			}
-			break;
-		case OBJECTPROPERTY:
-			try {
-				value = entityFactory.createOWLObjectProperty(aValue, null)
-						.getOWLEntity();
-			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOWLDataFactory().getOWLObjectProperty(
-						this.buildURI(aValue));
-			}
-			break;
-		case DATAPROPERTY:
-			try {
-				value = entityFactory.createOWLDataProperty(aValue, null)
-						.getOWLEntity();
-			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOWLDataFactory().getOWLDataProperty(
-						this.buildURI(aValue));
-			}
-			break;
-		case INDIVIDUAL:
-			try {
-				value = entityFactory.createOWLIndividual(aValue, null)
-						.getOWLEntity();
-			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOWLDataFactory().getOWLIndividual(
-						this.buildURI(aValue));
-			}
-			break;
-		case CONSTANT:
-			value = OPPLParser.getOWLDataFactory().getOWLTypedConstant(aValue);
-		default:
-			break;
-		}
-		return value;
-	}
-
-	/**
-	 * @param aValue
-	 * @return
-	 */
-	private URI buildURI(String aValue) {
-		return URI.create(OPPLParser.getConstraintSystem().getOntology()
-				.getURI().toString()
-				+ "#" + aValue);
-	}
+	protected abstract OWLObject generateObject(N generatedValue);
 
 	public boolean removePossibleBinding(OWLObject object) {
 		return false;
-	}
-
-	public static GeneratedVariable buildGeneratedVariable(String name,
-			VariableType type, GeneratedValue value) {
-		return new GeneratedVariable(name, type, value);
-	}
-
-	@Override
-	public String toString() {
-		return this.name + ":" + this.type + "=" + this.value.toString();
 	}
 
 	public <P> P accept(VariableVisitor<P> visitor) {
@@ -205,7 +135,7 @@ public class GeneratedVariable implements Variable {
 	/**
 	 * @return the value
 	 */
-	public GeneratedValue getValue() {
+	public GeneratedValue<N> getValue() {
 		return this.value;
 	}
 
@@ -215,4 +145,23 @@ public class GeneratedVariable implements Variable {
 	public void accept(PlainVariableVisitor visitor) {
 		visitor.visit(this);
 	}
+
+	protected abstract GeneratedVariable<N> replace(GeneratedValue<N> value);
+
+	public GeneratedVariable<N> replaceValue(GeneratedValue<?> replaceValue) {
+		return this.replace((GeneratedValue<N>) replaceValue);
+	}
+
+	/**
+	 * @param value
+	 *            the value to set
+	 */
+	protected void setValue(GeneratedValue<N> value) {
+		this.value = value;
+	}
+
+	/**
+	 * @return the OPPL function String serialisation
+	 */
+	public abstract String getOPPLFunction();
 }

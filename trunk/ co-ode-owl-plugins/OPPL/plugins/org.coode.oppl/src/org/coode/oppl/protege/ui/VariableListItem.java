@@ -201,4 +201,11 @@ public class VariableListItem implements MListItem, OPPLMacroStatusChange {
 	private Collection<OPPLMacroListener> getListeners() {
 		return this.listeners;
 	}
+
+	/**
+	 * @return the owlEditorKit
+	 */
+	protected final OWLEditorKit getOwlEditorKit() {
+		return this.owlEditorKit;
+	}
 }
