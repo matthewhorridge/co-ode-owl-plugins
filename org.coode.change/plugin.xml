@@ -8,4 +8,16 @@
         <class value="org.coode.change.ChangeView"/>
     </extension>
 
+    <extension id="AxiomsView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Axioms"/>
+        <class value="org.coode.change.diff.AxiomsView"/>
+    </extension>
+
+    <extension id="DiffView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Diff"/>
+        <class value="org.coode.change.diff.DiffView"/>
+    </extension>
+
 </plugin>
