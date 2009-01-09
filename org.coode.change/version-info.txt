@@ -1,15 +1,23 @@
 <html>
 <body>
-<h2>Change View</h2>
+<h2>Changes</h2>
 <p>When writing plugins, particularly those that perform refactoring,
  it is useful to be able to verify the changes that have been applied to the model.
-  This view provides a very straightforward list of changesets and the axioms that
-  have been added and removed.
+  <br>This plugin provides two views:<ul>
+  <li>a list of changesets and the axioms that have been added and removed</li>
+  <li>a diff view that shows the axioms differences between two ontologies</li>
+ </ul>
 
 <p><a href="http://code.google.com/p/co-ode-owl-plugins//wiki/ChangeView">Documentation</a>
 
 
 <h3>Version info</h3>
+
+<h4>v1.0.2 9th Jan 2009)</h4>
+<ul>
+</li>diff view</li>
+</li>axioms view</li>
+</ul>
 
 <h4>v1.0.1 (7th Nov 2008)</h4>
 <ul></li>auto-update activated</li></ul>
