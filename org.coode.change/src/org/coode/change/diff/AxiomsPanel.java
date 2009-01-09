@@ -14,6 +14,8 @@ import org.semanticweb.owl.model.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.HierarchyEvent;
+import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.*;
@@ -74,7 +76,7 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
         }
     };
 
-    
+
     private OWLOntologySelectionListener diffListener = new OWLOntologySelectionListener(){
         public void selectionChanged(OWLOntology selectedOntology) {
             refresh();
@@ -87,8 +89,24 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
             if (event.getType().equals(EventType.ONTOLOGY_LOADED)){
                 reloadOntologySelector();
             }
+            else if (event.getType().equals(EventType.ONTOLOGY_CREATED)){
+                reloadOntologySelector();
+            }
         }
     };
+
+    private boolean updateViewRequired = true;
+
+    private HierarchyListener componentHierarchyListener = new HierarchyListener() {
+        public void hierarchyChanged(HierarchyEvent hierarchyEvent) {
+            if (isShowing()) {
+                if (updateViewRequired) {
+                    refresh();
+                }
+            }
+        }
+    };
+
 
     AxiomsPanel(OWLEditorKit eKit) {
         setLayout(new BorderLayout());
@@ -112,6 +130,8 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
 
         mngr.addOntologyChangeListener(ontChangeListener);
         mngr.addListener(mngrListener);
+
+        addHierarchyListener(componentHierarchyListener);
     }
 
 
@@ -140,17 +160,23 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
         Set<OWLOntology> ontologies = eKit.getOWLModelManager().getOntologies();
         ontologySelector.setModel(new DefaultComboBoxModel(ontologies.toArray()));
     }
-    
+
 
     private void refresh() {
-        final Set<OWLAxiom> axioms = new HashSet<OWLAxiom>(currentOntology.getAxioms());
-        if (diff != null &&
-            diff.getSelectedOntology() != null &&
-            !diff.getSelectedOntology().equals(currentOntology)){
-            final Set<OWLAxiom> diffAxioms = diff.getSelectedOntology().getAxioms();
-            axioms.removeAll(diffAxioms);
+        if (isShowing()){
+            final Set<OWLAxiom> axioms = new HashSet<OWLAxiom>(currentOntology.getAxioms());
+            if (diff != null &&
+                diff.getSelectedOntology() != null &&
+                !diff.getSelectedOntology().equals(currentOntology)){
+                final Set<OWLAxiom> diffAxioms = diff.getSelectedOntology().getAxioms();
+                axioms.removeAll(diffAxioms);
+            }
+            list.setRootObject(axioms);
+            updateViewRequired = false;
         }
-        list.setRootObject(axioms);
+        else{
+            updateViewRequired = true;
+        }
     }
 
 
