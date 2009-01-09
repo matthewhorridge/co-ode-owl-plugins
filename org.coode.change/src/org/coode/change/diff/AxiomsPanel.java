@@ -3,6 +3,9 @@ package org.coode.change.diff;
 import org.protege.editor.core.Disposable;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
 import org.protege.editor.owl.ui.frame.AxiomListFrameSection;
 import org.protege.editor.owl.ui.framelist.OWLFrameList2;
@@ -59,7 +62,6 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     private List<OWLOntologySelectionListener> listeners = new ArrayList<OWLOntologySelectionListener>();
 
     private OWLOntologyChangeListener ontChangeListener = new OWLOntologyChangeListener(){
-
         public void ontologiesChanged(java.util.List<? extends OWLOntologyChange> changes) throws OWLException {
             handleChanges(changes);
         }
@@ -79,17 +81,22 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
         }
     };
 
+    private OWLModelManagerListener mngrListener = new OWLModelManagerListener(){
+
+        public void handleChange(OWLModelManagerChangeEvent event) {
+            if (event.getType().equals(EventType.ONTOLOGY_LOADED)){
+                reloadOntologySelector();
+            }
+        }
+    };
 
     AxiomsPanel(OWLEditorKit eKit) {
         setLayout(new BorderLayout());
 
         this.eKit = eKit;
 
-        OWLModelManager mngr = eKit.getOWLModelManager();
-
-        Set<OWLOntology> ontologies = mngr.getOntologies();
-
-        ontologySelector = new JComboBox(ontologies.toArray());
+        ontologySelector = new JComboBox();
+        reloadOntologySelector();
         ontologySelector.setRenderer(new OWLOntologyCellRenderer(eKit));
         ontologySelector.addItemListener(itemSelectorListener);
 
@@ -99,9 +106,12 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
         add(ontologySelector, BorderLayout.NORTH);
         add(new JScrollPane(list), BorderLayout.CENTER);
 
+        OWLModelManager mngr = eKit.getOWLModelManager();
+
         setOntology(mngr.getActiveOntology());
 
         mngr.addOntologyChangeListener(ontChangeListener);
+        mngr.addListener(mngrListener);
     }
 
 
@@ -126,14 +136,18 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     }
 
 
+    private void reloadOntologySelector() {
+        Set<OWLOntology> ontologies = eKit.getOWLModelManager().getOntologies();
+        ontologySelector.setModel(new DefaultComboBoxModel(ontologies.toArray()));
+    }
+    
+
     private void refresh() {
         final Set<OWLAxiom> axioms = new HashSet<OWLAxiom>(currentOntology.getAxioms());
-        System.out.println("axioms.size(); = " + axioms.size());
         if (diff != null &&
             diff.getSelectedOntology() != null &&
             !diff.getSelectedOntology().equals(currentOntology)){
             final Set<OWLAxiom> diffAxioms = diff.getSelectedOntology().getAxioms();
-            System.out.println("diffAxioms = " + diffAxioms);
             axioms.removeAll(diffAxioms);
         }
         list.setRootObject(axioms);
@@ -154,18 +168,10 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     }
 
 
-//        private void reloadSelector() {
-//            DefaultComboBoxModel model = (DefaultComboBoxModel) ontologySelector.getModel();
-//            model.removeAllElements();
-//            for (OWLOntology ontology : getOWLModelManager().getOntologies()){
-//                model.addElement(ontology);
-//            }
-//        }
-
-
     public void dispose() throws Exception {
         list.dispose();
         eKit.getOWLModelManager().removeOntologyChangeListener(ontChangeListener);
+        eKit.getOWLModelManager().removeListener(mngrListener);
         ontologySelector = null;
     }
 
