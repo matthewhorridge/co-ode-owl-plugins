@@ -1,22 +1,33 @@
-#summary A simple debugging view for tracking ontology changes
+#summary Several simple views for tracking ontology changes
 
 = Change View =
 
 == Description ==
-When writing plugins, particularly those that perform refactoring, it is useful to be able to verify the changes that have been applied to the model. This view provides a very straightforward list of changesets and the axioms that have been added and removed.
+
+=== Change View ===
+<p>When writing plugins, particularly those that perform refactoring, it is useful to be able to verify the changes that have been applied to the model.</p>
+<p>The change view provides a very straightforward list of changesets and the axioms that have been added and removed.</p>
+
+=== Diff View ===
+A straightforward view that allows two loaded ontologies to be selected for side-by-side comparison. Each pane displays the axioms that exist in that ontology but not in the other.
+
 
 == Features ==
   * Changesets are grouped together as they are applied in P4
   * History updates on undo/redo
+  * Axiom-level comparison of ontologies
 
 == Screenshots ==
 
-<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/change.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/change.png" width="400" /></a>
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/change.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/change.png" width="400" /></a><br /><i>Changes View</i>
+<br />
+
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/diff-pizza-el.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/diff-pizza-el.png" width="400" /></a><br /><i>Diff View</i>
 
 
-== Find the plugin ==
+== Find the plugins ==
 
-Find it under the *View | Misc views | Changes* menu
+Find the Changes and Diff Vies under the *View | Misc views* menu
 
 == Download ==
 
