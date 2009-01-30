@@ -49,7 +49,7 @@ import java.util.List;
 public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
     private static final String TEMPLATE_EXT = "template";
-    
+
     private JTable table;
     private JToolBar toolbar;
 
@@ -221,18 +221,21 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         }
 
         File importFile = UIUtil.openFile(f, "Import a template file for your annotations", Collections.EMPTY_SET);
-        try {
-            FileInputStream inStream = new FileInputStream(importFile);
-            List<String> rows = AnnotationTemplatePrefs.parseStream(inStream);
-            model = new MyTableModel(rows);
-            table.setModel(model);
-            dirty = true;
-            inStream.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
+        if (importFile != null){
+            try {
+                FileInputStream inStream = new FileInputStream(importFile);
+                List<String> rows = AnnotationTemplatePrefs.parseStream(inStream);
+                model = new MyTableModel(rows);
+                table.setModel(model);
+                dirty = true;
+                inStream.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
+
 
     private void handleExport() {
         JFrame f = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, getParent());
@@ -240,17 +243,19 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
             f = new JFrame();
         }
 
-        File importFile = UIUtil.saveFile(f, "Export a template file for your annotations", Collections.EMPTY_SET);
-        try {
-            PrintStream outStream = new PrintStream(new FileOutputStream(importFile));
-            for (String row : getValuesFromTable()){
-                outStream.println(row);
+        File exportFile = UIUtil.saveFile(f, "Export a template file for your annotations", Collections.EMPTY_SET);
+        if (exportFile != null){
+            try {
+                PrintStream outStream = new PrintStream(new FileOutputStream(exportFile));
+                for (String row : getValuesFromTable()){
+                    outStream.println(row);
+                }
+                outStream.flush();
+                outStream.close();
             }
-            outStream.flush();
-            outStream.close();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
+            catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
