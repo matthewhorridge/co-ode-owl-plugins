@@ -1,0 +1,27 @@
+#summary Show the URI of the last selected entity
+
+= URI Tools =
+
+== Description ==
+
+Entity URI just shows the URI of the last selected entity
+
+== Screenshot ==
+
+<img src="http://www.co-ode.org/downloads/protege-x/plugins/images/entity-uri-view.png" />
+
+== Find the plugin ==
+
+Entity URI is a view plugin. Find it under the *View | Misc views | Entity URI* menu
+
+== Download ==
+
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?q=shell download]
+
+== Author ==
+
+P4 plugin developed by Nick Drummond, The University of Manchester
+
+== License ==
+
+LGPL
