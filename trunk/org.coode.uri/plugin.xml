@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+
+<plugin>
+
+    <extension id="org.coode.uri.SelectedEntityURIView"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Entity URI"/>
+        <class value="org.coode.uri.SelectedEntityURIView"/>
+        <navigates value="@org.protege.classcategory"/>
+        <navigates value="@org.protege.objectpropertycategory"/>
+        <navigates value="@org.protege.datapropertycategory"/>
+        <navigates value="@org.protege.individualcategory"/>        
+    </extension>
+
+</plugin>
