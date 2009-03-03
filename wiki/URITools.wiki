@@ -16,7 +16,7 @@ Entity URI is a view plugin. Find it under the *View | Misc views | Entity URI* 
 
 == Download ==
 
-[http://code.google.com/p/co-ode-owl-plugins/downloads/list?q=shell download]
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?q=uri download]
 
 == Author ==
 
