@@ -24,7 +24,7 @@ Find them under the *View | Class views* menu
 
 == Download ==
 
-[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=taxonomy download]
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=Tabbed+Subclasses download]
 
 == Author ==
 
