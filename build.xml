@@ -35,6 +35,16 @@
 
         <!-- now do the plugins -->
 
+        <echo message = "Building annotate plugin}"/>
+        <ant antfile="./build.xml"
+             dir="./org.coode.annotate"
+             target="${sub.target}"/>
+
+        <echo message = "Building bean shell plugin"/>
+        <ant antfile="./build.xml"
+             dir="./org.coode.shell"
+             target="${sub.target}"/>
+
         <echo message = "Building bookmark plugin}"/>
         <ant antfile="./build.xml"
              dir="./bookmark"
@@ -49,7 +59,6 @@
         <ant antfile="./build.xml"
              dir="./org.coode.change"
              target="${sub.target}"/>
-
 
         <echo message = "Building cloud plugin"/>
         <ant antfile="./build.xml"
@@ -76,9 +85,9 @@
              dir="./org.coode.owldoc"
              target="${sub.target}"/>
 
-        <echo message = "Building bean shell plugin"/>
+        <echo message = "Building taxonomy plugin"/>
         <ant antfile="./build.xml"
-             dir="./org.coode.shell"
+             dir="./taxonomy"
              target="${sub.target}"/>
 
 
