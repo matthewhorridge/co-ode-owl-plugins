@@ -1,0 +1,166 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<project name = "owlmanager library" default = "install" basedir = ".">    
+   <!-- 
+        To run this build file set the environment variable
+        PROTEGE_HOME to point to a protege distribution and type ant
+        install or jar.
+     -->
+
+   <property environment="env"/>
+   <property name = "protege.home"      location="${env.PROTEGE_HOME}"/>
+
+
+   <!-- 
+        these can be overridden in the local.properties for different
+        distributions 
+     -->
+   <property file="local.properties"/>
+   <property name = "protege.common"    location="${protege.home}/bundles"/>
+   <property name = "protege.plugins"   location="${protege.home}/plugins"/>
+   <property name = "protege.osgi"      location="${protege.home}/org.eclipse.osgi.jar"/>
+
+   <!-- ============================================================= -->
+   <!-- 
+        This section may need to be customized by the developer for a 
+        particular project 
+     -->
+
+   <!-- 
+        This setting defines the name of the library.
+        This may be the only setting that the developer needs to
+        change.
+     -->
+   <property name = "libname"          value = "owlmanager"/>
+
+
+   <!-- 
+        The following target only needs to be modified if the
+        developer needs to obtain some jar files that are contained in
+        the Protege bundles.  The contents of these jar files are
+        found when Protege 4 runs but may be needed in order to
+        compile the plugin. 
+     -->
+   <target name = "buildlibs" depends="init, checkProtegeLibsAndReport">
+       <unjar dest="${build}"
+              src="${common.lib}">
+           <patternset>
+               <include name = "**/log4j.jar"/>
+           </patternset>
+       </unjar>
+   </target>
+
+
+
+   <!-- 
+        The following target only needs to be modified if the user
+        needs to change the classpath.  It is preconfigured to use
+        the common protege 4 jars, the lib directory and the
+        libraries that have been uncovered in buildlibs. 
+     -->
+   <target name = "checkProtegeLibs">
+     <echo message="Using Protege Home = ${protege.home} to find protege jars"/>
+     <condition property="libs.found">
+       <and>
+         <available file="${owl.lib}" type="file"/>
+       </and>
+     </condition>
+     <path id = "project.classpath">    
+       <pathelement location="${owl.lib}"/>
+       <fileset dir="${genlib}"/>
+     </path>
+   </target>
+
+
+   <!-- 
+        It is less likely that the developer will want to make changes
+        below this line 
+        -->
+   <!-- ============================================================= -->
+
+   
+   <property name="protege.home"      location="${env.PROTEGE_HOME}"/>
+   <property name = "src"             location = "./src"/>  
+   <property name = "build"           location = "./build"/>
+   <property name = "classes"         location = "${build}/classes"/>
+   <property name = "lib"             location = "./lib"/>
+   <property name = "genlib"          location = "${build}/lib"/>
+   <property name = "manifest"        location = "${build}/manifest.mf"/>
+
+   <!-- 
+        This is the section that changes for different distributions.
+        It would only need small changes for knopflerfish or felix.
+     -->
+
+   <property name="owl.lib"
+             location="${protege.plugins}/org.semanticweb.owl.owlapi.jar"/>
+
+   <property name="common.lib"
+             location="${protege.common}/org.protege.common.jar"/>
+
+   <!-- end of equinox specific settings -->
+
+
+   <target name = "usage">
+     <echo message = "To run this script set the PROTEGE_HOME environment"/>
+     <echo message = "variable and use one of the following targets"/>
+     <echo message = "jar - builds the jar (bundle) file for this project"/>
+   </target>
+
+   <target name = "init">
+     <tstamp>
+       <format property="build.time" pattern="MM/dd/yyyy hh:mm aa"/>
+     </tstamp>
+     <mkdir dir = "${build}"/>
+     <mkdir dir = "${classes}"/>
+     <mkdir dir = "${classes}/lib"/>
+     <mkdir dir = "${genlib}"/>
+   </target>  
+   	
+   <target name="checkProtegeHome">
+       <condition property="protege.home.set">
+           <available file="${protege.home}/org.protege.editor.core.application.jar" type="file"/>
+       </condition>
+   </target>
+
+    <target name="checkProtegeLibsAndReport" depends="checkProtegeLibs"
+            unless="libs.found">
+      <echo message="Missing protege libraries.  You need to set "/>
+      <echo message="the PROTEGE_HOME environment variable to a"/>
+      <echo message="protege installation directory where the"/>
+      <echo message="appropriate plugins have been installed."/>
+      <echo message="Alternatively set the jar libs in local.properties (protege.lib=...)"/>
+      <echo message="Use the -v option to ant to see what jars are missing."/>
+      <fail message = "missing protege libraries"/>
+    </target>
+      
+
+   <target name = "compile" depends = "buildlibs, checkProtegeLibsAndReport">
+     <javac srcdir = "${src}"
+            excludes = "org/coode/owl/test/*.java"
+            destdir = "${classes}" 
+            debug="on"
+            includeAntRuntime="false">
+       <classpath refid = "project.classpath"/>  
+     </javac>
+   </target>
+
+   <target name="build.manifest">
+     <manifest file="${manifest}">
+        <attribute name="Built-By" value = "${user.name}"/>
+        <attribute name="Build-Date" value = "${build.time}"/>
+     </manifest>
+   </target>
+
+   <target name = "jar" depends = "compile, build.manifest">
+     <jar jarfile = "${build}/${libname}.jar"
+          basedir = "${classes}" 
+          manifest = "${build}/manifest.mf"/>
+   </target>
+
+   <target name = "install" depends="jar"/>
+	
+   <target name = "clean">
+     <delete dir = "${build}"/>
+   </target>
+
+</project>
