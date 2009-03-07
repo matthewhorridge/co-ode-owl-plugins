@@ -54,9 +54,11 @@ public class DescendantsView extends AbstractOWLClassViewComponent {
     protected OWLClass updateView(OWLClass selectedClass) {
         namesComponent.setText("");
         OWLObjectHierarchyProvider<OWLClass> hp = getOWLModelManager().getOWLClassHierarchyProvider();
-        for (OWLClass sub: hp.getDescendants(selectedClass)){
-            namesComponent.append(getOWLModelManager().getRendering(sub));
-            namesComponent.append("\n");
+        if (selectedClass != null) {
+        	for (OWLClass sub: hp.getDescendants(selectedClass)){
+        		namesComponent.append(getOWLModelManager().getRendering(sub));
+        		namesComponent.append("\n");
+        	}
         }
         return selectedClass;
     }
