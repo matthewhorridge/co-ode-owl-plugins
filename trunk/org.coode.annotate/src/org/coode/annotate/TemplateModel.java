@@ -99,10 +99,12 @@ public class TemplateModel {
     public Set<OWLOntology> getOntologiesContainingAnnotation(TemplateRow templateRow) {
         Set<OWLOntology> onts = new HashSet<OWLOntology>();
         OWLAxiom ax = templateRow.getAxiom();
-        for (OWLOntology ont : mngr.getActiveOntologies()){
-            if (ont.containsAxiom(ax)){
-                onts.add(ont);
-            }
+        if (ax != null) {
+        	for (OWLOntology ont : mngr.getActiveOntologies()){
+        		if (ont.containsAxiom(ax)){
+        			onts.add(ont);
+        		}
+        	}
         }
         return onts;
     }
