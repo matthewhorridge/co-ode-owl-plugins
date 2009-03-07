@@ -152,7 +152,13 @@
      </manifest>
    </target>
 
-   <target name = "jar" depends = "compile, build.manifest">
+   <target name="copy.resources">
+       <copy todir="${classes}/resources">
+           <fileset dir="./resources"/>
+       </copy>
+   </target>
+
+   <target name = "jar" depends = "compile, build.manifest, copy.resources">
      <jar jarfile = "${build}/${libname}.jar"
           basedir = "${classes}" 
           manifest = "${build}/manifest.mf"/>
