@@ -20,7 +20,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oae.ui;
+package uk.ac.manchester.mae.evaluation;
 
 /**
  * @author Luigi Iannone
@@ -70,5 +70,22 @@ public class BindingModel {
 	 */
 	public void setPropertyChainModel(PropertyChainModel propertyChainModel) {
 		this.propertyChainModel = propertyChainModel;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.identifier.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof BindingModel
+				&& ((BindingModel) obj).identifier.compareTo(this
+						.getIdentifier()) == 0;
+	}
+
+	@Override
+	public String toString() {
+		return this.identifier + "->" + this.propertyChainModel.toString();
 	}
 }

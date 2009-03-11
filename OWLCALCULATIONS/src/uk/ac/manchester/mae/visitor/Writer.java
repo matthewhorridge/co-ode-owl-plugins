@@ -44,6 +44,8 @@ import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyChangeException;
 import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.model.OWLTypedConstant;
+import org.semanticweb.owl.util.ShortFormProvider;
+import org.semanticweb.owl.util.SimpleShortFormProvider;
 import org.semanticweb.owl.vocab.XSDVocabulary;
 
 import uk.ac.manchester.mae.ArithmeticsParserVisitor;
@@ -88,7 +90,7 @@ public class Writer implements ArithmeticsParserVisitor {
 	protected OWLDataProperty dataProperty;
 	protected Object results;
 	protected MAEStart startingFormula;
-	protected FacetExtractor facetExtractor;
+	protected DescriptionFacetExtractor facetExtractor;
 	protected OWLReasoner reasoner;
 
 	/**
@@ -102,7 +104,8 @@ public class Writer implements ArithmeticsParserVisitor {
 			OWLDataProperty dataProperty, Object results,
 			OWLOntology startingOntology, OWLReasoner reasoner,
 			OWLOntologyManager ontologyManager,
-			EvaluationReport evaluationReport, FacetExtractor facetExtractor) {
+			EvaluationReport evaluationReport,
+			DescriptionFacetExtractor facetExtractor) {
 		this.evaluationReport = evaluationReport == null ? new EvaluationReport()
 				: evaluationReport;
 		this.currentIndividual = currentIndividual;
@@ -238,10 +241,21 @@ public class Writer implements ArithmeticsParserVisitor {
 		if (fillers != null && !fillers.isEmpty()) {
 			this.currentIndividual = (OWLIndividual) fillers.iterator().next();
 		} else {
+			ShortFormProvider shortFormProvider = new SimpleShortFormProvider();
+			String newIndividualName = shortFormProvider
+					.getShortForm(this.currentIndividual);
+			if (!facetDescription.equals(this.ontologyManager
+					.getOWLDataFactory().getOWLThing())
+					&& !facetDescription.isAnonymous()) {
+				newIndividualName += shortFormProvider
+						.getShortForm(facetDescription.asOWLClass());
+			} else {
+				newIndividualName += propertyName + "Filler";
+			}
 			OWLIndividual newFiller = this.ontologyManager.getOWLDataFactory()
 					.getOWLIndividual(
 							URI.create(Constants.FORMULA_NAMESPACE_URI_STRING
-									+ System.nanoTime()));
+									+ newIndividualName));
 			AddAxiom addAxiom = new AddAxiom(this.startingOntology,
 					this.ontologyManager.getOWLDataFactory()
 							.getOWLObjectPropertyAssertionAxiom(
@@ -387,6 +401,9 @@ public class Writer implements ArithmeticsParserVisitor {
 			OWLDescription facetDescription) throws URISyntaxException,
 			UnsupportedDataTypeException, OWLReasonerException {
 		Collection<Object> toReturn = null;
+		if (!this.reasoner.isClassified()) {
+			this.reasoner.classify();
+		}
 		Iterator<OWLOntology> it = this.ontologies.iterator();
 		boolean found = false;
 		OWLOntology ontology;

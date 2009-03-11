@@ -22,32 +22,21 @@
  */
 package org.coode.oae.ui;
 
+import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
+import org.semanticweb.owl.model.OWLClass;
+
 /**
  * @author Luigi Iannone
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Apr 21, 2008
+ * Apr 3, 2008
  */
-public class StorageModel {
-	protected PropertyChainModel propertyChainModel;
-
-	public StorageModel(PropertyChainModel propertyChainModel) {
-		this.propertyChainModel = propertyChainModel;
-	}
-
-	/**
-	 * @return the propertyChainModel
-	 */
-	public PropertyChainModel getPropertyChainModel() {
-		return this.propertyChainModel;
-	}
-
-	/**
-	 * @param propertyChainModel
-	 *            the propertyChainModel to set
-	 */
-	public void setPropertyChainModel(PropertyChainModel propertyChainModel) {
-		this.propertyChainModel = propertyChainModel;
+public class OWLCalculationsFormulaClassFrame extends AbstractOWLFrame<OWLClass> {
+	public OWLCalculationsFormulaClassFrame(OWLEditorKit editorKit) {
+		super(editorKit.getModelManager().getOWLOntologyManager());
+		this.addSection(new OWLCalculationsFormulaClassFrameSection(editorKit,
+				this));
 	}
 }

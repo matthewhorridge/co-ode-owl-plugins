@@ -20,24 +20,41 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae;
+package uk.ac.manchester.mae.evaluation;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.inference.OWLReasonerException;
-
-import uk.ac.manchester.mae.evaluation.Evaluator;
+import java.util.Collection;
 
 /**
  * @author Luigi Iannone
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Mar 6, 2008
+ * Apr 29, 2008
  */
-public class ProtegeEvaluator extends Evaluator {
-	public ProtegeEvaluator(OWLModelManager owlModeManager)
-			throws OWLReasonerException {
-		super(owlModeManager.getActiveOntology(), owlModeManager
-				.getOWLOntologyManager(), owlModeManager.getReasoner());
+public class BindingAssignment {
+	protected BindingModel bindingModel;
+	protected Collection<? extends Object> values;
+
+	/**
+	 * @param bindingModel
+	 * @param values
+	 */
+	public BindingAssignment(BindingModel bindingModel,
+			Collection<? extends Object> values) {
+		this.bindingModel = bindingModel;
+		this.values = values;
+	}
+
+	public Collection<? extends Object> getValues() {
+		return this.values;
+	}
+
+	public BindingModel getBindingModel() {
+		return this.bindingModel;
+	}
+
+	@Override
+	public String toString() {
+		return this.bindingModel.getIdentifier() + "->" + this.values;
 	}
 }

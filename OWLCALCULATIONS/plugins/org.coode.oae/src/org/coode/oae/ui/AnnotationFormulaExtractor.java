@@ -82,15 +82,17 @@ public class AnnotationFormulaExtractor implements OWLAnnotationVisitor {
 							.compareTo(Constants.FORMULA_NAMESPACE_URI_STRING) == 0) {
 				String formulaString = annotation.getAnnotationValue()
 						.getLiteral().toString();
-				ParserFactory.initParser(formulaString);
+				ParserFactory.initParser(formulaString, this.modelManager);
 				try {
 					MAEStart extractedFormula = (MAEStart) ArithmeticsParser
 							.Start();
 					ProtegeClassExtractor classExtractor = new ProtegeClassExtractor(
 							this.modelManager);
+					extractedFormula.jjtAccept(classExtractor, null);
+					Object extractedClass = classExtractor
+							.getClassDescription();
 					this.extractedFormula = this.owlClass == null
-							|| this.owlClass.equals(extractedFormula.jjtAccept(
-									classExtractor, null)) ? extractedFormula
+							|| this.owlClass.equals(extractedClass) ? extractedFormula
 							: null;
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block

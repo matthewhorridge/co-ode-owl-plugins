@@ -39,8 +39,12 @@ import uk.ac.manchester.mae.MAEBinding;
 import uk.ac.manchester.mae.MAEPropertyChain;
 import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.ParseException;
+import uk.ac.manchester.mae.evaluation.BindingModel;
+import uk.ac.manchester.mae.evaluation.FormulaModel;
+import uk.ac.manchester.mae.evaluation.PropertyChainModel;
+import uk.ac.manchester.mae.evaluation.StorageModel;
 import uk.ac.manchester.mae.visitor.BindingPropertyChainExtractor;
-import uk.ac.manchester.mae.visitor.FormulaModelExtractor;
+import uk.ac.manchester.mae.visitor.protege.ProtegeFormulaModelExtractor;
 
 /**
  * @author Luigi Iannone
@@ -107,22 +111,17 @@ public class MAENodeAdapter {
 		return toReturn;
 	}
 
-	public static MAEStart toFormula(FormulaModel formulaModel)
-			throws ParseException {
+	public static MAEStart toFormula(FormulaModel formulaModel,
+			OWLModelManager modelManager) throws ParseException {
 		String formulaString = "";
-		OWLEditorKit owlEditorKit = formulaModel.getOwlEditorKit();
-		;
 		ConflictStrategy conflictStrategy = formulaModel.getConflictStrategy();
 		if (conflictStrategy != null) {
 			formulaString += "$" + conflictStrategy.toString() + "$ ";
 		}
 		OWLDescription appliesTo = formulaModel.getAppliesTo();
 		if (appliesTo != null) {
-			String rendering = owlEditorKit.getOWLModelManager()
-					.getOWLObjectRenderer().render(
-							appliesTo,
-							owlEditorKit.getOWLModelManager()
-									.getOWLEntityRenderer());
+			String rendering = modelManager.getOWLObjectRenderer().render(
+					appliesTo, modelManager.getOWLEntityRenderer());
 			formulaString += "APPLIESTO <" + rendering + "> ";
 		}
 		StorageModel storageModel = formulaModel.getStorageModel();
@@ -144,13 +143,14 @@ public class MAENodeAdapter {
 			formulaString += "->";
 		}
 		formulaString += formulaModel.getFormulaBody();
-		ParserFactory.initParser(formulaString);
+		ParserFactory.initParser(formulaString, modelManager);
 		return (MAEStart) ArithmeticsParser.Start();
 	}
 
 	public static FormulaModel toFormulaModel(MAEStart formula, URI formulaURI,
 			OWLEditorKit owlEditorKit) {
-		FormulaModelExtractor fme = new FormulaModelExtractor(owlEditorKit);
+		ProtegeFormulaModelExtractor fme = new ProtegeFormulaModelExtractor(
+				owlEditorKit.getModelManager());
 		formula.jjtAccept(fme, null);
 		FormulaModel extractedFormulaModel = fme.getExtractedFormulaModel();
 		if (extractedFormulaModel != null) {

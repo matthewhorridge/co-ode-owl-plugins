@@ -53,10 +53,12 @@ public class OWLArithmeticsFormulaClassView extends
 	@Override
 	public void initialiseClassView() throws Exception {
 		this.list = new OWLFrameList2<OWLClass>(this.getOWLEditorKit(),
-				new OWLArithmeticsFormulaClassFrame(this.getOWLEditorKit()));
+				new OWLCalculationsFormulaClassFrame(this.getOWLEditorKit()));
 		this.setLayout(new BorderLayout());
 		JScrollPane sp = new JScrollPane(this.list);
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		this.list.setCellRenderer(new ViewFormulaCellRederer(true, this
+				.getOWLEditorKit()));
 		this.add(sp);
 	}
 

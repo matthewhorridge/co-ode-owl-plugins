@@ -34,20 +34,12 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
 import org.semanticweb.owl.util.OWLEntitySetProvider;
 import org.semanticweb.owl.util.ReferencedEntitySetProvider;
-import org.semanticweb.owl.util.ShortFormProvider;
+import org.semanticweb.owl.util.SimpleShortFormProvider;
 
-import uk.ac.manchester.mae.ArithmeticsParserVisitor;
-import uk.ac.manchester.mae.MAEAdd;
-import uk.ac.manchester.mae.MAEBigSum;
 import uk.ac.manchester.mae.MAEBinding;
 import uk.ac.manchester.mae.MAEConflictStrategy;
-import uk.ac.manchester.mae.MAEIdentifier;
-import uk.ac.manchester.mae.MAEIntNode;
-import uk.ac.manchester.mae.MAEMult;
-import uk.ac.manchester.mae.MAEPower;
 import uk.ac.manchester.mae.MAEPropertyChain;
 import uk.ac.manchester.mae.MAEPropertyFacet;
-import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.MAEStoreTo;
 import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
 import uk.ac.manchester.mae.SimpleNode;
@@ -59,34 +51,30 @@ import uk.ac.manchester.mae.SimpleNode;
  * Bio-Health Informatics Group<br>
  * Mar 12, 2008
  */
-public class ClassExatrctor implements ArithmeticsParserVisitor {
+public class ClassExtractor extends FormulaSetupVisitor {
 	private OWLOntologyManager manager;
-	private ShortFormProvider shortFormProvider;
 	private Set<OWLOntology> ontologies;
+	private OWLDescription classDescription = null;
 
 	/**
 	 * @param ontologies
 	 * @param shortFormProvider
 	 * @param manager
 	 */
-	public ClassExatrctor(Set<OWLOntology> ontologies,
-			ShortFormProvider shortFormProvider, OWLOntologyManager manager) {
+	public ClassExtractor(Set<OWLOntology> ontologies,
+			OWLOntologyManager manager) {
 		this.ontologies = ontologies;
-		this.shortFormProvider = shortFormProvider;
 		this.manager = manager;
 	}
 
+	@Override
 	public Object visit(SimpleNode node, Object data) {
-		return null;
-	}
-
-	public Object visit(MAEStart node, Object data) {
 		return null;
 	}
 
 	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
 		BidirectionalShortFormProviderAdapter adapter = new BidirectionalShortFormProviderAdapter(
-				this.shortFormProvider);
+				new SimpleShortFormProvider());
 		OWLEntitySetProvider<OWLEntity> owlEntitySetProvider = new ReferencedEntitySetProvider(
 				this.ontologies);
 		adapter.rebuild(owlEntitySetProvider);
@@ -94,8 +82,8 @@ public class ClassExatrctor implements ArithmeticsParserVisitor {
 				this.manager.getOWLDataFactory(), new ShortFormEntityChecker(
 						adapter));
 		try {
-			OWLDescription classDescription = parser.parse(node.getContent());
-			data = classDescription;
+			this.classDescription = parser.parse(node.getContent());
+			data = this.classDescription;
 			return data;
 		} catch (ParserException e) {
 			return null;
@@ -112,60 +100,6 @@ public class ClassExatrctor implements ArithmeticsParserVisitor {
 	}
 
 	public Object visit(MAEPropertyChain node, Object data) {
-		Object toReturn = data;
-		if (data == null) {
-			data = this.manager.getOWLDataFactory().getOWLThing();
-			toReturn = data;
-		}
-		return toReturn;
-	}
-
-	public Object visit(MAEAdd node, Object data) {
-		Object toReturn = data;
-		if (data == null) {
-			data = this.manager.getOWLDataFactory().getOWLThing();
-			toReturn = data;
-		}
-		return toReturn;
-	}
-
-	public Object visit(MAEMult node, Object data) {
-		Object toReturn = data;
-		if (data == null) {
-			data = this.manager.getOWLDataFactory().getOWLThing();
-			toReturn = data;
-		}
-		return toReturn;
-	}
-
-	public Object visit(MAEPower node, Object data) {
-		Object toReturn = data;
-		if (data == null) {
-			data = this.manager.getOWLDataFactory().getOWLThing();
-			toReturn = data;
-		}
-		return toReturn;
-	}
-
-	public Object visit(MAEIntNode node, Object data) {
-		Object toReturn = data;
-		if (data == null) {
-			data = this.manager.getOWLDataFactory().getOWLThing();
-			toReturn = data;
-		}
-		return toReturn;
-	}
-
-	public Object visit(MAEIdentifier node, Object data) {
-		Object toReturn = data;
-		if (data == null) {
-			data = this.manager.getOWLDataFactory().getOWLThing();
-			toReturn = data;
-		}
-		return toReturn;
-	}
-
-	public Object visit(MAEBigSum node, Object data) {
 		Object toReturn = data;
 		if (data == null) {
 			data = this.manager.getOWLDataFactory().getOWLThing();
@@ -197,5 +131,9 @@ public class ClassExatrctor implements ArithmeticsParserVisitor {
 	 */
 	public Object visit(MAEPropertyFacet node, Object data) {
 		return null;
+	}
+
+	public OWLDescription getClassDescription() {
+		return this.classDescription;
 	}
 }

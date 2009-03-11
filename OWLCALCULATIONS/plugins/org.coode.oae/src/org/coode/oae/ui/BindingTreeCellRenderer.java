@@ -12,6 +12,8 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.model.OWLObjectProperty;
 
+import uk.ac.manchester.mae.evaluation.PropertyChainModel;
+
 public class BindingTreeCellRenderer implements TreeCellRenderer {
 	protected DefaultTreeCellRenderer defaultTreeCellRenderer = new DefaultTreeCellRenderer();
 	protected OWLCellRenderer owlCellRenderer;
@@ -32,14 +34,12 @@ public class BindingTreeCellRenderer implements TreeCellRenderer {
 						leaf, row, hasFocus);
 		if (nodeUserObject instanceof PropertyChainModel) {
 			PropertyChainModel propertyChainModel = (PropertyChainModel) nodeUserObject;
-			String propertyRendering = this.owlEditorKit.getOWLModelManager()
+			String propertyRendering = this.owlEditorKit.getModelManager()
 					.getRendering(propertyChainModel.getProperty());
 			String facetRendering = propertyChainModel.getFacet() == null ? ""
 					: "["
-							+ this.owlEditorKit
-									.getOWLModelManager()
-									.getRendering(propertyChainModel.getFacet())
-							+ "]";
+							+ this.owlEditorKit.getModelManager().getRendering(
+									propertyChainModel.getFacet()) + "]";
 			String iconName = propertyChainModel.getProperty() instanceof OWLObjectProperty ? "property.object.png"
 					: "property.data.png";
 			this.defaultTreeCellRenderer.setOpenIcon(new ImageIcon(this
@@ -52,6 +52,47 @@ public class BindingTreeCellRenderer implements TreeCellRenderer {
 					.getTreeCellRendererComponent(tree, propertyRendering
 							+ facetRendering, selected, expanded, leaf, row,
 							hasFocus);
+			this.defaultTreeCellRenderer
+					.setOpenIcon(this.defaultTreeCellRenderer
+							.getDefaultOpenIcon());
+			this.defaultTreeCellRenderer
+					.setClosedIcon(this.defaultTreeCellRenderer
+							.getDefaultClosedIcon());
+			this.defaultTreeCellRenderer
+					.setLeafIcon(this.defaultTreeCellRenderer
+							.getDefaultLeafIcon());
+		} else if (((DefaultMutableTreeNode) value).isRoot()) {
+			String iconName = "binding.jpg";
+			this.defaultTreeCellRenderer.setOpenIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			this.defaultTreeCellRenderer.setClosedIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			this.defaultTreeCellRenderer.setLeafIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			toReturn = this.defaultTreeCellRenderer
+					.getTreeCellRendererComponent(tree, value, selected,
+							expanded, leaf, row, hasFocus);
+			this.defaultTreeCellRenderer
+					.setOpenIcon(this.defaultTreeCellRenderer
+							.getDefaultOpenIcon());
+			this.defaultTreeCellRenderer
+					.setClosedIcon(this.defaultTreeCellRenderer
+							.getDefaultClosedIcon());
+			this.defaultTreeCellRenderer
+					.setLeafIcon(this.defaultTreeCellRenderer
+							.getDefaultLeafIcon());
+		} else {
+			// Variable
+			String iconName = "variable.jpg";
+			this.defaultTreeCellRenderer.setOpenIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			this.defaultTreeCellRenderer.setClosedIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			this.defaultTreeCellRenderer.setLeafIcon(new ImageIcon(this
+					.getClass().getClassLoader().getResource(iconName)));
+			toReturn = this.defaultTreeCellRenderer
+					.getTreeCellRendererComponent(tree, value, selected,
+							expanded, leaf, row, hasFocus);
 			this.defaultTreeCellRenderer
 					.setOpenIcon(this.defaultTreeCellRenderer
 							.getDefaultOpenIcon());

@@ -63,11 +63,13 @@ public class OWLArithmeticsFormulaDataPropertyView extends
 	@Override
 	public void initialiseView() throws Exception {
 		this.list = new OWLFrameList2<OWLDataProperty>(this.getOWLEditorKit(),
-				new OWLArithmeticsFormulaDataPropertyFrame(this
+				new OWLCalculationsFormulaDataPropertyFrame(this
 						.getOWLEditorKit()));
 		this.setLayout(new BorderLayout());
 		JScrollPane sp = new JScrollPane(this.list);
 		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		this.add(sp);
+		this.list.setCellRenderer(new ViewFormulaCellRederer(false, this
+				.getOWLEditorKit()));
 	}
 }

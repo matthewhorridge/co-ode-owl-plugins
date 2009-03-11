@@ -23,13 +23,16 @@
 package uk.ac.manchester.mae.report;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.semanticweb.owl.model.OWLIndividual;
 
 import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.evaluation.EvaluationResult;
+import uk.ac.manchester.mae.evaluation.IndividualEvaluationResult;
 
 /**
  * @author Luigi Iannone
@@ -40,7 +43,7 @@ import uk.ac.manchester.mae.MAEStart;
  */
 public class FormulaEvaluationReport {
 	protected MAEStart formula;
-	protected Map<OWLIndividual, Object> individualReports = new HashMap<OWLIndividual, Object>();
+	protected Set<IndividualEvaluationResult> results = new HashSet<IndividualEvaluationResult>();
 	protected List<Exception> exceptions = new ArrayList<Exception>();
 
 	/**
@@ -68,14 +71,46 @@ public class FormulaEvaluationReport {
 		return this.formula;
 	}
 
-	/**
-	 * @return the individualReports
-	 */
-	public Map<OWLIndividual, Object> getIndividualReports() {
-		return this.individualReports;
-	}
-
 	public void addException(Exception exception) {
 		this.exceptions.add(exception);
+	}
+
+	/**
+	 * @return the results
+	 */
+	public Set<IndividualEvaluationResult> getResults() {
+		return this.results;
+	}
+
+	/**
+	 * @return the set of individuals whose value for the formula has been
+	 *         evaluated
+	 */
+	public Set<OWLIndividual> getIndividuals() {
+		Set<OWLIndividual> toReturn = new HashSet<OWLIndividual>();
+		for (IndividualEvaluationResult individualEvaluationResult : this.results) {
+			toReturn.add(individualEvaluationResult.getIndividual());
+		}
+		return toReturn;
+	}
+
+	/**
+	 * @param individual
+	 * @return the result for the formula for the input OWLIndividual, it may be
+	 *         null if the individual has no value for the formula
+	 */
+	public EvaluationResult getResult(OWLIndividual individual) {
+		EvaluationResult toReturn = null;
+		boolean found = false;
+		Iterator<IndividualEvaluationResult> it = this.results.iterator();
+		IndividualEvaluationResult result = null;
+		while (!found && it.hasNext()) {
+			result = it.next();
+			found = result.getIndividual().equals(individual);
+		}
+		if (found) {
+			toReturn = result.getResults();
+		}
+		return toReturn;
 	}
 }

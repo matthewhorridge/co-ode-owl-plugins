@@ -14,7 +14,14 @@
         <class value="org.coode.oae.ui.OWLArithmeticsFormulaDataPropertyView"/>
         <headerColor value="@org.protege.datapropertycolor"/>
         <category value="@org.protege.datapropertycategory"/>
-    </extension>   
+    </extension>
+     <extension id="EvaluationResults"
+                point="org.protege.editor.core.application.ViewComponent">
+        <label value="OWL calculations evaluation results"/>
+        <class value="org.coode.oae.ui.EvaluationResultsView"/>
+        <headerColor value="@org.protege.datapropertycolor"/>
+        <category value="@org.protege.datapropertycategory"/>
+    </extension>       
 <!-- Menu items -->
     <extension id="evaluateFormulas"
                 point="org.protege.editor.core.application.EditorKitMenuAction">

@@ -22,6 +22,7 @@
  */
 package org.coode.oae.ui;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,14 +30,14 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRow;
 import org.protege.editor.owl.ui.frame.OWLFrameSection;
 import org.protege.editor.owl.ui.frame.OWLFrameSectionRowObjectEditor;
-import org.semanticweb.owl.model.OWLAnnotation;
 import org.semanticweb.owl.model.OWLAnnotationAxiom;
-import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
 import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.ParseException;
+import uk.ac.manchester.mae.evaluation.FormulaModel;
 
 /**
  * @author Luigi Iannone
@@ -45,45 +46,66 @@ import uk.ac.manchester.mae.MAEStart;
  * Bio-Health Informatics Group<br>
  * Apr 3, 2008
  */
-public class OWLArithmeticsFormulaClassFrameSectionRow extends
-		AbstractOWLFrameSectionRow<OWLClass, OWLAnnotationAxiom, MAEStart> {
+public class OWLCalculationsFormulaDataPropertyFrameSectionRow
+		extends
+		AbstractOWLFrameSectionRow<OWLDataProperty, OWLAnnotationAxiom<OWLDataProperty>, FormulaModel> {
 	protected OWLAnnotationAxiom<OWLDataProperty> axiom;
 
-	protected OWLArithmeticsFormulaClassFrameSectionRow(
+	protected OWLCalculationsFormulaDataPropertyFrameSectionRow(
 			OWLEditorKit owlEditorKit,
-			OWLFrameSection<OWLClass, OWLAnnotationAxiom, MAEStart> section,
-			OWLOntology ontology, OWLClass rootObject,
+			OWLFrameSection<OWLDataProperty, OWLAnnotationAxiom<OWLDataProperty>, FormulaModel> section,
+			OWLOntology ontology, OWLDataProperty rootObject,
 			OWLAnnotationAxiom<OWLDataProperty> axiom) {
 		super(owlEditorKit, section, ontology, rootObject, axiom);
 		this.axiom = axiom;
 	}
 
 	@Override
-	protected OWLAnnotationAxiom createAxiom(MAEStart editedObject) {
-		OWLAnnotationAxiom toReturn = this.getOWLDataFactory()
-				.getOWLEntityAnnotationAxiom(
-						this.axiom.getSubject(),
-						this.axiom.getAnnotation().getAnnotationURI(),
-						this.getOWLDataFactory().getOWLTypedConstant(
-								editedObject.toString()));
+	protected OWLAnnotationAxiom<OWLDataProperty> createAxiom(
+			FormulaModel editedObject) {
+		OWLAnnotationAxiom toReturn = null;
+		OWLDataProperty dataProperty = this.getRootObject();
+		if (dataProperty != null) {
+			URI uri = editedObject.getFormulaURI();
+			if (uri != null) {
+				try {
+					toReturn = this
+							.getOWLDataFactory()
+							.getOWLEntityAnnotationAxiom(
+									dataProperty,
+									uri,
+									this
+											.getOWLDataFactory()
+											.getOWLTypedConstant(
+													MAENodeAdapter
+															.toFormula(
+																	editedObject,
+																	this
+																			.getOWLModelManager())
+															.toString()));
+				} catch (ParseException e) {
+					// Impossible
+					e.printStackTrace();
+				}
+			}
+		}
 		return toReturn;
 	}
 
 	@Override
-	protected OWLFrameSectionRowObjectEditor<MAEStart> getObjectEditor() {
-		OWLArithmeticFormulaEditor arithmeticClassFormulaEditor = new OWLArithmeticFormulaEditor(
-				this.getOWLEditorKit(), this.getRootObject(), false);
+	protected OWLFrameSectionRowObjectEditor<FormulaModel> getObjectEditor() {
+		OWLCalculationsFormulaEditor toReturn = new OWLCalculationsFormulaEditor(
+				this.getOWLEditorKit());
 		AnnotationFormulaExtractor extractor = new AnnotationFormulaExtractor(
-				this.getRootObject(), this.getOWLModelManager());
-		OWLAnnotation annotation = this.axiom.getAnnotation();
-		annotation.accept(extractor);
+				null, this.getOWLModelManager());
+		this.axiom.getAnnotation().accept(extractor);
 		MAEStart formula = extractor.getExtractedFormula();
 		if (formula != null) {
-			arithmeticClassFormulaEditor.setFormulaURI(annotation
-					.getAnnotationURI());
-			arithmeticClassFormulaEditor.setFormula(formula);
+			toReturn.setFormula(MAENodeAdapter.toFormulaModel(formula,
+					this.axiom.getAnnotation().getAnnotationURI(), this
+							.getOWLEditorKit()));
 		}
-		return arithmeticClassFormulaEditor;
+		return toReturn;
 	}
 
 	public List<? extends OWLObject> getManipulatableObjects() {

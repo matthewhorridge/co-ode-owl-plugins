@@ -33,11 +33,11 @@ import org.semanticweb.owl.model.OWLDataProperty;
  * Bio-Health Informatics Group<br>
  * Apr 3, 2008
  */
-public class OWLArithmeticsFormulaDataPropertyFrame extends
+public class OWLCalculationsFormulaDataPropertyFrame extends
 		AbstractOWLFrame<OWLDataProperty> {
-	public OWLArithmeticsFormulaDataPropertyFrame(OWLEditorKit editorKit) {
+	public OWLCalculationsFormulaDataPropertyFrame(OWLEditorKit editorKit) {
 		super(editorKit.getModelManager().getOWLOntologyManager());
-		this.addSection(new OWLArithmeticsFormulaDataPropertyFrameSection(
+		this.addSection(new OWLCalculationsFormulaDataPropertyFrameSection(
 				editorKit, this));
 	}
 }
