@@ -23,25 +23,8 @@
 package uk.ac.manchester.mae.visitor.protege;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.description.OWLExpressionParserException;
-import org.semanticweb.owl.model.OWLDescription;
 
-import uk.ac.manchester.mae.MAEAdd;
-import uk.ac.manchester.mae.MAEBigSum;
-import uk.ac.manchester.mae.MAEBinding;
-import uk.ac.manchester.mae.MAEConflictStrategy;
-import uk.ac.manchester.mae.MAEIdentifier;
-import uk.ac.manchester.mae.MAEIntNode;
-import uk.ac.manchester.mae.MAEMult;
-import uk.ac.manchester.mae.MAEPower;
-import uk.ac.manchester.mae.MAEPropertyChain;
-import uk.ac.manchester.mae.MAEPropertyFacet;
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.MAEStoreTo;
-import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
-import uk.ac.manchester.mae.Node;
-import uk.ac.manchester.mae.SimpleNode;
-import uk.ac.manchester.mae.visitor.FacetExtractor;
+import uk.ac.manchester.mae.visitor.DescriptionFacetExtractor;
 
 /**
  * @author Luigi Iannone
@@ -50,149 +33,165 @@ import uk.ac.manchester.mae.visitor.FacetExtractor;
  * Bio-Health Informatics Group<br>
  * Apr 24, 2008
  */
-public class ProtegeDescriptionFacetExtractor extends FacetExtractor {
-	private OWLModelManager modelManager;
-	private OWLDescription classDescription;
-
+public class ProtegeDescriptionFacetExtractor extends DescriptionFacetExtractor {
 	public ProtegeDescriptionFacetExtractor(OWLModelManager modelManager) {
-		this.modelManager = modelManager;
+		super(modelManager.getOWLOntologyManager(), modelManager
+				.getOntologies());
 	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.SimpleNode,
-	 *      java.lang.Object)
-	 */
-	public Object visit(SimpleNode node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStart,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEStart node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEConflictStrategy,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEConflictStrategy node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEStoreTo node, Object data) {
-		node.childrenAccept(this, data);
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEmanSyntaxClassExpression,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
-		try {
-			this.classDescription = this.modelManager.getOWLDescriptionParser()
-					.createOWLDescription(node.getContent());
-			data = this.classDescription;
-			return data;
-		} catch (OWLExpressionParserException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBinding,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEBinding node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyChain,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEPropertyChain node, Object data) {
-		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-			Node child = node.jjtGetChild(i);
-			if (child instanceof MAEPropertyFacet) {
-				child.jjtAccept(this, data);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEPropertyFacet node, Object data) {
-		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-			Node child = node.jjtGetChild(i);
-			if (child instanceof MAEmanSyntaxClassExpression) {
-				child.jjtAccept(this, data);
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEAdd,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEAdd node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEMult,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEMult node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPower,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEPower node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEIntNode,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEIntNode node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEIdentifier,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEIdentifier node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBigSum,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEBigSum node, Object data) {
-		return null;
-	}
-
-	@Override
-	public OWLDescription getExtractedDescription() {
-		return this.classDescription;
-	}
+	// extends FacetExtractor {
+	// private OWLModelManager modelManager;
+	// private OWLDescription classDescription;
+	//
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.SimpleNode,
+	// * java.lang.Object)
+	// */
+	// public Object visit(SimpleNode node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStart,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEStart node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEConflictStrategy,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEConflictStrategy node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEStoreTo node, Object data) {
+	// node.childrenAccept(this, data);
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEmanSyntaxClassExpression,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEmanSyntaxClassExpression node, Object data) {
+	// try {
+	// this.classDescription = this.modelManager.getOWLDescriptionParser()
+	// .createOWLDescription(node.getContent());
+	// data = this.classDescription;
+	// return data;
+	// } catch (OWLExpressionParserException e) {
+	// e.printStackTrace();
+	// return null;
+	// }
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBinding,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEBinding node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyChain,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEPropertyChain node, Object data) {
+	// for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+	// Node child = node.jjtGetChild(i);
+	// if (child instanceof MAEPropertyFacet) {
+	// child.jjtAccept(this, data);
+	// }
+	// }
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEPropertyFacet node, Object data) {
+	// for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+	// Node child = node.jjtGetChild(i);
+	// if (child instanceof MAEmanSyntaxClassExpression) {
+	// child.jjtAccept(this, data);
+	// }
+	// }
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEAdd,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEAdd node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEMult,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEMult node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPower,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEPower node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEIntNode,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEIntNode node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEIdentifier,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEIdentifier node, Object data) {
+	// return null;
+	// }
+	//
+	// /**
+	// * @see
+	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBigSum,
+	// * java.lang.Object)
+	// */
+	// public Object visit(MAEBigSum node, Object data) {
+	// return null;
+	// }
+	//
+	// @Override
+	// public OWLDescription getExtractedDescription() {
+	// return this.classDescription;
+	// }
 }

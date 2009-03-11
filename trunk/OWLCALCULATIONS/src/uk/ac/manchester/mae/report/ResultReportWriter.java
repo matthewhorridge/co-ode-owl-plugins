@@ -22,12 +22,10 @@
  */
 package uk.ac.manchester.mae.report;
 
-import java.util.Map;
-
 import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLIndividual;
 
 import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.evaluation.IndividualEvaluationResult;
 
 /**
  * @author Luigi Iannone
@@ -37,24 +35,22 @@ import uk.ac.manchester.mae.MAEStart;
  * Mar 17, 2008
  */
 public class ResultReportWriter extends FormulaReportWriter {
-	private Map<OWLIndividual, Object> result;
+	private IndividualEvaluationResult result;
 
 	public ResultReportWriter(OWLDataProperty dataProperty, MAEStart formula,
-			Map<OWLIndividual, Object> result) {
+			IndividualEvaluationResult results) {
 		super(dataProperty, formula);
-		this.result = result;
+		this.result = results;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see uk.ac.manchester.mae.report.FormulaReportWriter#visitFormulaEvaluationReport(uk.ac.manchester.mae.report.FormulaEvaluationReport,
 	 *      java.lang.Object)
 	 */
 	@Override
 	public Object visitFormulaEvaluationReport(
 			FormulaEvaluationReport formulaEvaluationReport, Object data) {
-		formulaEvaluationReport.getIndividualReports().putAll(this.result);
+		formulaEvaluationReport.getResults().add(this.result);
 		return null;
 	}
 }

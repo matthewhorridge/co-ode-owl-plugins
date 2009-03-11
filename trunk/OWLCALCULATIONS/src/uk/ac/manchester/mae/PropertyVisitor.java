@@ -26,6 +26,8 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.coode.oae.utils.ParserFactory;
 import org.semanticweb.owl.model.OWLAnnotation;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLObjectProperty;
@@ -83,7 +85,8 @@ public class PropertyVisitor implements OWLPropertyExpressionVisitor {
 			if (annotationURI != null) {
 				String annotationNameSpace = nsUtil.split(annotationURI
 						.toString(), new String[2])[0];
-				if (annotationNameSpace.compareTo(Constants.FORMULA_NAMESPACE_URI_STRING) == 0) {
+				if (annotationNameSpace
+						.compareTo(Constants.FORMULA_NAMESPACE_URI_STRING) == 0) {
 					String annotationBody = annotation
 							.getAnnotationValueAsConstant().getLiteral();
 					this.extractedFormulaStrings.add(annotationBody);
@@ -92,10 +95,31 @@ public class PropertyVisitor implements OWLPropertyExpressionVisitor {
 		}
 	}
 
+	@Deprecated
 	/**
 	 * @return the extractedFormulas
 	 */
 	public Set<String> getExtractedFormulaStrings() {
 		return this.extractedFormulaStrings;
+	}
+
+	public Set<MAEStart> getExtractedFormulas() {
+		Set<MAEStart> toReturn = new HashSet<MAEStart>(
+				this.extractedFormulaStrings.size());
+		for (String formulaBody : this.extractedFormulaStrings) {
+			ParserFactory.initParser(formulaBody, this.ontologies);
+			try {
+				toReturn.add((MAEStart) ArithmeticsParser.Start());
+			} catch (ParseException e) {
+				Logger
+						.getLogger(this.getClass().toString())
+						.warn(
+								"The formula body "
+										+ formulaBody
+										+ " could not be correctly parsed it will be skipped ",
+								e);
+			}
+		}
+		return toReturn;
 	}
 }

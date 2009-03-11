@@ -30,11 +30,12 @@ import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRow;
 import org.protege.editor.owl.ui.frame.OWLFrameSection;
 import org.protege.editor.owl.ui.frame.OWLFrameSectionRowObjectEditor;
 import org.semanticweb.owl.model.OWLAnnotationAxiom;
+import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
-import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.evaluation.FormulaModel;
 
 /**
  * @author Luigi Iannone
@@ -43,46 +44,39 @@ import uk.ac.manchester.mae.MAEStart;
  * Bio-Health Informatics Group<br>
  * Apr 3, 2008
  */
-@SuppressWarnings("unchecked")
-public class OWLArithmeticsFormulaDataPropertyFrameSectionRow
+public class OWLCalculationsFormulaClassFrameSectionRow
 		extends
-		AbstractOWLFrameSectionRow<OWLDataProperty, OWLAnnotationAxiom, MAEStart> {
+		AbstractOWLFrameSectionRow<OWLClass, OWLAnnotationAxiom<OWLDataProperty>, FormulaModel> {
 	protected OWLAnnotationAxiom<OWLDataProperty> axiom;
 
-	protected OWLArithmeticsFormulaDataPropertyFrameSectionRow(
+	protected OWLCalculationsFormulaClassFrameSectionRow(
 			OWLEditorKit owlEditorKit,
-			OWLFrameSection<OWLDataProperty, OWLAnnotationAxiom, MAEStart> section,
-			OWLOntology ontology, OWLDataProperty rootObject,
+			OWLFrameSection<OWLClass, OWLAnnotationAxiom<OWLDataProperty>, FormulaModel> section,
+			OWLOntology ontology, OWLClass rootObject,
 			OWLAnnotationAxiom<OWLDataProperty> axiom) {
 		super(owlEditorKit, section, ontology, rootObject, axiom);
 		this.axiom = axiom;
 	}
 
 	@Override
-	protected OWLAnnotationAxiom createAxiom(MAEStart editedObject) {
-		OWLAnnotationAxiom toReturn = this.getOWLDataFactory()
-				.getOWLEntityAnnotationAxiom(
-						this.getRootObject(),
-						this.axiom.getAnnotation().getAnnotationURI(),
-						this.getOWLDataFactory().getOWLTypedConstant(
-								editedObject.toString()));
-		return toReturn;
+	protected OWLAnnotationAxiom<OWLDataProperty> createAxiom(
+			FormulaModel editedObject) {
+		return null;
 	}
 
 	@Override
-	protected OWLFrameSectionRowObjectEditor<MAEStart> getObjectEditor() {
-		OWLArithmeticFormulaEditor arithmeticFormulaEditor = new OWLArithmeticFormulaEditor(
-				this.getOWLEditorKit(), null, true);
-		AnnotationFormulaExtractor extractor = new AnnotationFormulaExtractor(
-				null, this.getOWLModelManager());
-		this.axiom.getAnnotation().accept(extractor);
-		MAEStart formula = extractor.getExtractedFormula();
-		if (formula != null) {
-			arithmeticFormulaEditor.setFormulaURI(this.axiom.getAnnotation()
-					.getAnnotationURI());
-			arithmeticFormulaEditor.setFormula(formula);
-		}
-		return arithmeticFormulaEditor;
+	public boolean isDeleteable() {
+		return false;
+	}
+
+	@Override
+	public boolean isEditable() {
+		return false;
+	}
+
+	@Override
+	protected OWLFrameSectionRowObjectEditor<FormulaModel> getObjectEditor() {
+		return null;
 	}
 
 	public List<? extends OWLObject> getManipulatableObjects() {

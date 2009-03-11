@@ -60,12 +60,12 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
 import org.coode.oae.utils.ParserFactory;
+import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
+import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.core.ui.util.VerifyingOptionPane;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRowObjectEditor;
-import org.protege.editor.owl.ui.frame.InputVerificationStatusChangedListener;
 import org.protege.editor.owl.ui.frame.OWLClassDescriptionEditor;
-import org.protege.editor.owl.ui.frame.VerifiedInputEditor;
 import org.protege.editor.owl.ui.tree.OWLModelManagerTree;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataProperty;
@@ -78,15 +78,18 @@ import uk.ac.manchester.mae.ArithmeticsParser;
 import uk.ac.manchester.mae.ConflictStrategy;
 import uk.ac.manchester.mae.Constants;
 import uk.ac.manchester.mae.ExceptionStrategy;
-import uk.ac.manchester.mae.MAEBinding;
 import uk.ac.manchester.mae.MAEPropertyChain;
 import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.OverriddenStrategy;
 import uk.ac.manchester.mae.OverridingStrategy;
 import uk.ac.manchester.mae.ParseException;
-import uk.ac.manchester.mae.visitor.BindingExtractor;
+import uk.ac.manchester.mae.evaluation.BindingModel;
+import uk.ac.manchester.mae.evaluation.FormulaModel;
+import uk.ac.manchester.mae.evaluation.PropertyChainModel;
+import uk.ac.manchester.mae.evaluation.StorageModel;
 import uk.ac.manchester.mae.visitor.ConflictStrategyExtractor;
 import uk.ac.manchester.mae.visitor.StorageExtractor;
+import uk.ac.manchester.mae.visitor.protege.ProtegeBindingExtractor;
 import uk.ac.manchester.mae.visitor.protege.ProtegeClassExtractor;
 
 /**
@@ -168,7 +171,7 @@ public class OWLArithmeticFormulaEditor extends
 			Map<MAEStart, URI> formulaAnnotationURIs) {
 		this.owlEditorKit = owlEditorKit;
 		this.owlDescription = appliesToOWLDescription;
-		this.formulaModel = new FormulaModel(owlEditorKit);
+		this.formulaModel = new FormulaModel();
 		this.canEditAppliesTo = canEditAppliesTo;
 		this.init();
 		this.mainPanel.revalidate();
@@ -411,10 +414,11 @@ public class OWLArithmeticFormulaEditor extends
 			}
 		});
 		if (this.formula != null) {
-			BindingExtractor bindingExtractor = new BindingExtractor();
-			Set<MAEBinding> extractedBindings = (Set<MAEBinding>) this.formula
+			ProtegeBindingExtractor bindingExtractor = new ProtegeBindingExtractor(
+					this.owlEditorKit.getModelManager());
+			Set<BindingModel> extractedBindings = (Set<BindingModel>) this.formula
 					.jjtAccept(bindingExtractor, null);
-			for (MAEBinding binding : extractedBindings) {
+			for (BindingModel binding : extractedBindings) {
 				MutableTreeNode bindingNode = MAENodeAdapter.toTreeNode(
 						binding, this.owlEditorKit.getModelManager());
 				this.bindingTreeModel.insertNodeInto(bindingNode, root, 0);
@@ -628,27 +632,40 @@ public class OWLArithmeticFormulaEditor extends
 						OWLModelManagerTree<OWLDataProperty> dataPropertyTree = new OWLModelManagerTree<OWLDataProperty>(
 								OWLArithmeticFormulaEditor.this.owlEditorKit,
 								OWLArithmeticFormulaEditor.this.owlEditorKit
-										.getOWLModelManager()
+										.getModelManager()
 										.getOWLDataPropertyHierarchyProvider());
-						JOptionPane.showMessageDialog(
+						JScrollPane panel = new JScrollPane(dataPropertyTree);
+						panel.setBorder(LineBorder.createBlackLineBorder());
+						JOptionPane jOptionPane = new JOptionPane(panel,
+								JOptionPane.QUESTION_MESSAGE,
+								JOptionPane.OK_CANCEL_OPTION, new ImageIcon(
+										this.getClass().getClassLoader()
+												.getResource(
+														"property.data.png")));
+						JDialog jDialog = jOptionPane.createDialog(
 								OWLArithmeticFormulaEditor.this.mainPanel,
-								dataPropertyTree);
-						Object selectedProperty = ((DefaultMutableTreeNode) dataPropertyTree
-								.getLastSelectedPathComponent())
-								.getUserObject();
-						Object currentNode = OWLArithmeticFormulaEditor.this.bindingTree
-								.getLastSelectedPathComponent();
-						if (selectedProperty != null && currentNode != null) {
+								"data property");
+						jDialog.pack();
+						jDialog.setVisible(true);
+						if ((DefaultMutableTreeNode) dataPropertyTree
+								.getLastSelectedPathComponent() != null) {
+							Object selectedProperty = ((DefaultMutableTreeNode) dataPropertyTree
+									.getLastSelectedPathComponent())
+									.getUserObject();
+							Object currentNode = OWLArithmeticFormulaEditor.this.bindingTree
+									.getLastSelectedPathComponent();
 							OWLArithmeticFormulaEditor.this.bindingTreeModel
 									.insertNodeInto(
 											new DefaultMutableTreeNode(
 													new PropertyChainModel(
 															(OWLProperty) selectedProperty,
-															null,
-															OWLArithmeticFormulaEditor.this.owlEditorKit)),
+															null)),
 											(MutableTreeNode) currentNode, 0);
 							OWLArithmeticFormulaEditor.this.bindingTree
 									.revalidate();
+							OWLArithmeticFormulaEditor.this.bindingTree
+									.expandPath(OWLArithmeticFormulaEditor.this.bindingTree
+											.getLeadSelectionPath());
 						}
 					}
 				});
@@ -656,28 +673,41 @@ public class OWLArithmeticFormulaEditor extends
 				.addActionListener(new ActionListener() {
 					@SuppressWarnings("unchecked")
 					public void actionPerformed(ActionEvent e) {
-						OWLModelManagerTree<OWLObjectProperty> dataPropertyTree = new OWLModelManagerTree<OWLObjectProperty>(
+						OWLModelManagerTree<OWLObjectProperty> objectPropertyTree = new OWLModelManagerTree<OWLObjectProperty>(
 								OWLArithmeticFormulaEditor.this.owlEditorKit,
 								OWLArithmeticFormulaEditor.this.owlEditorKit
-										.getOWLModelManager()
+										.getModelManager()
 										.getOWLObjectPropertyHierarchyProvider());
-						JOptionPane.showMessageDialog(
+						JScrollPane panel = new JScrollPane(objectPropertyTree);
+						panel.setBorder(LineBorder.createBlackLineBorder());
+						JOptionPane jOptionPane = new JOptionPane(panel,
+								JOptionPane.QUESTION_MESSAGE,
+								JOptionPane.OK_CANCEL_OPTION, new ImageIcon(
+										this.getClass().getClassLoader()
+												.getResource(
+														"property.object.png")));
+						JDialog jDialog = jOptionPane.createDialog(
 								OWLArithmeticFormulaEditor.this.mainPanel,
-								dataPropertyTree);
-						Object selectedProperty = ((DefaultMutableTreeNode) dataPropertyTree
-								.getLastSelectedPathComponent())
-								.getUserObject();
-						Object currentNode = OWLArithmeticFormulaEditor.this.bindingTree
-								.getLastSelectedPathComponent();
-						if (selectedProperty != null && currentNode != null) {
+								"object property");
+						jDialog.pack();
+						jDialog.setVisible(true);
+						if ((DefaultMutableTreeNode) objectPropertyTree
+								.getLastSelectedPathComponent() != null) {
+							Object selectedProperty = ((DefaultMutableTreeNode) objectPropertyTree
+									.getLastSelectedPathComponent())
+									.getUserObject();
+							Object currentNode = OWLArithmeticFormulaEditor.this.bindingTree
+									.getLastSelectedPathComponent();
 							OWLArithmeticFormulaEditor.this.bindingTreeModel
 									.insertNodeInto(
 											new DefaultMutableTreeNode(
 													new PropertyChainModel(
 															(OWLProperty) selectedProperty,
-															null,
-															OWLArithmeticFormulaEditor.this.owlEditorKit)),
+															null)),
 											(MutableTreeNode) currentNode, 0);
+							OWLArithmeticFormulaEditor.this.bindingTree
+									.expandPath(OWLArithmeticFormulaEditor.this.bindingTree
+											.getLeadSelectionPath());
 							OWLArithmeticFormulaEditor.this.bindingTree
 									.revalidate();
 						}
@@ -707,11 +737,9 @@ public class OWLArithmeticFormulaEditor extends
 					};
 					// if the editor is verifying, will need to prevent the OK
 					// button from being available
-					if (owlDescriptionEditor instanceof VerifiedInputEditor) {
-						//			            
-						((VerifiedInputEditor) owlDescriptionEditor)
-								.addStatusChangedListener(verificationListener);
-					}
+					//			            
+					owlDescriptionEditor
+							.addStatusChangedListener(verificationListener);
 					final JDialog dlg = optionPane.createDialog(
 							OWLArithmeticFormulaEditor.this.mainPanel, null);
 					dlg.setModal(true);
@@ -720,9 +748,12 @@ public class OWLArithmeticFormulaEditor extends
 					dlg
 							.setLocationRelativeTo(OWLArithmeticFormulaEditor.this.mainPanel);
 					dlg.setVisible(true);
-					OWLDescription editedObject = owlDescriptionEditor
-							.getEditedObject();
-					currentPropertyChainModel.setFacet(editedObject);
+					Set<OWLDescription> editedObjects = owlDescriptionEditor
+							.getEditedObjects();
+					if (editedObjects != null && editedObjects.size() > 0) {
+						currentPropertyChainModel.setFacet(editedObjects
+								.iterator().next());
+					}
 					OWLArithmeticFormulaEditor.this
 							.handleVerifyEditorContents();
 				}
@@ -750,28 +781,38 @@ public class OWLArithmeticFormulaEditor extends
 				.addActionListener(new ActionListener() {
 					@SuppressWarnings("unchecked")
 					public void actionPerformed(ActionEvent e) {
-						OWLModelManagerTree<OWLObjectProperty> dataPropertyTree = new OWLModelManagerTree<OWLObjectProperty>(
+						OWLModelManagerTree<OWLObjectProperty> objectPropertyTree = new OWLModelManagerTree<OWLObjectProperty>(
 								OWLArithmeticFormulaEditor.this.owlEditorKit,
 								OWLArithmeticFormulaEditor.this.owlEditorKit
-										.getOWLModelManager()
+										.getModelManager()
 										.getOWLObjectPropertyHierarchyProvider());
-						JOptionPane.showMessageDialog(
+						JScrollPane panel = new JScrollPane(objectPropertyTree);
+						panel.setBorder(LineBorder.createBlackLineBorder());
+						JOptionPane jOptionPane = new JOptionPane(panel,
+								JOptionPane.QUESTION_MESSAGE,
+								JOptionPane.OK_CANCEL_OPTION, new ImageIcon(
+										this.getClass().getClassLoader()
+												.getResource(
+														"property.object.png")));
+						JDialog jDialog = jOptionPane.createDialog(
 								OWLArithmeticFormulaEditor.this.mainPanel,
-								dataPropertyTree);
-						Object selectedProperty = ((DefaultMutableTreeNode) dataPropertyTree
-								.getLastSelectedPathComponent())
-								.getUserObject();
-						Object currentNode = OWLArithmeticFormulaEditor.this.storeTree
-								.getLastSelectedPathComponent();
-						if (selectedProperty != null && currentNode != null) {
+								"object property");
+						jDialog.pack();
+						jDialog.setVisible(true);
+						if ((DefaultMutableTreeNode) objectPropertyTree
+								.getLastSelectedPathComponent() != null) {
+							DefaultMutableTreeNode currentNode = (DefaultMutableTreeNode) OWLArithmeticFormulaEditor.this.storeTree
+									.getLastSelectedPathComponent();
+							Object selectedProperty = ((DefaultMutableTreeNode) objectPropertyTree
+									.getLastSelectedPathComponent())
+									.getUserObject();
 							OWLArithmeticFormulaEditor.this.storeTreeModel
 									.insertNodeInto(
 											new DefaultMutableTreeNode(
 													new PropertyChainModel(
 															(OWLProperty) selectedProperty,
-															null,
-															OWLArithmeticFormulaEditor.this.owlEditorKit)),
-											(MutableTreeNode) currentNode, 0);
+															null)),
+											currentNode, 0);
 							OWLArithmeticFormulaEditor.this.storeTree
 									.revalidate();
 						}
@@ -799,13 +840,8 @@ public class OWLArithmeticFormulaEditor extends
 							optionPane.setOKEnabled(verified);
 						}
 					};
-					// if the editor is verifying, will need to prevent the OK
-					// button from being available
-					if (owlDescriptionEditor instanceof VerifiedInputEditor) {
-						//			            
-						((VerifiedInputEditor) owlDescriptionEditor)
-								.addStatusChangedListener(verificationListener);
-					}
+					owlDescriptionEditor
+							.addStatusChangedListener(verificationListener);
 					final JDialog dlg = optionPane.createDialog(
 							OWLArithmeticFormulaEditor.this.mainPanel, null);
 					dlg.setModal(true);
@@ -814,9 +850,12 @@ public class OWLArithmeticFormulaEditor extends
 					dlg
 							.setLocationRelativeTo(OWLArithmeticFormulaEditor.this.mainPanel);
 					dlg.setVisible(true);
-					OWLDescription editedObject = owlDescriptionEditor
-							.getEditedObject();
-					currentPropertyChainModel.setFacet(editedObject);
+					Set<OWLDescription> editedObjects = owlDescriptionEditor
+							.getEditedObjects();
+					if (editedObjects != null && editedObjects.size() > 0) {
+						currentPropertyChainModel.setFacet(editedObjects
+								.iterator().next());
+					}
 					OWLArithmeticFormulaEditor.this
 							.handleVerifyEditorContents();
 				}
@@ -831,15 +870,14 @@ public class OWLArithmeticFormulaEditor extends
 		OWLDescription appliesToOWLDescription = this.owlDescription;
 		if (this.formula != null) {
 			ProtegeClassExtractor classExtractor = new ProtegeClassExtractor(
-					this.owlEditorKit.getOWLModelManager());
+					this.owlEditorKit.getModelManager());
 			appliesToOWLDescription = (OWLDescription) this.formula.jjtAccept(
 					classExtractor, null);
 		} else if (this.formulaModel != null) {
 			appliesToOWLDescription = this.formulaModel.getAppliesTo();
 		}
 		String string = appliesToOWLDescription != null ? this.owlEditorKit
-				.getOWLModelManager().getRendering(appliesToOWLDescription)
-				: "";
+				.getModelManager().getRendering(appliesToOWLDescription) : "";
 		this.appliesToLabel.setText(APPLIES_TO_LABEL_NAME + ": " + string);
 		this.editAppliesToButton.setEnabled(this.canEditAppliesTo);
 	}
@@ -869,11 +907,8 @@ public class OWLArithmeticFormulaEditor extends
 				};
 				// if the editor is verifying, will need to prevent the OK
 				// button from being available
-				if (owlDescriptionEditor instanceof VerifiedInputEditor) {
-					//			            
-					((VerifiedInputEditor) owlDescriptionEditor)
-							.addStatusChangedListener(verificationListener);
-				}
+				owlDescriptionEditor
+						.addStatusChangedListener(verificationListener);
 				final JDialog dlg = optionPane.createDialog(
 						OWLArithmeticFormulaEditor.this.mainPanel, null);
 				dlg.setModal(true);
@@ -882,20 +917,27 @@ public class OWLArithmeticFormulaEditor extends
 				dlg
 						.setLocationRelativeTo(OWLArithmeticFormulaEditor.this.mainPanel);
 				dlg.setVisible(true);
-				OWLDescription editedObject = owlDescriptionEditor
-						.getEditedObject();
-				OWLArithmeticFormulaEditor.this.formulaModel
-						.setAppliesTo(editedObject);
-				String rendering = editedObject != null ? OWLArithmeticFormulaEditor.this.owlEditorKit
-						.getOWLModelManager().getOWLObjectRenderer().render(
-								editedObject,
-								OWLArithmeticFormulaEditor.this.owlEditorKit
-										.getOWLModelManager()
-										.getOWLEntityRenderer())
-						: "";
-				OWLArithmeticFormulaEditor.this.appliesToLabel
-						.setText(rendering);
-				OWLArithmeticFormulaEditor.this.handleVerifyEditorContents();
+				Set<OWLDescription> editedObjects = owlDescriptionEditor
+						.getEditedObjects();
+				if (editedObjects != null && editedObjects.size() > 0) {
+					OWLDescription editedObject = editedObjects.iterator()
+							.next();
+					OWLArithmeticFormulaEditor.this.formulaModel
+							.setAppliesTo(editedObject);
+					String rendering = editedObject != null ? OWLArithmeticFormulaEditor.this.owlEditorKit
+							.getModelManager()
+							.getOWLObjectRenderer()
+							.render(
+									editedObject,
+									OWLArithmeticFormulaEditor.this.owlEditorKit
+											.getModelManager()
+											.getOWLEntityRenderer())
+							: "";
+					OWLArithmeticFormulaEditor.this.appliesToLabel
+							.setText(rendering);
+					OWLArithmeticFormulaEditor.this
+							.handleVerifyEditorContents();
+				}
 			}
 		});
 		appliesToSection.add(this.editAppliesToButton);
@@ -965,7 +1007,8 @@ public class OWLArithmeticFormulaEditor extends
 			}
 			if (validated) {
 				try {
-					this.formula = MAENodeAdapter.toFormula(this.formulaModel);
+					this.formula = MAENodeAdapter.toFormula(this.formulaModel,
+							this.owlEditorKit.getModelManager());
 				} catch (ParseException e) {
 					e.printStackTrace();
 				}
@@ -1020,7 +1063,8 @@ public class OWLArithmeticFormulaEditor extends
 	private boolean validateFormulaBody() {
 		String formulaBody = this.arithmeticFormulaTextArea.getText();
 		if (formulaBody != null && formulaBody.length() > 0) {
-			ParserFactory.initParser(formulaBody);
+			ParserFactory.initParser(formulaBody, this.owlEditorKit
+					.getModelManager());
 			try {
 				ArithmeticsParser.Start();
 				return true;
@@ -1083,7 +1127,8 @@ public class OWLArithmeticFormulaEditor extends
 	public void verifiedStatusChanged(boolean valid) {
 		if (valid) {
 			try {
-				this.formula = MAENodeAdapter.toFormula(this.formulaModel);
+				this.formula = MAENodeAdapter.toFormula(this.formulaModel,
+						this.owlEditorKit.getModelManager());
 				if (this.formulaURIMap != null) {
 					this.formulaURIMap.put(this.formula, this.formulaModel
 							.getFormulaURI());

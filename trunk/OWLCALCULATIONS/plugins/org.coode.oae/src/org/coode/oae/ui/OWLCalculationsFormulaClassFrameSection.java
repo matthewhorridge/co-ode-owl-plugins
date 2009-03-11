@@ -19,23 +19,23 @@ import org.semanticweb.owl.model.OWLEntityAnnotationAxiom;
 import org.semanticweb.owl.model.OWLOntology;
 
 import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.evaluation.FormulaModel;
 
-public class OWLArithmeticsFormulaClassFrameSection extends
-		AbstractOWLFrameSection<OWLClass, OWLAnnotationAxiom, MAEStart> {
+public class OWLCalculationsFormulaClassFrameSection
+		extends
+		AbstractOWLFrameSection<OWLClass, OWLAnnotationAxiom<OWLDataProperty>, FormulaModel> {
 	private static final String LABEL = "Formulas";
 	protected Map<MAEStart, URI> formulaAnnotationURIs = new HashMap<MAEStart, URI>();
 	protected Map<MAEStart, OWLDataProperty> formulaProperties = new HashMap<MAEStart, OWLDataProperty>();
 	protected boolean inferredFormulas = true;
 
-	protected OWLArithmeticsFormulaClassFrameSection(OWLEditorKit editorKit,
+	protected OWLCalculationsFormulaClassFrameSection(OWLEditorKit editorKit,
 			OWLFrame<? extends OWLClass> frame) {
 		super(editorKit, LABEL, frame);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected void clear() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -44,29 +44,19 @@ public class OWLArithmeticsFormulaClassFrameSection extends
 	}
 
 	@Override
-	protected OWLAnnotationAxiom createAxiom(MAEStart object) {
-		OWLAnnotationAxiom toReturn = null;
-		OWLDataProperty dataProperty = this.formulaProperties.get(object);
-		if (dataProperty != null) {
-			URI uri = this.formulaAnnotationURIs.get(object);
-			if (uri != null) {
-				toReturn = this.getOWLDataFactory()
-						.getOWLEntityAnnotationAxiom(
-								dataProperty,
-								uri,
-								this.getOWLDataFactory().getOWLTypedConstant(
-										object.toString()));
-			}
-		}
-		return toReturn;
+	protected OWLAnnotationAxiom<OWLDataProperty> createAxiom(
+			FormulaModel object) {
+		return null;
 	}
 
 	@Override
-	public OWLFrameSectionRowObjectEditor<MAEStart> getObjectEditor() {
-		return new OWLArithmeticFormulaEditor(this.getOWLEditorKit(), this
-				.getRootObject(), false, this.formulaAnnotationURIs);
+	public OWLFrameSectionRowObjectEditor<FormulaModel> getObjectEditor() {
+		// return new OWLArithmeticFormulaEditor(this.getOWLEditorKit(), this
+		// .getRootObject(), false, this.formulaAnnotationURIs);
+		return new OWLCalculationsFormulaEditor(this.getOWLEditorKit());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void refill(OWLOntology ontology) {
 		for (OWLDataProperty dataProperty : ontology
@@ -78,7 +68,7 @@ public class OWLArithmeticsFormulaClassFrameSection extends
 						this.getRootObject(), this.getOWLModelManager());
 				annotationAxiom.accept(visitor);
 				if (visitor.getExtractedFormula() != null) {
-					this.addRow(new OWLArithmeticsFormulaClassFrameSectionRow(
+					this.addRow(new OWLCalculationsFormulaClassFrameSectionRow(
 							this.getOWLEditorKit(), this, ontology, this
 									.getRootObject(), annotationAxiom));
 				}
@@ -86,6 +76,7 @@ public class OWLArithmeticsFormulaClassFrameSection extends
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void refillInferred() throws OWLReasonerException {
 		if (this.inferredFormulas) {
@@ -108,7 +99,7 @@ public class OWLArithmeticsFormulaClassFrameSection extends
 									annotationAxiom.accept(visitor);
 									if (visitor.getExtractedFormula() != null) {
 										this
-												.addRow(new OWLArithmeticsFormulaClassFrameSectionRow(
+												.addRow(new OWLCalculationsFormulaClassFrameSectionRow(
 														this.getOWLEditorKit(),
 														this, null,
 														this.getRootObject(),
@@ -123,7 +114,7 @@ public class OWLArithmeticsFormulaClassFrameSection extends
 		}
 	}
 
-	public Comparator<OWLFrameSectionRow<OWLClass, OWLAnnotationAxiom, MAEStart>> getRowComparator() {
+	public Comparator<OWLFrameSectionRow<OWLClass, OWLAnnotationAxiom<OWLDataProperty>, FormulaModel>> getRowComparator() {
 		return null;
 	}
 

@@ -20,24 +20,50 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae;
+package uk.ac.manchester.mae.evaluation;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.inference.OWLReasonerException;
-
-import uk.ac.manchester.mae.evaluation.Evaluator;
+import org.semanticweb.owl.model.OWLIndividual;
 
 /**
  * @author Luigi Iannone
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Mar 6, 2008
+ * Apr 30, 2008
  */
-public class ProtegeEvaluator extends Evaluator {
-	public ProtegeEvaluator(OWLModelManager owlModeManager)
-			throws OWLReasonerException {
-		super(owlModeManager.getActiveOntology(), owlModeManager
-				.getOWLOntologyManager(), owlModeManager.getReasoner());
+public class IndividualEvaluationResult {
+	OWLIndividual individual;
+	EvaluationResult results;
+
+	/**
+	 * @param individual
+	 * @param dataProperty
+	 * @param formula
+	 * @param results
+	 */
+	public IndividualEvaluationResult(OWLIndividual individual,
+			EvaluationResult results) {
+		this.individual = individual;
+		this.results = results;
+	}
+
+	/**
+	 * @return the individual
+	 */
+	public OWLIndividual getIndividual() {
+		return this.individual;
+	}
+
+	/**
+	 * @return the results
+	 */
+	public EvaluationResult getResults() {
+		return this.results;
+	}
+
+	@Override
+	public String toString() {
+		String toReturn = this.individual.toString() + " " + this.results;
+		return toReturn;
 	}
 }

@@ -20,24 +20,53 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae;
+package uk.ac.manchester.mae.evaluation;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.inference.OWLReasonerException;
+import java.util.Set;
 
-import uk.ac.manchester.mae.evaluation.Evaluator;
+import uk.ac.manchester.mae.MAEStart;
 
 /**
  * @author Luigi Iannone
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Mar 6, 2008
+ * Apr 30, 2008
  */
-public class ProtegeEvaluator extends Evaluator {
-	public ProtegeEvaluator(OWLModelManager owlModeManager)
-			throws OWLReasonerException {
-		super(owlModeManager.getActiveOntology(), owlModeManager
-				.getOWLOntologyManager(), owlModeManager.getReasoner());
+public class FormulaEvaluationResult {
+	MAEStart formula;
+	Set<IndividualEvaluationResult> individualEvaluationResults;
+
+	/**
+	 * @param formula
+	 * @param individualEvaluationResults
+	 */
+	public FormulaEvaluationResult(MAEStart formula,
+			Set<IndividualEvaluationResult> individualEvaluationResults) {
+		this.formula = formula;
+		this.individualEvaluationResults = individualEvaluationResults;
+	}
+
+	/**
+	 * @return the formula
+	 */
+	public MAEStart getFormula() {
+		return this.formula;
+	}
+
+	/**
+	 * @return the individualEvaluationResults
+	 */
+	public Set<IndividualEvaluationResult> getIndividualEvaluationResults() {
+		return this.individualEvaluationResults;
+	}
+
+	@Override
+	public String toString() {
+		String toReturn = this.formula.toString();
+		for (IndividualEvaluationResult individualEvaluationResult : this.individualEvaluationResults) {
+			toReturn += "\n" + individualEvaluationResult;
+		}
+		return toReturn;
 	}
 }

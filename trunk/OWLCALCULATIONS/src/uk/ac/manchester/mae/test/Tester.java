@@ -13,6 +13,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.coode.oae.utils.ParserFactory;
+import org.semanticweb.owl.apibinding.OWLManager;
 
 import uk.ac.manchester.mae.ArithmeticsParser;
 import uk.ac.manchester.mae.ParseException;
@@ -36,7 +37,8 @@ public class Tester extends TestCase {
 
 	public void testParser() {
 		for (String string : this.lines) {
-			ParserFactory.initParser(string);
+			ParserFactory.initParser(string, OWLManager
+					.createOWLOntologyManager());
 			System.out.println(string);
 			try {
 				ArithmeticsParser.Start();

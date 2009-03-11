@@ -1,5 +1,5 @@
 <?xml version="1.0"?> 
-<project name="lintroll plugin" default="bundle" basedir="/Users/luigi/Documents/workspace/OWLCALCULATIONS">
+<project name="OWLCALCULATIONS" default="bundle" basedir="/Users/luigi/Documents/workspace/OWLCALCULATIONS">
   
   
   <property name="classes" location="${basedir}/bin"/>
@@ -41,7 +41,7 @@
   	</copy>
     <jar basedir = "${classes}"
          jarfile  = "${jardest}"
-         manifest = "${basedir}/plugins/org.coode.oae/META-INF/MANIFEST.MF" update="true"/>
+         manifest = "${basedir}/plugins/org.coode.oae/META-INF/MANIFEST.MF" update="true" />
   </target> 
 
 	

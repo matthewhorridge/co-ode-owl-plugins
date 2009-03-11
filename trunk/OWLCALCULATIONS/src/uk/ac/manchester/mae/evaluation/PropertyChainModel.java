@@ -20,11 +20,16 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oae.ui;
+package uk.ac.manchester.mae.evaluation;
 
-import org.protege.editor.owl.OWLEditorKit;
+import java.io.StringWriter;
+
+import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLProperty;
+import org.semanticweb.owl.util.SimpleShortFormProvider;
+
+import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
 /**
  * @author Luigi Iannone
@@ -38,17 +43,14 @@ public class PropertyChainModel {
 	protected OWLProperty property;
 	protected PropertyChainModel child = null;
 	protected OWLDescription facet = null;
-	private OWLEditorKit owlEditorKit;
 
 	/**
 	 * @param property
 	 * @param index
 	 */
-	public PropertyChainModel(OWLProperty property, OWLDescription facet,
-			OWLEditorKit owlEditorKit) {
+	public PropertyChainModel(OWLProperty property, OWLDescription facet) {
 		this.property = property;
 		this.facet = facet;
-		this.owlEditorKit = owlEditorKit;
 	}
 
 	/**
@@ -72,15 +74,18 @@ public class PropertyChainModel {
 		PropertyChainModel propertyChainModel = this;
 		toReturn += propertyChainModel.getProperty().getURI().toString();
 		if (this.facet != null) {
-			toReturn += "["
-					+ this.owlEditorKit.getModelManager().getRendering(
-							this.facet) + "]";
+			StringWriter stringWriter = new StringWriter();
+			ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
+					stringWriter);
+			renderer.setShortFormProvider(new SimpleShortFormProvider());
+			this.facet.accept(renderer);
+			String rendering = stringWriter.toString();
+			toReturn += "[" + rendering + "]";
 		}
 		boolean endReached = propertyChainModel.getChild() == null;
 		while (!endReached) {
 			propertyChainModel = propertyChainModel.getChild();
-			toReturn += "!"
-					+ propertyChainModel.getProperty().getURI().toString();
+			toReturn += "!" + propertyChainModel.toString();
 			endReached = propertyChainModel.getChild() == null;
 		}
 		return toReturn;
@@ -95,5 +100,22 @@ public class PropertyChainModel {
 	 */
 	public void setFacet(OWLDescription descriptionFacet) {
 		this.facet = descriptionFacet;
+	}
+
+	public String render(OWLModelManager manager) {
+		String toReturn = "";
+		PropertyChainModel propertyChainModel = this;
+		toReturn += manager.getRendering(this.getProperty());
+		if (this.facet != null) {
+			String rendering = manager.getRendering(this.facet);
+			toReturn += "[" + rendering + "]";
+		}
+		boolean endReached = propertyChainModel.getChild() == null;
+		while (!endReached) {
+			propertyChainModel = propertyChainModel.getChild();
+			toReturn += "!" + propertyChainModel.render(manager);
+			endReached = propertyChainModel.getChild() == null;
+		}
+		return toReturn;
 	}
 }

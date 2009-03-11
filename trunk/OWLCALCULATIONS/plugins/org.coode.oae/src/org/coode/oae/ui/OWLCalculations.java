@@ -20,24 +20,26 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package uk.ac.manchester.mae;
+package org.coode.oae.ui;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.inference.OWLReasonerException;
-
-import uk.ac.manchester.mae.evaluation.Evaluator;
+import uk.ac.manchester.mae.report.EvaluationReport;
 
 /**
  * @author Luigi Iannone
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Mar 6, 2008
+ * Apr 28, 2008
  */
-public class ProtegeEvaluator extends Evaluator {
-	public ProtegeEvaluator(OWLModelManager owlModeManager)
-			throws OWLReasonerException {
-		super(owlModeManager.getActiveOntology(), owlModeManager
-				.getOWLOntologyManager(), owlModeManager.getReasoner());
+public class OWLCalculations {
+	static EvaluationReport lastEvaluationReport = null;
+
+	public static EvaluationReport getLastEvaluationReport() {
+		return lastEvaluationReport;
+	}
+
+	public static void setLastEvaluationReport(
+			EvaluationReport lastEvaluationReport) {
+		OWLCalculations.lastEvaluationReport = lastEvaluationReport;
 	}
 }

@@ -23,6 +23,15 @@
 package org.coode.oae.utils;
 
 import java.io.StringReader;
+import java.util.Set;
+
+import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcherImpl;
+import org.semanticweb.owl.expression.ShortFormEntityChecker;
+import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
+import org.semanticweb.owl.util.SimpleShortFormProvider;
 
 import uk.ac.manchester.mae.ArithmeticsParser;
 
@@ -36,12 +45,50 @@ import uk.ac.manchester.mae.ArithmeticsParser;
 public class ParserFactory {
 	static ArithmeticsParser parser = null;
 
-	public static ArithmeticsParser initParser(String formulaBody) {
+	public static ArithmeticsParser initParser(String formulaBody,
+			OWLOntologyManager ontologyManager) {
 		if (parser == null) {
 			parser = new ArithmeticsParser(new StringReader(formulaBody));
 		} else {
 			ArithmeticsParser.ReInit(new StringReader(formulaBody));
 		}
+		BidirectionalShortFormProviderAdapter bidirectionalShortFormProviderAdapter = new BidirectionalShortFormProviderAdapter(
+				ontologyManager.getOntologies(), new SimpleShortFormProvider());
+		ShortFormEntityChecker shortFormEntityChecker = new ShortFormEntityChecker(
+				bidirectionalShortFormProviderAdapter);
+		ArithmeticsParser
+				.setOWLDataFactory(ontologyManager.getOWLDataFactory());
+		ArithmeticsParser.setOWLEntityChecker(shortFormEntityChecker);
+		return parser;
+	}
+
+	public static ArithmeticsParser initParser(String formulaBody,
+			Set<OWLOntology> ontologies) {
+		if (parser == null) {
+			parser = new ArithmeticsParser(new StringReader(formulaBody));
+		} else {
+			ArithmeticsParser.ReInit(new StringReader(formulaBody));
+		}
+		BidirectionalShortFormProviderAdapter bidirectionalShortFormProviderAdapter = new BidirectionalShortFormProviderAdapter(
+				ontologies, new SimpleShortFormProvider());
+		ShortFormEntityChecker shortFormEntityChecker = new ShortFormEntityChecker(
+				bidirectionalShortFormProviderAdapter);
+		ArithmeticsParser.setOWLEntityChecker(shortFormEntityChecker);
+		return parser;
+	}
+
+	public static ArithmeticsParser initParser(String formulaBody,
+			OWLModelManager modelManager) {
+		if (parser == null) {
+			parser = new ArithmeticsParser(new StringReader(formulaBody));
+		} else {
+			ArithmeticsParser.ReInit(new StringReader(formulaBody));
+		}
+		ArithmeticsParser.setOWLDataFactory(modelManager.getOWLDataFactory());
+		ArithmeticsParser.setOWLEntityChecker(new RenderingOWLEntityChecker(
+				modelManager));
+		ArithmeticsParser.setAutoCompleterMatcher(new AutoCompleterMatcherImpl(
+				modelManager));
 		return parser;
 	}
 }

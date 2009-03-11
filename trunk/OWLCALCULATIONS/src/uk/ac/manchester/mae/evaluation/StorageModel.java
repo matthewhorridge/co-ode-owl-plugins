@@ -20,22 +20,34 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oae.ui;
-
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
-import org.semanticweb.owl.model.OWLClass;
+package uk.ac.manchester.mae.evaluation;
 
 /**
  * @author Luigi Iannone
  * 
  * The University Of Manchester<br>
  * Bio-Health Informatics Group<br>
- * Apr 3, 2008
+ * Apr 21, 2008
  */
-public class OWLArithmeticsFormulaClassFrame extends AbstractOWLFrame<OWLClass> {
-	public OWLArithmeticsFormulaClassFrame(OWLEditorKit editorKit) {
-		super(editorKit.getModelManager().getOWLOntologyManager());
-		this.addSection(new OWLArithmeticsFormulaClassFrameSection(editorKit, this));
+public class StorageModel {
+	protected PropertyChainModel propertyChainModel;
+
+	public StorageModel(PropertyChainModel propertyChainModel) {
+		this.propertyChainModel = propertyChainModel;
+	}
+
+	/**
+	 * @return the propertyChainModel
+	 */
+	public PropertyChainModel getPropertyChainModel() {
+		return this.propertyChainModel;
+	}
+
+	/**
+	 * @param propertyChainModel
+	 *            the propertyChainModel to set
+	 */
+	public void setPropertyChainModel(PropertyChainModel propertyChainModel) {
+		this.propertyChainModel = propertyChainModel;
 	}
 }

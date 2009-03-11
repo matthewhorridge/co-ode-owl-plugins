@@ -83,9 +83,12 @@ public class ReportTreeCellRenderer implements TreeCellRenderer {
 			Icon formulaIcon = new ImageIcon(url);
 			this.defaultTreeCellRenderer.setOpenIcon(formulaIcon);
 			this.defaultTreeCellRenderer.setClosedIcon(formulaIcon);
+			ViewFormulaCellRederer render = new ViewFormulaCellRederer(false,
+					this.owlEditorKit);
+			((MAEStart) nodeUserObject).jjtAccept(render, null);
+			String rendering = render.getFormulaString();
 			this.defaultTreeCellRenderer.getTreeCellRendererComponent(tree,
-					((MAEStart) nodeUserObject).toString(""), selected,
-					expanded, leaf, row, hasFocus);
+					rendering, selected, expanded, leaf, row, hasFocus);
 			this.defaultTreeCellRenderer.setOpenIcon(openIcon);
 			this.defaultTreeCellRenderer.setClosedIcon(closedIcon);
 		} else if (nodeUserObject instanceof Exception) {

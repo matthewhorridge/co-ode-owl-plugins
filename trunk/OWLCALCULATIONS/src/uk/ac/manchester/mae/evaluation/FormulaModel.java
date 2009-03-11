@@ -20,13 +20,13 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oae.ui;
+package uk.ac.manchester.mae.evaluation;
 
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.OWLDescription;
 
 import uk.ac.manchester.mae.ConflictStrategy;
@@ -40,19 +40,11 @@ import uk.ac.manchester.mae.ConflictStrategy;
  */
 public class FormulaModel {
 	protected URI formulaURI;
-	protected OWLEditorKit owlEditorKit = null;
 	protected ConflictStrategy conflictStrategy = null;
 	protected OWLDescription appliesTo = null;
 	protected Set<BindingModel> bindings = new HashSet<BindingModel>();
 	protected String formulaBody = null;
 	protected StorageModel storageModel = null;
-
-	/**
-	 * @param owlEditorKit
-	 */
-	public FormulaModel(OWLEditorKit owlEditorKit) {
-		this.owlEditorKit = owlEditorKit;
-	}
 
 	/**
 	 * @return the conflictStrategy
@@ -107,10 +99,6 @@ public class FormulaModel {
 		this.appliesTo = appliesTo;
 	}
 
-	public OWLEditorKit getOwlEditorKit() {
-		return this.owlEditorKit;
-	}
-
 	/**
 	 * @param storageModel
 	 */
@@ -131,5 +119,40 @@ public class FormulaModel {
 
 	public void setFormulaURI(URI formulaURI) {
 		this.formulaURI = formulaURI;
+	}
+
+	public String render(OWLModelManager manager) {
+		String formulaString = "";
+		ConflictStrategy conflictStrategy = this.getConflictStrategy();
+		if (conflictStrategy != null) {
+			formulaString += "$" + conflictStrategy.toString() + "$ ";
+		}
+		OWLDescription appliesTo = this.getAppliesTo();
+		if (appliesTo != null) {
+			String rendering = manager.getOWLObjectRenderer().render(appliesTo,
+					manager.getOWLEntityRenderer());
+			formulaString += "APPLIESTO <" + rendering + "> ";
+		}
+		StorageModel storageModel = this.getStorageModel();
+		if (storageModel != null) {
+			formulaString += "STORETO <"
+					+ storageModel.getPropertyChainModel().render(manager)
+					+ ">";
+		}
+		Set<BindingModel> bindings = this.getBindings();
+		for (BindingModel bindingModel : bindings) {
+			formulaString += "{" + bindingModel.getIdentifier() + "=";
+			PropertyChainModel propertyChainModel = bindingModel
+					.getPropertyChainModel();
+			if (propertyChainModel != null) {
+				formulaString += propertyChainModel.render(manager);
+			}
+			formulaString += "}";
+		}
+		if (!bindings.isEmpty()) {
+			formulaString += "->";
+		}
+		formulaString += this.getFormulaBody();
+		return formulaString;
 	}
 }

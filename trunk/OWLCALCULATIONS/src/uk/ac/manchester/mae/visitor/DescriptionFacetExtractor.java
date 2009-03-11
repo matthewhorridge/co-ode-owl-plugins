@@ -34,7 +34,7 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
 import org.semanticweb.owl.util.OWLEntitySetProvider;
 import org.semanticweb.owl.util.ReferencedEntitySetProvider;
-import org.semanticweb.owl.util.ShortFormProvider;
+import org.semanticweb.owl.util.SimpleShortFormProvider;
 
 import uk.ac.manchester.mae.MAEAdd;
 import uk.ac.manchester.mae.MAEBigSum;
@@ -62,7 +62,6 @@ import uk.ac.manchester.mae.SimpleNode;
 public class DescriptionFacetExtractor extends FacetExtractor {
 	private OWLOntologyManager manager;
 	private Set<OWLOntology> ontologies;
-	private ShortFormProvider shortFormProvider;
 	private OWLDescription classDescription;
 
 	/**
@@ -71,10 +70,9 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @param shortFormProvider
 	 */
 	public DescriptionFacetExtractor(OWLOntologyManager manager,
-			Set<OWLOntology> ontologies, ShortFormProvider shortFormProvider) {
+			Set<OWLOntology> ontologies) {
 		this.manager = manager;
 		this.ontologies = ontologies;
-		this.shortFormProvider = shortFormProvider;
 	}
 
 	/**
@@ -116,7 +114,7 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 */
 	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
 		BidirectionalShortFormProviderAdapter adapter = new BidirectionalShortFormProviderAdapter(
-				this.shortFormProvider);
+				new SimpleShortFormProvider());
 		OWLEntitySetProvider<OWLEntity> owlEntitySetProvider = new ReferencedEntitySetProvider(
 				this.ontologies);
 		adapter.rebuild(owlEntitySetProvider);
@@ -216,6 +214,7 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 		return null;
 	}
 
+	@Override
 	public OWLDescription getExtractedDescription() {
 		return this.classDescription;
 	}
