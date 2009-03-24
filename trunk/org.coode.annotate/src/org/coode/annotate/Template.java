@@ -66,7 +66,6 @@ public class Template extends JComponent implements Scrollable {
 
     public void setEntity(OWLEntity entity){
         model.setEntity(entity);
-        rebuildUI();
     }
 
     private void rebuildUI() {
