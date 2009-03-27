@@ -22,10 +22,28 @@
  */
 package org.coode.oppl;
 
+import org.semanticweb.owl.model.OWLObject;
+
 /**
  * @author Luigi Iannone
  * 
  */
 public interface ConstraintVisitor<O extends Object> {
+	/**
+	 * Visitor pattern required method
+	 * 
+	 * @param c
+	 * @return the specific output of the visit (dependent on the
+	 *         implementation)
+	 */
 	O visit(InequalityConstraint c);
+
+	/**
+	 * Visitor pattern required method
+	 * 
+	 * @param c
+	 * @return the specific output of the visit (dependent on the
+	 *         implementation)
+	 */
+	O visit(InCollectionConstraint<? extends OWLObject> c);
 }

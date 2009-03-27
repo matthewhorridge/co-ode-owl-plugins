@@ -49,7 +49,7 @@ import org.coode.oppl.utils.*;
 
 public class OPPLParser {
 	private static OWLOntologyManager owlOntologyManager;
-	//private static ConstraintSystem constraintSystem;
+	
 	private static OPPLAbstractFactory opplFactory = null;
 	private static List completions = new ArrayList();
 	static private AutoCompleterMatcher matcher=null;
@@ -69,7 +69,7 @@ public class OPPLParser {
 	public static OPPLAbstractFactory getOPPLFactory(){
 		if(opplFactory ==null){
 			opplFactory = new OPPLFactory(owlOntologyManager,
-			ontology, owlOntologyManager.getOWLDataFactory(), reasoner);
+			ontology, reasoner);
 		}
 		return opplFactory;
 	}
@@ -80,9 +80,7 @@ public class OPPLParser {
 	
 
 	
-	public static  OWLDataFactory getOWLDataFactory(){
-		return owlOntologyManager.getOWLDataFactory();
-	}
+
 	
 	public static OWLOntologyManager getOWLOntologyManager(){
 		return owlOntologyManager;
@@ -209,9 +207,10 @@ TOKEN: /*PUNCTUATION*/
 	
 }
 
-TOKEN: /* CONSTRAINT SYNTAX*/
+TOKEN[IGNORE_CASE]: /* CONSTRAINT SYNTAX*/
 {
 	<NEQ: "!=">
+	| <IN: "IN">
 }
 
 TOKEN: /* CREATED ENTITIES */
@@ -508,7 +507,7 @@ VariableScope typeScope(VariableScopes.Direction direction, VariableType variabl
 			manSyntaxString = manSyntaxString.trim();
 			completions.clear();
 			ManchesterOWLSyntaxEditorParser parser = new ManchesterOWLSyntaxEditorParser(
-					getOWLDataFactory(), manSyntaxString);
+					getOWLOntologyManager().getOWLDataFactory(), manSyntaxString);
 			parser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
 			toReturn = parseScope(direction,variableType,parser);
 				
@@ -542,7 +541,7 @@ VariableScope typeScope(VariableScopes.Direction direction, VariableType variabl
 					+ manSyntaxString + " error: " + e.getMessage());
 		}
 		String expression = manSyntaxString+"**";	
-        ManchesterOWLSyntaxEditorParser completerParser = new ManchesterOWLSyntaxEditorParser(getOWLDataFactory(),expression);
+        ManchesterOWLSyntaxEditorParser completerParser = new ManchesterOWLSyntaxEditorParser(getOWLOntologyManager().getOWLDataFactory(),expression);
         completerParser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
         try{
         	
@@ -615,7 +614,7 @@ VariableScope parseScope(VariableScopes.Direction direction,
 	}
 
 
-AbstractConstraint Constraint(ConstraintSystem constraintSystem):{Token t;OWLObject owlObject;Variable variable;}
+AbstractConstraint Constraint(ConstraintSystem constraintSystem):{Token t;OWLObject owlObject;Variable variable;Set<OWLObject> owlObjects = new HashSet<OWLObject>();}
 {
 	t = <IDENTIFIER> {
 		variable = constraintSystem.getVariable(t.image);
@@ -623,9 +622,20 @@ AbstractConstraint Constraint(ConstraintSystem constraintSystem):{Token t;OWLObj
 			throw new ParseException("Undeclared variable "+t.image);
 		}
 	} 
-	<NEQ> owlObject = OWLExpression(variable, constraintSystem){
+	(<NEQ> owlObject = OWLExpression(variable, constraintSystem){
 		return new InequalityConstraint(variable, owlObject,constraintSystem);
 	}
+	|
+	
+	<IN><OPENCURLYBRACKETS>owlObject = OWLExpression(variable,constraintSystem){
+		owlObjects.add(owlObject);
+	}
+	(<COMMA> owlObject = OWLExpression(variable,constraintSystem){
+		owlObjects.add(owlObject);
+	})* 
+	<CLOSEDCURLYBRACKETS>{
+		return new InCollectionConstraint(variable,owlObjects, constraintSystem);
+	})
 	
 }
 
@@ -646,7 +656,7 @@ OWLObject OWLExpression(Variable v, ConstraintSystem constraintSystem)
 
 	VariableType type = v.getType();
 	manSyntaxString = manSyntaxString.trim();
-	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, constraintSystem,OPPLParser.getOWLDataFactory(), OPPLParser.getOWLOntologyManager());
+	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, constraintSystem,getOWLOntologyManager().getOWLDataFactory(), OPPLParser.getOWLOntologyManager());
 	 
 	try{
 	OWLObject toReturn = type.accept(expressionParser);
@@ -724,7 +734,7 @@ OWLAxiom Clause(ConstraintSystem constraintSystem){
 			}
 		}
 	manSyntaxString = manSyntaxString.trim();	
-	VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(OPPLParser.getOWLDataFactory(), manSyntaxString, constraintSystem
+	VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(getOWLOntologyManager().getOWLDataFactory(), manSyntaxString, constraintSystem
 					);
 	parser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
 	try{
@@ -758,7 +768,7 @@ OWLAxiom Clause(ConstraintSystem constraintSystem){
 		throw new ParseException(e.getMessage());
 	}
 	String expression = manSyntaxString+"**";	
-        VariableManchesterOWLSyntaxParser completerParser = new VariableManchesterOWLSyntaxParser(OPPLParser.getOWLDataFactory(), expression, constraintSystem
+        VariableManchesterOWLSyntaxParser completerParser = new VariableManchesterOWLSyntaxParser(getOWLOntologyManager().getOWLDataFactory(), expression, constraintSystem
 					);
         completerParser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
         try{

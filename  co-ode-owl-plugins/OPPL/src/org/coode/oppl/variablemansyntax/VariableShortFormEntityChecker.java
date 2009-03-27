@@ -226,8 +226,8 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 				Variable variable = this.constraintSystems.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(VariableType.CLASS)) {
-					toReturn = OPPLParser.getOWLDataFactory().getOWLClass(
-							variable.getURI());
+					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()
+							.getOWLClass(variable.getURI());
 				}
 			}
 		}
@@ -261,7 +261,7 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 				Variable variable = this.constraintSystems.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(VariableType.DATAPROPERTY)) {
-					toReturn = OPPLParser.getOWLDataFactory()
+					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()
 							.getOWLDataProperty(variable.getURI());
 				}
 			}
@@ -297,7 +297,7 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 				if (variable != null
 						&& variable.getType().equals(
 								VariableType.OBJECTPROPERTY)) {
-					toReturn = OPPLParser.getOWLDataFactory()
+					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()
 							.getOWLObjectProperty(variable.getURI());
 				}
 			}
@@ -331,8 +331,8 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 				Variable variable = this.constraintSystems.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(VariableType.INDIVIDUAL)) {
-					toReturn = OPPLParser.getOWLDataFactory().getOWLIndividual(
-							variable.getURI());
+					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()
+							.getOWLIndividual(variable.getURI());
 				}
 			}
 		}

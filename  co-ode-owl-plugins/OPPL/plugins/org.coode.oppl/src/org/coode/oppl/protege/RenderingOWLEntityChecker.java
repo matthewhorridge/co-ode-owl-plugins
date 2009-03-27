@@ -52,7 +52,7 @@ public class RenderingOWLEntityChecker implements OWLEntityChecker {
 		this.owlModelManager = owlModelManager;
 		this.shortFormEntityChecker = new ShortFormEntityChecker(
 				new BidirectionalShortFormProviderAdapter(owlModelManager
-						.getOntologies(), new SimpleShortFormProvider()));
+						.getActiveOntologies(), new SimpleShortFormProvider()));
 	}
 
 	/**

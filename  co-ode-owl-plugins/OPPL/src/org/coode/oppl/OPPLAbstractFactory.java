@@ -33,6 +33,7 @@ import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLAxiomChange;
+import org.semanticweb.owl.model.OWLDataFactory;
 
 import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
@@ -92,4 +93,9 @@ public interface OPPLAbstractFactory {
 
 	public ManchesterOWLSyntaxObjectRenderer getOWLObjectRenderer(
 			StringWriter writer);
+
+	/**
+	 * @return the appropriate OWLDataFactory used by this OPPLAbstractFactory
+	 */
+	public OWLDataFactory getOWLDataFactory();
 }

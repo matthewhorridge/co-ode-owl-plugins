@@ -110,8 +110,8 @@ public class OPPLFactory implements OPPLAbstractFactory {
 				throws OWLEntityCreationException {
 			URI anURI = this.buildURI(shortName);
 			T entity = this.getOWLEntity(type, anURI);
-			OWLDeclarationAxiom declarationAxiom = OPPLFactory.this.dataFactory
-					.getOWLDeclarationAxiom(entity);
+			OWLDeclarationAxiom declarationAxiom = OPPLFactory.this
+					.getOWLDataFactory().getOWLDeclarationAxiom(entity);
 			List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 			changes.add(new AddAxiom(OPPLFactory.this.constraintSystem
 					.getOntology(), declarationAxiom));
@@ -130,14 +130,17 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		@SuppressWarnings("unchecked")
 		private <T extends OWLEntity> T getOWLEntity(Class<T> type, URI uri) {
 			if (OWLClass.class.isAssignableFrom(type)) {
-				return (T) OPPLFactory.this.dataFactory.getOWLClass(uri);
+				return (T) OPPLFactory.this.getOWLDataFactory()
+						.getOWLClass(uri);
 			} else if (OWLObjectProperty.class.isAssignableFrom(type)) {
-				return (T) OPPLFactory.this.dataFactory
+				return (T) OPPLFactory.this.getOWLDataFactory()
 						.getOWLObjectProperty(uri);
 			} else if (OWLDataProperty.class.isAssignableFrom(type)) {
-				return (T) OPPLFactory.this.dataFactory.getOWLDataProperty(uri);
+				return (T) OPPLFactory.this.getOWLDataFactory()
+						.getOWLDataProperty(uri);
 			} else if (OWLIndividual.class.isAssignableFrom(type)) {
-				return (T) OPPLFactory.this.dataFactory.getOWLIndividual(uri);
+				return (T) OPPLFactory.this.getOWLDataFactory()
+						.getOWLIndividual(uri);
 			}
 			return null;
 		}
@@ -151,7 +154,6 @@ public class OPPLFactory implements OPPLAbstractFactory {
 
 	private OWLOntologyManager ontologyManager;
 	private ConstraintSystem constraintSystem;
-	private OWLDataFactory dataFactory;
 	private VariableScopeChecker variableScopeChecker = null;
 	private OWLReasoner reasoner;
 	private OWLOntology ontology;
@@ -162,11 +164,9 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	 * @param dataFactory
 	 */
 	public OPPLFactory(OWLOntologyManager ontologyManager,
-			OWLOntology ontology, OWLDataFactory dataFactory,
-			OWLReasoner reasoner) {
+			OWLOntology ontology, OWLReasoner reasoner) {
 		this.ontologyManager = ontologyManager;
 		this.ontology = ontology;
-		this.dataFactory = dataFactory;
 		this.reasoner = reasoner;
 	}
 
@@ -234,5 +234,14 @@ public class OPPLFactory implements OPPLAbstractFactory {
 				this.ontology, this.ontologyManager) : new ConstraintSystem(
 				this.ontology, this.ontologyManager, this.reasoner);
 		return this.constraintSystem;
+	}
+
+	/**
+	 * @return the OWLDataFactory instance used by the internal
+	 *         OWLOntologyManager instance
+	 * @see org.coode.oppl.OPPLAbstractFactory#getOWLDataFactory()
+	 */
+	public OWLDataFactory getOWLDataFactory() {
+		return this.ontologyManager.getOWLDataFactory();
 	}
 }

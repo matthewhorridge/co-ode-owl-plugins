@@ -35,8 +35,8 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 							.getOWLEntity();
 				}
 			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOWLDataFactory().getOWLClass(
-						this.buildURI(aValue));
+				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
+						.getOWLClass(this.buildURI(aValue));
 			}
 			break;
 		case OBJECTPROPERTY:
@@ -47,8 +47,8 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 							.getOWLEntity();
 				}
 			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOWLDataFactory().getOWLObjectProperty(
-						this.buildURI(aValue));
+				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
+						.getOWLObjectProperty(this.buildURI(aValue));
 			}
 			break;
 		case DATAPROPERTY:
@@ -59,8 +59,8 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 							.getOWLEntity();
 				}
 			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOWLDataFactory().getOWLDataProperty(
-						this.buildURI(aValue));
+				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
+						.getOWLDataProperty(this.buildURI(aValue));
 			}
 			break;
 		case INDIVIDUAL:
@@ -71,12 +71,13 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 							.getOWLEntity();
 				}
 			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOWLDataFactory().getOWLIndividual(
-						this.buildURI(aValue));
+				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
+						.getOWLIndividual(this.buildURI(aValue));
 			}
 			break;
 		case CONSTANT:
-			value = OPPLParser.getOWLDataFactory().getOWLTypedConstant(aValue);
+			value = OPPLParser.getOPPLFactory().getOWLDataFactory()
+					.getOWLTypedConstant(aValue);
 		default:
 			break;
 		}
