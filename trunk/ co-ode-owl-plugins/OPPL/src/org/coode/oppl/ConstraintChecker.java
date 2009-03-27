@@ -22,6 +22,8 @@
  */
 package org.coode.oppl;
 
+import java.util.Collection;
+
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.Variable;
@@ -37,9 +39,9 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public class ConstraintChecker implements ConstraintVisitor<Boolean> {
-	protected BindingNode bindingNode;
-	protected ConstraintSystem constraintSystem;
-	protected OWLDataFactory dataFactory;
+	private BindingNode bindingNode;
+	private ConstraintSystem constraintSystem;
+	private OWLDataFactory dataFactory;
 
 	/**
 	 * @param bindingNode
@@ -61,8 +63,16 @@ public class ConstraintChecker implements ConstraintVisitor<Boolean> {
 		OWLObject instantiatedObject = expression.accept(instantiator);
 		Variable variable = c.getVariable();
 		OWLObject assignedValue = this.bindingNode.getAssignmentValue(variable);
-		// Hard coded check as there is only one kind of constraint at the
-		// moment
 		return !assignedValue.equals(instantiatedObject);
+	}
+
+	/**
+	 * @see org.coode.oppl.ConstraintVisitor#visit(org.coode.oppl.InCollectionConstraint)
+	 */
+	public Boolean visit(InCollectionConstraint<? extends OWLObject> c) {
+		Collection<? extends OWLObject> collection = c.getCollection();
+		OWLObject assignedValue = this.bindingNode.getAssignmentValue(c
+				.getVariable());
+		return collection.contains(assignedValue);
 	}
 }

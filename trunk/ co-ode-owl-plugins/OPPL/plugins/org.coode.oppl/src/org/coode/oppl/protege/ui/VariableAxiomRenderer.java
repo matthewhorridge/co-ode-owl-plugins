@@ -53,7 +53,7 @@ public class VariableAxiomRenderer implements ListCellRenderer {
 			ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
-		new VariableOWLObjectRenderer(owlEditorKit.getModelManager());
+		// new VariableOWLObjectRenderer(owlEditorKit.getModelManager());
 		this.renderer = new VariableOWLEntityRenderer(this.constraintSystem,
 				this.owlEditorKit.getModelManager());
 		this.variableAxiomOWLCellRenderer = new VariableAxiomOWLCellRenderer(

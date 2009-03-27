@@ -40,6 +40,7 @@ import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLAxiomChange;
+import org.semanticweb.owl.model.OWLDataFactory;
 
 import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
@@ -131,5 +132,14 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	private ConstraintSystem getConstraintSystem() {
 		return this.constraintSystem == null ? this.createConstraintSystem()
 				: this.constraintSystem;
+	}
+
+	/**
+	 * @return the OWLDataFactory exposed by this ProtegeOPPLFactory's internal
+	 *         OWLModelManager instance
+	 * @see org.coode.oppl.OPPLAbstractFactory#getOWLDataFactory()
+	 */
+	public OWLDataFactory getOWLDataFactory() {
+		return this.modelManager.getOWLDataFactory();
 	}
 }
