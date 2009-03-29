@@ -33,6 +33,7 @@ import java.util.Set;
 
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntax;
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
+import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxTokenizer;
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxTokenizer.Token;
 import org.coode.oppl.syntax.OPPLParser;
 import org.semanticweb.owl.expression.OWLEntityChecker;
@@ -57,6 +58,14 @@ import org.semanticweb.owl.model.OWLObjectPropertyExpression;
  */
 public class VariableManchesterOWLSyntaxParser extends
 		ManchesterOWLSyntaxEditorParser {
+	protected class ManchesterOWLSyntaxVariableTokeizer extends
+			ManchesterOWLSyntaxTokenizer {
+		public ManchesterOWLSyntaxVariableTokeizer(String s) {
+			super(s);
+			this.delims.remove('?');
+		}
+	}
+
 	private ConstraintSystem constraintSystem;
 	@SuppressWarnings("unchecked")
 	private Map<String, Set<AxiomType>> tokenAxiomTypesMap = new HashMap<String, Set<AxiomType>>();
@@ -70,6 +79,11 @@ public class VariableManchesterOWLSyntaxParser extends
 				.getOPPLFactory().getOWLEntityChecker(), cs);
 		super.setOWLEntityChecker(this.owlEntityChecker);
 		this.setupTokenAximoTypeMap();
+	}
+
+	@Override
+	protected ManchesterOWLSyntaxTokenizer getTokenizer(String s) {
+		return new ManchesterOWLSyntaxVariableTokeizer(s);
 	}
 
 	@SuppressWarnings("unchecked")
