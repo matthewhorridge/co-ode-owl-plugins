@@ -178,46 +178,49 @@ public class OPPLScriptImpl implements OPPLScript {
 		boolean first = true;
 		for (Variable v : this.getVariables()) {
 			String commaString = first ? "" : ", ";
-			first = false;
 			buffer.append(commaString);
+			if (!first) {
+				buffer.append("\n");
+			}
+			first = false;
 			buffer.append(v.toString());
 			VariableScope variableScope = v.getVariableScope();
 			if (variableScope != null) {
 				buffer.append("[");
 				buffer.append(variableScope.getDirection().toString());
-				StringWriter writer = new StringWriter();
+				// StringWriter writer = new StringWriter();
 				buffer.append(" ");
 				// ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
 				// .getOPPLFactory().getOWLObjectRenderer(writer);
 				ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
-						.getManchesterSyntaxRenderer();
+						.getManchesterSyntaxRenderer(this.constraintSystem);
 				variableScope.getScopingObject().accept(renderer);
-				buffer.append(writer.toString());
+				buffer.append(renderer.toString());
 				buffer.append("]");
 			}
-			buffer.append("\n");
 		}
 		OPPLQuery opplQuery = this.getQuery();
 		if (this.query != null) {
+			buffer.append("\n");
 			buffer.append(opplQuery.render());
 		}
 		if (this.getActions().size() > 0) {
-			buffer.append("BEGIN \n");
+			buffer.append("BEGIN ");
 			first = true;
 			for (OWLAxiomChange action : this.getActions()) {
-				String commaString = first ? "" : ", ";
-				StringWriter writer = new StringWriter();
+				String commaString = first ? "\n" : ",\n ";
+				// StringWriter writer = new StringWriter();
 				String actionString = action instanceof AddAxiom ? "\tADD "
 						: "\tREMOVE ";
 				first = false;
 				// ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
 				// .getOPPLFactory().getOWLObjectRenderer(writer);
 				ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
-						.getManchesterSyntaxRenderer();
+						.getManchesterSyntaxRenderer(this.constraintSystem);
 				buffer.append(commaString);
 				buffer.append(actionString);
 				action.getAxiom().accept(renderer);
-				buffer.append(writer.toString());
+				buffer.append(renderer.toString());
 				buffer.append("\n");
 			}
 			buffer.append("END;");

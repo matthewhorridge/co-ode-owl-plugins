@@ -51,13 +51,20 @@ import org.semanticweb.owl.model.OWLObjectProperty;
 public abstract class VariableGeneratedValue<N> implements GeneratedValue<N> {
 	private static class RenderingAttributeGenerator implements
 			AttributeGenerator<String> {
-		final static OWLEntityRenderer entityRenderer = OPPLParser
-				.getOPPLFactory().getOWLEntityRenderer();
+		private OWLEntityRenderer entityRenderer = OPPLParser.getOPPLFactory()
+				.getOWLEntityRenderer(this.constraintSystem);
 		private static RenderingAttributeGenerator instance = null;
+		private ConstraintSystem constraintSystem;
 
-		public static RenderingAttributeGenerator getInstance() {
+		private RenderingAttributeGenerator(ConstraintSystem cs) {
+			assert cs != null;
+			this.constraintSystem = cs;
+		}
+
+		public static RenderingAttributeGenerator getInstance(
+				ConstraintSystem cs) {
 			if (instance == null) {
-				instance = new RenderingAttributeGenerator();
+				instance = new RenderingAttributeGenerator(cs);
 			}
 			return instance;
 		}
@@ -65,7 +72,7 @@ public abstract class VariableGeneratedValue<N> implements GeneratedValue<N> {
 		public String getValue(OWLObject object) {
 			String toReturn = null;
 			if (object instanceof OWLEntity) {
-				toReturn = entityRenderer.render((OWLEntity) object);
+				toReturn = this.entityRenderer.render((OWLEntity) object);
 			} else {
 				toReturn = object.toString();
 			}
@@ -77,7 +84,8 @@ public abstract class VariableGeneratedValue<N> implements GeneratedValue<N> {
 			Set<OWLObject> possibleBindings = variable.getPossibleBindings();
 			for (OWLObject object : possibleBindings) {
 				if (object instanceof OWLEntity) {
-					toReturn.add(entityRenderer.render((OWLEntity) object));
+					toReturn
+							.add(this.entityRenderer.render((OWLEntity) object));
 				} else {
 					toReturn.add(object.toString());
 				}
@@ -100,20 +108,19 @@ public abstract class VariableGeneratedValue<N> implements GeneratedValue<N> {
 		RENDERING("RENDERING") {
 			@Override
 			public VariableGeneratedValue<?> getVariableGeneratedValue(
-					Variable variable, ConstraintSystem constraintSystem) {
+					Variable variable, final ConstraintSystem constraintSystem) {
 				return new VariableGeneratedValue<String>(variable, this) {
 					@Override
 					public String getGeneratedValue(BindingNode node) {
-						return RenderingAttributeGenerator.getInstance()
-								.getValue(
-										node.getAssignmentValue(this
-												.getVariable()));
+						return RenderingAttributeGenerator.getInstance(
+								constraintSystem).getValue(
+								node.getAssignmentValue(this.getVariable()));
 					}
 
 					@Override
 					public List<String> getGeneratedValues() {
-						return RenderingAttributeGenerator.getInstance()
-								.getValues(this.getVariable());
+						return RenderingAttributeGenerator.getInstance(
+								constraintSystem).getValues(this.getVariable());
 					}
 				};
 			}

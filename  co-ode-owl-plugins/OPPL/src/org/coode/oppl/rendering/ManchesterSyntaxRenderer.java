@@ -268,7 +268,7 @@ public class ManchesterSyntaxRenderer implements OWLObjectVisitor {
 	private Map<URI, Boolean> simpleRenderDatatypes;
 	private int currentIndex = 0;
 	private StringBuilder buffer;
-	int lastNewLineIndex = 0;
+	private int lastNewLineIndex = 0;
 	private BracketWriter bracketWriter;
 	private final OWLEntityRenderer entityRenderer;
 
@@ -1133,5 +1133,10 @@ public class ManchesterSyntaxRenderer implements OWLObjectVisitor {
 		for (int i = 0; i < indent; i++) {
 			this.write(" ");
 		}
+	}
+
+	@Override
+	public String toString() {
+		return this.buffer.toString();
 	}
 }

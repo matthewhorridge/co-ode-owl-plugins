@@ -137,37 +137,46 @@ public class OPPLQueryImpl implements OPPLQuery {
 		boolean first = true;
 		for (OWLAxiom axiom : this.getAssertedAxioms()) {
 			String commaString = first ? "ASSERTED " : "ASSERTED, ";
-			StringWriter writer = new StringWriter();
-			ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
-					writer);
-			renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
-					this.getConstraintSystem()));
-			first = false;
+			// StringWriter writer = new StringWriter();
+			// ManchesterOWLSyntaxObjectRenderer renderer = new
+			// ManchesterOWLSyntaxObjectRenderer(
+			// writer);
+			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
+					.getManchesterSyntaxRenderer(this.constraintSystem);
+			// renderer.setShortFormProvider(new
+			// SimpleVariableShortFormProvider(
+			// this.getConstraintSystem()));
 			buffer.append(commaString);
+			if (!first) {
+				buffer.append("\n");
+			}
+			first = false;
 			axiom.accept(renderer);
-			buffer.append(writer.toString());
+			buffer.append(renderer.toString());
 			buffer.append("\n");
 		}
 		for (OWLAxiom axiom : this.getAxioms()) {
 			String commaString = first ? "" : ", ";
-			StringWriter writer = new StringWriter();
+			// StringWriter writer = new StringWriter();
 			// ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
 			// .getOPPLFactory().getOWLObjectRenderer(writer);
 			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
-					.getManchesterSyntaxRenderer();
-			first = false;
+					.getManchesterSyntaxRenderer(this.constraintSystem);
 			buffer.append(commaString);
+			if (!first) {
+				buffer.append("\n");
+			}
+			first = false;
 			axiom.accept(renderer);
-			buffer.append(writer.toString());
-			buffer.append("\n");
+			buffer.append(renderer.toString());
 		}
 		if (this.getConstraints().size() > 0) {
-			buffer.append("WHERE ");
+			buffer.append("\nWHERE ");
 			first = true;
 			for (AbstractConstraint c : this.getConstraints()) {
 				String commaString = first ? "" : ", ";
 				buffer.append(commaString);
-				buffer.append(c.toString());
+				buffer.append(c.render());
 				buffer.append("\n");
 			}
 		}
