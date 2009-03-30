@@ -27,6 +27,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
@@ -243,5 +244,10 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	 */
 	public OWLDataFactory getOWLDataFactory() {
 		return this.ontologyManager.getOWLDataFactory();
+	}
+
+	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer() {
+		return new ManchesterSyntaxRenderer(this.ontologyManager, this
+				.getOWLEntityRenderer());
 	}
 }

@@ -61,8 +61,16 @@ public class OPPLSelectClauseList extends MList {
 			ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
-		DefaultListModel model = new DefaultListModel();
+		DefaultListModel model = this.clearModel();
 		this.setModel(model);
+		this.setCellRenderer(new OPPLSelectListItemCellRederer());
+	}
+
+	/**
+	 * @return
+	 */
+	private DefaultListModel clearModel() {
+		DefaultListModel model = new DefaultListModel();
 		model.addElement(new MListSectionHeader() {
 			public boolean canAdd() {
 				return true;
@@ -72,7 +80,7 @@ public class OPPLSelectClauseList extends MList {
 				return "SELECT";
 			}
 		});
-		this.setCellRenderer(new OPPLSelectListItemCellRederer());
+		return model;
 	}
 
 	@Override
@@ -201,5 +209,9 @@ public class OPPLSelectClauseList extends MList {
 			}
 			return toReturn;
 		}
+	}
+
+	public void clear() {
+		this.setModel(this.clearModel());
 	}
 }

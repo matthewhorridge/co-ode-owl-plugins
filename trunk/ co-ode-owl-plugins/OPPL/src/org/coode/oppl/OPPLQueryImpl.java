@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.semanticweb.owl.model.OWLAxiom;
@@ -145,24 +146,29 @@ public class OPPLQueryImpl implements OPPLQuery {
 			buffer.append(commaString);
 			axiom.accept(renderer);
 			buffer.append(writer.toString());
+			buffer.append("\n");
 		}
 		for (OWLAxiom axiom : this.getAxioms()) {
 			String commaString = first ? "" : ", ";
 			StringWriter writer = new StringWriter();
-			ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
-					.getOPPLFactory().getOWLObjectRenderer(writer);
+			// ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
+			// .getOPPLFactory().getOWLObjectRenderer(writer);
+			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
+					.getManchesterSyntaxRenderer();
 			first = false;
 			buffer.append(commaString);
 			axiom.accept(renderer);
 			buffer.append(writer.toString());
+			buffer.append("\n");
 		}
 		if (this.getConstraints().size() > 0) {
-			buffer.append(" WHERE ");
+			buffer.append("WHERE ");
 			first = true;
 			for (AbstractConstraint c : this.getConstraints()) {
 				String commaString = first ? "" : ", ";
 				buffer.append(commaString);
 				buffer.append(c.toString());
+				buffer.append("\n");
 			}
 		}
 		return buffer.toString();

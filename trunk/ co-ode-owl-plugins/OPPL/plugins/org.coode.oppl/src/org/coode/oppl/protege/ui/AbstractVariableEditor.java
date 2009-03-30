@@ -8,6 +8,11 @@ import org.protege.editor.core.ui.util.VerifiedInputEditor;
 
 public abstract class AbstractVariableEditor extends JPanel implements
 		VerifiedInputEditor {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1273971509314422094L;
+
 	public abstract void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener);
 

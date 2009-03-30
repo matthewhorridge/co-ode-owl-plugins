@@ -26,6 +26,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.InputVariable;
@@ -186,34 +187,40 @@ public class OPPLScriptImpl implements OPPLScript {
 				buffer.append(variableScope.getDirection().toString());
 				StringWriter writer = new StringWriter();
 				buffer.append(" ");
-				ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
-						.getOPPLFactory().getOWLObjectRenderer(writer);
+				// ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
+				// .getOPPLFactory().getOWLObjectRenderer(writer);
+				ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
+						.getManchesterSyntaxRenderer();
 				variableScope.getScopingObject().accept(renderer);
 				buffer.append(writer.toString());
 				buffer.append("]");
 			}
+			buffer.append("\n");
 		}
 		OPPLQuery opplQuery = this.getQuery();
 		if (this.query != null) {
 			buffer.append(opplQuery.render());
 		}
 		if (this.getActions().size() > 0) {
-			buffer.append(" BEGIN ");
+			buffer.append("BEGIN \n");
 			first = true;
 			for (OWLAxiomChange action : this.getActions()) {
 				String commaString = first ? "" : ", ";
 				StringWriter writer = new StringWriter();
-				String actionString = action instanceof AddAxiom ? "ADD "
-						: "REMOVE ";
+				String actionString = action instanceof AddAxiom ? "\tADD "
+						: "\tREMOVE ";
 				first = false;
-				ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
-						.getOPPLFactory().getOWLObjectRenderer(writer);
+				// ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
+				// .getOPPLFactory().getOWLObjectRenderer(writer);
+				ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
+						.getManchesterSyntaxRenderer();
 				buffer.append(commaString);
 				buffer.append(actionString);
 				action.getAxiom().accept(renderer);
 				buffer.append(writer.toString());
+				buffer.append("\n");
 			}
-			buffer.append(" END;");
+			buffer.append("END;");
 		}
 		return buffer.toString();
 	}
