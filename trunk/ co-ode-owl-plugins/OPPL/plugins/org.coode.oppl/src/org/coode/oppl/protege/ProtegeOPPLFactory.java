@@ -32,6 +32,7 @@ import org.coode.oppl.OPPLQueryImpl;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.OPPLScriptImpl;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
+import org.coode.oppl.rendering.VariableOWLEntityRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.ProtegeScopeVariableChecker;
 import org.coode.oppl.variablemansyntax.Variable;
@@ -39,6 +40,7 @@ import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
+import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLDataFactory;
@@ -84,8 +86,14 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	/**
 	 * @see org.coode.oppl.OPPLAbstractFactory#getOWLEntityRenderer()
 	 */
-	public OWLEntityRenderer getOWLEntityRenderer() {
-		return this.modelManager.getOWLEntityRenderer();
+	public OWLEntityRenderer getOWLEntityRenderer(ConstraintSystem cs) {
+		if (cs == null) {
+			throw new NullPointerException(
+					"The constraint system cannot be null");
+		}
+		OWLModelManagerEntityRenderer defaultEntityRenderer = this.modelManager
+				.getOWLEntityRenderer();
+		return new VariableOWLEntityRenderer(cs, defaultEntityRenderer);
 	}
 
 	/**
@@ -147,9 +155,13 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	/**
 	 * @see org.coode.oppl.OPPLAbstractFactory#getManchesterSyntaxRenderer()
 	 */
-	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer() {
+	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer(
+			ConstraintSystem cs) {
+		if (cs == null) {
+			throw new NullPointerException(
+					"The constraint system cannot be null");
+		}
 		return new ManchesterSyntaxRenderer(this.modelManager
-				.getOWLOntologyManager(), this.modelManager
-				.getOWLEntityRenderer());
+				.getOWLOntologyManager(), this.getOWLEntityRenderer(cs));
 	}
 }

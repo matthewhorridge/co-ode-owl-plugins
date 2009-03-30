@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
+import org.coode.oppl.rendering.VariableOWLEntityRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
@@ -194,8 +195,13 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		return this.variableScopeChecker;
 	}
 
-	public OWLEntityRenderer getOWLEntityRenderer() {
-		return new OWLEntityRendererImpl();
+	public OWLEntityRenderer getOWLEntityRenderer(ConstraintSystem cs) {
+		if (cs == null) {
+			throw new NullPointerException(
+					"The constraint system cannot be null");
+		}
+		OWLEntityRendererImpl defaultRenderer = new OWLEntityRendererImpl();
+		return new VariableOWLEntityRenderer(cs, defaultRenderer);
 	}
 
 	public OWLEntityFactory getOWLEntityFactory() {
@@ -246,8 +252,13 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		return this.ontologyManager.getOWLDataFactory();
 	}
 
-	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer() {
+	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer(
+			ConstraintSystem cs) {
+		if (cs == null) {
+			throw new NullPointerException(
+					"The constraint system cannot be null");
+		}
 		return new ManchesterSyntaxRenderer(this.ontologyManager, this
-				.getOWLEntityRenderer());
+				.getOWLEntityRenderer(cs));
 	}
 }

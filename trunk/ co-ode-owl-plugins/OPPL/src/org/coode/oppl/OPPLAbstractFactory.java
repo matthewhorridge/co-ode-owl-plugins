@@ -56,9 +56,14 @@ public interface OPPLAbstractFactory {
 	VariableScopeChecker getVariableScopeChecker() throws OPPLException;
 
 	/**
+	 * @param cs
+	 *            the ConstraintSystem containing the variables. Cannot be
+	 *            {@code null}.
 	 * @return the OWLEntityRenderer instance used by this factory
+	 * @throws NullPointerException
+	 *             when the input is {@code null}.
 	 */
-	OWLEntityRenderer getOWLEntityRenderer();
+	OWLEntityRenderer getOWLEntityRenderer(ConstraintSystem cs);
 
 	/**
 	 * @return the OWLEntityFactory used by this factory
@@ -97,9 +102,15 @@ public interface OPPLAbstractFactory {
 			StringWriter writer);
 
 	/**
+	 * @param cs
+	 *            the ConstraintSystem containing all the variable that can be
+	 *            rendered. Cannot be {@code null}.
 	 * @return the Manchester OWL Syntax renderer for this factory.
+	 * @throws NullPointerException
+	 *             when the input is {@code null}.
 	 */
-	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer();
+	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer(
+			ConstraintSystem cs);
 
 	/**
 	 * @return the appropriate OWLDataFactory used by this OPPLAbstractFactory

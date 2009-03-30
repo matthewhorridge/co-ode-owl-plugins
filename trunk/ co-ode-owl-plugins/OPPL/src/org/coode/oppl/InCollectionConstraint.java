@@ -22,14 +22,14 @@
  */
 package org.coode.oppl;
 
-import java.io.StringWriter;
 import java.util.Collection;
 
+import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
+import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
-
-import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
 /**
  * Constraint that verifies whether a variable values are contained in a
@@ -40,8 +40,8 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
  */
 public class InCollectionConstraint<P extends OWLObject> implements
 		AbstractConstraint {
-	private final Variable variable;
-	private final Collection<P> collection;
+	final Variable variable;
+	final Collection<P> collection;
 	private ConstraintSystem constraintSystem;
 
 	/**
@@ -104,17 +104,50 @@ public class InCollectionConstraint<P extends OWLObject> implements
 		buffer.append(" IN {");
 		boolean first = true;
 		String comma;
+		SimpleVariableShortFormProvider simpleVariableShortFormProvider = new SimpleVariableShortFormProvider(
+				this.constraintSystem);
 		for (P p : this.collection) {
 			comma = first ? ", " : "";
 			first = false;
 			buffer.append(comma);
-			StringWriter writer = new StringWriter();
-			ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
-					writer);
-			renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
-					this.constraintSystem));
+			// StringWriter writer = new StringWriter();
+			// ManchesterOWLSyntaxObjectRenderer renderer = new
+			// ManchesterOWLSyntaxObjectRenderer(
+			// writer);
+			// renderer.setShortFormProvider(simpleVariableShortFormProvider);
+			// p.accept(renderer);
+			if (p instanceof OWLEntity) {
+				buffer.append(simpleVariableShortFormProvider
+						.getShortForm((OWLEntity) p));
+			} else {
+				buffer.append(p.toString());
+			}
+		}
+		buffer.append("}");
+		return buffer.toString();
+	}
+
+	public String render() {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(this.variable.getName());
+		buffer.append(" IN {");
+		boolean first = true;
+		String comma;
+		for (P p : this.collection) {
+			comma = first ? ", " : "";
+			first = false;
+			buffer.append(comma);
+			// StringWriter writer = new StringWriter();
+			// ManchesterOWLSyntaxObjectRenderer renderer = new
+			// ManchesterOWLSyntaxObjectRenderer(
+			// writer);
+			// renderer.setShortFormProvider(new
+			// SimpleVariableShortFormProvider(
+			// this.constraintSystem));
+			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
+					.getManchesterSyntaxRenderer(this.constraintSystem);
 			p.accept(renderer);
-			buffer.append(writer.toString());
+			buffer.append(renderer.toString());
 		}
 		buffer.append("}");
 		return buffer.toString();

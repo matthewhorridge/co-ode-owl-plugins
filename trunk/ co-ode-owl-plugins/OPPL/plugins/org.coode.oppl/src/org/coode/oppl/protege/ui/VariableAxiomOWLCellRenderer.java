@@ -22,27 +22,32 @@
  */
 package org.coode.oppl.protege.ui;
 
+import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.model.OWLObject;
 
 public class VariableAxiomOWLCellRenderer extends OWLCellRenderer {
 	private VariableOWLObjectRenderer objectRenderer;
-	private VariableOWLEntityRenderer entityRenderer;
+	private ConstraintSystem constraintSystem;
 
+	// private VariableOWLEntityRenderer entityRenderer;
 	public VariableAxiomOWLCellRenderer(OWLEditorKit owlEditorKit,
-			
-			VariableOWLEntityRenderer renderer) {
+			ConstraintSystem cs) {
 		super(owlEditorKit);
-		this.objectRenderer = new VariableOWLObjectRenderer(owlEditorKit.getModelManager());
-		this.entityRenderer = renderer;
+		this.objectRenderer = new VariableOWLObjectRenderer(owlEditorKit
+				.getModelManager());
+		this.constraintSystem = cs;
+		// this.entityRenderer = renderer;
 	}
 
 	@Override
 	protected String getRendering(Object object) {
 		if (object instanceof OWLObject) {
-			return this.objectRenderer.render((OWLObject) object,
-					this.entityRenderer);
+			return this.objectRenderer.render((OWLObject) object, OPPLParser
+					.getOPPLFactory().getOWLEntityRenderer(
+							this.constraintSystem));
 		}
 		return super.getRendering(object);
 	}
