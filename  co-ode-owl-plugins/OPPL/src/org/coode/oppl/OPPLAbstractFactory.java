@@ -25,6 +25,7 @@ package org.coode.oppl;
 import java.io.StringWriter;
 import java.util.List;
 
+import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.NullReasonerException;
 import org.coode.oppl.variablemansyntax.Variable;
@@ -91,8 +92,14 @@ public interface OPPLAbstractFactory {
 	 */
 	ConstraintSystem createConstraintSystem();
 
+	@Deprecated
 	public ManchesterOWLSyntaxObjectRenderer getOWLObjectRenderer(
 			StringWriter writer);
+
+	/**
+	 * @return the Manchester OWL Syntax renderer for this factory.
+	 */
+	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer();
 
 	/**
 	 * @return the appropriate OWLDataFactory used by this OPPLAbstractFactory

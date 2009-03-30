@@ -47,8 +47,15 @@ public class OPPLConstraintList extends MList {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
 		this.setCellRenderer(new OPPLConstraintListItemCellRenderer());
-		DefaultListModel model = new DefaultListModel();
+		DefaultListModel model = this.clearModel();
 		this.setModel(model);
+	}
+
+	/**
+	 * @return
+	 */
+	private DefaultListModel clearModel() {
+		DefaultListModel model = new DefaultListModel();
 		model.addElement(new MListSectionHeader() {
 			public boolean canAdd() {
 				return true;
@@ -58,6 +65,7 @@ public class OPPLConstraintList extends MList {
 				return "WHERE";
 			}
 		});
+		return model;
 	}
 
 	@Override
@@ -122,5 +130,9 @@ public class OPPLConstraintList extends MList {
 			}
 		});
 		dlg.setVisible(true);
+	}
+
+	public void clear() {
+		this.setModel(this.clearModel());
 	}
 }

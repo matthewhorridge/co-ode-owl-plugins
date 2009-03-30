@@ -31,6 +31,7 @@ import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLQueryImpl;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.OPPLScriptImpl;
+import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.ProtegeScopeVariableChecker;
 import org.coode.oppl.variablemansyntax.Variable;
@@ -141,5 +142,14 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	 */
 	public OWLDataFactory getOWLDataFactory() {
 		return this.modelManager.getOWLDataFactory();
+	}
+
+	/**
+	 * @see org.coode.oppl.OPPLAbstractFactory#getManchesterSyntaxRenderer()
+	 */
+	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer() {
+		return new ManchesterSyntaxRenderer(this.modelManager
+				.getOWLOntologyManager(), this.modelManager
+				.getOWLEntityRenderer());
 	}
 }

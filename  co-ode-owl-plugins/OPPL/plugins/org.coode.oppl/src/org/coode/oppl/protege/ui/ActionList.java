@@ -111,4 +111,8 @@ public class ActionList extends MList {
 		this.setCellRenderer(new VariableAxiomRenderer(this.owlEditorKit,
 				constraintSystem));
 	}
+
+	public void clear() {
+		this.setModel(new ActionListModel());
+	}
 }
