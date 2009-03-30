@@ -21,7 +21,7 @@
 
 	
 
-  <target name="bundle" depends="">
+  <target name="bundle" depends="javacc">
 
   	<delete dir="${dist}/configuration/org.eclipse.core.runtime"/>
   	<delete dir="${dist}/configuration/org.eclipse.osgi"/>
@@ -55,6 +55,19 @@
         <copy todir="${releasedownloads}" file="${updateProperty}"/>
     	
     </target>
+	
+	<!-- ====================================
+		target: javaCC
+		builds the JavaCC java files.
+	=========================================-->
+	<target name="javacc">
+		<exec executable="sh" dir="${basedir}/src/org/coode/oppl/syntax">
+			<arg line="/Applications/javacc-4.2/bin/jjtree oppl.jjt"/>
+		</exec>
+		<exec executable="sh" dir="${basedir}/src/org/coode/oppl/syntax">
+			<arg line="/Applications/javacc-4.2/bin/javacc oppl.jj"/>
+		</exec>
+	</target>
 
 	
 </project>

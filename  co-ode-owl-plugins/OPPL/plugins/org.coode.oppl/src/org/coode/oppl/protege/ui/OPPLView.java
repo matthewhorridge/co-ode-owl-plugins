@@ -166,7 +166,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	private static final long serialVersionUID = 1897093057453176659L;
 	private static final String OPPL_COMPUTATION_IN_PROGRESS_PLEASE_WAIT = "OPPL Computation in progress...please wait";
 	// private ExpressionEditor<OPPLScript> opplStatementExpressionEditor;
-	private OPPLEditor editor;
+	private OPPLBuilder editor;
 	private JButton evaluate = new JButton("Evaluate");
 	private JButton execute = new JButton("Execute");
 	private ActionList affectedAxioms;
@@ -232,7 +232,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		// this.getOWLEditorKit(),
 		// new VariableManchesterSyntaxExpressionChecker(this
 		// .getOWLEditorKit()));
-		this.editor = new OPPLEditor(this.getOWLEditorKit());
+		this.editor = new OPPLBuilder(this.getOWLEditorKit());
 		// this.opplStatementExpressionEditor.setPreferredSize(new Dimension(50,
 		// 200));
 		this.editor.setPreferredSize(new Dimension(200, 300));
