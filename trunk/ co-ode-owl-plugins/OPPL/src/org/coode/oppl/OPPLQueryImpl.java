@@ -189,4 +189,65 @@ public class OPPLQueryImpl implements OPPLQuery {
 	public ConstraintSystem getConstraintSystem() {
 		return this.constraintSystem;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ (this.assertedAxioms == null ? 0 : this.assertedAxioms
+						.hashCode());
+		result = prime * result
+				+ (this.axioms == null ? 0 : this.axioms.hashCode());
+		result = prime * result
+				+ (this.constraints == null ? 0 : this.constraints.hashCode());
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		OPPLQueryImpl other = (OPPLQueryImpl) obj;
+		if (this.assertedAxioms == null) {
+			if (other.assertedAxioms != null) {
+				return false;
+			}
+		} else if (!this.assertedAxioms.equals(other.assertedAxioms)) {
+			return false;
+		}
+		if (this.axioms == null) {
+			if (other.axioms != null) {
+				return false;
+			}
+		} else if (!this.axioms.equals(other.axioms)) {
+			return false;
+		}
+		if (this.constraints == null) {
+			if (other.constraints != null) {
+				return false;
+			}
+		} else if (!this.constraints.equals(other.constraints)) {
+			return false;
+		}
+		return true;
+	}
 }
