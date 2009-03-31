@@ -38,6 +38,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.coode.oppl.OPPLException;
+import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
@@ -46,6 +47,7 @@ import org.protege.editor.core.ui.list.MListButton;
 import org.protege.editor.core.ui.list.MListItem;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -112,8 +114,9 @@ public class OWLObjectList extends MList implements ActionListener,
 
 	public OWLObjectList(ConstraintSystem cs, OWLEditorKit owlEditorKit) {
 		this.owlEditorKit = owlEditorKit;
-		this.setCellRenderer(new OWLObjectListCellRenderer(owlEditorKit));
 		this.constraintSystem = cs;
+		this.setCellRenderer(new VariableOWLCellRenderer(owlEditorKit,
+				this.constraintSystem, new OWLCellRenderer(owlEditorKit)));
 	}
 
 	public void actionPerformed(ActionEvent e) {

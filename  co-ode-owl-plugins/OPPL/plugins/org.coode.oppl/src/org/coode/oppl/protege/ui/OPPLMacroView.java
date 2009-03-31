@@ -45,6 +45,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.coode.oppl.protege.ProtegeOPPLFactory;
+import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.OWLObjectAbstractor;
@@ -55,6 +56,7 @@ import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
@@ -171,9 +173,11 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 				ListModel actionModel = OPPLMacroView.this.recordedActions
 						.getModel();
 				opplString += "\nBEGIN";
-				VariableAxiomRenderer cellRenderer = new VariableAxiomRenderer(
+				VariableOWLCellRenderer cellRenderer = new VariableOWLCellRenderer(
 						OPPLMacroView.this.getOWLEditorKit(),
-						OPPLMacroView.this.constraintSystem);
+						OPPLMacroView.this.constraintSystem,
+						new OWLCellRenderer(OPPLMacroView.this
+								.getOWLEditorKit()));
 				for (int i = 0; i < actionModel.getSize(); i++) {
 					Object actionElement = actionModel.getElementAt(i);
 					if (actionElement instanceof ActionListItem) {

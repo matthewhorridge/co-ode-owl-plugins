@@ -111,4 +111,44 @@ public class OPPLConstraintListItem implements MListItem {
 	public String toString() {
 		return this.constraint.toString();
 	}
+
+	/**
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ (this.constraint == null ? 0 : this.constraint.hashCode());
+		return result;
+	}
+
+	/**
+	 * @return true if the input Object is an instance of OPPLConstraintListItem
+	 *         whose inner constraint is equal to this one&apos;s.
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		OPPLConstraintListItem other = (OPPLConstraintListItem) obj;
+		if (this.constraint == null) {
+			if (other.constraint != null) {
+				return false;
+			}
+		} else if (!this.constraint.equals(other.constraint)) {
+			return false;
+		}
+		return true;
+	}
 }
