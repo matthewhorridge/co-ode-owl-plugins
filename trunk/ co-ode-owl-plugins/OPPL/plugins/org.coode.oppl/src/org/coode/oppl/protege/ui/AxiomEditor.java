@@ -30,6 +30,7 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
+import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -39,6 +40,7 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.description.OWLExpressionParserException;
 import org.protege.editor.owl.ui.clsdescriptioneditor.ExpressionEditor;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
+import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.expression.ParserException;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLException;
@@ -153,8 +155,9 @@ public class AxiomEditor extends JPanel implements VerifiedInputEditor {
 	}
 
 	public void setOWLAxiom(OWLAxiom anOWLAxiom) {
-		VariableAxiomRenderer renderer = new VariableAxiomRenderer(
-				this.owlEditorKit, this.constraintSystem);
+		VariableOWLCellRenderer renderer = new VariableOWLCellRenderer(
+				this.owlEditorKit, this.constraintSystem, new OWLCellRenderer(
+						this.owlEditorKit));
 		this.editor.setText(renderer.getRendering(anOWLAxiom));
 	}
 }

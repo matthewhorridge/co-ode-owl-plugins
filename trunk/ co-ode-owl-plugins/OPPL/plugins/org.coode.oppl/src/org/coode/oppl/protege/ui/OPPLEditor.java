@@ -76,32 +76,37 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor {
 		this.owlEditorKit = owlEditor;
 		this.opplBuilder = new OPPLBuilder(this.getOwlEditorKit());
 		this.opplTextEditor = new OPPLTextEditor(this.getOwlEditorKit());
-		this.opplBuilder
-				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
-					public void verifiedStatusChanged(boolean newState) {
-						if (newState) {
-							OPPLEditor.this.opplScript = OPPLEditor.this.opplBuilder
-									.getOPPLScript();
-							OPPLEditor.this.opplTextEditor
-									.setOPPLScript(OPPLEditor.this
-											.getOPPLScript());
-						}
-						OPPLEditor.this.handleChange();
+		InputVerificationStatusChangedListener opplTextModifier = new InputVerificationStatusChangedListener() {
+			public void verifiedStatusChanged(boolean newState) {
+				if (newState) {
+					OPPLEditor.this.opplScript = OPPLEditor.this.opplBuilder
+							.getOPPLScript();
+					if (!OPPLEditor.this.opplScript
+							.equals(OPPLEditor.this.opplTextEditor
+									.getOPPLScript())) {
+						OPPLEditor.this.opplTextEditor
+								.setOPPLScript(OPPLEditor.this.getOPPLScript());
 					}
-				});
-		this.opplTextEditor
-				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
-					public void verifiedStatusChanged(boolean newState) {
-						if (newState) {
-							OPPLEditor.this.opplScript = OPPLEditor.this.opplTextEditor
-									.getOPPLScript();
-							OPPLEditor.this.opplBuilder
-									.setOPPLScript(OPPLEditor.this
-											.getOPPLScript());
-						}
-						OPPLEditor.this.handleChange();
+				}
+				OPPLEditor.this.handleChange();
+			}
+		};
+		this.opplBuilder.addStatusChangedListener(opplTextModifier);
+		InputVerificationStatusChangedListener opplBuilderModifier = new InputVerificationStatusChangedListener() {
+			public void verifiedStatusChanged(boolean newState) {
+				if (newState) {
+					OPPLEditor.this.opplScript = OPPLEditor.this.opplTextEditor
+							.getOPPLScript();
+					if (!OPPLEditor.this.opplScript
+							.equals(OPPLEditor.this.opplBuilder.getOPPLScript())) {
+						OPPLEditor.this.opplBuilder
+								.setOPPLScript(OPPLEditor.this.getOPPLScript());
 					}
-				});
+				}
+				OPPLEditor.this.handleChange();
+			}
+		};
+		this.opplTextEditor.addStatusChangedListener(opplBuilderModifier);
 		this.initGUI();
 	}
 

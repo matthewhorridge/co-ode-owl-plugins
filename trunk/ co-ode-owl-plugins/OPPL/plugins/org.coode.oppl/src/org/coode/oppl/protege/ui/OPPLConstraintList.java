@@ -1,15 +1,11 @@
 package org.coode.oppl.protege.ui;
 
-import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JDialog;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.ListCellRenderer;
 
 import org.coode.oppl.AbstractConstraint;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
@@ -20,17 +16,6 @@ import org.protege.editor.core.ui.util.VerifyingOptionPane;
 import org.protege.editor.owl.OWLEditorKit;
 
 public class OPPLConstraintList extends MList {
-	static private class OPPLConstraintListItemCellRenderer implements
-			ListCellRenderer {
-		private DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
-
-		public Component getListCellRendererComponent(JList list, Object value,
-				int index, boolean isSelected, boolean cellHasFocus) {
-			return this.defaultListCellRenderer.getListCellRendererComponent(
-					list, value.toString(), index, isSelected, cellHasFocus);
-		}
-	}
-
 	/**
 	 * 
 	 */
@@ -46,7 +31,6 @@ public class OPPLConstraintList extends MList {
 			ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
-		this.setCellRenderer(new OPPLConstraintListItemCellRenderer());
 		DefaultListModel model = this.clearModel();
 		this.setModel(model);
 	}
@@ -76,6 +60,15 @@ public class OPPLConstraintList extends MList {
 			((DefaultListModel) this.getModel()).removeElement(item);
 			item.handleEdit();
 			((DefaultListModel) this.getModel()).addElement(item);
+		}
+	}
+
+	@Override
+	protected void handleDelete() {
+		if (this.getSelectedValue() instanceof OPPLConstraintListItem) {
+			OPPLConstraintListItem item = (OPPLConstraintListItem) this
+					.getSelectedValue();
+			((DefaultListModel) this.getModel()).removeElement(item);
 		}
 	}
 

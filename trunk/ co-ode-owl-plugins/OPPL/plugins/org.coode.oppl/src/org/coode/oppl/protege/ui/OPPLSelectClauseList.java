@@ -38,12 +38,14 @@ import javax.swing.JOptionPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.border.Border;
 
+import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.core.ui.list.MListSectionHeader;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifyingOptionPane;
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 
 /**
  * @author Luigi Iannone
@@ -183,10 +185,15 @@ public class OPPLSelectClauseList extends MList {
 	}
 
 	private class OPPLSelectListItemCellRederer implements ListCellRenderer {
-		private VariableAxiomOWLCellRenderer variableAxiomRenderer = new VariableAxiomOWLCellRenderer(
-				OPPLSelectClauseList.this.owlEditorKit,
-				OPPLSelectClauseList.this.constraintSystem);
+		// private VariableAxiomOWLCellRenderer variableAxiomRenderer = new
+		// VariableAxiomOWLCellRenderer(
+		// OPPLSelectClauseList.this.owlEditorKit,
+		// OPPLSelectClauseList.this.constraintSystem);
 		private final DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
+		private VariableOWLCellRenderer variableAxiomRenderer = new VariableOWLCellRenderer(
+				OPPLSelectClauseList.this.owlEditorKit,
+				OPPLSelectClauseList.this.constraintSystem,
+				new OWLCellRenderer(OPPLSelectClauseList.this.owlEditorKit));
 
 		public OPPLSelectListItemCellRederer() {
 			this.variableAxiomRenderer.setHighlightKeywords(true);
