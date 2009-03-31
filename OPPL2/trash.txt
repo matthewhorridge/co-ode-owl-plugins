@@ -1,0 +1,175 @@
+OWLAxiom Clause(){
+	OWLAxiom toReturn =null;
+	String manSyntaxString="";
+	Token t;
+		while(true){
+			t = getToken(1);
+			if (t.image.equals(",") || t.image.equals(";") || t.image
+								.equals("BEGIN") || t.image
+								.equals("END")){
+				break;
+			}else{
+				manSyntaxString += t.image+" ";
+				t = getNextToken();
+			}
+		}
+	ManchesterOWLSyntaxEditorParser parser = new ManchesterOWLSyntaxEditorParser(OPPLParser.getOWLDataFactory(), manSyntaxString,
+					OPPLParser.getConstraintSystem());
+	BidirectionalShortFormProvider bshp = new BidirectionalShortFormProviderAdapter(
+					OPPLParser.getOWLOntologyManager().getOntologies(),
+					new SimpleShortFormProvider());
+	parser.setOWLEntityChecker(new ShortFormEntityChecker(bshp));
+	try{
+		toReturn = parser.parseAxiom();
+	}catch(ParserException e){
+		e.printStackTrace();
+	}
+	
+	return toReturn;
+}
+
+
+/*TOKEN :  MANSYNTAX ENTITY NAMES */
+{
+	<ENTITYNAMES : <LETTER> (<LETTER>|<DIGIT>)*>
+}
+
+?x:CLASS, ?y:CLASS, ?z:OBJECTPROPERTY SELECT ?x SubClassOf ?z some ?y BEGIN REMOVE ?x SubClassOf ?z some ?y, ADD ?x SubClassOf ?z some Thing  END;
+
+?x:OBJECTPROPERTY, ?y:INDIVIDUAL, ?z:INDIVIDUAL SELECT ?y ?x ?z BEGIN ADD ?y ?x ?z END;
+
+?x:DATAPROPERTY, ?y:INDIVIDUAL, ?z:CONSTANT SELECT ?y ?x ?z;
+
+?x:INDIVIDUAL SELECT Thing ?x BEGIN REMOVE Thing ?x END;
+
+?x:CLASS, ?y:CLASS, ?z:OBJECTPROPERTY SELECT ?x SubClassOf ?z some ?y, ?x SubClassOf Person WHERE ?y != Child, ?x != Thing  BEGIN REMOVE ?x SubClassOf ?z some ?y, ADD ?x SubClassOf ?z some Thing  END;
+
+?y:INDIVIDUAL SELECT ?y has_gender_female "true"^^xsd:boolean BEGIN ADD ?y has_sister miren END;
+
+?x:INDIVIDUAL SELECT miren has_sibling ?x BEGIN ADD miren has_sibling ?x END;
+
+
+-- Build new Classes ---
+
+BEGIN
+ ADD BP_wave subClassOf Indicant,
+ ADD BP_wave subClassOf has_sub_indicant some Diastolic_BP,
+ ADD BP_wave subClassOf has_sub_indicant some Systolic_BP,
+ ADD BP_wave subClassOf has_feature exactly 1 Level,
+ ADD BP_wave_observation subClassOf Observation,
+ ADD BP_wave_observation subClassOf has_accuracy some Accuracy_value,
+ ADD BP_wave_observation subClassOf has_feature max 1 By_method,
+ ADD By_method_BP_wave_observation subClassOf has_value some Cuff_type,
+ ADD By_method_BP_wave_observation subClassOf has_accuracy some Accuracy_value,
+ ADD By_method_BP_wave_observation equivalentTo By_method and is_feature_of some (Observation and observes some BP_wave),
+ ADD Clin_holder_BP_wave equivalentTo Clin_holder and references some BP_wave_observation
+END;
+
+
+		String value = Utils.readString(CLOSEDPARENTHESYS);
+		try{
+			return getConstraintSystem().createGeneratedVariable(name,type, value);
+		}catch(OPPLException e){
+			throw new ParseException(e.getMessage());
+		}
+
+?x:CLASS SELECT ?x subClassOf Thing BEGIN ADD ?x subClassOf Cibo END;
+
+?x:CLASS[SubClassOf Portata] SELECT ?x subClassOf Thing BEGIN ADD ?x subClassOf Cibo END;
+
+?x:CLASS,?y:CLASS=generate("Example") SELECT ?x subClassOf Thing 
+BEGIN
+   ADD ?x disjointWith ?y
+END;
+
+?x:CLASS,?y:CLASS=create("Example"+"Suffix") SELECT ?x subClassOf Thing 
+BEGIN
+   ADD ?x disjointWith ?y
+END;
+
+?x:CLASS,?y:CLASS=create(?x.RENDERING +"Suffix") SELECT ?x subClassOf Thing 
+BEGIN
+   ADD ?x disjointWith ?y
+END;
+
+
+
+?clinHolder:CLASS[subClassOf Clin_holder],
+?indicant:CLASS[subClassOf Indicant],
+?observes:OBJECTPROPERTY=create("observes"), 
+?observation:CLASS=create("Observation"),
+?indicantObservation:CLASS =create(?indicant.RENDERING+"Observation")
+SELECT ?clinHolder subClassOf Clin_holder that references some ?indicant
+BEGIN
+ REMOVE ?clinHolder equivalentTo Clin_holder that references some ?indicant,
+ ADD ?indicantObservation equivalentTo ?observation that ?observes some ?indicant,
+ ADD ?clinHolder equivalentTo Clin_holder that references some ?indicantObservation
+END;
+
+
+?clinHolder:CLASS[subClassOf Clin_holder],
+?indicant:CLASS[subClassOf Indicant],
+ ?indicantObservation:CLASS =create(?indicant.RENDERING+"Observation")
+SELECT ?clinHolder subClassOf Clin_holder that references some ?indicant
+BEGIN
+ REMOVE ?clinHolder equivalentTo Clin_holder that references some ?indicant,
+ ADD ?indicantObservation equivalentTo !Observation that !observes some ?indicant,
+ ADD ?clinHolder equivalentTo Clin_holder that references some ?indicantObservation
+END;
+
+?clinHolder:CLASS[subClassOf Clin_holder],
+?indicant:CLASS,
+?indicantObservation:CLASS=create(?indicant.RENDERING+"Observation")
+SELECT ?indicant subClassOf Indicant
+BEGIN
+ ADD ?indicantObservation equivalentTo !Observation that !observes some ?indicant 
+END;
+
+ ?clinHolder:CLASS[subClassOf Clin_holder], ?indicant:CLASS[subClassOf Indicant], ?observation:CLASS=create(?indicant.RENDERING+"Observation")
+BEGIN 
+ADD ?observation subClassOf Clinical_observation_act, 
+ADD !observes subPropertyOf clinical_properties, 
+ADD ?observation subClassOf !observes some ?indicant, 
+REMOVE ?clinHolder equivalentTo ?clinHolder
+                         and references some ?indicant, 
+ADD ?clinHolder equivalentTo ?clinHolder
+                         and !observes some ?indicant
+                         and references some Clinical_observation_act
+END;
+
+ ?country:INDIVIDUAL[instanceOf Country], ?adiacentCountry:INDIVIDUAL[instanceOf Country]
+SELECT ASSERTED  ?country adjacentTo ?adiacentCountry
+BEGIN 
+REMOVE ?country adjacentTo ?adiacentCountry, 
+ADD ?country instanceOf hasLandBoundary some (LandBoundaryFragment
+                                          and boundaryOf value ?adiacentCountry)
+END;
+
+
+?x:CLASS, ?y:CLASS
+SELECT ?x subClassOf gender,
+?y subClassOf gender
+WHERE ?x!=?y, ?y!=gender
+BEGIN
+ADD ?x disjointWith ?y
+END;
+
+?x:CLASS,?y:CLASS,?z:CLASS[subClassOf CCO_Y0000001]
+SELECT
+?x subClassOf participates_in some ?z,
+?y subClassOf participates_in some ?z
+WHERE ?x!=?y
+BEGIN
+ADD ?z subClassOf has_participant only (?x or ?y),
+ADD ?z subClassOf has_participant some ?x,
+ADD ?z subClassOf has_participant some ?y,
+REMOVE ?x subClassOf participates_in some ?z,
+REMOVE ?y subClassOf participates_in some ?z
+END;
+
+
+?x:OBJECTPROPERTY, ?y:OBJECTPROPERTY
+SELECT ?y subPropertyOf ?x, Transitive: ?y, Transitive: ?x
+BEGIN 
+REMOVE Transitive: ?y
+END;
