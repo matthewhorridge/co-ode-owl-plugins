@@ -1,0 +1,1 @@
+INFERENCE=OFF;file:/Users/luigi/Documents/workspace/OPPL/ontologies/example.owl;?x:CLASS, ?y:CLASS, ?z:OBJECTPROPERTY SELECT ?x SubClassOf ?z some ?y BEGIN REMOVE ?x SubClassOf ?z some ?y, ADD ?x SubClassOf ?z some Thing  END; Parent SubClassOf hasChild some Thing, Parent SubClassOf hasChild some Person 
