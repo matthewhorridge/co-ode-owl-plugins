@@ -23,8 +23,8 @@
 package org.coode.oppl.protege;
 
 import org.coode.oppl.InequalityConstraint;
-import org.coode.oppl.protege.ui.ShortFormVariableOWLEntityRenderer;
 import org.coode.oppl.protege.ui.VariableOWLObjectRenderer;
+import org.coode.oppl.protege.ui.rendering.ShortFormVariableOWLEntityRenderer;
 import org.protege.editor.owl.model.OWLModelManager;
 
 /**
