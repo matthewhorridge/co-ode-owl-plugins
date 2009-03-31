@@ -231,4 +231,63 @@ public class OPPLScriptImpl implements OPPLScript {
 	public void addVariable(Variable variable) {
 		this.variables.add(variable);
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ (this.actions == null ? 0 : this.actions.hashCode());
+		result = prime * result
+				+ (this.query == null ? 0 : this.query.hashCode());
+		result = prime * result
+				+ (this.variables == null ? 0 : this.variables.hashCode());
+		return result;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		OPPLScriptImpl other = (OPPLScriptImpl) obj;
+		if (this.actions == null) {
+			if (other.actions != null) {
+				return false;
+			}
+		} else if (!this.actions.equals(other.actions)) {
+			return false;
+		}
+		if (this.query == null) {
+			if (other.query != null) {
+				return false;
+			}
+		} else if (!this.query.equals(other.query)) {
+			return false;
+		}
+		if (this.variables == null) {
+			if (other.variables != null) {
+				return false;
+			}
+		} else if (!this.variables.equals(other.variables)) {
+			return false;
+		}
+		return true;
+	}
 }
