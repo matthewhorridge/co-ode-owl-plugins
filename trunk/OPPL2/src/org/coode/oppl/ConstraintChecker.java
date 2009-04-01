@@ -59,7 +59,7 @@ public class ConstraintChecker implements ConstraintVisitor<Boolean> {
 	public Boolean visit(InequalityConstraint c) {
 		OWLObject expression = c.getExpression();
 		OWLObjectInstantiator instantiator = new OWLObjectInstantiator(
-				this.bindingNode, this.constraintSystem, this.dataFactory);
+				this.bindingNode, this.constraintSystem);
 		OWLObject instantiatedObject = expression.accept(instantiator);
 		Variable variable = c.getVariable();
 		OWLObject assignedValue = this.bindingNode.getAssignmentValue(variable);

@@ -469,7 +469,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 				for (BindingNode aNewLeaf : new HashSet<BindingNode>(
 						this.leaves)) {
 					OWLObjectInstantiator instantiator = new OWLObjectInstantiator(
-							aNewLeaf, this, this.dataFactory);
+							aNewLeaf, this);
 					OWLAxiom instatiatedAxiom = (OWLAxiom) axiom
 							.accept(instantiator);
 					this.instantiatedAxioms.add(instatiatedAxiom);

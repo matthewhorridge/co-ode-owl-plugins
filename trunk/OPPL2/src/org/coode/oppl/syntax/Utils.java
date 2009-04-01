@@ -22,6 +22,14 @@
  */
 package org.coode.oppl.syntax;
 
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
+import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.generated.VariableExpressionGeneratedVariable;
+import org.semanticweb.owl.expression.ParserException;
+import org.semanticweb.owl.model.OWLObject;
+
 /**
  * @author Luigi Iannone
  * 
@@ -44,5 +52,37 @@ public class Utils {
 			}
 		}
 		return toReturn;
+	}
+
+	public static Variable parseVariableExpressionGeneratedVariable(
+			String name, VariableType type, String string,
+			ConstraintSystem constraintSystem) throws ParserException {
+		VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(
+				string, constraintSystem);
+		OWLObject owlObject = null;
+		switch (type) {
+		case CLASS:
+			owlObject = parser.parseDescription();
+			break;
+		case OBJECTPROPERTY:
+			owlObject = parser.parseObjectPropertyExpression();
+			break;
+		case DATAPROPERTY:
+			owlObject = parser.parseDataProperty();
+			break;
+		case INDIVIDUAL:
+			owlObject = parser.parseIndividual();
+			break;
+		case CONSTANT:
+			owlObject = parser.parseConstant();
+			break;
+		default:
+			throw new IllegalArgumentException("Unsupported type: "
+					+ type.toString());
+		}
+		VariableExpressionGeneratedVariable variableExpressionGeneratedVariable = new VariableExpressionGeneratedVariable(
+				name, owlObject, constraintSystem);
+		constraintSystem.importVariable(variableExpressionGeneratedVariable);
+		return variableExpressionGeneratedVariable;
 	}
 }

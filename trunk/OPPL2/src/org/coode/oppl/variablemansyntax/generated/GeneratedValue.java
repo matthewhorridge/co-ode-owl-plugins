@@ -32,6 +32,8 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
  * 
  * @see GeneratedVariable
  * 
+ * @param <N>
+ *            Generic object that will be used to generate a value.
  * 
  * @author Luigi Iannone
  * 

@@ -83,12 +83,9 @@ public class VariableOWLCellRenderer extends OWLCellRenderer implements
 		this.setWrap(true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing
-	 * .JList, java.lang.Object, int, boolean, boolean)
+	/**
+	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing
+	 *      .JList, java.lang.Object, int, boolean, boolean)
 	 */
 	@Override
 	public Component getListCellRendererComponent(JList list, Object value,

@@ -37,8 +37,7 @@ public class ExpressionParser implements VariableTypeVisitorEx<OWLObject> {
 
 	public ExpressionParser(String string, ConstraintSystem cs,
 			OWLDataFactory dataFactory, OWLOntologyManager ontologyManager) {
-		this.parser = new VariableManchesterOWLSyntaxParser(dataFactory,
-				string, cs);
+		this.parser = new VariableManchesterOWLSyntaxParser(string, cs);
 		this.parser.setOWLEntityChecker(OPPLParser.getOPPLFactory()
 				.getOWLEntityChecker());
 	}

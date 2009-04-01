@@ -41,7 +41,6 @@ import org.semanticweb.owl.expression.ParserException;
 import org.semanticweb.owl.model.AxiomType;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLConstant;
-import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owl.model.OWLDataPropertyExpression;
@@ -71,9 +70,8 @@ public class VariableManchesterOWLSyntaxParser extends
 	private Map<String, Set<AxiomType>> tokenAxiomTypesMap = new HashMap<String, Set<AxiomType>>();
 	private VariableShortFormEntityChecker owlEntityChecker;
 
-	public VariableManchesterOWLSyntaxParser(OWLDataFactory dataFactory,
-			String s, ConstraintSystem cs) {
-		super(dataFactory, s);
+	public VariableManchesterOWLSyntaxParser(String s, ConstraintSystem cs) {
+		super(cs.getDataFactory(), s);
 		this.constraintSystem = cs;
 		this.owlEntityChecker = new VariableShortFormEntityChecker(OPPLParser
 				.getOPPLFactory().getOWLEntityChecker(), cs);

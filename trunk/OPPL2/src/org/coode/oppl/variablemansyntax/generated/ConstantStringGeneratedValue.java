@@ -53,7 +53,7 @@ public class ConstantStringGeneratedValue implements GeneratedValue<String> {
 
 	@Override
 	public String toString() {
-		return this.constant;
+		return "\"" + this.constant + "\"";
 	}
 
 	public String getGeneratedValue(BindingNode node) {
