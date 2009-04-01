@@ -169,6 +169,7 @@ public class OPPLQueryImpl implements OPPLQuery {
 			first = false;
 			axiom.accept(renderer);
 			buffer.append(renderer.toString());
+			buffer.append("\n");
 		}
 		if (this.getConstraints().size() > 0) {
 			buffer.append("\nWHERE ");

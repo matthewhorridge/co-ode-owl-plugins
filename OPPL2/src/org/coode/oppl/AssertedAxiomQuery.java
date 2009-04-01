@@ -124,7 +124,8 @@ public class AssertedAxiomQuery implements AxiomQuery {
 					} else {
 						leaves = new HashSet<BindingNode>(this.constraintSystem
 								.getLeaves());
-						// Expand the leaves for possible new variables introduce by
+						// Expand the leaves for possible new variables
+						// introduce by
 						// this new axiom
 						for (BindingNode leaf : new HashSet<BindingNode>(leaves)) {
 							Set<Variable> unassignedVariables = new HashSet<Variable>(
@@ -153,8 +154,7 @@ public class AssertedAxiomQuery implements AxiomQuery {
 						if (leaf.getAssignedVariables().containsAll(
 								axiomVariables)) {
 							OWLObjectInstantiator objectInstatiator = new OWLObjectInstantiator(
-									leaf, this.constraintSystem,
-									this.dataFactory);
+									leaf, this.constraintSystem);
 							OWLAxiom instantiatedAxiom = (OWLAxiom) axiom
 									.accept(objectInstatiator);
 							if (this.locateAxiom(instantiatedAxiom)) {

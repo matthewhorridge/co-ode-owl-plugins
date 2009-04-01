@@ -100,11 +100,6 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 	}
 
 	@Override
-	public String toString() {
-		return this.getName() + ":" + this.getType() + this.getOPPLFunction();
-	}
-
-	@Override
 	protected GeneratedVariable<String> replace(GeneratedValue<String> value) {
 		return buildGeneratedVariable(this.getName(), this.getType(), value,
 				this.getOntology());
@@ -119,6 +114,6 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 
 	@Override
 	public String getOPPLFunction() {
-		return " = create(" + this.getValue() + ")";
+		return "create(" + this.getValue() + ")";
 	}
 }

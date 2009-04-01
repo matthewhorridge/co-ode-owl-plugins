@@ -53,7 +53,7 @@ public class ActionFactory {
 		if (leaves != null) {
 			for (BindingNode bindingNode : leaves) {
 				OWLObjectInstantiator instatiator = new OWLObjectInstantiator(
-						bindingNode, cs, owlDataFactory);
+						bindingNode, cs);
 				OWLAxiom instantiatedAxiom = (OWLAxiom) axiom
 						.accept(instatiator);
 				switch (actionType) {

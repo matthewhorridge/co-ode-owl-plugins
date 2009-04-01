@@ -186,6 +186,7 @@ public abstract class AggregatedGeneratedValue<N> implements GeneratedValue<N> {
 		boolean first = true;
 		for (GeneratedValue<N> value2Aggregate : this.getValues2Aggregate()) {
 			String aggregator = first ? "" : this.getAggregatorSymbol() + " ";
+			first = false;
 			buffer.append(aggregator);
 			buffer.append(value2Aggregate.toString());
 		}

@@ -73,10 +73,7 @@ public class AxiomEditor extends JPanel implements VerifiedInputEditor {
 							throws OWLExpressionParserException {
 						this.lastEditedObject = null;
 						VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(
-								AxiomEditor.this.owlEditorKit
-										.getOWLModelManager()
-										.getOWLDataFactory(), text,
-								AxiomEditor.this.constraintSystem);
+								text, AxiomEditor.this.constraintSystem);
 						try {
 							this.lastEditedObject = parser.parseAxiom();
 						} catch (ParserException e) {

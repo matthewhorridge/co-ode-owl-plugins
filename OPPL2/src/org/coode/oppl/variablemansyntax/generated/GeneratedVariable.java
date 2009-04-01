@@ -164,4 +164,10 @@ public abstract class GeneratedVariable<N> implements Variable {
 	 * @return the OPPL function String serialisation
 	 */
 	public abstract String getOPPLFunction();
+
+	@Override
+	public String toString() {
+		return this.getName() + ":" + this.getType() + " = "
+				+ this.getOPPLFunction();
+	}
 }

@@ -217,6 +217,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 					this.constraintSystem.removeVariable(this.variable);
 				}
 				this.variable = this.opplFunctionEditor.createObject();
+				this.constraintSystem.importVariable(this.variable);
 				this.notifyListeners();
 			} catch (OWLExpressionParserException e) {
 				this.notifyListeners();

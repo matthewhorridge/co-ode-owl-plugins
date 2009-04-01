@@ -382,7 +382,7 @@ Variable VariableDefinition(ConstraintSystem constraintSystem):{Token variableNa
 
 
 Variable opplFunction(String name,VariableType type, ConstraintSystem constraintSystem) #void:{GeneratedValue<String> value=null; 
-	CollectionGeneratedValue<? extends OWLObject> collection=null;}{
+	CollectionGeneratedValue<? extends OWLObject> collection=null;Variable expressionVariable;}{
 	<CREATE><OPENPARENTHESYS> 
 		value = stringOperation(constraintSystem)<CLOSEDPARENTHESYS>{
 		try{
@@ -398,6 +398,21 @@ Variable opplFunction(String name,VariableType type, ConstraintSystem constraint
 	|<CREATEUNION><OPENPARENTHESYS> collection = set(type,constraintSystem)
 	<CLOSEDPARENTHESYS>{
 		return constraintSystem.createUnionGeneratedVariable(name,type,(CollectionGeneratedValue<OWLClass>) collection);
+	}
+	|
+		 expressionVariable = expressionGeneratedVariable(name,type,constraintSystem){
+		 	return expressionVariable;
+		 }
+	 
+}
+
+JAVACODE
+Variable expressionGeneratedVariable(String name,VariableType type, ConstraintSystem constraintSystem){
+	String expression = Utils.readString(COMMA,SELECT);
+	try{
+		return Utils.parseVariableExpressionGeneratedVariable(name,  type, expression,constraintSystem);
+	} catch(ParserException e){
+		throw new ParseException(e.getMessage());
 	} 
 }
 
@@ -734,7 +749,7 @@ OWLAxiom Clause(ConstraintSystem constraintSystem){
 			}
 		}
 	manSyntaxString = manSyntaxString.trim();	
-	VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(getOWLOntologyManager().getOWLDataFactory(), manSyntaxString, constraintSystem
+	VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(manSyntaxString, constraintSystem
 					);
 	parser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
 	try{
@@ -768,7 +783,7 @@ OWLAxiom Clause(ConstraintSystem constraintSystem){
 		throw new ParseException(e.getMessage());
 	}
 	String expression = manSyntaxString+"**";	
-        VariableManchesterOWLSyntaxParser completerParser = new VariableManchesterOWLSyntaxParser(getOWLOntologyManager().getOWLDataFactory(), expression, constraintSystem
+        VariableManchesterOWLSyntaxParser completerParser = new VariableManchesterOWLSyntaxParser(expression, constraintSystem
 					);
         completerParser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
         try{

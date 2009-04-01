@@ -133,7 +133,7 @@ public class InferredAxiomQuery implements AxiomQuery {
 		}
 		for (BindingNode leaf : new HashSet<BindingNode>(leaves)) {
 			OWLObjectInstantiator instantiator = new OWLObjectInstantiator(
-					leaf, this.constraintSystem, this.dataFactory);
+					leaf, this.constraintSystem);
 			OWLAxiom instatiatedAxiom = (OWLAxiom) axiom.accept(instantiator);
 			if (this.locateAxiom(instatiatedAxiom)) {
 				this.instantiatedAxioms.add(instatiatedAxiom);
