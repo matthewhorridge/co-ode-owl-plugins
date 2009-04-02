@@ -90,8 +90,7 @@ public class VariableExpressionGeneratedVariable extends
 
 	@Override
 	protected OWLObject generateObject(OWLObject generatedValue) {
-		// TODO Auto-generated method stub
-		return null;
+		return generatedValue;
 	}
 
 	@Override
