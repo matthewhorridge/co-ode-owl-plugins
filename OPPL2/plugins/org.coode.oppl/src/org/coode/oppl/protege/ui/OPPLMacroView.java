@@ -102,7 +102,7 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 				.getOWLModelManager()));
 		this.setLayout(new BorderLayout());
 		this.recordedActions = new ActionList(this.getOWLEditorKit(),
-				this.constraintSystem);
+				this.constraintSystem, false);
 		JScrollPane recordedActionsScrollPane = ComponentFactory
 				.createScrollPane(this.recordedActions);
 		JPanel recordedActionBorderPanel = new JPanel(new BorderLayout());
@@ -225,7 +225,8 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 				.getOWLEditorKit());
 		this.entities.addOPPLMacroListener(this);
 		this.entities.setModel(new DefaultListModel());
-		this.variableList = new VariableList(this.getOWLEditorKit());
+		this.variableList = new VariableList(this.getOWLEditorKit(),
+				this.constraintSystem);
 		this.variableList.setModel(new DefaultListModel());
 		this.variableList.getModel().addListDataListener(this.entities);
 		JScrollPane entitiesPane = ComponentFactory
@@ -262,7 +263,7 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 	public void ontologiesChanged(List<? extends OWLOntologyChange> changes)
 			throws OWLException {
 		ListModel existingListModel = this.recordedActions.getModel();
-		ActionListModel updatedListModel = new ActionListModel();
+		ActionListModel updatedListModel = new ActionListModel(false);
 		updatedListModel.addListDataListener(this);
 		this.recordedActions.setModel(updatedListModel);
 		if (existingListModel != null) {

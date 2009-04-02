@@ -132,7 +132,8 @@ public class OWLObjectList extends MList implements ActionListener,
 		if (selectedValue instanceof OWLObjectListItem) {
 			OWLObject owlObject = ((OWLObjectListItem) selectedValue)
 					.getOwlObject();
-			VariableList variableList = new VariableList(this.owlEditorKit);
+			VariableList variableList = new VariableList(this.owlEditorKit,
+					this.constraintSystem);
 			VariableType variableType = VariableType.getVariableType(owlObject);
 			for (Variable variable : this.getVariables()) {
 				if (variable.getType().equals(variableType)) {

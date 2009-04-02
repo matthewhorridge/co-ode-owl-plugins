@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
@@ -78,8 +79,8 @@ public class VariableList extends MList {
 										.getResource(
 												variable instanceof GeneratedVariable ? "cog.png"
 														: "user-icon.gif")));
-				label.setText(variable.getName().startsWith("?_") ? variable
-						.getName().replaceAll("\\?_", "$") : variable.getName()
+				label.setText(VariableList.this.constraintSystem
+						.render(variable)
 						+ ":" + variable.getType() + variableScopeString);
 			}
 			return label;
@@ -92,9 +93,12 @@ public class VariableList extends MList {
 	private static final long serialVersionUID = 6135780833694887712L;
 	private final VariableListCellRenderer variableListCellRenderer = new VariableListCellRenderer();
 	private final OWLEditorKit owlEditorKit;
+	private ConstraintSystem constraintSystem;
 
-	public VariableList(OWLEditorKit owlEditorKit) {
+	public VariableList(OWLEditorKit owlEditorKit,
+			ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
+		this.constraintSystem = constraintSystem;
 		this.setModel(new DefaultListModel());
 		this.setCellRenderer(this.variableListCellRenderer);
 	}
