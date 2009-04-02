@@ -183,7 +183,6 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	protected void disposeOWLView() {
 		this.getOWLEditorKit().getModelManager().removeListener(this);
 		this.editor.removeStatusChangedListener(this);
-		// this.opplStatementExpressionEditor.removeStatusChangedListener(this);
 	}
 
 	@Override
@@ -191,13 +190,10 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.setLayout(new BorderLayout());
 		JPanel statementPanel = new JPanel(new BorderLayout());
 		ParserFactory.initParser("", this.getOWLModelManager());
-		// OPPLParser.setOPPLFactory(new
-		// ProtegeOPPLFactory(this.getOWLEditorKit()
-		// .getModelManager()));
 		this.affectedAxioms = new ActionList(this.getOWLEditorKit(),
 				new ConstraintSystem(this.getOWLEditorKit().getModelManager()
 						.getActiveOntology(), this.getOWLEditorKit()
-						.getModelManager().getOWLOntologyManager()));
+						.getModelManager().getOWLOntologyManager()), false);
 		this.instantiatedAxiomsList = new MList();
 		this.instantiatedAxiomsList.setModel(new DefaultListModel());
 		OWLCellRenderer cellRenderer = new OWLCellRenderer(this

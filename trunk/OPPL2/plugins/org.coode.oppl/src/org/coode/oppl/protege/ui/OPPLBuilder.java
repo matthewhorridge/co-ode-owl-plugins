@@ -44,9 +44,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 	private class OPPLActionList extends ActionList {
 		public OPPLActionList() {
 			super(OPPLBuilder.this.owlEditorKit,
-					OPPLBuilder.this.constraintSystem);
-			((DefaultListModel) this.getModel())
-					.addElement(new ActionListSectionHeader());
+					OPPLBuilder.this.constraintSystem, true);
 		}
 
 		@Override
@@ -377,7 +375,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		}
 
 		public OPPLVariableList(OWLEditorKit owlEditorKit) {
-			super(owlEditorKit);
+			super(owlEditorKit, OPPLBuilder.this.constraintSystem);
 			((DefaultListModel) this.getModel())
 					.addElement(new InputVariableSectionHeader());
 			((DefaultListModel) this.getModel())

@@ -35,6 +35,12 @@ import org.semanticweb.owl.model.OWLAxiomChange;
  * 
  */
 public class ActionListModel extends DefaultListModel {
+	public ActionListModel(boolean canAdd) {
+		if (canAdd) {
+			this.addElement(new ActionListSectionHeader());
+		}
+	}
+
 	/**
 	 * 
 	 */

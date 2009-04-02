@@ -54,38 +54,6 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 	private final OPPLTextEditor opplTextEditor;
 	private OPPLScript opplScript;
 
-	// private final transient InputVerificationStatusChangedListener
-	// opplTextModifier = new InputVerificationStatusChangedListener() {
-	// public void verifiedStatusChanged(boolean newState) {
-	// if (newState) {
-	// OPPLEditor.this.opplScript = OPPLEditor.this.opplBuilder
-	// .getOPPLScript();
-	// OPPLEditor.this.opplTextEditor
-	// .removeStatusChangedListener(OPPLEditor.this.opplBuilderModifier);
-	// OPPLEditor.this.opplTextEditor.setOPPLScript(OPPLEditor.this
-	// .getOPPLScript());
-	// OPPLEditor.this.opplTextEditor
-	// .addStatusChangedListener(OPPLEditor.this.opplBuilderModifier);
-	// }
-	// OPPLEditor.this.handleChange();
-	// }
-	// };
-	// private final transient InputVerificationStatusChangedListener
-	// opplBuilderModifier = new InputVerificationStatusChangedListener() {
-	// public void verifiedStatusChanged(boolean newState) {
-	// if (newState) {
-	// OPPLEditor.this.opplScript = OPPLEditor.this.opplTextEditor
-	// .getOPPLScript();
-	// OPPLEditor.this.opplBuilder
-	// .removeStatusChangedListener(OPPLEditor.this.opplTextModifier);
-	// OPPLEditor.this.opplBuilder.setOPPLScript(OPPLEditor.this
-	// .getOPPLScript());
-	// OPPLEditor.this.opplBuilder
-	// .addStatusChangedListener(OPPLEditor.this.opplTextModifier);
-	// }
-	// OPPLEditor.this.handleChange();
-	// }
-	// };
 	/**
 	 * @return the opplScript
 	 */
@@ -113,8 +81,6 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 		this.owlEditorKit = owlEditor;
 		this.opplBuilder = new OPPLBuilder(this.getOwlEditorKit());
 		this.opplTextEditor = new OPPLTextEditor(this.getOwlEditorKit());
-		// this.opplBuilder.addStatusChangedListener(this.opplTextModifier);
-		// this.opplTextEditor.addStatusChangedListener(this.opplBuilderModifier);
 		this.opplBuilder
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
 					public void verifiedStatusChanged(boolean newState) {

@@ -173,3 +173,15 @@ SELECT ?y subPropertyOf ?x, Transitive: ?y, Transitive: ?x
 BEGIN 
 REMOVE Transitive: ?y
 END;
+
+?base:CLASS, 
+?topping:CLASS, 
+?restriction:CLASS = hasTopping some ?topping, 
+?allTopping:CLASS = createIntersection(?restriction.VALUES)
+BEGIN
+ 	ADD $thisClass subClassOf Pizza, 
+	ADD $thisClass subClassOf hasTopping some ?topping, 
+	ADD $thisClass subClassOf hasBase some ?base, 
+	ADD $thisClass equivalentTo ?allTopping
+END;
+A pizza with ?base base and ?topping toppings 

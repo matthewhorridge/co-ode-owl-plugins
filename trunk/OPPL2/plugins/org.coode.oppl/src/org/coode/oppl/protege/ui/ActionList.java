@@ -49,11 +49,13 @@ public class ActionList extends MList {
 	 */
 	private static final long serialVersionUID = 6135780833694887712L;
 	private final OWLEditorKit owlEditorKit;
+	private final boolean canAdd;
 
 	public ActionList(OWLEditorKit owlEditorKit,
-			ConstraintSystem constraintSystem) {
+			ConstraintSystem constraintSystem, boolean canAdd) {
 		this.owlEditorKit = owlEditorKit;
-		this.setModel(new ActionListModel());
+		this.setModel(new ActionListModel(canAdd));
+		this.canAdd = canAdd;
 		VariableOWLCellRenderer variableAxiomRenderer = new VariableOWLCellRenderer(
 				owlEditorKit, constraintSystem, new OWLCellRenderer(
 						owlEditorKit));
@@ -116,6 +118,6 @@ public class ActionList extends MList {
 	}
 
 	public void clear() {
-		this.setModel(new ActionListModel());
+		this.setModel(new ActionListModel(this.canAdd));
 	}
 }

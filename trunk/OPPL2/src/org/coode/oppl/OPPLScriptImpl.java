@@ -200,30 +200,32 @@ public class OPPLScriptImpl implements OPPLScript {
 			}
 		}
 		OPPLQuery opplQuery = this.getQuery();
+		buffer.append("\n");
 		if (this.query != null) {
-			buffer.append("\n");
 			buffer.append(opplQuery.render());
 		}
 		if (this.getActions().size() > 0) {
-			buffer.append("BEGIN ");
+			buffer.append("BEGIN\n ");
 			first = true;
 			for (OWLAxiomChange action : this.getActions()) {
-				String commaString = first ? "\n" : ",\n ";
+				String commaString = first ? "" : ", ";
 				// StringWriter writer = new StringWriter();
 				String actionString = action instanceof AddAxiom ? "\tADD "
 						: "\tREMOVE ";
-				first = false;
 				// ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
 				// .getOPPLFactory().getOWLObjectRenderer(writer);
 				ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
 						.getManchesterSyntaxRenderer(this.constraintSystem);
 				buffer.append(commaString);
+				if (!first) {
+					buffer.append("\n");
+				}
+				first = false;
 				buffer.append(actionString);
 				action.getAxiom().accept(renderer);
 				buffer.append(renderer.toString());
-				buffer.append("\n");
 			}
-			buffer.append("END;");
+			buffer.append("\nEND;");
 		}
 		return buffer.toString();
 	}
