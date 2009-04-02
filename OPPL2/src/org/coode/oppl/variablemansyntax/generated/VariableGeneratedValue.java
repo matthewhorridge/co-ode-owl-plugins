@@ -36,9 +36,9 @@ import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
-import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLConstant;
 import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLIndividual;
 import org.semanticweb.owl.model.OWLObject;
@@ -131,17 +131,17 @@ public abstract class VariableGeneratedValue<N> implements GeneratedValue<N> {
 					Variable variable, final ConstraintSystem constraintSystem) {
 				switch (variable.getType()) {
 				case CLASS:
-					return new CollectionGeneratedValue<OWLClass>(variable,
-							this, constraintSystem) {
+					return new CollectionGeneratedValue<OWLDescription>(
+							variable, this, constraintSystem) {
 						@Override
-						public Collection<OWLClass> getGeneratedValue(
+						public Collection<OWLDescription> getGeneratedValue(
 								BindingNode node) {
-							Set<OWLClass> toReturn = new HashSet<OWLClass>();
+							Set<OWLDescription> toReturn = new HashSet<OWLDescription>();
 							Set<BindingNode> leaves = constraintSystem
 									.getLeaves();
 							if (leaves != null && !leaves.isEmpty()) {
 								for (BindingNode bindingNode : leaves) {
-									OWLClass assignmentValue = (OWLClass) bindingNode
+									OWLDescription assignmentValue = (OWLDescription) bindingNode
 											.getAssignmentValue(this
 													.getVariable());
 									if (assignmentValue != null) {
@@ -156,11 +156,11 @@ public abstract class VariableGeneratedValue<N> implements GeneratedValue<N> {
 						}
 
 						@Override
-						public List<Collection<OWLClass>> getGeneratedValues() {
-							Collection<OWLClass> generatedValue = this
+						public List<Collection<OWLDescription>> getGeneratedValues() {
+							Collection<OWLDescription> generatedValue = this
 									.getGeneratedValue(null);
-							return generatedValue == null ? new ArrayList<Collection<OWLClass>>()
-									: new ArrayList<Collection<OWLClass>>(
+							return generatedValue == null ? new ArrayList<Collection<OWLDescription>>()
+									: new ArrayList<Collection<OWLDescription>>(
 											Collections
 													.singleton(generatedValue));
 						}
