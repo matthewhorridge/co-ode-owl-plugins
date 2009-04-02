@@ -1,0 +1,150 @@
+/**
+ * Copyright (C) 2008, University of Manchester
+ *
+ * Modifications to the initial code base are copyright of their
+ * respective authors, or their employers as appropriate.  Authorship
+ * of the modifications may be determined from the ChangeLog placed at
+ * the end of this file.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+package org.coode.patterns;
+
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.coode.oppl.variablemansyntax.InputVariable;
+import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.patterns.syntax.PatternParser;
+import org.semanticweb.owl.model.OWLObject;
+
+import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
+
+/**
+ * @author Luigi Iannone
+ * 
+ *         Dec 10, 2008
+ */
+public class PatternReferenceGeneratedVariable extends
+		GeneratedVariable<PatternReference> {
+	public PatternReferenceGeneratedVariable(VariableType type,
+			GeneratedValue<PatternReference> value) {
+		super(value.toString(), type, value);
+	}
+
+	/**
+	 * @author Luigi Iannone
+	 * 
+	 *         Dec 10, 2008
+	 */
+	private static class PatternReferenceGeneratedValue implements
+			GeneratedValue<PatternReference> {
+		private final PatternReference patternReference;
+
+		public PatternReferenceGeneratedValue(PatternReference patternReference) {
+			this.patternReference = patternReference;
+		}
+
+		/**
+		 * @see org.coode.oppl.variablemansyntax.generated.GeneratedValue#getGeneratedValue(org.coode.oppl.variablemansyntax.bindingtree.BindingNode)
+		 */
+		public PatternReference getGeneratedValue(BindingNode node) {
+			List<List<String>> newArguments = new ArrayList<List<String>>(
+					this.patternReference.getExtractedPattern()
+							.getInputVariables().size());
+			PatternOPPLScript pattern = this.patternReference
+					.getExtractedPattern();
+			List<InputVariable> inputVariables = pattern.getInputVariables();
+			PatternConstraintSystem constraintSystem = this.patternReference
+					.getConstraintSystem();
+			for (int i = 0; i < inputVariables.size(); i++) {
+				InputVariable inputVariable = inputVariables.get(i);
+				OWLObject assignmentValue = node
+						.getAssignmentValue(inputVariable);
+				if (assignmentValue != null) {
+					StringWriter writer = new StringWriter();
+					ManchesterOWLSyntaxObjectRenderer renderer = PatternParser
+							.getPatternModelFactory().getRenderer(
+									constraintSystem, writer);
+					assignmentValue.accept(renderer);
+					newArguments.add(new ArrayList<String>(Collections
+							.singleton(writer.toString())));
+				} else {
+					newArguments.add(new ArrayList<String>(Collections
+							.singleton(inputVariable.getName())));
+				}
+			}
+			try {
+				return new PatternReference(this.patternReference
+						.getPatternName(), constraintSystem,
+						this.patternReference.getOntologyManger(), newArguments
+								.toArray(new List[inputVariables.size()]));
+			} catch (PatternException e) {
+				throw new RuntimeException(e);
+			}
+		}
+
+		/**
+		 * @see org.coode.oppl.variablemansyntax.generated.GeneratedValue#getGeneratedValues()
+		 */
+		public List<PatternReference> getGeneratedValues() {
+			return new ArrayList<PatternReference>(Collections
+					.singleton(this.patternReference));
+		}
+
+		@Override
+		public String toString() {
+			String patternName = "?_" + this.patternReference.getPatternName();
+			List<String>[] arguments = this.patternReference.getArguments();
+			long hash = 1;
+			for (List<String> list : arguments) {
+				for (String string : list) {
+					hash *= string.hashCode();
+				}
+			}
+			return patternName + hash;
+		}
+	}
+
+	@Override
+	protected OWLObject generateObject(PatternReference reference) {
+		try {
+			return reference.getResolution().get(0);
+		} catch (PatternException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	protected GeneratedVariable<PatternReference> replace(
+			GeneratedValue<PatternReference> value) {
+		return new PatternReferenceGeneratedVariable(this.getType(), value);
+	}
+
+	public static GeneratedValue<PatternReference> getPatternReferenceGeneratedValue(
+			PatternReference patternReference) {
+		return new PatternReferenceGeneratedValue(patternReference);
+	}
+
+	@Override
+	public String getOPPLFunction() {
+		return this.getValue().toString();
+	}
+}
