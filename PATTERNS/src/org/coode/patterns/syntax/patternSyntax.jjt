@@ -514,6 +514,7 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 	Token opplFunctionName=null; 
 	String opplFunctionArgs="";
 	String variableExpression="";
+	String opplFunction="";
 	}
 {
 	LOOKAHEAD(4)
@@ -522,15 +523,12 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 	}<CLOSEDSQUAREBRACKETS>{
 		return variableNameToken.image+":"+variableType.image+"["+directionToken.image+" "+scopeString.trim()+"]";
 	}
-		|	
+	|	
 	LOOKAHEAD(4)
-	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> opplFunctionName=<OPPLFUNCTION><OPENPARENTHESYS> opplFunctionArgs=opplFunctionArgs()<CLOSEDPARENTHESYS>
+	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> opplFunction = opplFunction(variableNameToken.image, variableType.image)
 	{
-		return variableNameToken.image+":"+variableType.image+"="+opplFunctionName.image+"("+opplFunctionArgs+")";
-	}
-	| LOOKAHEAD(5) 
-	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> variableExpression = variableExpression(){
-		return variableNameToken.image+":"+variableType.image+" = "+variableExpression;
+		System.out.println("That is what I parsed "+variableNameToken.image+":"+variableType.image+" = "+opplFunction);
+		return variableNameToken.image+":"+variableType.image+" = "+opplFunction;
 	}
 	|
 	LOOKAHEAD(3)
@@ -546,6 +544,24 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 	| variableNameToken=<VARIABLENAME>{
 		return variableNameToken.image;
 	}
+}
+
+
+String opplFunction(String variableNameString, String variableTypeString) #void:{
+	Token opplFunctionNameToken;
+	String variableExpression;
+	String opplFunctionArgs;	
+	}
+{
+	LOOKAHEAD(1)
+	   opplFunctionNameToken = <OPPLFUNCTION><OPENPARENTHESYS> opplFunctionArgs=opplFunctionArgs()<CLOSEDPARENTHESYS>
+	   {
+	   		return opplFunctionNameToken.image+"("+opplFunctionArgs+")";
+	   }
+	  | variableExpression = variableExpression()
+		{
+			return variableExpression;
+		}
 }
 
 JAVACODE
