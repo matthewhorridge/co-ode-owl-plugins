@@ -160,3 +160,12 @@ OWLObject OWLExpression(Variable v)
 		throw new ParseException(e.getMessage());
 	}
 }
+
+	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> opplFunctionName=<OPPLFUNCTION><OPENPARENTHESYS> opplFunctionArgs=opplFunctionArgs()<CLOSEDPARENTHESYS>
+	{
+		return variableNameToken.image+":"+variableType.image+"="+opplFunctionName.image+"("+opplFunctionArgs+")";
+	}
+	| LOOKAHEAD(5) 
+	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> variableExpression = variableExpression(){
+		return variableNameToken.image+":"+variableType.image+" = "+variableExpression;
+	}
