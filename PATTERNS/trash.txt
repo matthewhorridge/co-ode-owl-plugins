@@ -169,3 +169,7 @@ OWLObject OWLExpression(Variable v)
 	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> variableExpression = variableExpression(){
 		return variableNameToken.image+":"+variableType.image+" = "+variableExpression;
 	}
+
+	
+	
+?name:CONSTANT BEGIN ADD $thisClass subClassOf hasName value "anonymous" END;
