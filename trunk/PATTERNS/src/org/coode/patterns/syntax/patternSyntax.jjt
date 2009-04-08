@@ -501,6 +501,10 @@ String resolvedString(PatternConstraintSystem constraintSystem) #void :{
 		unresolvedString += t.image;
 		return "";
 	}
+	| <QUOTE> t=<IDENTIFIER><QUOTE>{
+		unresolvedString += "\""+t.image+"\"";
+		return "\""+t.image+"\"";
+	}
 	
 }
 
