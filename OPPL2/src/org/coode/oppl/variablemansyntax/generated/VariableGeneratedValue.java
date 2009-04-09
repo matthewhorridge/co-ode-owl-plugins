@@ -31,11 +31,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.model.OWLConstant;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLDescription;

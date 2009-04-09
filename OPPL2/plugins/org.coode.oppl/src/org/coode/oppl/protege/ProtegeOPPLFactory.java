@@ -23,6 +23,7 @@
 package org.coode.oppl.protege;
 
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.List;
 
 import org.coode.oppl.OPPLAbstractFactory;
@@ -31,6 +32,10 @@ import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLQueryImpl;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.OPPLScriptImpl;
+import org.coode.oppl.entity.OWLEntityCreationException;
+import org.coode.oppl.entity.OWLEntityCreationSet;
+import org.coode.oppl.entity.OWLEntityFactory;
+import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.rendering.VariableOWLEntityRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
@@ -38,12 +43,15 @@ import org.coode.oppl.variablemansyntax.ProtegeScopeVariableChecker;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.entity.OWLEntityFactory;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
-import org.protege.editor.owl.ui.renderer.OWLModelManagerEntityRenderer;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLAxiomChange;
+import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owl.model.OWLEntity;
+import org.semanticweb.owl.model.OWLIndividual;
+import org.semanticweb.owl.model.OWLObjectProperty;
+import org.semanticweb.owl.model.OWLOntologyChange;
 
 import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
@@ -52,9 +60,116 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
  * 
  */
 public class ProtegeOPPLFactory implements OPPLAbstractFactory {
+	/**
+	 * Adapter between {@code org.coode.oppl.entity.OWLEntityRenderer} and
+	 * {@code org.protege.editor.owl.ui.renderer.OWLEntityRenderer}
+	 * 
+	 * @author Luigi Iannone
+	 * 
+	 */
+	private final class ProtegeOWLEntityRenderer implements OWLEntityRenderer {
+		public String render(OWLEntity entity) {
+			return ProtegeOPPLFactory.this.modelManager.getRendering(entity);
+		}
+	}
+
+	private final class ProtegeOWLEntityFactory implements OWLEntityFactory {
+		private final org.protege.editor.owl.model.entity.OWLEntityFactory protegeOWLEntityFactory = ProtegeOPPLFactory.this.modelManager
+				.getOWLEntityFactory();
+
+		public OWLEntityCreationSet<OWLClass> createOWLClass(String shortName,
+				URI baseURI) throws OWLEntityCreationException {
+			try {
+				org.protege.editor.owl.model.entity.OWLEntityCreationSet<OWLClass> protegeCreationSet = this.protegeOWLEntityFactory
+						.createOWLClass(shortName, baseURI);
+				return this.convert(protegeCreationSet);
+			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
+				throw new OWLEntityCreationException(e.getMessage());
+			}
+		}
+
+		private <T extends OWLEntity> OWLEntityCreationSet<T> convert(
+				org.protege.editor.owl.model.entity.OWLEntityCreationSet<T> protegeCreationSet) {
+			List<? extends OWLOntologyChange> changes = protegeCreationSet
+					.getOntologyChanges();
+			T entity = protegeCreationSet.getOWLEntity();
+			OWLEntityCreationSet<T> toReturn = new OWLEntityCreationSet<T>(
+					entity, changes);
+			return toReturn;
+		}
+
+		public OWLEntityCreationSet<OWLDataProperty> createOWLDataProperty(
+				String shortName, URI baseURI)
+				throws OWLEntityCreationException {
+			try {
+				org.protege.editor.owl.model.entity.OWLEntityCreationSet<OWLDataProperty> protegeCreationSet = this.protegeOWLEntityFactory
+						.createOWLDataProperty(shortName, baseURI);
+				return this.convert(protegeCreationSet);
+			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
+				throw new OWLEntityCreationException(e.getMessage());
+			}
+		}
+
+		public <T extends OWLEntity> OWLEntityCreationSet<T> createOWLEntity(
+				Class<T> type, String shortName, URI baseURI)
+				throws OWLEntityCreationException {
+			try {
+				org.protege.editor.owl.model.entity.OWLEntityCreationSet<T> protegeCreationSet = this.protegeOWLEntityFactory
+						.createOWLEntity(type, shortName, baseURI);
+				return this.convert(protegeCreationSet);
+			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
+				throw new OWLEntityCreationException(e.getMessage());
+			}
+		}
+
+		public OWLEntityCreationSet<OWLIndividual> createOWLIndividual(
+				String shortName, URI baseURI)
+				throws OWLEntityCreationException {
+			try {
+				org.protege.editor.owl.model.entity.OWLEntityCreationSet<OWLIndividual> protegeCreationSet = this.protegeOWLEntityFactory
+						.createOWLIndividual(shortName, baseURI);
+				return this.convert(protegeCreationSet);
+			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
+				throw new OWLEntityCreationException(e.getMessage());
+			}
+		}
+
+		public OWLEntityCreationSet<OWLObjectProperty> createOWLObjectProperty(
+				String shortName, URI baseURI)
+				throws OWLEntityCreationException {
+			try {
+				org.protege.editor.owl.model.entity.OWLEntityCreationSet<OWLObjectProperty> protegeCreationSet = this.protegeOWLEntityFactory
+						.createOWLObjectProperty(shortName, baseURI);
+				return this.convert(protegeCreationSet);
+			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
+				throw new OWLEntityCreationException(e.getMessage());
+			}
+		}
+
+		public <T extends OWLEntity> OWLEntityCreationSet<T> preview(
+				Class<T> type, String shortName, URI baseURI)
+				throws OWLEntityCreationException {
+			try {
+				org.protege.editor.owl.model.entity.OWLEntityCreationSet<T> protegeCreationSet = this.protegeOWLEntityFactory
+						.preview(type, shortName, baseURI);
+				return this.convert(protegeCreationSet);
+			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
+				throw new OWLEntityCreationException(e.getMessage());
+			}
+		}
+
+		public void tryCreate(Class<? extends OWLEntity> type,
+				String shortName, URI baseURI)
+				throws OWLEntityCreationException {
+			// TODO: not sure how this goes
+		}
+	}
+
 	private OWLModelManager modelManager;
 	private ConstraintSystem constraintSystem;
 	private ProtegeScopeVariableChecker variableScopeVariableChecker = null;
+	private final ProtegeOWLEntityFactory entityFactory;
+	private final ProtegeOWLEntityRenderer entityRenderer;
 
 	/**
 	 * @param modelManager
@@ -63,6 +178,8 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	 */
 	public ProtegeOPPLFactory(OWLModelManager modelManager) {
 		this.modelManager = modelManager;
+		this.entityFactory = new ProtegeOWLEntityFactory();
+		this.entityRenderer = new ProtegeOWLEntityRenderer();
 	}
 
 	/**
@@ -86,21 +203,20 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	/**
 	 * @see org.coode.oppl.OPPLAbstractFactory#getOWLEntityRenderer()
 	 */
-	public OWLEntityRenderer getOWLEntityRenderer(ConstraintSystem cs) {
+	public org.coode.oppl.entity.OWLEntityRenderer getOWLEntityRenderer(
+			ConstraintSystem cs) {
 		if (cs == null) {
 			throw new NullPointerException(
 					"The constraint system cannot be null");
 		}
-		OWLModelManagerEntityRenderer defaultEntityRenderer = this.modelManager
-				.getOWLEntityRenderer();
-		return new VariableOWLEntityRenderer(cs, defaultEntityRenderer);
+		return new VariableOWLEntityRenderer(cs, this.entityRenderer);
 	}
 
 	/**
 	 * @see org.coode.oppl.OPPLAbstractFactory#getOWLEntityFactory()
 	 */
 	public OWLEntityFactory getOWLEntityFactory() {
-		return this.modelManager.getOWLEntityFactory();
+		return this.entityFactory;
 	}
 
 	public OPPLScript buildOPPLScript(ConstraintSystem constraintSystem,
@@ -162,6 +278,6 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 					"The constraint system cannot be null");
 		}
 		return new ManchesterSyntaxRenderer(this.modelManager
-				.getOWLOntologyManager(), this.getOWLEntityRenderer(cs));
+				.getOWLOntologyManager(), this.getOWLEntityRenderer(cs), cs);
 	}
 }

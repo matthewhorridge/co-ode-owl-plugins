@@ -27,16 +27,15 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.coode.oppl.entity.OWLEntityCreationException;
+import org.coode.oppl.entity.OWLEntityCreationSet;
+import org.coode.oppl.entity.OWLEntityRenderer;
+import org.coode.oppl.entity.OWLEntityRendererImpl;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.rendering.VariableOWLEntityRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
-import org.protege.editor.owl.model.entity.OWLEntityCreationException;
-import org.protege.editor.owl.model.entity.OWLEntityCreationSet;
-import org.protege.editor.owl.model.entity.OWLEntityFactory;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
-import org.protege.editor.owl.ui.renderer.OWLEntityRendererImpl;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.expression.ShortFormEntityChecker;
 import org.semanticweb.owl.inference.OWLReasoner;
@@ -62,7 +61,8 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
  * 
  */
 public class OPPLFactory implements OPPLAbstractFactory {
-	private class EntityFactory implements OWLEntityFactory {
+	private class EntityFactory implements
+			org.coode.oppl.entity.OWLEntityFactory {
 		/**
 		 * @param shortName
 		 * @return
@@ -80,6 +80,13 @@ public class OPPLFactory implements OPPLAbstractFactory {
 			return this.createOWLEntity(OWLClass.class, shortName, baseURI);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.coode.oppl.EntityFactory#createOWLObjectProperty(java.lang.String
+		 * , java.net.URI)
+		 */
 		public OWLEntityCreationSet<OWLObjectProperty> createOWLObjectProperty(
 				String shortName, URI baseURI)
 				throws OWLEntityCreationException {
@@ -87,6 +94,13 @@ public class OPPLFactory implements OPPLAbstractFactory {
 					baseURI);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.coode.oppl.EntityFactory#createOWLDataProperty(java.lang.String,
+		 * java.net.URI)
+		 */
 		public OWLEntityCreationSet<OWLDataProperty> createOWLDataProperty(
 				String shortName, URI baseURI)
 				throws OWLEntityCreationException {
@@ -94,6 +108,13 @@ public class OPPLFactory implements OPPLAbstractFactory {
 					baseURI);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see
+		 * org.coode.oppl.EntityFactory#createOWLIndividual(java.lang.String,
+		 * java.net.URI)
+		 */
 		public OWLEntityCreationSet<OWLIndividual> createOWLIndividual(
 				String shortName, URI baseURI)
 				throws OWLEntityCreationException {
@@ -107,6 +128,12 @@ public class OPPLFactory implements OPPLAbstractFactory {
 					.getOntology().getURI());
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.coode.oppl.EntityFactory#createOWLEntity(java.lang.Class,
+		 * java.lang.String, java.net.URI)
+		 */
 		public <T extends OWLEntity> OWLEntityCreationSet<T> createOWLEntity(
 				Class<T> type, String shortName, URI baseURI)
 				throws OWLEntityCreationException {
@@ -120,6 +147,12 @@ public class OPPLFactory implements OPPLAbstractFactory {
 			return new OWLEntityCreationSet<T>(entity, changes);
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.coode.oppl.EntityFactory#tryCreate(java.lang.Class,
+		 * java.lang.String, java.net.URI)
+		 */
 		public void tryCreate(Class<? extends OWLEntity> type,
 				String shortName, URI baseURI)
 				throws OWLEntityCreationException {
@@ -147,6 +180,12 @@ public class OPPLFactory implements OPPLAbstractFactory {
 			return null;
 		}
 
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see org.coode.oppl.EntityFactory#preview(java.lang.Class,
+		 * java.lang.String, java.net.URI)
+		 */
 		public <T extends OWLEntity> OWLEntityCreationSet<T> preview(
 				Class<T> type, String shortName, URI baseURI)
 				throws OWLEntityCreationException {
@@ -204,7 +243,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		return new VariableOWLEntityRenderer(cs, defaultRenderer);
 	}
 
-	public OWLEntityFactory getOWLEntityFactory() {
+	public org.coode.oppl.entity.OWLEntityFactory getOWLEntityFactory() {
 		return new EntityFactory();
 	}
 
@@ -259,6 +298,6 @@ public class OPPLFactory implements OPPLAbstractFactory {
 					"The constraint system cannot be null");
 		}
 		return new ManchesterSyntaxRenderer(this.ontologyManager, this
-				.getOWLEntityRenderer(cs));
+				.getOWLEntityRenderer(cs), cs);
 	}
 }

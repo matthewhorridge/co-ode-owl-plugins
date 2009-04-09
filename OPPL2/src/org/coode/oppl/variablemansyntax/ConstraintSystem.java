@@ -445,7 +445,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public boolean isVariable(OWLConstant node) {
-		return node.toString().trim().startsWith("?");
+		return node.toString().trim().startsWith("\"?");
 	}
 
 	public void setLeaves(Set<BindingNode> newLeaves) {

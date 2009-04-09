@@ -22,10 +22,10 @@
  */
 package org.coode.oppl.protege;
 
+import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.model.OWLEntity;
 
 public class VariableOWLEntityRenderer implements OWLEntityRenderer {
@@ -33,18 +33,11 @@ public class VariableOWLEntityRenderer implements OWLEntityRenderer {
 	private final OWLModelManager modelManager;
 
 	public String render(OWLEntity entity) {
-		// Variable variable = this.getConstraintSystem().getVariable(
-		// entity.getURI());
 		OWLEntityRenderer entityRenderer = OPPLParser.getOPPLFactory()
 				.getOWLEntityRenderer(this.constraintSystem);
-		// return variable != null ? this.renderVariable(variable) : this
-		// .getModelManager().getRendering(entity);
 		return entityRenderer.render(entity);
 	}
 
-	// private String renderVariable(Variable variable) {
-	// return this.constraintSystem.render(variable);
-	// }
 	/**
 	 * @param constraintSystem
 	 * @param modelManager

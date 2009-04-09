@@ -33,10 +33,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import org.coode.oppl.entity.OWLEntityCreationException;
+import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.syntax.OPPLParser;
-import org.protege.editor.owl.model.entity.OWLEntityCreationException;
-import org.protege.editor.owl.model.entity.OWLEntityCreationSet;
-import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataProperty;
@@ -388,8 +387,8 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 			break;
 		}
 		OWLEntityCreationSet<? extends OWLEntity> toReturn = null;
-		OWLEntityFactory owlEntityFactory = OPPLParser.getOPPLFactory()
-				.getOWLEntityFactory();
+		org.coode.oppl.entity.OWLEntityFactory owlEntityFactory = OPPLParser
+				.getOPPLFactory().getOWLEntityFactory();
 		if (clazz != null) {
 			toReturn = owlEntityFactory.createOWLEntity(clazz, shortName, null);
 			this.created.put(shortName, toReturn.getOWLEntity());
