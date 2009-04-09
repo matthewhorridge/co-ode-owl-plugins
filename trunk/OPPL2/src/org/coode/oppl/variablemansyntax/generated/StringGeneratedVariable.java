@@ -2,10 +2,10 @@ package org.coode.oppl.variablemansyntax.generated;
 
 import java.net.URI;
 
+import org.coode.oppl.entity.OWLEntityCreationException;
+import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.VariableType;
-import org.protege.editor.owl.model.entity.OWLEntityCreationException;
-import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;

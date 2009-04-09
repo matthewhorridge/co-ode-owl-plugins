@@ -160,6 +160,7 @@ public class VariableManchesterOWLSyntaxParser extends
 		Variable variable = this.constraintSystem.getVariable(tok.getToken());
 		if (variable != null
 				&& variable.getType().equals(VariableType.CONSTANT)) {
+			this.consumeToken();
 			toReturn = this.getDataFactory().getOWLUntypedConstant(
 					variable.getName());
 		}

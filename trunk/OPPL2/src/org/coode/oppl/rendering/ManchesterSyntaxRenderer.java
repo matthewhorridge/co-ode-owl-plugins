@@ -29,7 +29,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
+import org.coode.oppl.entity.OWLEntityRenderer;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.protege.editor.owl.ui.renderer.OWLRendererPreferences;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLAxiomAnnotationAxiom;
@@ -271,6 +273,7 @@ public class ManchesterSyntaxRenderer implements OWLObjectVisitor {
 	private int lastNewLineIndex = 0;
 	private BracketWriter bracketWriter;
 	private final OWLEntityRenderer entityRenderer;
+	private ConstraintSystem constraintSystem;
 
 	/**
 	 * Builds a renderer in Manchester OWL Syntax <b>non frame based</b>
@@ -280,11 +283,13 @@ public class ManchesterSyntaxRenderer implements OWLObjectVisitor {
 	 * @param entityRenderer
 	 *            the renderer according to which the named entities will be
 	 *            rendered. Cannot be {@code null}.
+	 * @param constraintSystem
+	 *            the ConstraintSystem . Cannot be {@code null}.
 	 * @throws NullPointerException
-	 *             if either of the inputs is {@code null}.
+	 *             if any of the inputs is {@code null}.
 	 */
 	public ManchesterSyntaxRenderer(OWLOntologyManager ontologyManager,
-			OWLEntityRenderer entityRenderer) {
+			OWLEntityRenderer entityRenderer, ConstraintSystem constraintSystem) {
 		if (ontologyManager == null) {
 			throw new NullPointerException(
 					"The ontology manager cannot be null");
@@ -292,8 +297,13 @@ public class ManchesterSyntaxRenderer implements OWLObjectVisitor {
 		if (entityRenderer == null) {
 			throw new NullPointerException("The entity renderer cannot be null");
 		}
+		if (constraintSystem == null) {
+			throw new NullPointerException(
+					"The constraint system cannoe be null");
+		}
 		this.ontologyManager = ontologyManager;
 		this.entityRenderer = entityRenderer;
+		this.constraintSystem = constraintSystem;
 		this.buffer = new StringBuilder();
 		this.bracketWriter = new BracketWriter();
 		this.facetMap = new HashMap<OWLRestrictedDataRangeFacetVocabulary, String>();
@@ -877,12 +887,17 @@ public class ManchesterSyntaxRenderer implements OWLObjectVisitor {
 	}
 
 	public void visit(OWLUntypedConstant node) {
-		this.write("\"");
-		this.write(node.getLiteral());
-		this.write("\"");
-		if (node.hasLang()) {
-			this.write("@");
-			this.write(node.getLang());
+		if (this.constraintSystem.isVariable(node)) {
+			Variable v = this.constraintSystem.getVariable(node.getLiteral());
+			this.write(this.constraintSystem.render(v));
+		} else {
+			this.write("\"");
+			this.write(node.getLiteral());
+			this.write("\"");
+			if (node.hasLang()) {
+				this.write("@");
+				this.write(node.getLang());
+			}
 		}
 	}
 

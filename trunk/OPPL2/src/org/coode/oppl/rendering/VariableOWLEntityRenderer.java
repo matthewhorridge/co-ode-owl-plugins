@@ -24,9 +24,9 @@ package org.coode.oppl.rendering;
 
 import java.net.URI;
 
+import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.model.OWLEntity;
 
 /**

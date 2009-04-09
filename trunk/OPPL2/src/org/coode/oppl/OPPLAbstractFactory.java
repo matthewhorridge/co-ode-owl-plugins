@@ -25,13 +25,13 @@ package org.coode.oppl;
 import java.io.StringWriter;
 import java.util.List;
 
+import org.coode.oppl.entity.OWLEntityFactory;
+import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.NullReasonerException;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
-import org.protege.editor.owl.model.entity.OWLEntityFactory;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLDataFactory;
