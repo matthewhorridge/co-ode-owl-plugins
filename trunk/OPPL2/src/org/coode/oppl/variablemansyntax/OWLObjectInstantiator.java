@@ -680,7 +680,7 @@ public class OWLObjectInstantiator implements OWLObjectVisitorEx<OWLObject> {
 		OWLConstant toReturn = node;
 		if (this.constraintSystem.isVariable(node)) {
 			Variable variable = this.constraintSystem.getVariable(node
-					.toString().trim());
+					.getLiteral());
 			toReturn = (OWLConstant) this.bindingNode
 					.getAssignmentValue(variable);
 		}
