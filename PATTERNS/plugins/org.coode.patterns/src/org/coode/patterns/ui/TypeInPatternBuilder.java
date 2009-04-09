@@ -234,10 +234,10 @@ public class TypeInPatternBuilder extends
 	}
 
 	public void dispose() {
-		this.patternModel.removeChangeListener(this);
+		if (this.patternModel != null) {
+			this.patternModel.removeChangeListener(this);
+		}
 		this.patternModelEditor.removeStatusChangedListener(this);
-		// this.opplStatementEditor.removeStatusChangedListener(this);
-		// this.renderingExpressionEditor.removeStatusChangedListener(this);
 	}
 
 	public PatternModel getEditedObject() {

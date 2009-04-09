@@ -22,13 +22,13 @@
  */
 package org.coode.patterns.syntax;
 
+import org.coode.oppl.entity.OWLEntityCreationException;
+import org.coode.oppl.entity.OWLEntityCreationSet;
+import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.patterns.PatternException;
 import org.coode.patterns.PatternSignature;
-import org.protege.editor.owl.model.entity.OWLEntityCreationException;
-import org.protege.editor.owl.model.entity.OWLEntityCreationSet;
-import org.protege.editor.owl.model.entity.OWLEntityFactory;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLOntologyChangeException;
