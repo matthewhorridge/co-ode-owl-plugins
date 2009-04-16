@@ -1,6 +1,6 @@
 #summary Several simple views for tracking ontology changes
 
-= Change View =
+= Change/Diff View =
 
 == Description ==
 
