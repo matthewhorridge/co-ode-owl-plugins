@@ -61,7 +61,7 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
 /**
  * @author Luigi Iannone
  * 
- * Jun 11, 2008
+ *         Jun 11, 2008
  */
 public class InstantiatedPatternModel implements InstantiatedOPPLScript,
 		PatternOPPLScript {
@@ -74,8 +74,13 @@ public class InstantiatedPatternModel implements InstantiatedOPPLScript,
 	 * PatternModel
 	 * 
 	 * @param patternModel
+	 *            the Pattern on which the this instantiated pattern will be
+	 *            built. Cannot be {@code null}.
 	 */
 	public InstantiatedPatternModel(PatternModel patternModel) {
+		if (patternModel == null) {
+			throw new NullPointerException("The pattern cannot be null");
+		}
 		this.patternModel = patternModel;
 	}
 
