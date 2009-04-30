@@ -1,10 +1,18 @@
 package org.coode.shell.view;
 
+import bsh.EvalError;
 import bsh.Interpreter;
 import bsh.util.JConsole;
+import org.protege.editor.core.ui.util.UIUtil;
+import org.protege.editor.core.ui.view.DisposableAction;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
-import java.awt.*;/*
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;/*
 * Copyright (C) 2007, University of Manchester
 *
 * Modifications to the initial code base are copyright of their
@@ -35,13 +43,74 @@ import java.awt.*;/*
  * Bio Health Informatics Group<br>
  * Date: Jun 18, 2008<br><br>
  */
-public class    BeanShellView extends AbstractOWLViewComponent {
+public class BeanShellView extends AbstractOWLViewComponent {
+
+    private Interpreter interpreter;
+
+    private JConsole console;
+
+    private File lastRunScript = null;
+
+    private DisposableAction runScriptAction = new DisposableAction("Run script", null){
+
+        public void actionPerformed(ActionEvent event) {
+            handleRunScript();
+        }
+
+        public void dispose() {
+        }
+    };
+
+    private DisposableAction reRunScriptAction = new DisposableAction("Rerun script", null){
+
+        public void actionPerformed(ActionEvent event) {
+            handleReRunScript();
+        }
+
+        public void dispose() {
+        }
+    };
+
+
+    private void handleRunScript() {
+        Window f = (Window) SwingUtilities.getAncestorOfClass(Window.class, this);
+        File file = UIUtil.openFile(f, "Select a script to run", new HashSet<String>());
+        if (file != null){
+            lastRunScript = file;
+            reRunScriptAction.setEnabled(true);
+            runScript(file);
+        }
+    }
+
+
+    private void handleReRunScript() {
+        if (lastRunScript != null){
+            runScript(lastRunScript);
+        }
+    }
+
+    private void runScript(File script){
+        if (script != null){
+            try {
+                Object result = interpreter.source(script.toString());
+                if (result != null){
+                    console.println(result);
+                }
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            catch (EvalError evalError) {
+                console.print(evalError, Color.RED);
+            }
+        }
+    }
 
 
     protected void initialiseOWLView() throws Exception {
         setLayout(new BorderLayout());
-        JConsole console = new JConsole();
-        Interpreter interpreter = new Interpreter(console);
+        console = new JConsole();
+        interpreter = new Interpreter(console);
         interpreter.setClassLoader(getClass().getClassLoader());
         interpreter.set("eKit", getOWLEditorKit());
         interpreter.set("mngr", getOWLModelManager());
@@ -53,6 +122,11 @@ public class    BeanShellView extends AbstractOWLViewComponent {
         new Thread(interpreter).start();
 
         add(console, BorderLayout.CENTER);
+
+        addAction(runScriptAction, "A", "A");
+        addAction(reRunScriptAction, "A", "B");
+
+        reRunScriptAction.setEnabled(false);
     }
 
 
