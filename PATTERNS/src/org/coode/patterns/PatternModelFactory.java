@@ -42,7 +42,7 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
 /**
  * @author Luigi Iannone
  * 
- * Jun 16, 2008
+ *         Jun 16, 2008
  */
 public class PatternModelFactory implements AbstractPatternModelFactory {
 	private OWLOntologyManager ontologyManager;
@@ -123,5 +123,19 @@ public class PatternModelFactory implements AbstractPatternModelFactory {
 				throw new RuntimeException(e);
 			}
 		}
+	}
+
+	/**
+	 * @return the ontologyManager
+	 */
+	public OWLOntologyManager getOntologyManager() {
+		return this.ontologyManager;
+	}
+
+	/**
+	 * @return the ontology
+	 */
+	public OWLOntology getOntology() {
+		return this.ontology;
 	}
 }
