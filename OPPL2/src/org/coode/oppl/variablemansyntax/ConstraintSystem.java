@@ -23,7 +23,6 @@
 package org.coode.oppl.variablemansyntax;
 
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -205,7 +204,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 		AxiomVariableExtractor axiomVariableExtractor = new AxiomVariableExtractor(
 				this);
 		Set<Variable> axiomVariables = axiom.accept(axiomVariableExtractor);
-		return Collections.unmodifiableSet(axiomVariables);
+		return new HashSet<Variable>(axiomVariables);
 	}
 
 	public boolean isVariableURI(URI uri) {
