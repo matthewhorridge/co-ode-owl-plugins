@@ -419,10 +419,11 @@ public class InstantiatedPatternModel implements InstantiatedOPPLScript,
 	}
 
 	public void accept(OPPLScriptVisitor visitor) {
+		this.patternModel.accept(visitor);
 	}
 
 	public <P> P accept(OPPLScriptVisitorEx<P> visitor) {
-		return null;
+		return this.patternModel.accept(visitor);
 	}
 
 	public List<OWLAxiomChange> getActions() {

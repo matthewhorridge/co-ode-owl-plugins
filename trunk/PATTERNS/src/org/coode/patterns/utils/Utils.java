@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.PatternExtractor;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.syntax.PatternParser;
@@ -41,10 +42,9 @@ import org.semanticweb.owl.util.NamespaceUtil;
 /**
  * @author Luigi Iannone
  * 
- * Jun 10, 2008
+ *         Jun 10, 2008
  */
 public class Utils {
-	@SuppressWarnings("unchecked")
 	public static Set<PatternModel> getExistingPatterns(OWLOntology ontology) {
 		Set<PatternModel> toReturn = new HashSet<PatternModel>();
 		PatternExtractor patternExtractor = PatternParser
@@ -72,8 +72,10 @@ public class Utils {
 			URI annotationURI = annotation.getAnnotationURI();
 			if (annotationURI.toString().compareTo(
 					PatternModel.NAMESPACE + patternName) == 0) {
-				PatternExtractor patternExtractor = PatternParser
-						.getPatternModelFactory().getPatternExtractor();
+				AbstractPatternModelFactory patternModelFactory = PatternParser
+						.getPatternModelFactory();
+				PatternExtractor patternExtractor = patternModelFactory
+						.getPatternExtractor();
 				extractedPattern = (PatternModel) annotation
 						.accept(patternExtractor);
 				found = extractedPattern != null
@@ -96,7 +98,6 @@ public class Utils {
 		return toReturn;
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Set<String> getExistingPatternNames(OWLOntology ontology) {
 		Set<String> toReturn = new HashSet<String>();
 		NamespaceUtil nsUtil = new NamespaceUtil();

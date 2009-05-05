@@ -90,12 +90,7 @@ private static OWLOntologyManager owlOntologyManager;
 	}
 	
 	
-//	public static ConstraintSystem getConstraintSystem(){
-//		if(constraintSystem==null){
-//			constraintSystem = (getPatternModelFactory()==null)?null:getPatternModelFactory().createConstraintSystem();
-//		}		
-//		return constraintSystem;
-//	}
+
 	
 	public static  OWLDataFactory getOWLDataFactory(){
 		return owlOntologyManager.getOWLDataFactory();
@@ -531,7 +526,7 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 	LOOKAHEAD(4)
 	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> opplFunction = opplFunction(variableNameToken.image, variableType.image)
 	{
-		System.out.println("That is what I parsed "+variableNameToken.image+":"+variableType.image+" = "+opplFunction);
+		
 		return variableNameToken.image+":"+variableType.image+" = "+opplFunction;
 	}
 	|
