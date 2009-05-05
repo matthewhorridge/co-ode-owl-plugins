@@ -15,7 +15,7 @@ Find it under the *Tabs* menu
 
 == Download ==
 
-[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=excel download]
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=Excel download]
 
 == Author ==
 
