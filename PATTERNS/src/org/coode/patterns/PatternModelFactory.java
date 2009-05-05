@@ -59,8 +59,7 @@ public class PatternModelFactory implements AbstractPatternModelFactory {
 
 	public PatternModel createPatternModel(OPPLScript opplScript)
 			throws UnsuitableOPPLScriptException {
-		if (opplScript.getActions().isEmpty()
-				|| opplScript.getInputVariables().isEmpty()) {
+		if (opplScript.getActions().isEmpty()) {
 			throw new UnsuitableOPPLScriptException(opplScript);
 		} else {
 			return new PatternModel(opplScript, this.ontologyManager);

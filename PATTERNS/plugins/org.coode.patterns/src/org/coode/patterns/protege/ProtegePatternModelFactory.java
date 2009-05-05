@@ -49,7 +49,7 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
 /**
  * @author Luigi Iannone
  * 
- * Jun 16, 2008
+ *         Jun 16, 2008
  */
 public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 	private final OWLModelManager modelManager;
@@ -63,8 +63,7 @@ public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 
 	public PatternModel createPatternModel(OPPLScript opplScript)
 			throws UnsuitableOPPLScriptException {
-		if (opplScript.getActions().isEmpty()
-				|| opplScript.getInputVariables().isEmpty()) {
+		if (opplScript.getActions().isEmpty()) {
 			throw new UnsuitableOPPLScriptException(opplScript);
 		} else {
 			return new ProtegePatternModel(opplScript, this.modelManager);
