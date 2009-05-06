@@ -387,7 +387,7 @@ OPPLScript OPPLPatternStatement(PatternConstraintSystem constraintSystem){
 			break;
 		}else{
 				
-				string += resolvedString(constraintSystem)+" ";
+				string += resolvedString(constraintSystem, true)+" ";
 				if(t.kind == END){
 					break;
 				}
@@ -438,34 +438,44 @@ String Rendering(ConstraintSystem constraintSystem)
 }
 
 
-String resolvedString(PatternConstraintSystem constraintSystem) #void :{
+String resolvedString(PatternConstraintSystem constraintSystem, boolean writeUnresolved) #void :{
 	Token t=null;String resolvedPattern=null;
 	String variableDefinition=null;}
 {
 	
 	variableDefinition=variableReference(constraintSystem){
-		unresolvedString+=variableDefinition+" ";
+		if(writeUnresolved){
+			unresolvedString+=variableDefinition+" ";
+		}
 		return variableDefinition;
 	}
 	| resolvedPattern =resolveInnerPattern(constraintSystem){
 		 return resolvedPattern;
 	}
 	| t = <THISCLASS>{
-		unresolvedString += t.image+" ";
+		if(writeUnresolved){
+			unresolvedString += t.image+" ";
+		}
 		 return new PatternConstant<OWLClass>(
 				PatternConstraintSystem.THIS_CLASS_VARIABLE_NAME, VariableType.CLASS, constraintSystem.getDataFactory()).getName();
 	}
 	
 	| t = <ACTIONTOKENS>{
-		unresolvedString += t.image+" ";
+		if(writeUnresolved){
+			unresolvedString += t.image+" ";
+		}
 		 return t.image;
 	}
 	| t = <END>{
-		unresolvedString += t.image+" ";
-		 return t.image;
+		if(writeUnresolved){
+			unresolvedString += t.image+" ";
+		}
+		return t.image;
 	}
 	| t = <IDENTIFIER>{
-		unresolvedString += t.image+" ";
+		if(writeUnresolved){
+			unresolvedString += t.image+" ";
+		}
 		 return t.image;
 	}
 	| t= <CREATEDIDENTIFIER>{
@@ -473,32 +483,58 @@ String resolvedString(PatternConstraintSystem constraintSystem) #void :{
 		return t.image;
 	}
 	| t=<OPENCURLYBRACKETS>{
-		unresolvedString += t.image;
+		if(writeUnresolved){
+			unresolvedString += t.image;
+		}
 		return t.image;
 	}
 	| t=<CLOSEDCURLYBRACKETS>{
-		unresolvedString += t.image+" ";
+		if(writeUnresolved){
+			unresolvedString += t.image+" ";
+		}
 		return t.image;
 	}
 	| t=<COMMA>{
-		unresolvedString += t.image+" ";
+		if(writeUnresolved){
+			unresolvedString += t.image+" ";
+		}
 		return t.image;
 	}
 	| t=<OPENPARENTHESYS>{
-		unresolvedString += t.image;
+		if(writeUnresolved){
+			unresolvedString += t.image;
+		}
 		return t.image;
 	}
 	| t=<CLOSEDPARENTHESYS>{
-		unresolvedString += t.image+" ";
+		if(writeUnresolved){
+			unresolvedString += t.image+" ";
+		}	
 		return t.image;
 	}
 	| t=<SEMICOLON>{
-		unresolvedString += t.image;
+		if(writeUnresolved){
+			unresolvedString += t.image;
+		}
 		return "";
 	}
 	| <QUOTE> t=<IDENTIFIER><QUOTE>{
-		unresolvedString += "\""+t.image+"\"";
+		if(writeUnresolved){
+			unresolvedString += "\""+t.image+"\"";
+		}
 		return "\""+t.image+"\"";
+	}
+	| t = <DOT>{
+		if(writeUnresolved){
+			unresolvedString += t.image+" ";
+		}
+		return  t.image;
+	}
+	| t = <PLUS>{
+		if(writeUnresolved){
+			unresolvedString += t.image+" ";
+		}
+		return  t.image;
 	}
 	
 }
@@ -524,7 +560,7 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 	}
 	|	
 	LOOKAHEAD(4)
-	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> opplFunction = opplFunction(variableNameToken.image, variableType.image)
+	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> opplFunction = opplFunction(variableNameToken.image, variableType.image, constraintSystem)
 	{
 		
 		return variableNameToken.image+":"+variableType.image+" = "+opplFunction;
@@ -546,14 +582,14 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 }
 
 
-String opplFunction(String variableNameString, String variableTypeString) #void:{
+String opplFunction(String variableNameString, String variableTypeString, PatternConstraintSystem constraintSystem) #void:{
 	Token opplFunctionNameToken;
 	String variableExpression;
 	String opplFunctionArgs;	
 	}
 {
 	LOOKAHEAD(1)
-	   opplFunctionNameToken = <OPPLFUNCTION><OPENPARENTHESYS> opplFunctionArgs=opplFunctionArgs()<CLOSEDPARENTHESYS>
+	   opplFunctionNameToken = <OPPLFUNCTION><OPENPARENTHESYS> opplFunctionArgs=opplFunctionArgs(constraintSystem)<CLOSEDPARENTHESYS>
 	   {
 	   		return opplFunctionNameToken.image+"("+opplFunctionArgs+")";
 	   }
@@ -570,8 +606,8 @@ String variableExpression(){
 }
 
 JAVACODE
-String opplFunctionArgs(){
-	return org.coode.patterns.syntax.Utils.readString(this, CLOSEDPARENTHESYS);
+String opplFunctionArgs(PatternConstraintSystem constraintSystem){
+	return org.coode.patterns.syntax.Utils.readAndResolveString(this,constraintSystem, CLOSEDPARENTHESYS);
 }
 
 String resolveInnerPattern(PatternConstraintSystem constraintSystem) #void:{Token t;List<List<String>> args; PatternSignature signature = null;}

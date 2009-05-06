@@ -24,7 +24,9 @@ package org.coode.patterns;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
@@ -83,8 +85,9 @@ public class PatternConstant<P extends OWLEntity> extends
 		}
 
 		public List<OWLObject> getGeneratedValues() {
-			return new ArrayList<OWLObject>(Collections.singleton(this
-					.getGeneratedValue(null)));
+			// return new ArrayList<OWLObject>(Collections.singleton(this
+			// .getGeneratedValue(null)));
+			return Collections.emptyList();
 		}
 	}
 
@@ -139,5 +142,10 @@ public class PatternConstant<P extends OWLEntity> extends
 	@Override
 	public String getOPPLFunction() {
 		return this.getValue().toString();
+	}
+
+	@Override
+	public Set<OWLObject> getPossibleBindings() {
+		return new HashSet<OWLObject>(this.getValue().getGeneratedValues());
 	}
 }

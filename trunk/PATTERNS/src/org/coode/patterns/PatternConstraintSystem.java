@@ -220,7 +220,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	}
 
 	public void instantiateThisClass(PatternConstant<OWLClass> patternConstant) {
-		this.createSpecialVariable(THIS_CLASS_VARIABLE_CONSTANT_SYMBOL,
+		this.createSpecialVariable(patternConstant.getName(),
 				THIS_CLASS_VARIABLE_CONSTANT_SYMBOL, patternConstant);
 	}
 
