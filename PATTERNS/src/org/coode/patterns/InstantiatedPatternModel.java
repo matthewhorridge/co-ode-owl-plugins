@@ -231,8 +231,11 @@ public class InstantiatedPatternModel implements InstantiatedOPPLScript,
 				}
 			}
 		}
-		BindingNode rootBindingNode = new BindingNode(assignments,
-				new HashSet<Variable>(this.getInputVariables()));
+		Set<Variable> toAssign = new HashSet<Variable>(this.getInputVariables());
+		if (this.isClassPattern()) {
+			toAssign.add(this.getConstraintSystem().getThisClassVariable());
+		}
+		BindingNode rootBindingNode = new BindingNode(assignments, toAssign);
 		LeafBrusher leafBrusher = new LeafBrusher();
 		rootBindingNode.accept(leafBrusher);
 		Set<BindingNode> leaves = leafBrusher.getLeaves();

@@ -22,6 +22,8 @@
  */
 package org.coode.patterns.syntax;
 
+import org.coode.patterns.PatternConstraintSystem;
+
 /**
  * @author Luigi Iannone
  * 
@@ -42,6 +44,26 @@ public class Utils {
 			} else {
 				toReturn += token.image + " ";
 				patternParser.getNextToken();
+			}
+		}
+		return toReturn;
+	}
+
+	public static String readAndResolveString(PatternParser patternParser,
+			PatternConstraintSystem cs, int... delimiterTokenKinds)
+			throws ParseException {
+		String toReturn = "";
+		while (true) {
+			Token token = patternParser.getToken(1);
+			boolean found = false;
+			for (int i = 0; !found && i < delimiterTokenKinds.length; i++) {
+				found = token.kind == PatternParser.EOF
+						|| delimiterTokenKinds[i] == token.kind;
+			}
+			if (found) {
+				break;
+			} else {
+				toReturn += patternParser.resolvedString(cs, false) + " ";
 			}
 		}
 		return toReturn;
