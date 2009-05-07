@@ -162,7 +162,19 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	}
 
 	public OWLObject visit(GeneratedVariable<?> v) {
-		return v.getGeneratedOWLObject(this);
+		Iterator<Assignment> it = this.assignments.iterator();
+		boolean found = false;
+		OWLObject toReturn = null;
+		while (!found && it.hasNext()) {
+			Assignment assignment = it.next();
+			found = assignment.getAssignedVariable().getName().compareTo(
+					v.getName()) == 0;
+			toReturn = found ? assignment.getAssignment() : toReturn;
+		}
+		if (!found) {
+			toReturn = v.getGeneratedOWLObject(this);
+		}
+		return toReturn;
 	}
 
 	/**

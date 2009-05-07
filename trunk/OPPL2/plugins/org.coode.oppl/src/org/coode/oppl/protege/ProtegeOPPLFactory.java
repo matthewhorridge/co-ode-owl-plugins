@@ -52,6 +52,7 @@ import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLIndividual;
 import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLOntologyChange;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
@@ -279,5 +280,9 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 		}
 		return new ManchesterSyntaxRenderer(this.modelManager
 				.getOWLOntologyManager(), this.getOWLEntityRenderer(cs), cs);
+	}
+
+	public OWLOntologyManager getOntologyManager() {
+		return this.modelManager.getOWLOntologyManager();
 	}
 }
