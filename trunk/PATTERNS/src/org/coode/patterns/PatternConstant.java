@@ -55,8 +55,8 @@ public class PatternConstant<P extends OWLEntity> extends
 		}
 
 		public OWLObject getGeneratedValue(BindingNode node) {
-			VariableType variableType = PatternConstant.this.getType();
 			OWLObject toReturn = null;
+			VariableType variableType = PatternConstant.this.getType();
 			switch (variableType) {
 			case CLASS:
 				toReturn = this.dataFactory.getOWLClass(PatternConstant.this
