@@ -3,12 +3,19 @@ package org.coode.oppl.variablemansyntax.generated;
 import java.net.URI;
 
 import org.coode.oppl.entity.OWLEntityCreationException;
+import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.semanticweb.owl.expression.OWLEntityChecker;
+import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owl.model.OWLIndividual;
 import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyChangeException;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 public class StringGeneratedVariable extends GeneratedVariable<String> {
 	private final OWLOntology ontology;
@@ -24,6 +31,8 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 		OWLObject value = null;
 		OWLEntityChecker entityChecker = OPPLParser.getOPPLFactory()
 				.getOWLEntityChecker();
+		OWLOntologyManager ontologyManager = OPPLParser.getOPPLFactory()
+				.getOntologyManager();
 		OWLEntityFactory entityFactory = OPPLParser.getOPPLFactory()
 				.getOWLEntityFactory();
 		switch (this.getType()) {
@@ -31,48 +40,68 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 			try {
 				value = entityChecker.getOWLClass(aValue);
 				if (value == null) {
-					value = entityFactory.createOWLClass(aValue, null)
-							.getOWLEntity();
+					OWLEntityCreationSet<OWLClass> creationEntitySet = entityFactory
+							.createOWLClass(aValue, null);
+					value = creationEntitySet.getOWLEntity();
+					ontologyManager.applyChanges(creationEntitySet
+							.getOntologyChanges());
 				}
 			} catch (OWLEntityCreationException e) {
 				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
 						.getOWLClass(this.buildURI(aValue));
+			} catch (OWLOntologyChangeException e) {
+				throw new RuntimeException(e);
 			}
 			break;
 		case OBJECTPROPERTY:
 			try {
 				value = entityChecker.getOWLObjectProperty(aValue);
 				if (value == null) {
-					value = entityFactory.createOWLObjectProperty(aValue, null)
-							.getOWLEntity();
+					OWLEntityCreationSet<OWLObjectProperty> creationEntitySet = entityFactory
+							.createOWLObjectProperty(aValue, null);
+					value = creationEntitySet.getOWLEntity();
+					ontologyManager.applyChanges(creationEntitySet
+							.getOntologyChanges());
 				}
 			} catch (OWLEntityCreationException e) {
 				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
 						.getOWLObjectProperty(this.buildURI(aValue));
+			} catch (OWLOntologyChangeException e) {
+				new RuntimeException(e);
 			}
 			break;
 		case DATAPROPERTY:
 			try {
 				value = entityChecker.getOWLDataProperty(aValue);
 				if (value == null) {
-					value = entityFactory.createOWLDataProperty(aValue, null)
-							.getOWLEntity();
+					OWLEntityCreationSet<OWLDataProperty> creationEntitySet = entityFactory
+							.createOWLDataProperty(aValue, null);
+					value = creationEntitySet.getOWLEntity();
+					ontologyManager.applyChanges(creationEntitySet
+							.getOntologyChanges());
 				}
 			} catch (OWLEntityCreationException e) {
 				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
 						.getOWLDataProperty(this.buildURI(aValue));
+			} catch (OWLOntologyChangeException e) {
+				throw new RuntimeException(e);
 			}
 			break;
 		case INDIVIDUAL:
 			try {
 				value = entityChecker.getOWLIndividual(aValue);
 				if (value == null) {
-					value = entityFactory.createOWLIndividual(aValue, null)
-							.getOWLEntity();
+					OWLEntityCreationSet<OWLIndividual> creationEntitySet = entityFactory
+							.createOWLIndividual(aValue, null);
+					value = creationEntitySet.getOWLEntity();
+					ontologyManager.applyChanges(creationEntitySet
+							.getOntologyChanges());
 				}
 			} catch (OWLEntityCreationException e) {
 				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
 						.getOWLIndividual(this.buildURI(aValue));
+			} catch (OWLOntologyChangeException e) {
+				throw new RuntimeException(e);
 			}
 			break;
 		case CONSTANT:

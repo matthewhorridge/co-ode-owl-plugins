@@ -51,14 +51,15 @@ import org.semanticweb.owl.model.OWLObjectProperty;
 public abstract class VariableGeneratedValue<N> implements GeneratedValue<N> {
 	private static class RenderingAttributeGenerator implements
 			AttributeGenerator<String> {
-		private OWLEntityRenderer entityRenderer = OPPLParser.getOPPLFactory()
-				.getOWLEntityRenderer(this.constraintSystem);
+		private final OWLEntityRenderer entityRenderer;
 		private static RenderingAttributeGenerator instance = null;
 		private ConstraintSystem constraintSystem;
 
 		private RenderingAttributeGenerator(ConstraintSystem cs) {
 			assert cs != null;
 			this.constraintSystem = cs;
+			this.entityRenderer = OPPLParser.getOPPLFactory()
+					.getOWLEntityRenderer(this.constraintSystem);
 		}
 
 		public static RenderingAttributeGenerator getInstance(

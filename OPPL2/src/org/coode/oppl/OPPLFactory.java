@@ -300,4 +300,8 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		return new ManchesterSyntaxRenderer(this.ontologyManager, this
 				.getOWLEntityRenderer(cs), cs);
 	}
+
+	public OWLOntologyManager getOntologyManager() {
+		return this.ontologyManager;
+	}
 }

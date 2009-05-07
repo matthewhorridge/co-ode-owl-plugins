@@ -35,6 +35,7 @@ import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
@@ -116,4 +117,9 @@ public interface OPPLAbstractFactory {
 	 * @return the appropriate OWLDataFactory used by this OPPLAbstractFactory
 	 */
 	public OWLDataFactory getOWLDataFactory();
+
+	/**
+	 * @return the OWLOntologyManager used by this OPPLAbstractFactory.
+	 */
+	public OWLOntologyManager getOntologyManager();
 }
