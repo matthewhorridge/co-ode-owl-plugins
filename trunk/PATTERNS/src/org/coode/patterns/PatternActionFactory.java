@@ -144,30 +144,6 @@ public class PatternActionFactory {
 				addChange(instantiatedAxiom, actionType, toReturn,
 						instantiatedPatternModel, owlDataFactory, ontology,
 						annotationURI);
-				// OWLAxiomChange axiomChange = null;
-				// switch (actionType) {
-				// case ADD:
-				// OWLAnnotation<? extends OWLObject> annotation =
-				// owlDataFactory
-				// .getOWLConstantAnnotation(URI
-				// .create(PatternModel.NAMESPACE
-				// + PatternActionFactory.CREATED_BY),
-				// owlDataFactory
-				// .getOWLTypedConstant(annotationURI
-				// .toString()));
-				// OWLAnnotationAxiom<OWLAxiom> annotationAxiom = owlDataFactory
-				// .getOWLAxiomAnnotationAxiom(instantiatedAxiom,
-				// annotation);
-				// axiomChange = new AddAxiom(ontology, instantiatedAxiom);
-				// toReturn.add(new AddAxiom(ontology, annotationAxiom));
-				// break;
-				// case REMOVE:
-				// axiomChange = new RemoveAxiom(ontology, instantiatedAxiom);
-				// break;
-				// default:
-				// break;
-				// }
-				// toReturn.add(axiomChange);
 			}
 		}
 		return toReturn;
