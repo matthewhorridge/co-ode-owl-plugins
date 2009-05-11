@@ -33,6 +33,8 @@ import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
+ * Utility class for parser initialisation.
+ * 
  * @author Luigi Iannone
  * 
  */
