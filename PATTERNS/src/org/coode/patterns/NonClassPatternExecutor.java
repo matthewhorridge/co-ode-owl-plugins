@@ -25,6 +25,7 @@ package org.coode.patterns;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.coode.oppl.ActionType;
@@ -38,7 +39,7 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 /**
  * @author Luigi Iannone
  * 
- * Jul 3, 2008
+ *         Jul 3, 2008
  */
 public class NonClassPatternExecutor extends ChangeExtractor {
 	private InstantiatedPatternModel instantiatedPatternModel;
@@ -69,6 +70,6 @@ public class NonClassPatternExecutor extends ChangeExtractor {
 							this.annotationURI, this.getOntology());
 			p.addAll(createdChanges);
 		}
-		return p;
+		return new ArrayList<OWLAxiomChange>(new HashSet<OWLAxiomChange>(p));
 	}
 }

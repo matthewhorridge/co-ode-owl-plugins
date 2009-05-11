@@ -100,6 +100,12 @@ public class PatternModelFactory implements AbstractPatternModelFactory {
 		return renderer;
 	}
 
+	/**
+	 * @see org.coode.patterns.AbstractPatternModelFactory#createPatternModel(java.lang.String,
+	 *      java.util.List, java.util.List,
+	 *      org.coode.oppl.variablemansyntax.Variable, java.lang.String,
+	 *      org.coode.oppl.variablemansyntax.ConstraintSystem)
+	 */
 	public PatternModel createPatternModel(String name,
 			List<Variable> variables, List<OWLAxiomChange> actions,
 			Variable returnClause, String rendering,
