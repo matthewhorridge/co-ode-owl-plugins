@@ -11,6 +11,15 @@ Follows existential (and appropriate cardinality) restrictions to build up a vie
 === Existential Tree view ===
 A simplified version that shows the tree along a specified property.
 
+To enable this view select the single property you wish to follow by using the action on the view's toolbar.
+
+=== Reverse Existential Tree view ===
+Shows the existential tree for named classes in the opposite direction to which the restrictions were placed.
+
+This can be useful for anatomy or other meronomies where you wish to see the structure from the root (eg body) but all statements are in the form Lungs -> partOf some Chest.
+
+To enable this view select the single property you wish to follow by using the action on the view's toolbar
+
 
 == Features ==
   * Filter out whether to show all inherited restrictions
