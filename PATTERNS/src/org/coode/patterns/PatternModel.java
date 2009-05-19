@@ -41,7 +41,6 @@ import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.patterns.syntax.PatternParser;
 import org.coode.patterns.utils.Utils;
-import org.protege.editor.core.ui.list.MListItem;
 import org.semanticweb.owl.model.OWLAnnotationAxiom;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
@@ -102,7 +101,9 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
  * 
  *         Jun 10, 2008
  */
-public class PatternModel implements MListItem, OPPLScript, PatternOPPLScript {
+public class PatternModel implements
+// MListItem,
+		OPPLScript, PatternOPPLScript {
 	class ClassPatternDetector implements OWLAxiomVisitorEx<Boolean>,
 			OPPLScriptVisitorEx<Boolean> {
 		private OWLClass thisClass = PatternModel.this.ontologyManager
@@ -616,25 +617,24 @@ public class PatternModel implements MListItem, OPPLScript, PatternOPPLScript {
 		this.ontologyManager = ontologyManager;
 	}
 
-	public String getTooltip() {
-		return this.getRendering();
-	}
-
-	public boolean handleDelete() {
-		return false;
-	}
-
-	public void handleEdit() {
-	}
-
-	public boolean isDeleteable() {
-		return false;
-	}
-
-	public boolean isEditable() {
-		return false;
-	}
-
+	// public String getTooltip() {
+	// return this.getRendering();
+	// }
+	//
+	// public boolean handleDelete() {
+	// return false;
+	// }
+	//
+	// public void handleEdit() {
+	// }
+	//
+	// public boolean isDeleteable() {
+	// return false;
+	// }
+	//
+	// public boolean isEditable() {
+	// return false;
+	// }
 	public List<Variable> getVariables() {
 		List<Variable> toReturn = new ArrayList<Variable>();
 		if (this.opplStatement != null) {
