@@ -63,10 +63,10 @@ public final class VariableImpl implements InputVariable {
 
 	public boolean addPossibleBinding(OWLObject owlObject)
 			throws OWLReasonerException {
-		if (this.variableScopeChecker == null
-				|| this.variableScope == null
-				|| this.variableScope.check(owlObject,
-						this.variableScopeChecker)) {
+		if (owlObject != null
+				&& (this.variableScopeChecker == null
+						|| this.variableScope == null || this.variableScope
+						.check(owlObject, this.variableScopeChecker))) {
 			this.possibleBindings.add(owlObject);
 			return true;
 		} else {
