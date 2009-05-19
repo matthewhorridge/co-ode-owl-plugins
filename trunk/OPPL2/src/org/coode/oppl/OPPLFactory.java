@@ -196,7 +196,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	private OWLOntologyManager ontologyManager;
 	private ConstraintSystem constraintSystem;
 	private VariableScopeChecker variableScopeChecker = null;
-	private OWLReasoner reasoner;
+	private OWLReasoner reasoner = null;
 	private OWLOntology ontology;
 
 	/**
@@ -209,6 +209,11 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		this.ontologyManager = ontologyManager;
 		this.ontology = ontology;
 		this.reasoner = reasoner;
+	}
+
+	public OPPLFactory(OWLOntologyManager ontologyManager, OWLOntology ontology) {
+		this.ontologyManager = ontologyManager;
+		this.ontology = ontology;
 	}
 
 	/**
@@ -227,7 +232,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	 * @throws OPPLException
 	 */
 	public VariableScopeChecker getVariableScopeChecker() throws OPPLException {
-		if (this.variableScopeChecker == null) {
+		if (this.variableScopeChecker == null && this.reasoner != null) {
 			this.variableScopeChecker = new VariableScopeChecker(
 					this.ontologyManager, this.reasoner);
 		}
