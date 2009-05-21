@@ -41,7 +41,7 @@ import javax.swing.JRadioButton;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.syntax.TokenMgrError;
-import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.InvalidVariableNameException;
 import org.coode.oppl.variablemansyntax.Variable;
@@ -156,7 +156,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 					public void check(String text)
 							throws OWLExpressionParserException {
 						this.lastEditedObject = null;
-						ParserFactory.initParser(text,
+						ProtegeParserFactory.initParser(text,
 								GeneratedVariableEditor.this.owlEditorKit
 										.getModelManager());
 						try {

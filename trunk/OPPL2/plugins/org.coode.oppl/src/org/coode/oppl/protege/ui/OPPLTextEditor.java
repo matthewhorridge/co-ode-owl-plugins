@@ -31,7 +31,7 @@ import javax.swing.JPanel;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
-import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.utils.ProtegeParserFactory;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
@@ -98,8 +98,9 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 					public void check(String text)
 							throws OWLExpressionParserException {
 						this.lastCreatedObject = null;
-						ParserFactory.initParser(text, OPPLTextEditor.this
-								.getOWLEditorKit().getModelManager());
+						ProtegeParserFactory.initParser(text,
+								OPPLTextEditor.this.getOWLEditorKit()
+										.getModelManager());
 						try {
 							this.lastCreatedObject = OPPLParser.Start();
 						} catch (ParseException e) {
