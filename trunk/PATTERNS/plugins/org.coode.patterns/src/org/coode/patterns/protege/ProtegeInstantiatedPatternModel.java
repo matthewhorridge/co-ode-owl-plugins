@@ -24,7 +24,7 @@ package org.coode.patterns.protege;
 
 import java.util.Set;
 
-import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.patterns.InstantiatedPatternModel;
 import org.coode.patterns.PatternModel;
@@ -35,7 +35,7 @@ import org.semanticweb.owl.model.OWLObject;
 /**
  * @author Luigi Iannone
  * 
- * Jun 12, 2008
+ *         Jun 12, 2008
  */
 public class ProtegeInstantiatedPatternModel extends InstantiatedPatternModel {
 	protected OWLModelManager modelManager;
@@ -50,7 +50,7 @@ public class ProtegeInstantiatedPatternModel extends InstantiatedPatternModel {
 	}
 
 	protected void initOPPLParser(String s) {
-		ParserFactory.initParser(s, this.modelManager);
+		ProtegeParserFactory.initParser(s, this.modelManager);
 	}
 
 	protected PatternParser initParser(String s) {

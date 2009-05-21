@@ -96,8 +96,8 @@ public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 	}
 
 	public void initOPPLParser(String string) {
-		org.coode.oppl.utils.ParserFactory
-				.initParser(string, this.modelManager);
+		org.coode.oppl.utils.ProtegeParserFactory.initParser(string,
+				this.modelManager);
 	}
 
 	public ManchesterOWLSyntaxObjectRenderer getRenderer(
