@@ -139,7 +139,7 @@ private static OWLOntologyManager owlOntologyManager;
 	
 	public static void initProtegeOPPLParser(String s, OWLModelManager modelManager){
 		
-		org.coode.oppl.utils.ParserFactory.initParser(s, modelManager);
+		org.coode.oppl.utils.ProtegeParserFactory.initParser(s, modelManager);
 		
 	} 	
 	
