@@ -24,10 +24,7 @@ package org.coode.oppl.utils;
 
 import java.io.StringReader;
 
-import org.coode.oppl.protege.ProtegeOPPLFactory;
 import org.coode.oppl.syntax.OPPLParser;
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcherImpl;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -51,23 +48,6 @@ public class ParserFactory {
 			OPPLParser.ReInit(new StringReader(formulaBody), ontologyManager,
 					ontology, reasoner);
 		}
-		return parser;
-	}
-
-	public static OPPLParser initParser(String formulaBody,
-			OWLModelManager manager) {
-		if (parser == null) {
-			parser = new OPPLParser(new StringReader(formulaBody), manager
-					.getOWLOntologyManager(), manager.getActiveOntology(),
-					manager.getReasoner());
-		} else {
-			OPPLParser.ReInit(new StringReader(formulaBody), manager
-					.getOWLOntologyManager(), manager.getActiveOntology(),
-					manager.getReasoner());
-		}
-		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager));
-		OPPLParser
-				.setAutoCompleterMatcher(new AutoCompleterMatcherImpl(manager));
 		return parser;
 	}
 }

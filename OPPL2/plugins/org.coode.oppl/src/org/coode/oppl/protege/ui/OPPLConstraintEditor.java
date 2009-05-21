@@ -33,7 +33,7 @@ import org.coode.oppl.AbstractConstraint;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.syntax.TokenMgrError;
-import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
@@ -142,7 +142,7 @@ public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor 
 					public void check(String text)
 							throws OWLExpressionParserException {
 						this.lastCheckedObject = null;
-						ParserFactory.initParser(text,
+						ProtegeParserFactory.initParser(text,
 								OPPLConstraintEditor.this.owlEditorKit
 										.getModelManager());
 						try {

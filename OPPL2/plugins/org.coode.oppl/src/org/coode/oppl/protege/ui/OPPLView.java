@@ -49,7 +49,7 @@ import javax.swing.event.ListDataListener;
 import org.coode.oppl.ChangeExtractor;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
-import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.jdesktop.swingworker.SwingWorker;
 import org.protege.editor.core.ui.list.MList;
@@ -189,7 +189,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	protected void initialiseOWLView() throws Exception {
 		this.setLayout(new BorderLayout());
 		JPanel statementPanel = new JPanel(new BorderLayout());
-		ParserFactory.initParser("", this.getOWLModelManager());
+		ProtegeParserFactory.initParser("", this.getOWLModelManager());
 		this.affectedAxioms = new ActionList(this.getOWLEditorKit(),
 				new ConstraintSystem(this.getOWLEditorKit().getModelManager()
 						.getActiveOntology(), this.getOWLEditorKit()

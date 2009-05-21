@@ -51,7 +51,7 @@ import javax.swing.text.JTextComponent;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.syntax.TokenMgrError;
-import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -63,7 +63,7 @@ import org.semanticweb.owl.model.OWLObject;
 /**
  * @author Luigi Iannone
  * 
- * Jul 2, 2008
+ *         Jul 2, 2008
  */
 @SuppressWarnings("unchecked")
 public class OPPLCompleter {
@@ -146,7 +146,8 @@ public class OPPLCompleter {
 		this.textComponent.addHierarchyListener(new HierarchyListener() {
 			/**
 			 * Called when the hierarchy has been changed. To discern the actual
-			 * type of change, call <code>HierarchyEvent.getChangeFlags()</code>.
+			 * type of change, call <code>HierarchyEvent.getChangeFlags()</code>
+			 * .
 			 * 
 			 * @see java.awt.event.HierarchyEvent#getChangeFlags()
 			 */
@@ -205,7 +206,7 @@ public class OPPLCompleter {
 	}
 
 	private List getMatches() {
-		ParserFactory.initParser(this.textComponent.getText(),
+		ProtegeParserFactory.initParser(this.textComponent.getText(),
 				this.owlEditorKit.getModelManager());
 		List completions;
 		try {

@@ -29,7 +29,7 @@ import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.syntax.TokenMgrError;
-import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.utils.ProtegeParserFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.description.OWLExpressionParserException;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
@@ -99,7 +99,7 @@ public class VariableManchesterSyntaxExpressionChecker implements
 	 * @return
 	 */
 	protected OPPLParser initParser(String text) {
-		return ParserFactory.initParser(text, this.owlEditorKit
+		return ProtegeParserFactory.initParser(text, this.owlEditorKit
 				.getModelManager());
 	}
 }
