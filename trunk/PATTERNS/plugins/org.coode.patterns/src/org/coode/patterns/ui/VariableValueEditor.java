@@ -101,7 +101,7 @@ public abstract class VariableValueEditor extends JPanel implements
 
 		@Override
 		public void dispose() {
-			this.classSelectorPanel.removeSelectionListener(this);
+			this.classSelectorPanel.dispose();
 		}
 	}
 
@@ -140,7 +140,7 @@ public abstract class VariableValueEditor extends JPanel implements
 
 		@Override
 		public void dispose() {
-			this.propertySelector.removeSelectionListener(this);
+			this.propertySelector.dispose();
 		}
 	}
 
@@ -179,7 +179,7 @@ public abstract class VariableValueEditor extends JPanel implements
 
 		@Override
 		public void dispose() {
-			this.individualSelectorPanel.removeSelectionListener(this);
+			this.individualSelectorPanel.dispose();
 		}
 	}
 
