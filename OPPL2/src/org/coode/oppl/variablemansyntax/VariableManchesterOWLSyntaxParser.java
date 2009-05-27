@@ -40,12 +40,14 @@ import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.expression.ParserException;
 import org.semanticweb.owl.model.AxiomType;
 import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owl.model.OWLClassAxiom;
 import org.semanticweb.owl.model.OWLConstant;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owl.model.OWLDataPropertyExpression;
 import org.semanticweb.owl.model.OWLDataRange;
 import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owl.model.OWLDisjointClassesAxiom;
 import org.semanticweb.owl.model.OWLIndividual;
 import org.semanticweb.owl.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owl.model.OWLObjectPropertyAxiom;
@@ -102,6 +104,14 @@ public class VariableManchesterOWLSyntaxParser extends
 		disjointWithAxiomTypes.add(AxiomType.DISJOINT_OBJECT_PROPERTIES);
 		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.DISJOINT_WITH
 				.toString().toLowerCase(), disjointWithAxiomTypes);
+		// For n-ary disjoint classes axioms
+		Set<AxiomType> disjointClasses = new HashSet<AxiomType>();
+		disjointClasses.add(AxiomType.DISJOINT_CLASSES);
+		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.DISJOINT_CLASSES
+				.toString(), disjointClasses);
+		// With or without (above) colon
+		this.tokenAxiomTypesMap.put(DISJOINT_CLASSES.toString(),
+				disjointClasses);
 		Set<AxiomType> antiSymmetricAxiomTypes = new HashSet<AxiomType>();
 		antiSymmetricAxiomTypes.add(AxiomType.ANTI_SYMMETRIC_OBJECT_PROPERTY);
 		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.ANTI_SYMMETRIC
@@ -238,6 +248,34 @@ public class VariableManchesterOWLSyntaxParser extends
 			throw bestTryExcpetion;
 		}
 		return axiom;
+	}
+
+	@Override
+	public OWLClassAxiom parseClassAxiom() throws ParserException {
+		String kw = this.peekToken();
+		if (kw.compareTo(DISJOINT_CLASSES.toString()) == 0
+				|| kw
+						.compareTo(ManchesterOWLSyntax.DISJOINT_CLASSES
+								.toString()) == 0) {
+			return this.parseDisjointClasses();
+		} else {
+			return super.parseClassAxiom();
+		}
+	}
+
+	@Override
+	public OWLDisjointClassesAxiom parseDisjointClasses()
+			throws ParserException {
+		String section = this.consumeToken();
+		if (!section.equalsIgnoreCase(DISJOINT_CLASSES)
+				&& section
+						.equalsIgnoreCase(ManchesterOWLSyntax.DISJOINT_CLASSES
+								.toString())) {
+			this.throwException(DISJOINT_CLASSES,
+					ManchesterOWLSyntax.DISJOINT_CLASSES.toString());
+		}
+		Set<OWLDescription> descriptions = this.parseDescriptionList();
+		return this.getDataFactory().getOWLDisjointClassesAxiom(descriptions);
 	}
 
 	/**
