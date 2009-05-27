@@ -87,7 +87,7 @@ import org.semanticweb.owl.model.SWRLRule;
 /**
  * @author Luigi Iannone
  * 
- * Jul 3, 2008
+ *         Jul 3, 2008
  */
 public class PatternManager implements OWLOntologyChangeListener {
 	static class AdditionManager implements OWLAxiomVisitor {
@@ -436,6 +436,7 @@ public class PatternManager implements OWLOntologyChangeListener {
 			OWLOntologyManager ontologyManager) {
 		PatternManager patternManager = instances.get(ontologyManager);
 		if (patternManager == null) {
+			System.out.println("PatternManager.getInstance() ");
 			patternManager = new PatternManager(ontologyManager);
 			instances.put(ontologyManager, patternManager);
 		}
