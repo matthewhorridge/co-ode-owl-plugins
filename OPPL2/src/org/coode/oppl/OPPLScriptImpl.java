@@ -177,21 +177,15 @@ public class OPPLScriptImpl implements OPPLScript {
 		StringBuffer buffer = new StringBuffer();
 		boolean first = true;
 		for (Variable v : this.getVariables()) {
-			String commaString = first ? "" : ", ";
+			String commaString = first ? "" : ",\n ";
 			buffer.append(commaString);
-			if (!first) {
-				buffer.append("\n");
-			}
 			first = false;
 			buffer.append(v.toString());
 			VariableScope variableScope = v.getVariableScope();
 			if (variableScope != null) {
 				buffer.append("[");
 				buffer.append(variableScope.getDirection().toString());
-				// StringWriter writer = new StringWriter();
 				buffer.append(" ");
-				// ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
-				// .getOPPLFactory().getOWLObjectRenderer(writer);
 				ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
 						.getManchesterSyntaxRenderer(this.constraintSystem);
 				variableScope.getScopingObject().accept(renderer);
@@ -208,18 +202,12 @@ public class OPPLScriptImpl implements OPPLScript {
 			buffer.append("BEGIN\n ");
 			first = true;
 			for (OWLAxiomChange action : this.getActions()) {
-				String commaString = first ? "" : ", ";
-				// StringWriter writer = new StringWriter();
+				String commaString = first ? "" : ",\n ";
 				String actionString = action instanceof AddAxiom ? "\tADD "
 						: "\tREMOVE ";
-				// ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
-				// .getOPPLFactory().getOWLObjectRenderer(writer);
 				ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
 						.getManchesterSyntaxRenderer(this.constraintSystem);
 				buffer.append(commaString);
-				if (!first) {
-					buffer.append("\n");
-				}
 				first = false;
 				buffer.append(actionString);
 				action.getAxiom().accept(renderer);
@@ -234,9 +222,7 @@ public class OPPLScriptImpl implements OPPLScript {
 		this.variables.add(variable);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -252,9 +238,7 @@ public class OPPLScriptImpl implements OPPLScript {
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
+	/**
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override

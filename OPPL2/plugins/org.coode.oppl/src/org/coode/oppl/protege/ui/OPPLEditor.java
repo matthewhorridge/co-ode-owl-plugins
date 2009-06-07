@@ -84,6 +84,7 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 		this.opplBuilder
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
 					public void verifiedStatusChanged(boolean newState) {
+						OPPLEditor.this.opplScript = null;
 						if (newState) {
 							OPPLEditor.this.opplScript = OPPLEditor.this.opplBuilder
 									.getOPPLScript();
@@ -94,6 +95,7 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 		this.opplTextEditor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
 					public void verifiedStatusChanged(boolean newState) {
+						OPPLEditor.this.opplScript = null;
 						if (newState) {
 							OPPLEditor.this.opplScript = OPPLEditor.this.opplTextEditor
 									.getOPPLScript();

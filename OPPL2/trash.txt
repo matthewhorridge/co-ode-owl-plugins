@@ -185,3 +185,26 @@ BEGIN
 	ADD $thisClass equivalentTo ?allTopping
 END;
 A pizza with ?base base and ?topping toppings 
+
+?c1:CLASS, 
+?r1:OBJECTPROPERTY, 
+?c2:CLASS, 
+?c3:CLASS
+SELECT ?c1 subClassOf ?r1 some ?c2
+, 
+?c1 subClassOf ?r1 some ?c3
+, 
+?c2 disjointWith ?c3
+
+WHERE ?c2 != ?c3
+BEGIN
+ 	REMOVE ?c2 disjointWith ?c3
+END;
+
+?x:CLASS, 
+?y:CLASS
+SELECT ?x subClassOf gender,?y subClassOf gender
+WHERE ?x != ?y
+BEGIN
+ 	ADD ?x disjointWith ?y
+END;

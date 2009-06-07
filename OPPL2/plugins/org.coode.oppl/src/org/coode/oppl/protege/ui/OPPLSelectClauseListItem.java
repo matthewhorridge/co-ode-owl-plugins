@@ -27,8 +27,8 @@ public class OPPLSelectClauseListItem implements MListItem {
 	 * @param asserted
 	 * @param axiom
 	 */
-	public OPPLSelectClauseListItem(OWLEditorKit owlEditorKit, boolean asserted,
-			OWLAxiom axiom, ConstraintSystem constraintSystem) {
+	public OPPLSelectClauseListItem(OWLEditorKit owlEditorKit,
+			boolean asserted, OWLAxiom axiom, ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.asserted = asserted;
 		this.axiom = axiom;
@@ -48,7 +48,7 @@ public class OPPLSelectClauseListItem implements MListItem {
 	 * @see org.protege.editor.core.ui.list.MListItem#handleDelete()
 	 */
 	public boolean handleDelete() {
-		return false;
+		return true;
 	}
 
 	/**

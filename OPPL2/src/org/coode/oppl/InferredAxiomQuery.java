@@ -22,7 +22,9 @@
  */
 package org.coode.oppl;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -87,7 +89,7 @@ public class InferredAxiomQuery implements AxiomQuery {
 	protected Set<OWLOntology> ontologies;
 	private ConstraintSystem constraintSystem;
 	private OWLDataFactory dataFactory;
-	private Set<OWLAxiom> instantiatedAxioms = new HashSet<OWLAxiom>();
+	private Map<BindingNode, Set<OWLAxiom>> instantiatedAxioms = new HashMap<BindingNode, Set<OWLAxiom>>();
 	protected OWLReasoner reasoner;
 
 	/**
@@ -136,7 +138,12 @@ public class InferredAxiomQuery implements AxiomQuery {
 					leaf, this.constraintSystem);
 			OWLAxiom instatiatedAxiom = (OWLAxiom) axiom.accept(instantiator);
 			if (this.locateAxiom(instatiatedAxiom)) {
-				this.instantiatedAxioms.add(instatiatedAxiom);
+				Set<OWLAxiom> axioms = this.instantiatedAxioms.get(leaf);
+				if (axioms == null) {
+					axioms = new HashSet<OWLAxiom>();
+				}
+				axioms.add(instatiatedAxiom);
+				this.instantiatedAxioms.put(leaf, axioms);
 			} else {
 				leaves.remove(leaf);
 			}
@@ -306,10 +313,10 @@ public class InferredAxiomQuery implements AxiomQuery {
 		this.match(rule);
 	}
 
-	public Set<OWLAxiom> getInstantiations() {
-		Set<OWLAxiom> toReturn = new HashSet<OWLAxiom>();
+	public Map<BindingNode, Set<OWLAxiom>> getInstantiations() {
+		Map<BindingNode, Set<OWLAxiom>> toReturn = new HashMap<BindingNode, Set<OWLAxiom>>();
 		if (this.constraintSystem.getLeaves() != null) {
-			toReturn.addAll(this.instantiatedAxioms);
+			toReturn.putAll(this.instantiatedAxioms);
 		}
 		return toReturn;
 	}

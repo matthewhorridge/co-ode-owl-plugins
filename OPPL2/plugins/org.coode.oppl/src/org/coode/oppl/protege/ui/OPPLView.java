@@ -28,6 +28,7 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -41,23 +42,28 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTree;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.coode.oppl.ChangeExtractor;
 import org.coode.oppl.OPPLScript;
+import org.coode.oppl.protege.ui.rendering.BindingTreeRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.jdesktop.swingworker.SwingWorker;
-import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
+import org.protege.editor.owl.ui.list.OWLLinkedObjectList;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 import org.semanticweb.owl.model.OWLAxiom;
@@ -165,19 +171,20 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	 */
 	private static final long serialVersionUID = 1897093057453176659L;
 	private static final String OPPL_COMPUTATION_IN_PROGRESS_PLEASE_WAIT = "OPPL Computation in progress...please wait";
-	// private ExpressionEditor<OPPLScript> opplStatementExpressionEditor;
-	// private OPPLBuilder editor;
 	private OPPLEditor editor;
 	private JButton evaluate = new JButton("Evaluate");
 	private JButton execute = new JButton("Execute");
 	private ActionList affectedAxioms;
-	private MList instantiatedAxiomsList;
+	private OWLLinkedObjectList instantiatedAxiomsList;
 	private OPPLScript statementModel;
 	private JDialog window;
 	private JScrollPane affectedScrollPane;
 	private JScrollPane instantiatedScrollPane;
 	private JCheckBox considerImportClosureCheckBox = new JCheckBox(
 			"When removing consider Active Ontology Imported Closure", false);
+	private DefaultTreeModel bindingTreeNodeModel = new DefaultTreeModel(
+			new DefaultMutableTreeNode("Bindings"));
+	private JTree bindingNodeTree = new JTree(this.bindingTreeNodeModel);
 
 	@Override
 	protected void disposeOWLView() {
@@ -194,7 +201,8 @@ public class OPPLView extends AbstractOWLViewComponent implements
 				new ConstraintSystem(this.getOWLEditorKit().getModelManager()
 						.getActiveOntology(), this.getOWLEditorKit()
 						.getModelManager().getOWLOntologyManager()), false);
-		this.instantiatedAxiomsList = new MList();
+		this.instantiatedAxiomsList = new OWLLinkedObjectList(this
+				.getOWLEditorKit());
 		this.instantiatedAxiomsList.setModel(new DefaultListModel());
 		OWLCellRenderer cellRenderer = new OWLCellRenderer(this
 				.getOWLEditorKit());
@@ -224,24 +232,8 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.getOWLEditorKit().getModelManager().addListener(this);
 		this.getOWLModelManager().getOWLOntologyManager()
 				.addOntologyChangeListener(this);
-		// this.opplStatementExpressionEditor = new
-		// ExpressionEditor<OPPLScript>(
-		// this.getOWLEditorKit(),
-		// new VariableManchesterSyntaxExpressionChecker(this
-		// .getOWLEditorKit()));
-		// this.editor = new OPPLBuilder(this.getOWLEditorKit());
 		this.editor = new OPPLEditor(this.getOWLEditorKit());
-		// this.opplStatementExpressionEditor.setPreferredSize(new Dimension(50,
-		// 200));
 		this.editor.setPreferredSize(new Dimension(200, 300));
-		// this.removeKeyListeners();
-		// this.opplStatementExpressionEditor.addStatusChangedListener(this);
-		// new OPPLCompleter(this.getOWLEditorKit(),
-		// this.opplStatementExpressionEditor,
-		// this.opplStatementExpressionEditor.getExpressionChecker());
-		// statementPanel.add(new
-		// JScrollPane(this.opplStatementExpressionEditor),
-		// BorderLayout.NORTH);
 		statementPanel.add(ComponentFactory.createScrollPane(this.editor),
 				BorderLayout.NORTH);
 		statementPanel.add(this.evaluate, BorderLayout.SOUTH);
@@ -257,7 +249,16 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.affectedScrollPane.setBorder(ComponentFactory
 				.createTitledBorder("Affected axioms:"));
 		effects.add(this.affectedScrollPane, JSplitPane.LEFT);
-		effects.add(this.instantiatedScrollPane, JSplitPane.RIGHT);
+		JSplitPane instantiatonPanel = new JSplitPane();
+		JScrollPane bindingTreeScrollPane = ComponentFactory
+				.createScrollPane(this.bindingNodeTree);
+		bindingTreeScrollPane.setBorder(ComponentFactory
+				.createTitledBorder("Binding Tree:"));
+		this.bindingNodeTree.setCellRenderer(new BindingTreeRenderer(this
+				.getOWLEditorKit()));
+		instantiatonPanel.add(this.instantiatedScrollPane, JSplitPane.LEFT);
+		instantiatonPanel.add(bindingTreeScrollPane, JSplitPane.RIGHT);
+		effects.add(instantiatonPanel, JSplitPane.RIGHT);
 		this.add(effects, BorderLayout.CENTER);
 		this.add(this.execute, BorderLayout.SOUTH);
 		this.evaluate.setEnabled(false);
@@ -300,8 +301,6 @@ public class OPPLView extends AbstractOWLViewComponent implements
 					}
 				});
 				opplSwingWorker.execute();
-				// OPPLView.this.updateEffects();
-				// OPPLView.this.evaluate.setEnabled(false);
 			}
 		});
 		this.affectedAxioms.getModel().addListDataListener(
@@ -388,14 +387,6 @@ public class OPPLView extends AbstractOWLViewComponent implements
 				.createTitledBorder("Affected axioms: "));
 		this.instantiatedAxiomsList.setModel(new DefaultListModel());
 		if (newState) {
-			// try {
-			// this.statementModel = this.opplStatementExpressionEditor
-			// .createObject();
-			// } catch (OWLExpressionParserException e) {
-			// e.printStackTrace();
-			// } catch (OWLException e) {
-			// e.printStackTrace();
-			// }
 			this.statementModel = this.editor.getOPPLScript();
 		}
 	}
@@ -416,11 +407,22 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	 * 
 	 */
 	private void updateInstantiatedAxioms(OPPLScript statementModel) {
-		Set<OWLAxiom> instantiatedAxioms = statementModel.getConstraintSystem()
-				.getInstantiatedAxioms();
+		Map<BindingNode, Set<OWLAxiom>> instantiationMap = statementModel
+				.getConstraintSystem().getInstantiatedAxioms();
 		DefaultListModel model = new DefaultListModel();
-		for (OWLAxiom axiom : instantiatedAxioms) {
-			model.addElement(axiom);
+		DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.bindingNodeTree
+				.getModel().getRoot();
+		root.removeAllChildren();
+		for (BindingNode leaf : instantiationMap.keySet()) {
+			DefaultMutableTreeNode bindingTreeNode = new DefaultMutableTreeNode(
+					leaf);
+			root.add(bindingTreeNode);
+			for (OWLAxiom axiom : instantiationMap.get(leaf)) {
+				bindingTreeNode.add(new DefaultMutableTreeNode(axiom));
+				if (!model.contains(axiom)) {
+					model.addElement(axiom);
+				}
+			}
 		}
 		this.instantiatedAxiomsList.setModel(model);
 		this.revalidate();

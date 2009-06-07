@@ -136,40 +136,23 @@ public class OPPLQueryImpl implements OPPLQuery {
 		StringBuffer buffer = new StringBuffer("SELECT ");
 		boolean first = true;
 		for (OWLAxiom axiom : this.getAssertedAxioms()) {
-			String commaString = first ? "ASSERTED " : "ASSERTED, ";
-			// StringWriter writer = new StringWriter();
-			// ManchesterOWLSyntaxObjectRenderer renderer = new
-			// ManchesterOWLSyntaxObjectRenderer(
-			// writer);
+			String commaString = first ? "ASSERTED " : ",\nASSERTED ";
 			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
 					.getManchesterSyntaxRenderer(this.constraintSystem);
-			// renderer.setShortFormProvider(new
-			// SimpleVariableShortFormProvider(
-			// this.getConstraintSystem()));
 			buffer.append(commaString);
-			if (!first) {
-				buffer.append("\n");
-			}
 			first = false;
 			axiom.accept(renderer);
 			buffer.append(renderer.toString());
 			buffer.append("\n");
 		}
 		for (OWLAxiom axiom : this.getAxioms()) {
-			String commaString = first ? "" : ", ";
-			// StringWriter writer = new StringWriter();
-			// ManchesterOWLSyntaxObjectRenderer renderer = OPPLParser
-			// .getOPPLFactory().getOWLObjectRenderer(writer);
+			String commaString = first ? "" : ",\n ";
 			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
 					.getManchesterSyntaxRenderer(this.constraintSystem);
 			buffer.append(commaString);
-			if (!first) {
-				buffer.append("\n");
-			}
 			first = false;
 			axiom.accept(renderer);
 			buffer.append(renderer.toString());
-			buffer.append("\n");
 		}
 		if (this.getConstraints().size() > 0) {
 			buffer.append("\nWHERE ");

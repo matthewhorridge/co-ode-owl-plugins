@@ -35,6 +35,7 @@ import org.coode.oppl.AxiomQuery;
 import org.coode.oppl.ConstraintChecker;
 import org.coode.oppl.InferredAxiomQuery;
 import org.coode.oppl.OPPLException;
+import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.bindingtree.LeafBrusher;
@@ -109,7 +110,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	private final OWLDataFactory dataFactory;
 	private Set<AbstractConstraint> constraints = new HashSet<AbstractConstraint>();
 	private OWLReasoner reasoner = null;
-	private final Set<OWLAxiom> instantiatedAxioms = new HashSet<OWLAxiom>();
+	private final Map<BindingNode, Set<OWLAxiom>> instantiatedAxioms = new HashMap<BindingNode, Set<OWLAxiom>>();
 
 	public ConstraintSystem(OWLOntology ontology,
 			OWLOntologyManager ontologyManager) {
@@ -154,15 +155,16 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	private void updateBindings(OWLAxiom axiom) {
 		if (this.isVariableAxiom(axiom)) {
 			this.updateLeaves(axiom);
+			this.instantiatedAxioms.clear();
 			System.out.println("Initial size: "
 					+ (this.leaves == null ? "empty" : this.leaves.size()));
 			AxiomQuery query = this.reasoner == null
 					|| this.reasoner instanceof NoOpReasoner ? new AssertedAxiomQuery(
-					this.ontologies, this, this.dataFactory)
+					this.ontologies, this)
 					: new InferredAxiomQuery(this.ontologies, this,
 							this.dataFactory, this.reasoner);
 			axiom.accept(query);
-			this.instantiatedAxioms.addAll(query.getInstantiations());
+			this.instantiatedAxioms.putAll(query.getInstantiations());
 			System.out.println("Currently instantiated axioms count: "
 					+ this.instantiatedAxioms.size());
 		}
@@ -175,7 +177,12 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 				for (Variable variable : axiomVariables) {
 					if (!(bindingNode.getAssignedVariables().contains(variable) || bindingNode
 							.getAssignedVariables().contains(variable))) {
+						Set<OWLAxiom> bindingInstantiatedAxioms = this.instantiatedAxioms
+								.get(bindingNode);
+						this.instantiatedAxioms.remove(bindingNode);
 						bindingNode.addUnassignedVariable(variable);
+						this.instantiatedAxioms.put(bindingNode,
+								bindingInstantiatedAxioms);
 					}
 				}
 			}
@@ -186,11 +193,10 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 		if (this.isVariableAxiom(axiom)) {
 			System.out.println("Initial size: "
 					+ (this.leaves == null ? "empty" : this.leaves.size()));
-			AxiomQuery query = new AssertedAxiomQuery(this.ontologies, this,
-					this.dataFactory);
+			AxiomQuery query = new AssertedAxiomQuery(this.ontologies, this);
 			axiom.accept(query);
 			this.instantiatedAxioms.clear();
-			this.instantiatedAxioms.addAll(query.getInstantiations());
+			this.instantiatedAxioms.putAll(query.getInstantiations());
 			System.out.println("Current size: "
 					+ this.instantiatedAxioms.size());
 		}
@@ -201,7 +207,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public Set<Variable> getAxiomVariables(OWLAxiom axiom) {
-		AxiomVariableExtractor axiomVariableExtractor = new AxiomVariableExtractor(
+		VariableExtractor axiomVariableExtractor = new VariableExtractor(
 				this);
 		Set<Variable> axiomVariables = axiom.accept(axiomVariableExtractor);
 		return new HashSet<Variable>(axiomVariables);
@@ -463,7 +469,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 					it.remove();
 				}
 			}
-			this.instantiatedAxioms.clear();
+			this.instantiatedAxioms.keySet().retainAll(this.leaves);
 			for (OWLAxiom axiom : this.axioms) {
 				for (BindingNode aNewLeaf : new HashSet<BindingNode>(
 						this.leaves)) {
@@ -471,7 +477,13 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 							aNewLeaf, this);
 					OWLAxiom instatiatedAxiom = (OWLAxiom) axiom
 							.accept(instantiator);
-					this.instantiatedAxioms.add(instatiatedAxiom);
+					Set<OWLAxiom> values = this.instantiatedAxioms
+							.get(aNewLeaf);
+					if (values == null) {
+						values = new HashSet<OWLAxiom>();
+					}
+					values.add(instatiatedAxiom);
+					this.instantiatedAxioms.put(aNewLeaf, values);
 				}
 			}
 		}
@@ -564,8 +576,8 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	/**
 	 * @return the instantiatedAxioms
 	 */
-	public Set<OWLAxiom> getInstantiatedAxioms() {
-		return this.instantiatedAxioms;
+	public Map<BindingNode, Set<OWLAxiom>> getInstantiatedAxioms() {
+		return new HashMap<BindingNode, Set<OWLAxiom>>(this.instantiatedAxioms);
 	}
 
 	public void addAssertedAxiom(OWLAxiom axiom) {

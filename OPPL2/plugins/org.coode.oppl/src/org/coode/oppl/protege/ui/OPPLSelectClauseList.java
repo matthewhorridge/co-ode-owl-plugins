@@ -97,6 +97,16 @@ public class OPPLSelectClauseList extends MList {
 	}
 
 	@Override
+	protected void handleDelete() {
+		if (this.getSelectedValue() instanceof OPPLSelectClauseListItem) {
+			OPPLSelectClauseListItem item = (OPPLSelectClauseListItem) this
+					.getSelectedValue();
+			((DefaultListModel) this.getModel()).removeElement(item);
+			item.handleDelete();
+		}
+	}
+
+	@Override
 	protected void handleAdd() {
 		final OPPLSelectClauseEditor editor = new OPPLSelectClauseEditor(
 				this.owlEditorKit, this.constraintSystem);

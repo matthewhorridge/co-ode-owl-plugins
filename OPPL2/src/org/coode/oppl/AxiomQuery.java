@@ -22,8 +22,10 @@
  */
 package org.coode.oppl;
 
+import java.util.Map;
 import java.util.Set;
 
+import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomVisitor;
 
@@ -34,5 +36,11 @@ import org.semanticweb.owl.model.OWLAxiomVisitor;
  * 
  */
 public interface AxiomQuery extends OWLAxiomVisitor {
-	Set<OWLAxiom> getInstantiations();
+	/**
+	 * Retrieves the instantiated axioms indexed by the binding node causing
+	 * them.
+	 * 
+	 * @return the instantiation Map.
+	 */
+	Map<BindingNode, Set<OWLAxiom>> getInstantiations();
 }
