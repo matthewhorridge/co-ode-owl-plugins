@@ -6,6 +6,7 @@ import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -19,10 +20,14 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.coode.oppl.AbstractConstraint;
+import org.coode.oppl.ConstraintVisitor;
+import org.coode.oppl.InCollectionConstraint;
+import org.coode.oppl.InequalityConstraint;
 import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
 import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
@@ -34,6 +39,7 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
+import org.semanticweb.owl.model.OWLObject;
 
 public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 	/**
@@ -283,8 +289,76 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		public boolean handleDelete() {
 			Variable v = this.getVariable();
 			this.purgeActions(v);
+			this.purgeSelect(v);
+			this.purgeConstraints(v);
 			OPPLBuilder.this.handleChange();
 			return true;
+		}
+
+		private void purgeConstraints(final Variable v) {
+			DefaultListModel model = (DefaultListModel) OPPLBuilder.this.constraintList
+					.getModel();
+			for (int i = 0; i < model.getSize(); i++) {
+				Object e = model.getElementAt(i);
+				if (e instanceof OPPLConstraintListItem) {
+					AbstractConstraint constraint = ((OPPLConstraintListItem) e)
+							.getConstraint();
+					boolean contains = constraint
+							.accept(new ConstraintVisitor<Boolean>() {
+								public Boolean visit(
+										InCollectionConstraint<? extends OWLObject> c) {
+									boolean toReturn = c.getVariable()
+											.equals(v);
+									if (!toReturn) {
+										boolean found = false;
+										Iterator<? extends OWLObject> it = c
+												.getCollection().iterator();
+										while (!found && it.hasNext()) {
+											OWLObject owlObject = it.next();
+											found = owlObject
+													.accept(
+															new VariableExtractor(
+																	OPPLBuilder.this.constraintSystem))
+													.contains(v);
+											if (found) {
+												toReturn = true;
+											}
+										}
+									}
+									return toReturn;
+								}
+
+								public Boolean visit(InequalityConstraint c) {
+									return c.getVariable().equals(v)
+											|| c
+													.getExpression()
+													.accept(
+															new VariableExtractor(
+																	OPPLBuilder.this.constraintSystem))
+													.contains(v);
+								}
+							});
+					if (contains) {
+						model.remove(i);
+					}
+				}
+			}
+		}
+
+		private void purgeSelect(Variable v) {
+			DefaultListModel model = (DefaultListModel) OPPLBuilder.this.selectList
+					.getModel();
+			for (int i = 0; i < model.getSize(); i++) {
+				Object e = model.getElementAt(i);
+				if (e instanceof OPPLSelectClauseListItem) {
+					OWLAxiom axiom = ((OPPLSelectClauseListItem) e).getAxiom();
+					Set<Variable> axiomVariables = OPPLBuilder.this.constraintSystem
+							.getAxiomVariables(axiom);
+					if (axiomVariables.contains(v)) {
+						model.remove(i);
+					}
+				}
+			}
 		}
 
 		/**
@@ -548,11 +622,12 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 	private boolean check() {
 		// The numbers include the section headers
 		return this.variableList.getModel().getSize() > 2
-				&& (this.selectList.getModel().getSize() > 1 || this.actionList
-						.getModel().getSize() > 1);
+				&& this.selectList.getModel().getSize() > 1
+				&& this.actionList.getModel().getSize() > 1;
 	}
 
 	public void handleChange() {
+		this.opplScript = null;
 		boolean isValid = this.check();
 		if (isValid) {
 			this.opplScript = OPPLParser.getOPPLFactory().buildOPPLScript(

@@ -3,8 +3,8 @@
 
 <!DOCTYPE rdf:RDF [
     <!ENTITY owl "http://www.w3.org/2002/07/owl#" >
-    <!ENTITY patterns "http://www.co-ode.org/patterns#" >
     <!ENTITY owl2 "http://www.w3.org/2006/12/owl2#" >
+    <!ENTITY patterns "http://www.co-ode.org/patterns#" >
     <!ENTITY xsd "http://www.w3.org/2001/XMLSchema#" >
     <!ENTITY owl2xml "http://www.w3.org/2006/12/owl2-xml#" >
     <!ENTITY rdfs "http://www.w3.org/2000/01/rdf-schema#" >
@@ -15,19 +15,19 @@
 
 <rdf:RDF xmlns="http://www.coode.org/patterns/examples/food#"
      xml:base="http://www.coode.org/patterns/examples/food"
-     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-     xmlns:patterns="http://www.co-ode.org/patterns#"
      xmlns:owl2xml="http://www.w3.org/2006/12/owl2-xml#"
-     xmlns:food="http://www.coode.org/patterns/examples/food#"
-     xmlns:owl="http://www.w3.org/2002/07/owl#"
      xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:patterns="http://www.co-ode.org/patterns#"
+     xmlns:food="http://www.coode.org/patterns/examples/food#"
+     xmlns:owl2="http://www.w3.org/2006/12/owl2#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-     xmlns:owl2="http://www.w3.org/2006/12/owl2#">
+     xmlns:owl="http://www.w3.org/2002/07/owl#">
     <owl:Ontology rdf:about="">
         <patterns:FreeMenu rdf:datatype="&xsd;string"
-            >?x:CLASS BEGIN ADD $thisClass SubClassOf contains only ($Free(?x) ) END;  A ?x free menu</patterns:FreeMenu>
-        <patterns:Free rdf:datatype="&xsd;string"
-            >?x:CLASS,?forbiddenContent:CLASS=createUnion(?x.VALUES) BEGIN ADD $thisClass equivalentTo contains only (not ?forbiddenContent ) END;  A ?x free stuff ; RETURN $thisClass</patterns:Free>
+            >?x:CLASS BEGIN ADD $thisClass subClassOf contains only ($FoodWithout(?x) ) END;  A ?x free menu</patterns:FreeMenu>
+        <patterns:FoodWithout rdf:datatype="&xsd;string"
+            >?x:CLASS, ?forbiddenContent:CLASS = createUnion(?x.VALUES)  BEGIN ADD $thisClass subClassOf Food, ADD ?_thisClass equivalentTo contains only (not ?forbiddenContent) END; A food without ?x; RETURN $thisClass</patterns:FoodWithout>
     </owl:Ontology>
     
 
@@ -40,13 +40,15 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    <owl:AnnotationProperty rdf:about="&patterns;Hierarchy"/>
     <owl:AnnotationProperty rdf:about="&patterns;createdBy"/>
+    <owl:AnnotationProperty rdf:about="&patterns;VegeterianFoodFoodWithoutPatternInstantiation"/>
+    <owl:AnnotationProperty rdf:about="&patterns;FoodWithout"/>
+    <owl:AnnotationProperty rdf:about="&patterns;Hierarchy"/>
     <owl:AnnotationProperty rdf:about="&patterns;VegetarianCoursenullPatternInstantiation"/>
-    <owl:AnnotationProperty rdf:about="&patterns;FreeMenu"/>
     <owl:AnnotationProperty rdf:about="&patterns;VegetarianCourseFreePatternInstantiation"/>
-    <owl:AnnotationProperty rdf:about="&patterns;VegetarianMenuFreeMenuPatternInstantiation"/>
     <owl:AnnotationProperty rdf:about="&patterns;Free"/>
+    <owl:AnnotationProperty rdf:about="&patterns;FreeMenu"/>
+    <owl:AnnotationProperty rdf:about="&patterns;VegetarianMenuFreeMenuPatternInstantiation"/>
     
 
 
@@ -85,6 +87,14 @@
     <owl:Class rdf:about="#Course">
         <rdfs:label xml:lang="it">Portata</rdfs:label>
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.coode.org/patterns/examples/food#Eggs -->
+
+    <owl:Class rdf:about="#Eggs">
+        <rdfs:subClassOf rdf:resource="#Food"/>
     </owl:Class>
     
 
@@ -138,14 +148,7 @@
     <owl:Class rdf:about="#VegetarianCourse">
         <rdfs:label xml:lang="it"
             >Portata_Vegetariana</rdfs:label>
-        <rdfs:subClassOf rdf:resource="#Course"/>
-        <patterns:VegetarianCourseFreePatternInstantiation rdf:datatype="&xsd;string">$Free(Meat)</patterns:VegetarianCourseFreePatternInstantiation>
-    </owl:Class>
-    <rdf:Description>
-        <rdf:type rdf:resource="&owl;Axiom"/>
-        <rdf:subject rdf:resource="#VegetarianCourse"/>
-        <rdf:predicate rdf:resource="&owl;equivalentClass"/>
-        <rdf:object>
+        <owl:equivalentClass>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="#contains"/>
                 <owl:allValuesFrom>
@@ -154,9 +157,26 @@
                     </owl:Class>
                 </owl:allValuesFrom>
             </owl:Restriction>
-        </rdf:object>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="#Course"/>
+        <patterns:VegetarianCourseFreePatternInstantiation rdf:datatype="&xsd;string">$Free(Meat)</patterns:VegetarianCourseFreePatternInstantiation>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
         <patterns:createdBy rdf:datatype="&xsd;string"
             >http://www.co-ode.org/patterns#VegetarianCourseFreePatternInstantiation</patterns:createdBy>
+        <owl:subject rdf:resource="#VegetarianCourse"/>
+        <owl:predicate rdf:resource="&owl;equivalentClass"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#contains"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:complementOf rdf:resource="#Meat"/>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </owl:object>
     </rdf:Description>
     
 
@@ -167,13 +187,7 @@
         <rdfs:label xml:lang="it"
             >Men&#249;_Vegetariano</rdfs:label>
         <rdfs:subClassOf rdf:resource="#Menu"/>
-        <patterns:VegetarianMenuFreeMenuPatternInstantiation rdf:datatype="&xsd;string">$FreeMenu(Meat)</patterns:VegetarianMenuFreeMenuPatternInstantiation>
-    </owl:Class>
-    <rdf:Description>
-        <rdf:type rdf:resource="&owl;Axiom"/>
-        <rdf:subject rdf:resource="#VegetarianMenu"/>
-        <rdf:predicate rdf:resource="&rdfs;subClassOf"/>
-        <rdf:object>
+        <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="#contains"/>
                 <owl:allValuesFrom>
@@ -187,9 +201,89 @@
                     </owl:Restriction>
                 </owl:allValuesFrom>
             </owl:Restriction>
-        </rdf:object>
+        </rdfs:subClassOf>
+        <patterns:VegetarianMenuFreeMenuPatternInstantiation rdf:datatype="&xsd;string">$FreeMenu(Meat)</patterns:VegetarianMenuFreeMenuPatternInstantiation>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
         <patterns:createdBy rdf:datatype="&xsd;string"
             >http://www.co-ode.org/patterns#VegetarianMenuFreeMenuPatternInstantiation</patterns:createdBy>
+        <owl:subject rdf:resource="#VegetarianMenu"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#contains"/>
+                <owl:allValuesFrom>
+                    <owl:Restriction>
+                        <owl:onProperty rdf:resource="#contains"/>
+                        <owl:allValuesFrom>
+                            <owl:Class>
+                                <owl:complementOf rdf:resource="#Meat"/>
+                            </owl:Class>
+                        </owl:allValuesFrom>
+                    </owl:Restriction>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    
+
+
+    <!-- http://www.coode.org/patterns/examples/food#VegeterianFood -->
+
+    <owl:Class rdf:about="#VegeterianFood">
+        <owl:equivalentClass>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#contains"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:complementOf>
+                            <owl:Class>
+                                <owl:unionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="#Eggs"/>
+                                    <rdf:Description rdf:about="#Meat"/>
+                                </owl:unionOf>
+                            </owl:Class>
+                        </owl:complementOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </owl:equivalentClass>
+        <rdfs:subClassOf rdf:resource="#Food"/>
+        <patterns:VegeterianFoodFoodWithoutPatternInstantiation rdf:datatype="&xsd;string"
+            >$FoodWithout({Meat, Eggs})</patterns:VegeterianFoodFoodWithoutPatternInstantiation>
+    </owl:Class>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <patterns:createdBy rdf:datatype="&xsd;string"
+            >http://www.co-ode.org/patterns#VegeterianFoodFoodWithoutPatternInstantiation</patterns:createdBy>
+        <owl:subject rdf:resource="#VegeterianFood"/>
+        <owl:predicate rdf:resource="&owl;equivalentClass"/>
+        <owl:object>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="#contains"/>
+                <owl:allValuesFrom>
+                    <owl:Class>
+                        <owl:complementOf>
+                            <owl:Class>
+                                <owl:unionOf rdf:parseType="Collection">
+                                    <rdf:Description rdf:about="#Eggs"/>
+                                    <rdf:Description rdf:about="#Meat"/>
+                                </owl:unionOf>
+                            </owl:Class>
+                        </owl:complementOf>
+                    </owl:Class>
+                </owl:allValuesFrom>
+            </owl:Restriction>
+        </owl:object>
+    </rdf:Description>
+    <rdf:Description>
+        <rdf:type rdf:resource="&owl;Axiom"/>
+        <patterns:createdBy rdf:datatype="&xsd;string"
+            >http://www.co-ode.org/patterns#VegeterianFoodFoodWithoutPatternInstantiation</patterns:createdBy>
+        <owl:object rdf:resource="#Food"/>
+        <owl:subject rdf:resource="#VegeterianFood"/>
+        <owl:predicate rdf:resource="&rdfs;subClassOf"/>
     </rdf:Description>
     
 
@@ -201,5 +295,5 @@
 
 
 
-<!-- Generated by the OWL API (version 2.2.1.962) http://owlapi.sourceforge.net -->
+<!-- Generated by the OWL API (version 2.2.1.1101) http://owlapi.sourceforge.net -->
 

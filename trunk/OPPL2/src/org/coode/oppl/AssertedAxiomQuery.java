@@ -22,8 +22,10 @@
  */
 package org.coode.oppl;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -39,7 +41,6 @@ import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomAnnotationAxiom;
 import org.semanticweb.owl.model.OWLClassAssertionAxiom;
-import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owl.model.OWLDataPropertyDomainAxiom;
 import org.semanticweb.owl.model.OWLDataPropertyRangeAxiom;
@@ -84,17 +85,14 @@ import org.semanticweb.owl.model.SWRLRule;
 public class AssertedAxiomQuery implements AxiomQuery {
 	protected Set<OWLOntology> ontologies;
 	private ConstraintSystem constraintSystem;
-	private OWLDataFactory dataFactory;
-	private Set<OWLAxiom> instantiatedAxioms = new HashSet<OWLAxiom>();
+	private Map<BindingNode, Set<OWLAxiom>> instantiatedAxioms = new HashMap<BindingNode, Set<OWLAxiom>>();
 
 	/**
 	 * @param ontologies
 	 */
-	public AssertedAxiomQuery(Set<OWLOntology> ontologies, ConstraintSystem cs,
-			OWLDataFactory dataFactory) {
+	public AssertedAxiomQuery(Set<OWLOntology> ontologies, ConstraintSystem cs) {
 		this.ontologies = ontologies;
 		this.constraintSystem = cs;
-		this.dataFactory = dataFactory;
 	}
 
 	public void visit(OWLSubClassAxiom axiom) {
@@ -146,6 +144,13 @@ public class AssertedAxiomQuery implements AxiomQuery {
 								if (!newLeaves.isEmpty()) {
 									leaves.remove(leaf);
 									leaves.addAll(newLeaves);
+									Set<OWLAxiom> bindingInstantiatedAxioms = this.instantiatedAxioms
+											.get(leaf);
+									this.instantiatedAxioms.remove(leaf);
+									for (BindingNode newLeaf : newLeaves) {
+										this.instantiatedAxioms.put(newLeaf,
+												bindingInstantiatedAxioms);
+									}
 								}
 							}
 						}
@@ -159,7 +164,15 @@ public class AssertedAxiomQuery implements AxiomQuery {
 									.accept(objectInstatiator);
 							if (this.locateAxiom(instantiatedAxiom)) {
 								holdingAssignments.add(leaf);
-								this.instantiatedAxioms.add(instantiatedAxiom);
+								Set<OWLAxiom> axioms = this.instantiatedAxioms
+										.get(leaf);
+								if (axioms == null) {
+									axioms = new HashSet<OWLAxiom>();
+								}
+								axioms.add(instantiatedAxiom);
+								this.instantiatedAxioms.put(leaf, axioms);
+							} else {
+								this.instantiatedAxioms.remove(leaf);
 							}
 						}
 					}
@@ -348,10 +361,10 @@ public class AssertedAxiomQuery implements AxiomQuery {
 		this.match(rule);
 	}
 
-	public Set<OWLAxiom> getInstantiations() {
-		Set<OWLAxiom> toReturn = new HashSet<OWLAxiom>();
+	public Map<BindingNode, Set<OWLAxiom>> getInstantiations() {
+		Map<BindingNode, Set<OWLAxiom>> toReturn = new HashMap<BindingNode, Set<OWLAxiom>>();
 		if (this.constraintSystem.getLeaves() != null) {
-			toReturn.addAll(this.instantiatedAxioms);
+			toReturn.putAll(this.instantiatedAxioms);
 		}
 		return toReturn;
 	}

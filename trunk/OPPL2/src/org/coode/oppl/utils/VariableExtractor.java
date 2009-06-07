@@ -20,12 +20,14 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oppl.variablemansyntax;
+package org.coode.oppl.utils;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLAxiomAnnotationAxiom;
 import org.semanticweb.owl.model.OWLClass;
@@ -117,14 +119,14 @@ import org.semanticweb.owl.model.SWRLSameAsAtom;
  * @author Luigi Iannone
  * 
  */
-public class AxiomVariableExtractor implements
+public class VariableExtractor implements
 		OWLObjectVisitorEx<Set<Variable>> {
 	protected ConstraintSystem constraintSystem;
 
 	/**
 	 * @param constraintSystem
 	 */
-	public AxiomVariableExtractor(ConstraintSystem constraintSystem) {
+	public VariableExtractor(ConstraintSystem constraintSystem) {
 		this.constraintSystem = constraintSystem;
 	}
 
