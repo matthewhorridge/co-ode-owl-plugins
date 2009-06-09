@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLScriptVisitorEx;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
@@ -461,23 +462,30 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 	private final class OWLAxiomTranslator implements
 			OWLObjectVisitorEx<String> {
 		private final String axiomName;
+		private final ConstraintSystem constraintSystem;
+
+		/**
+		 * @return the constraintSystem
+		 */
+		private ConstraintSystem getConstraintSystem() {
+			return this.constraintSystem;
+		}
+
 		private final OWLAxiomVocabulary vocabulary = new OWLAxiomVocabulary();
 		private String path = "";
 		private final Map<Variable, Set<String>> variablePaths = new HashMap<Variable, Set<String>>();
+		private int index = 1;
 
 		/**
 		 * @param axiomName
 		 */
-		OWLAxiomTranslator(String axiomName) {
+		OWLAxiomTranslator(String axiomName, ConstraintSystem constraintSystem) {
 			this.axiomName = axiomName;
+			this.constraintSystem = constraintSystem;
 		}
 
 		public String getAxiomReference() {
 			return "$" + this.axiomName;
-		}
-
-		private void resetPath(int i) {
-			this.path = "";
 		}
 
 		private String buildAxiomQuery(OWLAxiom axiom) {
@@ -495,10 +503,8 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLSubClassAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLDescription subClass = axiom.getSubClass();
 			subClass.accept(this);
-			this.resetPath(2);
 			OWLDescription superClass = axiom.getSuperClass();
 			superClass.accept(this);
 			return toReturn;
@@ -509,13 +515,10 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression property = axiom.getProperty();
 			property.accept(this);
-			this.resetPath(1);
 			OWLIndividual subject = axiom.getSubject();
 			subject.accept(this);
-			this.resetPath(2);
 			OWLIndividual object = axiom.getObject();
 			object.accept(this);
 			return toReturn;
@@ -526,7 +529,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLAntiSymmetricObjectPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression property = axiom.getProperty();
 			property.accept(this);
 			return toReturn;
@@ -537,7 +539,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLReflexiveObjectPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression property = axiom.getProperty();
 			property.accept(this);
 			return toReturn;
@@ -552,7 +553,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 			int i = 0;
 			for (OWLDescription description : descriptions) {
 				i++;
-				this.resetPath(i);
 				description.accept(this);
 			}
 			return toReturn;
@@ -563,10 +563,8 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLDataPropertyDomainAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLDataPropertyExpression property = axiom.getProperty();
 			property.accept(this);
-			this.resetPath(1);
 			OWLDescription domain = axiom.getDomain();
 			domain.accept(this);
 			return toReturn;
@@ -591,10 +589,8 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLObjectPropertyDomainAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression property = axiom.getProperty();
 			property.accept(this);
-			this.resetPath(1);
 			OWLDescription domain = axiom.getDomain();
 			domain.accept(this);
 			return toReturn;
@@ -609,7 +605,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 			int i = 0;
 			for (OWLObjectPropertyExpression objectPropertyExpression : properties) {
 				i++;
-				this.resetPath(i);
 				objectPropertyExpression.accept(this);
 			}
 			return toReturn;
@@ -620,13 +615,10 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLDataPropertyExpression property = axiom.getProperty();
 			property.accept(this);
-			this.resetPath(1);
 			OWLIndividual subject = axiom.getSubject();
 			subject.accept(this);
-			this.resetPath(1);
 			OWLConstant object = axiom.getObject();
 			object.accept(this);
 			return toReturn;
@@ -641,7 +633,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 			int i = 0;
 			for (OWLIndividual individual : individuals) {
 				i++;
-				this.resetPath(i);
 				individual.accept(this);
 			}
 			return toReturn;
@@ -656,7 +647,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 			int i = 0;
 			for (OWLDataPropertyExpression dataPropertyExpression : properties) {
 				i++;
-				this.resetPath(i);
 				dataPropertyExpression.accept(this);
 			}
 			return toReturn;
@@ -671,7 +661,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 			int i = 0;
 			for (OWLObjectPropertyExpression objectPropertyExpression : properties) {
 				i++;
-				this.resetPath(i);
 				objectPropertyExpression.accept(this);
 			}
 			return toReturn;
@@ -682,10 +671,8 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLObjectPropertyRangeAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression property = axiom.getProperty();
 			property.accept(this);
-			this.resetPath(1);
 			OWLDescription range = axiom.getRange();
 			range.accept(this);
 			return toReturn;
@@ -696,13 +683,10 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLObjectPropertyAssertionAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression property = axiom.getProperty();
 			property.accept(this);
-			this.resetPath(1);
 			OWLIndividual subject = axiom.getSubject();
 			subject.accept(this);
-			this.resetPath(2);
 			OWLIndividual object = axiom.getObject();
 			object.accept(this);
 			return toReturn;
@@ -713,7 +697,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLFunctionalObjectPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression property = axiom.getProperty();
 			property.accept(this);
 			return toReturn;
@@ -724,10 +707,8 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLObjectSubPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression subProperty = axiom.getSubProperty();
 			subProperty.accept(this);
-			this.resetPath(2);
 			OWLObjectPropertyExpression superProperty = axiom
 					.getSuperProperty();
 			superProperty.accept(this);
@@ -743,7 +724,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 			int i = 0;
 			for (OWLDescription description : descriptions) {
 				i++;
-				this.resetPath(i);
 				description.accept(this);
 			}
 			return toReturn;
@@ -775,7 +755,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLSymmetricObjectPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression property = axiom.getProperty();
 			property.accept(this);
 			return toReturn;
@@ -786,10 +765,8 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLDataPropertyRangeAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLDataPropertyExpression property = axiom.getProperty();
 			property.accept(this);
-			this.resetPath(1);
 			OWLDataRange range = axiom.getRange();
 			range.accept(this);
 			return toReturn;
@@ -800,7 +777,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLFunctionalDataPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLDataPropertyExpression property = axiom.getProperty();
 			property.accept(this);
 			return toReturn;
@@ -815,7 +791,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 			int i = 0;
 			for (OWLDataPropertyExpression dataPropertyExpression : properties) {
 				i++;
-				this.resetPath(i);
 				dataPropertyExpression.accept(this);
 			}
 			return toReturn;
@@ -826,10 +801,8 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLClassAssertionAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLDescription description = axiom.getDescription();
 			description.accept(this);
-			this.resetPath(1);
 			OWLIndividual individual = axiom.getIndividual();
 			individual.accept(this);
 			return toReturn;
@@ -844,7 +817,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 			int i = 0;
 			for (OWLDescription description : descriptions) {
 				i++;
-				this.resetPath(i);
 				description.accept(this);
 			}
 			return toReturn;
@@ -855,13 +827,10 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLDataPropertyAssertionAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLDataPropertyExpression property = axiom.getProperty();
 			property.accept(this);
-			this.resetPath(1);
 			OWLIndividual subject = axiom.getSubject();
 			subject.accept(this);
-			this.resetPath(1);
 			OWLConstant object = axiom.getObject();
 			object.accept(this);
 			return toReturn;
@@ -872,7 +841,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLTransitiveObjectPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression property = axiom.getProperty();
 			property.accept(this);
 			return toReturn;
@@ -883,7 +851,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			axiom.getProperty().accept(this);
 			return toReturn;
 		}
@@ -893,10 +860,8 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLDataSubPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLDataPropertyExpression subProperty = axiom.getSubProperty();
 			subProperty.accept(this);
-			this.resetPath(2);
 			OWLDataPropertyExpression superProperty = axiom.getSuperProperty();
 			superProperty.accept(this);
 			return toReturn;
@@ -907,7 +872,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression property = axiom.getProperty();
 			property.accept(this);
 			return toReturn;
@@ -922,7 +886,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 			int i = 0;
 			for (OWLIndividual individual : individuals) {
 				i++;
-				this.resetPath(i);
 				individual.accept(this);
 			}
 			return toReturn;
@@ -933,7 +896,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLObjectPropertyChainSubPropertyAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression superProperty = axiom
 					.getSuperProperty();
 			superProperty.accept(this);
@@ -942,7 +904,6 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 			int i = 0;
 			for (OWLObjectPropertyExpression objectPropertyExpression : propertyChain) {
 				i++;
-				this.resetPath(i);
 				objectPropertyExpression.accept(this);
 			}
 			return toReturn;
@@ -953,11 +914,9 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		 */
 		public String visit(OWLInverseObjectPropertiesAxiom axiom) {
 			String toReturn = this.buildAxiomQuery(axiom);
-			this.resetPath(1);
 			OWLObjectPropertyExpression firstProperty = axiom
 					.getFirstProperty();
 			firstProperty.accept(this);
-			this.resetPath(2);
 			OWLObjectPropertyExpression secondProperty = axiom
 					.getSecondProperty();
 			secondProperty.accept(this);
@@ -972,12 +931,22 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		}
 
 		public String visit(OWLClass desc) {
-			// TODO Auto-generated method stub
-			return null;
+			this.path.concat("/" + desc.accept(this.vocabulary) + "["
+					+ this.index + "]");
+			if (this.getConstraintSystem().isVariable(desc)) {
+				Variable variable = this.getConstraintSystem().getVariable(
+						desc.getURI());
+				Set<String> paths = this.variablePaths.get(variable);
+				if (paths == null) {
+					paths = new HashSet<String>();
+				}
+				paths.add(this.path);
+				this.variablePaths.put(variable, paths);
+			}
+			return this.path;
 		}
 
 		public String visit(OWLObjectIntersectionOf desc) {
-			// TODO Auto-generated method stub
 			return null;
 		}
 
@@ -1206,7 +1175,7 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		for (int i = 0; i < assertedAxioms.size(); i++) {
 			OWLAxiom axiom = assertedAxioms.get(i);
 			OWLAxiomTranslator axiomTranslator = new OWLAxiomTranslator(
-					"assertedAxiom" + i);
+					"assertedAxiom" + i, q.getConstraintSystem());
 			writer.append("for " + axiomTranslator.getAxiomReference());
 			writer.append(this.getXQueryContext());
 			writer.append(axiom.accept(axiomTranslator));
@@ -1215,7 +1184,7 @@ public class XQueryRenderer implements OPPLScriptVisitorEx<String> {
 		for (int i = 0; i < axioms.size(); i++) {
 			OWLAxiom axiom = assertedAxioms.get(i);
 			OWLAxiomTranslator axiomTranslator = new OWLAxiomTranslator("axiom"
-					+ i);
+					+ i, q.getConstraintSystem());
 			writer.append("for " + axiomTranslator.getAxiomReference());
 			writer.append(this.getXQueryContext());
 			writer.append(axiom.accept(axiomTranslator));
