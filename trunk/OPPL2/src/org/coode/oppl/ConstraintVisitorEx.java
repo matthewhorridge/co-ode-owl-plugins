@@ -28,7 +28,7 @@ import org.semanticweb.owl.model.OWLObject;
  * @author Luigi Iannone
  * 
  */
-public interface ConstraintVisitor<O extends Object> {
+public interface ConstraintVisitorEx<O extends Object> {
 	/**
 	 * Visitor pattern required method
 	 * 

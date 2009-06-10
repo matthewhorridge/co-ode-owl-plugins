@@ -28,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.coode.oppl.ConstraintVisitorEx;
+import org.coode.oppl.InCollectionConstraint;
+import org.coode.oppl.InequalityConstraint;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
@@ -64,6 +67,7 @@ import org.semanticweb.owl.model.OWLDisjointClassesAxiom;
 import org.semanticweb.owl.model.OWLDisjointDataPropertiesAxiom;
 import org.semanticweb.owl.model.OWLDisjointObjectPropertiesAxiom;
 import org.semanticweb.owl.model.OWLDisjointUnionAxiom;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLEntityAnnotationAxiom;
 import org.semanticweb.owl.model.OWLEntityVisitor;
 import org.semanticweb.owl.model.OWLEquivalentClassesAxiom;
@@ -78,6 +82,7 @@ import org.semanticweb.owl.model.OWLInverseObjectPropertiesAxiom;
 import org.semanticweb.owl.model.OWLIrreflexiveObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.owl.model.OWLNegativeObjectPropertyAssertionAxiom;
+import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLObjectAllRestriction;
 import org.semanticweb.owl.model.OWLObjectAnnotation;
 import org.semanticweb.owl.model.OWLObjectComplementOf;
@@ -194,7 +199,8 @@ final class PathNode {
 	public String getPathToRoot() {
 		String parentPathString = this.parent == null ? "" : this.parent
 				.getPathToRoot();
-		return parentPathString + "/" + this.name;
+		String separator = this.parent == null ? "" : "/";
+		return parentPathString + separator + this.name;
 	}
 }
 
@@ -202,12 +208,12 @@ final class PathNode {
  * @author Luigi Iannone
  * 
  */
-public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
-	/**
-	 * @param constraintSystem
-	 */
-	public VariableXPathBuilder(ConstraintSystem constraintSystem) {
+public class VariableXPathBuilder implements OWLAxiomVisitorEx<String>,
+		ConstraintVisitorEx<String> {
+	public VariableXPathBuilder(String axiomName,
+			ConstraintSystem constraintSystem) {
 		this.constraintSystem = constraintSystem;
+		this.axiomName = axiomName;
 	}
 
 	private final class PathExtractor implements OWLDescriptionVisitor,
@@ -217,6 +223,8 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 					.addChild(desc.accept(VariableXPathBuilder.this.vocabulary));
 			PathNode uriChild = entityNode.addChild("@URI");
 			VariableXPathBuilder.this.currentNode = uriChild;
+			String pathToRoot = VariableXPathBuilder.this.currentNode
+					.getPathToRoot();
 			if (VariableXPathBuilder.this.constraintSystem.isVariable(desc)) {
 				Variable variable = VariableXPathBuilder.this.constraintSystem
 						.getVariable(desc.getURI());
@@ -225,15 +233,11 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 				if (paths == null) {
 					paths = new ArrayList<String>();
 				}
-				paths
-						.add(VariableXPathBuilder.this.currentNode
-								.getPathToRoot());
+				paths.add(pathToRoot);
 				VariableXPathBuilder.this.variablePaths.put(variable, paths);
 			} else {
-				VariableXPathBuilder.this.whereConditions
-						.add(VariableXPathBuilder.this.currentNode
-								.getPathToRoot()
-								+ " = " + desc.getURI());
+				VariableXPathBuilder.this.whereConditions.add(pathToRoot
+						+ " = " + desc.getURI());
 			}
 		}
 
@@ -561,7 +565,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 				VariableXPathBuilder.this.whereConditions
 						.add(VariableXPathBuilder.this.currentNode
 								.getPathToRoot()
-								+ " = " + node.getLiteral());
+								+ " = \"" + node.getLiteral() + "\"");
 			}
 		}
 
@@ -579,7 +583,8 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 	private final PathExtractor pathExtractor = new PathExtractor();
 	private Map<Variable, List<String>> variablePaths = new HashMap<Variable, List<String>>();
 	private final List<String> whereConditions = new ArrayList<String>();
-	private String axiomName;
+	private String axiomPath;
+	private final String axiomName;
 
 	private final class OWLAxiomVocabulary implements
 			OWLObjectVisitorEx<String> {
@@ -910,7 +915,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 	}
 
 	private void initialisePaths(OWLAxiom axiom) {
-		this.axiomName = this.buildAxiomQuery(axiom);
+		this.axiomPath = this.buildAxiomQuery(axiom);
 		this.variablePaths.clear();
 		this.whereConditions.clear();
 		this.currentNode = new PathNode(this.axiomName, null);
@@ -922,7 +927,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getSubClass().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getSuperClass().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
@@ -933,19 +938,19 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getSubject().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getObject().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLAntiSymmetricObjectPropertyAxiom axiom) {
 		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLReflexiveObjectPropertyAxiom axiom) {
 		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLDisjointClassesAxiom axiom) {
@@ -956,7 +961,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 			this.currentNode = axiomNode;
 			description.accept(this.pathExtractor);
 		}
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLDataPropertyDomainAxiom axiom) {
@@ -965,7 +970,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getDomain().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLImportsDeclaration axiom) {
@@ -982,7 +987,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getDomain().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLEquivalentObjectPropertiesAxiom axiom) {
@@ -993,7 +998,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 			this.currentNode = axiomNode;
 			objectPropertyExpression.accept(this.pathExtractor);
 		}
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
@@ -1004,7 +1009,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getSubject().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getObject().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLDifferentIndividualsAxiom axiom) {
@@ -1015,7 +1020,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 			this.currentNode = axiomNode;
 			individual.accept(this.pathExtractor);
 		}
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLDisjointDataPropertiesAxiom axiom) {
@@ -1026,7 +1031,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 			this.currentNode = axiomNode;
 			dataPropertyExpression.accept(this.pathExtractor);
 		}
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLDisjointObjectPropertiesAxiom axiom) {
@@ -1037,7 +1042,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 			this.currentNode = axiomNode;
 			objectPropertyExpression.accept(this.pathExtractor);
 		}
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLObjectPropertyRangeAxiom axiom) {
@@ -1046,7 +1051,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getRange().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLObjectPropertyAssertionAxiom axiom) {
@@ -1057,13 +1062,13 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getSubject().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getObject().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLFunctionalObjectPropertyAxiom axiom) {
 		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLObjectSubPropertyAxiom axiom) {
@@ -1072,7 +1077,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getSubProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getSuperProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLDisjointUnionAxiom axiom) {
@@ -1083,13 +1088,13 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 			this.currentNode = axiomNode;
 			description.accept(this.pathExtractor);
 		}
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLDeclarationAxiom axiom) {
 		this.initialisePaths(axiom);
 		axiom.getEntity().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLEntityAnnotationAxiom axiom) {
@@ -1103,7 +1108,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 	public String visit(OWLSymmetricObjectPropertyAxiom axiom) {
 		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLDataPropertyRangeAxiom axiom) {
@@ -1112,13 +1117,13 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getRange().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLFunctionalDataPropertyAxiom axiom) {
 		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLEquivalentDataPropertiesAxiom axiom) {
@@ -1129,7 +1134,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 			this.currentNode = axiomNode;
 			dataPropertyExpression.accept(this.pathExtractor);
 		}
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLClassAssertionAxiom axiom) {
@@ -1138,7 +1143,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getDescription().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getIndividual().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLEquivalentClassesAxiom axiom) {
@@ -1149,7 +1154,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 			this.currentNode = axiomNode;
 			description.accept(this.pathExtractor);
 		}
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLDataPropertyAssertionAxiom axiom) {
@@ -1160,19 +1165,19 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getSubject().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getSubject().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLTransitiveObjectPropertyAxiom axiom) {
 		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
 		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLDataSubPropertyAxiom axiom) {
@@ -1181,13 +1186,13 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getSubProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getSuperProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
 		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLSameIndividualsAxiom axiom) {
@@ -1198,7 +1203,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 			this.currentNode = axiomNode;
 			individual.accept(this.pathExtractor);
 		}
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLObjectPropertyChainSubPropertyAxiom axiom) {
@@ -1211,7 +1216,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 			this.currentNode = axiomNode;
 			objectPropertyExpression.accept(this.pathExtractor);
 		}
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(OWLInverseObjectPropertiesAxiom axiom) {
@@ -1220,7 +1225,7 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		axiom.getFirstProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
 		axiom.getSecondProperty().accept(this.pathExtractor);
-		return this.axiomName;
+		return this.axiomPath;
 	}
 
 	public String visit(SWRLRule rule) {
@@ -1241,5 +1246,83 @@ public class VariableXPathBuilder implements OWLAxiomVisitorEx<String> {
 		Map<Variable, List<String>> toReturn = new HashMap<Variable, List<String>>(
 				this.variablePaths);
 		return toReturn;
+	}
+
+	public String visit(InequalityConstraint c) {
+		String toReturn = "";
+		final String variableReference = c.getVariable().getName().replace('?',
+				'$');
+		OWLObject expression = c.getExpression();
+		if (expression instanceof OWLEntity) {
+			((OWLEntity) expression).accept(new OWLEntityVisitor() {
+				public void visit(OWLClass cls) {
+					if (VariableXPathBuilder.this.constraintSystem
+							.isVariable(cls)) {
+						Variable v = VariableXPathBuilder.this.constraintSystem
+								.getVariable(cls.getURI());
+						VariableXPathBuilder.this.whereConditions
+								.add(variableReference + " != "
+										+ v.getName().replace('?', '$'));
+					} else {
+						VariableXPathBuilder.this.whereConditions
+								.add(variableReference + " != " + cls.getURI());
+					}
+				}
+
+				public void visit(OWLObjectProperty property) {
+					if (VariableXPathBuilder.this.constraintSystem
+							.isVariable(property)) {
+						Variable v = VariableXPathBuilder.this.constraintSystem
+								.getVariable(property.getURI());
+						VariableXPathBuilder.this.whereConditions
+								.add(variableReference + " != "
+										+ v.getName().replace('?', '$'));
+					} else {
+						VariableXPathBuilder.this.whereConditions
+								.add(variableReference + " != "
+										+ property.getURI());
+					}
+				}
+
+				public void visit(OWLDataProperty property) {
+					if (VariableXPathBuilder.this.constraintSystem
+							.isVariable(property)) {
+						Variable v = VariableXPathBuilder.this.constraintSystem
+								.getVariable(property.getURI());
+						VariableXPathBuilder.this.whereConditions
+								.add(variableReference + " != "
+										+ v.getName().replace('?', '$'));
+					} else {
+						VariableXPathBuilder.this.whereConditions
+								.add(variableReference + " != "
+										+ property.getURI());
+					}
+				}
+
+				public void visit(OWLIndividual individual) {
+					if (VariableXPathBuilder.this.constraintSystem
+							.isVariable(individual)) {
+						Variable v = VariableXPathBuilder.this.constraintSystem
+								.getVariable(individual.getURI());
+						VariableXPathBuilder.this.whereConditions
+								.add(variableReference + " != "
+										+ v.getName().replace('?', '$'));
+					} else {
+						VariableXPathBuilder.this.whereConditions
+								.add(variableReference + " != "
+										+ individual.getURI());
+					}
+				}
+
+				public void visit(OWLDataType dataType) {
+				}
+			});
+		}
+		return toReturn;
+	}
+
+	public String visit(InCollectionConstraint<? extends OWLObject> c) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

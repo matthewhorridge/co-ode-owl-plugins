@@ -20,7 +20,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import org.coode.oppl.AbstractConstraint;
-import org.coode.oppl.ConstraintVisitor;
+import org.coode.oppl.ConstraintVisitorEx;
 import org.coode.oppl.InCollectionConstraint;
 import org.coode.oppl.InequalityConstraint;
 import org.coode.oppl.OPPLQuery;
@@ -304,7 +304,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 					AbstractConstraint constraint = ((OPPLConstraintListItem) e)
 							.getConstraint();
 					boolean contains = constraint
-							.accept(new ConstraintVisitor<Boolean>() {
+							.accept(new ConstraintVisitorEx<Boolean>() {
 								public Boolean visit(
 										InCollectionConstraint<? extends OWLObject> c) {
 									boolean toReturn = c.getVariable()
