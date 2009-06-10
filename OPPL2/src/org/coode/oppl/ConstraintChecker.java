@@ -38,7 +38,7 @@ import org.semanticweb.owl.model.OWLObject;
  * @author Luigi Iannone
  * 
  */
-public class ConstraintChecker implements ConstraintVisitor<Boolean> {
+public class ConstraintChecker implements ConstraintVisitorEx<Boolean> {
 	private BindingNode bindingNode;
 	private ConstraintSystem constraintSystem;
 	private OWLDataFactory dataFactory;
@@ -54,7 +54,7 @@ public class ConstraintChecker implements ConstraintVisitor<Boolean> {
 	}
 
 	/**
-	 * @see org.coode.oppl.ConstraintVisitor#visit(org.coode.oppl.InequalityConstraint)
+	 * @see org.coode.oppl.ConstraintVisitorEx#visit(org.coode.oppl.InequalityConstraint)
 	 */
 	public Boolean visit(InequalityConstraint c) {
 		OWLObject expression = c.getExpression();
@@ -67,7 +67,7 @@ public class ConstraintChecker implements ConstraintVisitor<Boolean> {
 	}
 
 	/**
-	 * @see org.coode.oppl.ConstraintVisitor#visit(org.coode.oppl.InCollectionConstraint)
+	 * @see org.coode.oppl.ConstraintVisitorEx#visit(org.coode.oppl.InCollectionConstraint)
 	 */
 	public Boolean visit(InCollectionConstraint<? extends OWLObject> c) {
 		Collection<? extends OWLObject> collection = c.getCollection();

@@ -30,7 +30,7 @@ public class XQueryVariableXPathRenderingTestCase extends TestCase {
 			.createOWLOntologyManager();
 	private final static URI MIKELS_FAMILY_ONTOLOGY = URI
 			.create("http://www.cs.man.ac.uk/~iannonel/oppl/ontologies/mikelsFamily.owl");
-	private final String opplScript = "?x:CLASS, ?y:CLASS SELECT ?x subClassOf ?x and gender, ?y subClassOf gender WHERE ?x!=?y BEGIN ADD ?x disjointWith ?y END;";
+	private final String opplScript = "?x:CLASS, ?y:CLASS SELECT ?x subClassOf gender, ?y subClassOf gender WHERE ?x!=?y BEGIN ADD ?x disjointWith ?y END;";
 	private static OPPLScript statement;
 	private final static String NAMESPACE_DECLARATION = "declare namespace owl2xml = \"http://www.w3.org/2006/12/owl2-xml#\";";
 
@@ -46,14 +46,14 @@ public class XQueryVariableXPathRenderingTestCase extends TestCase {
 		StringWriter writer = new StringWriter();
 		writer.append(NAMESPACE_DECLARATION);
 		writer.append("\n");
-		VariableXPathBuilder builder = new VariableXPathBuilder(statement
-				.getConstraintSystem());
 		List<OWLAxiom> axioms = statement.getQuery().getAxioms();
 		String axiomName;
 		int i = 0;
 		List<String> whereConditions = new ArrayList<String>();
 		for (OWLAxiom axiom : axioms) {
 			axiomName = "$axiom_" + ++i;
+			VariableXPathBuilder builder = new VariableXPathBuilder(axiomName,
+					statement.getConstraintSystem());
 			writer.append("for ");
 			writer.append(axiomName);
 			writer.append(" in ");

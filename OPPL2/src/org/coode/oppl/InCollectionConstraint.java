@@ -61,9 +61,9 @@ public class InCollectionConstraint<P extends OWLObject> implements
 	 * 
 	 * @return the specific output of the visit (dependent on the implementation
 	 *         of the visitor input instance)
-	 * @see org.coode.oppl.AbstractConstraint#accept(org.coode.oppl.ConstraintVisitor)
+	 * @see org.coode.oppl.AbstractConstraint#accept(org.coode.oppl.ConstraintVisitorEx)
 	 */
-	public <O> O accept(ConstraintVisitor<O> visitor) {
+	public <O> O accept(ConstraintVisitorEx<O> visitor) {
 		return visitor.visit(this);
 	}
 

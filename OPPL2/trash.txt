@@ -220,3 +220,13 @@ and
 and 
     $x!=$y    
 return $axiom
+
+declare namespace owl2xml = "http://www.w3.org/2006/12/owl2-xml#";
+for $axiom_1 in doc("mikelsFamily.owl")/owl2xml:Ontology/owl2xml:SubClassOf
+let $x = $axiom_1/owl2xml:Class[1]/@URI
+for $axiom_2 in doc("mikelsFamily.owl")/owl2xml:Ontology/owl2xml:SubClassOf
+let $y = $axiom_2/owl2xml:Class[1]/@URI
+
+WHERE
+$axiom_1/owl2xml:Class[2]/@URI = http://www.semanticweb.org/family.owl#gender and 
+$axiom_2/owl2xml:Class[2]/@URI = http://www.semanticweb.org/family.owl#gender

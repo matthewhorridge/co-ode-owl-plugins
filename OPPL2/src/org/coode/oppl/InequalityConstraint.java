@@ -67,9 +67,9 @@ public class InequalityConstraint implements AbstractConstraint {
 	}
 
 	/**
-	 * @see org.coode.oppl.AbstractConstraint#accept(org.coode.oppl.ConstraintVisitor)
+	 * @see org.coode.oppl.AbstractConstraint#accept(org.coode.oppl.ConstraintVisitorEx)
 	 */
-	public <O> O accept(ConstraintVisitor<O> visitor) {
+	public <O> O accept(ConstraintVisitorEx<O> visitor) {
 		return visitor.visit(this);
 	}
 
