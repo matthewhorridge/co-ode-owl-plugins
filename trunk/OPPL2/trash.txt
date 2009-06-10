@@ -208,3 +208,15 @@ WHERE ?x != ?y
 BEGIN
  	ADD ?x disjointWith ?y
 END;
+
+declare namespace owl2xml = "http://www.w3.org/2006/12/owl2-xml#";
+for $axiom in doc("mikelsFamily.owl")/owl2xml:Ontology/owl2xml:SubClassOf
+for $anotherAxiom in doc("mikelsFamily.owl")/owl2xml:Ontology/owl2xml:SubClassOf
+let $x := $axiom/owl2xml:Class[1]/@URI
+let $y := $anotherAxiom/owl2xml:Class[1]/@URI
+where $axiom/owl2xml:Class[2]/@URI="http://www.semanticweb.org/family.owl#gender"
+and 
+    $anotherAxiom/owl2xml:Class[2]/@URI="http://www.semanticweb.org/family.owl#gender"
+and 
+    $x!=$y    
+return $axiom
