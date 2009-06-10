@@ -153,4 +153,8 @@ public class InequalityConstraint implements AbstractConstraint {
 		}
 		return true;
 	}
+
+	public void accept(ConstraintVisitor visitor) {
+		visitor.visitInequalityConstraint(this);
+	}
 }
