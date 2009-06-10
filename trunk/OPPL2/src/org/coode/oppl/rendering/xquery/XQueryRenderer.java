@@ -30,7 +30,11 @@ import java.util.Map;
 import org.coode.oppl.AbstractConstraint;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.owlapi.owlxml.renderer.OWLXMLWriter;
+import org.coode.xml.XMLWriterNamespaceManager;
+import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owl.model.OWLAxiomChange;
 
 /**
  * @author Luigi Iannone
@@ -49,6 +53,34 @@ public class XQueryRenderer {
 
 	public String render(OPPLScript script) {
 		StringWriter writer = new StringWriter();
+		this.renderQuery(script, writer);
+		List<OWLAxiomChange> actions = script.getActions();
+		if (!actions.isEmpty()) {
+			writer.append("\nreturn");
+			for (OWLAxiomChange axiomChange : actions) {
+				boolean isAdd = axiomChange instanceof AddAxiom;
+				String startTag = isAdd ? "<Add>" : "<Remove>";
+				String endTag = isAdd ? "</Add>" : "</Remove>";
+				writer.append("\n");
+				writer.append(startTag);
+				writer.append("\n");
+				XQueryAxiomRenderer renderer = new XQueryAxiomRenderer(
+						new OWLXMLWriter(writer, new XMLWriterNamespaceManager(
+								"http://www.w3.org/2006/12/owl2-xml#")), script
+								.getConstraintSystem());
+				OWLAxiom axiom = axiomChange.getAxiom();
+				axiom.accept(renderer);
+				writer.append(endTag);
+			}
+		}
+		return writer.toString();
+	}
+
+	/**
+	 * @param script
+	 * @param writer
+	 */
+	private void renderQuery(OPPLScript script, StringWriter writer) {
 		writer.append(NAMESPACE_DECLARATION);
 		writer.append("\n");
 		List<OWLAxiom> axioms = script.getQuery().getAxioms();
@@ -105,7 +137,6 @@ public class XQueryRenderer {
 			writer.append(andString);
 			writer.append(string);
 		}
-		return writer.toString();
 	}
 
 	private String getContext() {
