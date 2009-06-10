@@ -8,7 +8,7 @@ import java.net.URI;
 import junit.framework.TestCase;
 
 import org.coode.oppl.OPPLScript;
-import org.coode.oppl.rendering.XQueryRenderer;
+import org.coode.oppl.rendering.xquery.XQueryRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.ParserFactory;
 import org.semanticweb.owl.apibinding.OWLManager;

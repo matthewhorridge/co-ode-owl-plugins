@@ -20,7 +20,7 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oppl.rendering;
+package org.coode.oppl.rendering.xquery;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -29,7 +29,6 @@ import java.util.Map;
 
 import org.coode.oppl.AbstractConstraint;
 import org.coode.oppl.OPPLScript;
-import org.coode.oppl.utils.VariableXQueryBuilder;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLAxiom;
 
