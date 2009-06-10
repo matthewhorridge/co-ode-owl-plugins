@@ -661,7 +661,7 @@ OWLObject OWLExpression(Variable v, ConstraintSystem constraintSystem)
 		String manSyntaxString="";
 		while(true){
 			t = getToken(1);
-			if (t.kind==COMMA || t.kind==SEMICOLON || t.kind==BEGIN || t.kind==END || t.kind == WHERE || t.kind == EOF){
+			if (t.kind==COMMA || t.kind ==CLOSEDCURLYBRACKETS || t.kind==SEMICOLON || t.kind==BEGIN || t.kind==END || t.kind == WHERE || t.kind == EOF){
 				break;
 			}else{
 				manSyntaxString += t.image+" ";

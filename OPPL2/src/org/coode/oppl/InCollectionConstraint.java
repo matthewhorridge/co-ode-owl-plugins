@@ -107,15 +107,9 @@ public class InCollectionConstraint<P extends OWLObject> implements
 		SimpleVariableShortFormProvider simpleVariableShortFormProvider = new SimpleVariableShortFormProvider(
 				this.constraintSystem);
 		for (P p : this.collection) {
-			comma = first ? ", " : "";
+			comma = !first ? ", " : "";
 			first = false;
 			buffer.append(comma);
-			// StringWriter writer = new StringWriter();
-			// ManchesterOWLSyntaxObjectRenderer renderer = new
-			// ManchesterOWLSyntaxObjectRenderer(
-			// writer);
-			// renderer.setShortFormProvider(simpleVariableShortFormProvider);
-			// p.accept(renderer);
 			if (p instanceof OWLEntity) {
 				buffer.append(simpleVariableShortFormProvider
 						.getShortForm((OWLEntity) p));
@@ -134,16 +128,9 @@ public class InCollectionConstraint<P extends OWLObject> implements
 		boolean first = true;
 		String comma;
 		for (P p : this.collection) {
-			comma = first ? ", " : "";
+			comma = !first ? ", " : "";
 			first = false;
 			buffer.append(comma);
-			// StringWriter writer = new StringWriter();
-			// ManchesterOWLSyntaxObjectRenderer renderer = new
-			// ManchesterOWLSyntaxObjectRenderer(
-			// writer);
-			// renderer.setShortFormProvider(new
-			// SimpleVariableShortFormProvider(
-			// this.constraintSystem));
 			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
 					.getManchesterSyntaxRenderer(this.constraintSystem);
 			p.accept(renderer);
@@ -151,5 +138,9 @@ public class InCollectionConstraint<P extends OWLObject> implements
 		}
 		buffer.append("}");
 		return buffer.toString();
+	}
+
+	public void accept(ConstraintVisitor visitor) {
+		visitor.visitInCollectionConstraint(this);
 	}
 }
