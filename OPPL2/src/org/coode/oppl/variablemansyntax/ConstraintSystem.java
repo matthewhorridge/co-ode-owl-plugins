@@ -207,8 +207,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public Set<Variable> getAxiomVariables(OWLAxiom axiom) {
-		VariableExtractor axiomVariableExtractor = new VariableExtractor(
-				this);
+		VariableExtractor axiomVariableExtractor = new VariableExtractor(this);
 		Set<Variable> axiomVariables = axiom.accept(axiomVariableExtractor);
 		return new HashSet<Variable>(axiomVariables);
 	}
@@ -501,8 +500,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 		boolean hold = true;
 		Iterator<AbstractConstraint> it = this.getConstraints().iterator();
 		AbstractConstraint c;
-		ConstraintChecker constraintChecker = new ConstraintChecker(leaf, this,
-				this.dataFactory);
+		ConstraintChecker constraintChecker = new ConstraintChecker(leaf, this);
 		while (hold && it.hasNext()) {
 			c = it.next();
 			hold = c.accept(constraintChecker);
