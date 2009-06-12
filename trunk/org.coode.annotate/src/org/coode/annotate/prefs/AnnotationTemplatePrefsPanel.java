@@ -1,5 +1,7 @@
 package org.coode.annotate.prefs;
 
+import org.apache.log4j.Logger;
+import org.coode.annotate.EditorType;
 import org.protege.editor.core.ui.util.Icons;
 import org.protege.editor.core.ui.util.UIUtil;
 import org.protege.editor.owl.ui.OWLIcons;
@@ -12,9 +14,9 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
-import java.util.ArrayList;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
-import java.util.List;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -48,7 +50,7 @@ import java.util.List;
  */
 public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
-    private static final String TEMPLATE_EXT = "template";
+    private static final Logger logger = Logger.getLogger(AnnotationTemplatePrefsPanel.class);
 
     private JTable table;
     private JToolBar toolbar;
@@ -97,30 +99,14 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
     };
 
+    private AnnotationTemplateDescriptor descriptor;
+
+
     public void applyChanges() {
         if (dirty){
-            AnnotationTemplatePrefs.getInstance().putValues(getValuesFromTable());
+            AnnotationTemplatePrefs.getInstance().setDefaultDescriptor(descriptor);
             dirty = false;
         }
-    }
-
-
-    private List<String> getValuesFromTable() {
-        List<String> values = new ArrayList<String>();
-        for (int i=0; i<model.getRowCount(); i++){
-            String str = "";
-            for (int j=0; j<model.getColumnCount(); j++){
-                if (j>0){
-                    str+=",";
-                }
-                final Object v = model.getValueAt(i, j);
-                if (v != null){
-                    str+= v;
-                }
-            }
-            values.add(str);
-        }
-        return values;
     }
 
 
@@ -141,15 +127,49 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
         add(toolbar, BorderLayout.NORTH);
 
-        List<String> rows = AnnotationTemplatePrefs.getInstance().getValues();
-        model = new MyTableModel(rows);
+        // create a copy of the default descriptor
+        descriptor = new AnnotationTemplateDescriptor(AnnotationTemplatePrefs.getInstance().getDefaultDescriptor());
+        model = new MyTableModel(descriptor);
         table = new JTable(model);
+        table.setRowHeight(table.getRowHeight() + 5);
         table.setShowVerticalLines(false);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_SUBSEQUENT_COLUMNS);
-        table.getColumnModel().getColumn(0).setWidth(200);
+
+        setupEditors();
+
         final JScrollPane scroller = new JScrollPane(table);
 //        scroller.setPreferredSize(new Dimension(400, 300));
         add(scroller, BorderLayout.CENTER);
+    }
+
+
+    private void setupEditors() {
+        JComboBox comboBox = new JComboBox(EditorType.values());
+        table.setDefaultEditor(EditorType.class, new DefaultCellEditor(comboBox));
+
+        table.setDefaultEditor(URI.class, new DefaultCellEditor(new JTextField()){
+            public URI oldValue;
+
+
+            public Object getCellEditorValue() {
+                String s = (String) super.getCellEditorValue();
+                try {
+                    URI uri = new URI(s);
+                    if (uri.isAbsolute()){
+                        return uri;
+                    }
+                }
+                catch (URISyntaxException e) {
+                    // invalid
+                }
+                return oldValue;
+            }
+
+
+            public Component getTableCellEditorComponent(JTable jTable, Object o, boolean b, int i, int i1) {
+                oldValue = (URI)o;
+                return super.getTableCellEditorComponent(jTable, o, b, i, i1);
+            }
+        });
     }
 
 
@@ -173,7 +193,7 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         scroller.setPreferredSize(new Dimension(400, 300));
         if (JOptionPane.showConfirmDialog(AnnotationTemplatePrefsPanel.this, scroller, "Pick an annotation",
                                           JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION){
-            Object[] rowData = new Object[]{list.getSelectedURI(), null};
+            Object[] rowData = new Object[]{list.getSelectedURI(), EditorType.text};
             model.addRow(rowData);
             table.getSelectionModel().setSelectionInterval(model.getRowCount()-1, model.getRowCount()-1);
             dirty = true;
@@ -224,8 +244,8 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         if (importFile != null){
             try {
                 FileInputStream inStream = new FileInputStream(importFile);
-                List<String> rows = AnnotationTemplatePrefs.parseStream(inStream);
-                model = new MyTableModel(rows);
+                descriptor = new AnnotationTemplateDescriptor(inStream);
+                model = new MyTableModel(descriptor);
                 table.setModel(model);
                 dirty = true;
                 inStream.close();
@@ -247,9 +267,7 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         if (exportFile != null){
             try {
                 PrintStream outStream = new PrintStream(new FileOutputStream(exportFile));
-                for (String row : getValuesFromTable()){
-                    outStream.println(row);
-                }
+                descriptor.export(outStream);
                 outStream.flush();
                 outStream.close();
             }
@@ -262,12 +280,54 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
     private class MyTableModel extends DefaultTableModel {
 
-        private MyTableModel(List<String> rows) {
-            addColumn("uri");
-            addColumn("params");
+        private MyTableModel(AnnotationTemplateDescriptor descriptor) {
+            addColumn("Annotation URI");
+            addColumn("Editor type");
 
-            for (String row : rows){
-                addRow(row.split(","));
+            for (URI uri : descriptor.getURIs()){
+                Object[] rowData = new Object[]{uri, descriptor.getEditor(uri)};
+                super.addRow(rowData);
+            }
+        }
+
+
+        public void setValueAt(Object o, int row, int col) {
+            super.setValueAt(o, row, col);
+            URI uri = descriptor.getURIs().get(row);
+            if (col == 0){
+                descriptor.changeURI(uri, (URI)o);
+            }
+            else if (col == 1){
+                descriptor.setEditor(uri, (EditorType)o);
+            }
+        }
+
+
+        public void moveRow(int start, int end, int to) {
+            super.moveRow(start, end, to);
+            descriptor.move(start, end, to);
+        }
+
+
+        public void removeRow(int row) {
+            super.removeRow(row);
+            URI uri = descriptor.getURIs().get(row);
+            descriptor.remove(uri);
+        }
+
+
+        public void addRow(Object[] rowData) {
+            super.addRow(rowData);
+            descriptor.addRow((URI)rowData[0], (EditorType)rowData[1]);
+        }
+
+
+        public Class<?> getColumnClass(int col) {
+            if (col == 0){
+                return URI.class;
+            }
+            else{
+                return EditorType.class;
             }
         }
     }

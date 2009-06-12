@@ -80,7 +80,7 @@ public class Template extends JComponent implements Scrollable {
 
             for (TemplateRow c : model.getRows()){
                 gbConstr.gridx = 0;
-                gbConstr.weightx = 0.5;
+                gbConstr.weightx = 0.0;
 
                 final JLabel jLabel = new JLabel(uriShortFormProvider.getShortForm(c.getURI()));
                 jLabel.setToolTipText(c.getURI().toString());
@@ -89,17 +89,19 @@ public class Template extends JComponent implements Scrollable {
                 add(jLabel, gbConstr);
 
                 gbConstr.gridx = 1;
-                gbConstr.weightx = 0.5;
+                gbConstr.weightx = 1.0;
                 JComponent editor = c.getEditor();
                 editor.setToolTipText(getToolTipText(c));
                 add(editor, gbConstr);
 
                 gbConstr.gridx = 2;
+                gbConstr.weightx = 0.0;
                 final JLabel deleteButton = new JLabel(Icons.getIcon("object.delete.gif"));
                 deleteButton.addMouseListener(new RemoveAxiomListener(c));
                 add(deleteButton, gbConstr);
 
                 gbConstr.gridx = 3;
+                gbConstr.weightx = 0.0;
                 final JLabel addButton = new JLabel(Icons.getIcon("object.add.gif"));
                 addButton.addMouseListener(new AddFieldListener(c));
                 add(addButton, gbConstr);
@@ -108,6 +110,7 @@ public class Template extends JComponent implements Scrollable {
             }
         }
         getParent().validate();
+        repaint();
     }
 
 

@@ -11,6 +11,11 @@ editable inline and easy to navigate through (Ctrl-Tab/Shift-Ctrl-Tab).
 
 <h3>Version info</h3>
 
+<h4>v1.0.7 (11th Jun 2009)</h4>
+<ul>
+<li>Tidied up preferences panel</li>
+<li>Fixed layout bugs</li></ul>
+
 <h4>v1.0.6 (24th Mar 2009)</h4>
 <ul><li>Null pointer exception fixed</li></ul>
 
