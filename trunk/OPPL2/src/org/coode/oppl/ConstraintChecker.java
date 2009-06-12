@@ -28,7 +28,6 @@ import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
-import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLObject;
 
 /**
@@ -41,16 +40,13 @@ import org.semanticweb.owl.model.OWLObject;
 public class ConstraintChecker implements ConstraintVisitorEx<Boolean> {
 	private BindingNode bindingNode;
 	private ConstraintSystem constraintSystem;
-	private OWLDataFactory dataFactory;
 
 	/**
 	 * @param bindingNode
 	 */
-	public ConstraintChecker(BindingNode bindingNode, ConstraintSystem cs,
-			OWLDataFactory dataFactory) {
+	public ConstraintChecker(BindingNode bindingNode, ConstraintSystem cs) {
 		this.bindingNode = bindingNode;
 		this.constraintSystem = cs;
-		this.dataFactory = dataFactory;
 	}
 
 	/**
