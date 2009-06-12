@@ -44,10 +44,6 @@ public class TemplateModel {
 
     private static final Logger logger = Logger.getLogger(TemplateModel.class.getName());
 
-    public static final String TEXT = "text";
-    public static final String ENTITY = "entity";
-    public static final String MULTILINE = "multiline";
-
     private final java.util.List<TemplateRow> cList = new ArrayList<TemplateRow>();
 
     private final AnnotationComponentComparator comparator = new AnnotationComponentComparator();
@@ -72,20 +68,10 @@ public class TemplateModel {
     }
 
 
-    public String getComponentType(URI uri){
-        Set<String> params = AnnotationTemplatePrefs.getInstance().getParams(uri);
-
-        // the order of these will determine precedence if multiple component types are specified
-        if (params.contains(ENTITY)){
-            return ENTITY;
-        }
-        else if (params.contains(MULTILINE)){
-            return MULTILINE;
-        }
-        else {// default to text (params.contains(TEXT)){
-            return TEXT;
-        }
+    public EditorType getComponentType(URI uri){
+        return AnnotationTemplatePrefs.getInstance().getDefaultDescriptor().getEditor(uri);
     }
+
 
     public Set<OWLAnnotationAxiom> getAnnotations(OWLEntity entity) {
         Set<OWLAnnotationAxiom> annotations = new HashSet<OWLAnnotationAxiom>();
@@ -137,17 +123,19 @@ public class TemplateModel {
         cList.clear();
 
         if (entity != null){
+            final List<URI> uris = AnnotationTemplatePrefs.getInstance().getDefaultDescriptor().getURIs();
+
             Set<OWLAnnotationAxiom> annots = getAnnotations(entity);
             Set<URI> usedURIs = new HashSet<URI>();
             for (OWLAnnotationAxiom annot : annots){
                 final URI annotationURI = annot.getAnnotation().getAnnotationURI();
-                if (AnnotationTemplatePrefs.getInstance().getURIList().contains(annotationURI)){
+                if (uris.contains(annotationURI)){
                     usedURIs.add(annotationURI);
                     cList.add(new TemplateRow(annot, this));
                 }
             }
 
-            for (URI uri : AnnotationTemplatePrefs.getInstance().getURIList()){
+            for (URI uri : uris){
                 if (!usedURIs.contains(uri)){
                     cList.add(new TemplateRow(entity, uri, this));
                 }
@@ -214,7 +202,7 @@ public class TemplateModel {
         public int compare(TemplateRow c1, TemplateRow c2) {
             URI uri1 = c1.getURI();
             URI uri2 = c2.getURI();
-            for (URI uri : AnnotationTemplatePrefs.getInstance().getURIList()){
+            for (URI uri : AnnotationTemplatePrefs.getInstance().getDefaultDescriptor().getURIs()){
                 if (uri.equals(uri1)){
                     return -1;
                 }

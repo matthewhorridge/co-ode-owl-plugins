@@ -9,8 +9,10 @@ import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /*
 * Copyright (C) 2007, University of Manchester
@@ -60,7 +62,7 @@ public class TemplateRow {
     private ActionListener acceptAction = new ActionListener(){
         public void actionPerformed(ActionEvent actionEvent) {
             updateAnnotation();
-            editor.transferFocusUpCycle();
+            editor.transferFocus();
         }
     };
 
@@ -128,83 +130,93 @@ public class TemplateRow {
 
 
     private void reload(OWLObject value) {
-        String type = model.getComponentType(uri);
-        if (TemplateModel.TEXT.equals(type) || TemplateModel.MULTILINE.equals(type)){
-            if (value == null){
-                ((JTextComponent) getEditor()).setText("");
-            }
-            else{
-                String rendering;
-                if (value instanceof OWLConstant){
-                    rendering = ((OWLConstant)value).getLiteral();
+        EditorType type = model.getComponentType(uri);
+
+        switch(type){
+            case text:      // FALLTHROUGH
+            case multiline:
+                if (value == null){
+                    ((JTextComponent) getEditor()).setText("");
                 }
                 else{
-                    rendering = value.toString();
+                    String rendering;
+                    if (value instanceof OWLConstant){
+                        rendering = ((OWLConstant)value).getLiteral();
+                    }
+                    else{
+                        rendering = value.toString();
+                    }
+                    ((JTextComponent) getEditor()).setText(rendering);
                 }
-                ((JTextComponent) getEditor()).setText(rendering);
-            }
-        }
-        else if (TemplateModel.ENTITY.equals(type)){
-            ((JComboBox) getEditor()).setSelectedItem(value);
+                break;
+//            case entity:
+//                ((JComboBox) getEditor()).setSelectedItem(value);
+//                break;
         }
     }
 
 
     // all of this should be here or in the model
     public OWLConstant getValue() {
-        String type = model.getComponentType(uri);
-        if (TemplateModel.TEXT.equals(type) || TemplateModel.MULTILINE.equals(type)){
-            String text = ((JTextComponent) getEditor()).getText().trim();
-            if (text != null && !text.equals("")){
-                return model.getOWLModelManager().getOWLDataFactory().getOWLUntypedConstant(text);
-            }
-        }
-        else if (TemplateModel.ENTITY.equals(type)){
-            return (OWLConstant)((JComboBox) getEditor()).getSelectedItem();
+        EditorType type = model.getComponentType(uri);
+
+        switch(type){
+            case text:      // FALLTHROUGH
+            case multiline:
+                String text = ((JTextComponent) getEditor()).getText().trim();
+                if (text != null && !text.equals("")){
+                    return model.getOWLModelManager().getOWLDataFactory().getOWLUntypedConstant(text);
+                }
+                break;
+//            case entity:
+//                return (OWLConstant)((JComboBox) getEditor()).getSelectedItem();
         }
         return null;
     }
 
     public JComponent getEditor(){
         if (editor == null){
-            String type = model.getComponentType(uri);
+            EditorType type = model.getComponentType(uri);
 
-            // the order of these will determine precedence if multiple editor types are specified
-            if (TemplateModel.TEXT.equals(type)){
-                editor = new JTextField();
-            }
-            else if (TemplateModel.MULTILINE.equals(type)){
-                editor = new JTextArea();
-                editor.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-                ((JTextArea)editor).setColumns(40);
+            Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>();
+            Set<AWTKeyStroke> newBackwardKeys = new HashSet<AWTKeyStroke>();
 
-                ((JTextArea)editor).setWrapStyleWord(true);
-                ((JTextArea)editor).setLineWrap(true);
-            }
-            else if (TemplateModel.ENTITY.equals(type)){
-                editor = new JComboBox();
-            }
-
-            if (editor instanceof JTextComponent){
-                editor.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK), 0);
-            }
-
-            // change the tab key to shift focus instead of inserting a tab character (to help fast input)
-
-            // bind our new forward focus traversal keys
-            Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>(1);
             newForwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK));
-            editor.setFocusTraversalKeys(
-                    KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS,
-                    Collections.unmodifiableSet(newForwardKeys)
-            );
-            // bind our new backward focus traversal keys
-            Set<AWTKeyStroke> newBackwardKeys = new HashSet<AWTKeyStroke>(1);
+
             newBackwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK+KeyEvent.SHIFT_DOWN_MASK));
-            editor.setFocusTraversalKeys(
-                    KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS,
-                    Collections.unmodifiableSet(newBackwardKeys)
-            );
+            newBackwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, KeyEvent.SHIFT_DOWN_MASK));
+
+            switch(type){
+                case text:
+                    editor = new JTextField();
+                    editor.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+
+                    // change the tab key to shift focus instead of inserting a tab character (to help fast input)
+                    newForwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, 0));
+
+                    editor.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK), 0);
+                    editor.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), 0);
+                    break;
+
+                case multiline:
+                    JTextArea textArea = new JTextArea();
+                    textArea.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+                    textArea.setColumns(40);
+                    textArea.setWrapStyleWord(true);
+                    textArea.setLineWrap(true);
+                    textArea.setTabSize(4);
+                    editor = textArea;
+
+                    editor.registerKeyboardAction(acceptAction, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK), 0);
+                    break;
+//            case entity:
+//                editor = new JComboBox();
+//                    break;
+            }
+
+            // bind our new focus traversal keys
+            editor.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, newForwardKeys);
+            editor.setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, newBackwardKeys);
 
             editor.addFocusListener(focusListener);
         }
