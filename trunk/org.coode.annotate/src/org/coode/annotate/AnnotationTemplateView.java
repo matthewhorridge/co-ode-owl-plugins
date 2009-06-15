@@ -50,7 +50,6 @@ public class AnnotationTemplateView extends AbstractOWLSelectionViewComponent {
 
     private HierarchyListener hListener = new HierarchyListener(){
         public void hierarchyChanged(HierarchyEvent hierarchyEvent) {
-            System.out.println("hierarchyEvent = " + hierarchyEvent);
             if (updateRequired){
                 updateView();
             }
