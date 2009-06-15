@@ -30,7 +30,7 @@ Find them under the *View | Class views* menu
 
 == Download ==
 
-[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=obotools download]
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=OBO%20Tools download]
 
 == Author ==
 
