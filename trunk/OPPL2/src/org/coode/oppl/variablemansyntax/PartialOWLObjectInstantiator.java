@@ -675,7 +675,7 @@ public class PartialOWLObjectInstantiator implements
 		OWLConstant toReturn = node;
 		if (this.constraintSystem.isVariable(node)) {
 			Variable variable = this.constraintSystem.getVariable(node
-					.toString());
+					.getLiteral());
 			OWLConstant assignmentValue = (OWLConstant) this.bindingNode
 					.getAssignmentValue(variable);
 			toReturn = assignmentValue == null ? node : assignmentValue;
@@ -687,7 +687,7 @@ public class PartialOWLObjectInstantiator implements
 		OWLConstant toReturn = node;
 		if (this.constraintSystem.isVariable(node)) {
 			Variable variable = this.constraintSystem.getVariable(node
-					.toString().trim());
+					.getLiteral());
 			OWLConstant assignmentValue = (OWLConstant) this.bindingNode
 					.getAssignmentValue(variable);
 			toReturn = assignmentValue == null ? node : assignmentValue;

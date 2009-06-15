@@ -114,7 +114,7 @@ public class XQueryAxiomRenderer extends OWLXMLObjectRenderer {
 	public void visit(OWLTypedConstant node) {
 		if (this.constraintSystem.isVariable(node)) {
 			Variable variable = this.constraintSystem.getVariable(node
-					.toString());
+					.getLiteral());
 			this.writer.writeStartElement(URI.create(Namespaces.OWL2XML
 					+ "Literal"));
 			this.writer.writeTextContent("("
@@ -133,7 +133,7 @@ public class XQueryAxiomRenderer extends OWLXMLObjectRenderer {
 	public void visit(OWLUntypedConstant node) {
 		if (this.constraintSystem.isVariable(node)) {
 			Variable variable = this.constraintSystem.getVariable(node
-					.toString());
+					.getLiteral());
 			this.writer.writeStartElement(URI.create(Namespaces.OWL2XML
 					+ "Literal"));
 			this.writer.writeTextContent("("

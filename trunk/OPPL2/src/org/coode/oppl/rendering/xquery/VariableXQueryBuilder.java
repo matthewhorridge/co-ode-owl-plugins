@@ -553,7 +553,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 			VariableXQueryBuilder.this.currentNode = uriChild;
 			if (VariableXQueryBuilder.this.constraintSystem.isVariable(node)) {
 				Variable variable = VariableXQueryBuilder.this.constraintSystem
-						.getVariable(node.toString());
+						.getVariable(node.getLiteral());
 				List<String> paths = VariableXQueryBuilder.this.variablePaths
 						.get(variable);
 				if (paths == null) {
@@ -578,7 +578,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 			VariableXQueryBuilder.this.currentNode = uriChild;
 			if (VariableXQueryBuilder.this.constraintSystem.isVariable(node)) {
 				Variable variable = VariableXQueryBuilder.this.constraintSystem
-						.getVariable(node.toString());
+						.getVariable(node.getLiteral());
 				List<String> paths = VariableXQueryBuilder.this.variablePaths
 						.get(variable);
 				if (paths == null) {
