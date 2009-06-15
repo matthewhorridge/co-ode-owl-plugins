@@ -27,9 +27,11 @@ To enable this view select the single property you wish to follow by using the a
 
 == Screenshots ==
 
-<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/outline.png.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/outline.png" width="400" /></a>
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/outline.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/outline.png" width="400" /></a>
 
 <a href="http://www.co-ode.org/downloads/protege-x/plugins/images/existentialtree.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/existentialtree.png" width="400" /></a>
+
+<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/obo-developsFrom.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/obo-developsFrom.png" width="400" /></a>
 
 
 == Find the plugin ==
