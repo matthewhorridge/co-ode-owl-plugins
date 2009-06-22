@@ -28,6 +28,7 @@ import org.semanticweb.owl.util.SimpleShortFormProvider;
 import org.coode.oppl.variablemansyntax.VariableManchesterSyntaxExpressionChecker;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.util.ReferencedEntitySetProvider;
+import org.coode.oppl.validation.OPPLScriptValidator;
 import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcher;
 
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -55,7 +56,11 @@ public class OPPLParser {
 	static private AutoCompleterMatcher matcher=null;
 	private static OWLOntology ontology;
 	private static OWLReasoner reasoner;
+	private  static OPPLScriptValidator validator=null; 
 	
+	public static void setOPPLScriptValidator(OPPLScriptValidator validator){
+		OPPLParser.validator = validator;
+	}
 	  
 	
 	public static List getCompletions(){
@@ -76,10 +81,7 @@ public class OPPLParser {
 	
 	public static void setOPPLFactory(OPPLAbstractFactory opplFactory){
 		OPPLParser.opplFactory = opplFactory;
-	}
-	
-
-	
+	}	
 
 	
 	public static OWLOntologyManager getOWLOntologyManager(){
@@ -275,8 +277,11 @@ OPPLScript parse(ConstraintSystem cs):{
 {
   (variables = VariableDeclaration(constraintSystem))?(opplQuery = query(constraintSystem))?(actions = Actions(constraintSystem))?";"
   { 
-  	
-  	return getOPPLFactory().buildOPPLScript(constraintSystem, variables, opplQuery, actions); 
+  	OPPLScript toReturn = getOPPLFactory().buildOPPLScript(constraintSystem, variables, opplQuery, actions);
+  	if(validator !=null && !validator.accept(toReturn)){
+  		throw new ParseException("Failed validation "+validator.getValidationRuleDescription());
+  	}
+  	return toReturn;
   	}
 }
 

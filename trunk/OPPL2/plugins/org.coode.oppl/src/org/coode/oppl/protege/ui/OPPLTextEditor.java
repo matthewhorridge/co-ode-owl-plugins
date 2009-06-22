@@ -32,6 +32,7 @@ import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.utils.ProtegeParserFactory;
+import org.coode.oppl.validation.OPPLScriptValidator;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
@@ -56,6 +57,7 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 	private final OWLEditorKit owlEditorKit;
 	private OPPLScript opplScript = null;
 	private final ExpressionEditor<OPPLScript> editor;
+	private final OPPLScriptValidator validator;
 
 	/**
 	 * @return the opplScript
@@ -86,11 +88,27 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 	 * @param owlEditorKit
 	 *            the editor kit for building the instance. Cannot be {@code
 	 *            null}.
+	 */
+	public OPPLTextEditor(OWLEditorKit owlEditorKit) {
+		this(owlEditorKit, null);
+	}
+
+	/**
+	 * Builds an instance of this OPPLTextBuilder.
+	 * 
+	 * @param owlEditorKit
+	 *            the editor kit for building the instance. Cannot be {@code
+	 *            null}.
+	 * @param validator
+	 *            performs custom validation checks on a syntactical valid
+	 *            OPPLScript.
 	 * @throws NullPointerException
 	 *             when the input is {@code null}.
 	 */
-	public OPPLTextEditor(OWLEditorKit owlEditorKit) {
+	public OPPLTextEditor(OWLEditorKit owlEditorKit,
+			OPPLScriptValidator validator) {
 		this.owlEditorKit = owlEditorKit;
+		this.validator = validator;
 		this.editor = new ExpressionEditor<OPPLScript>(this.getOWLEditorKit(),
 				new OWLExpressionChecker<OPPLScript>() {
 					private OPPLScript lastCreatedObject = null;
@@ -100,7 +118,8 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 						this.lastCreatedObject = null;
 						ProtegeParserFactory.initParser(text,
 								OPPLTextEditor.this.getOWLEditorKit()
-										.getModelManager());
+										.getModelManager(),
+								OPPLTextEditor.this.validator);
 						try {
 							this.lastCreatedObject = OPPLParser.Start();
 						} catch (ParseException e) {

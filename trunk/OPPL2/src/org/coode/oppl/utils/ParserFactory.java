@@ -25,6 +25,7 @@ package org.coode.oppl.utils;
 import java.io.StringReader;
 
 import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.validation.OPPLScriptValidator;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -41,6 +42,13 @@ public class ParserFactory {
 	public static OPPLParser initParser(String formulaBody,
 			OWLOntology ontology, OWLOntologyManager ontologyManager,
 			OWLReasoner reasoner) {
+		return initParser(formulaBody, ontology, ontologyManager, reasoner,
+				null);
+	}
+
+	public static OPPLParser initParser(String formulaBody,
+			OWLOntology ontology, OWLOntologyManager ontologyManager,
+			OWLReasoner reasoner, OPPLScriptValidator validator) {
 		if (parser == null) {
 			parser = new OPPLParser(new StringReader(formulaBody),
 					ontologyManager, ontology, reasoner);
@@ -48,6 +56,7 @@ public class ParserFactory {
 			OPPLParser.ReInit(new StringReader(formulaBody), ontologyManager,
 					ontology, reasoner);
 		}
+		OPPLParser.setOPPLScriptValidator(validator);
 		return parser;
 	}
 }

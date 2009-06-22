@@ -195,7 +195,7 @@ public class VariableEditor extends AbstractVariableEditor {
 				final JDialog dlg = optionPane.createDialog(
 						VariableEditor.this.owlEditorKit.getWorkspace(), null);
 				// The editor shouldn't be modal (or should it?)
-				dlg.setModal(false);
+				dlg.setModal(true);
 				dlg.setTitle(scopeEditor.getTitle());
 				dlg.setResizable(true);
 				dlg.pack();
@@ -249,7 +249,7 @@ public class VariableEditor extends AbstractVariableEditor {
 				final JDialog dlg = optionPane.createDialog(
 						VariableEditor.this.owlEditorKit.getWorkspace(), null);
 				// The editor shouldn't be modal (or should it?)
-				dlg.setModal(false);
+				dlg.setModal(true);
 				dlg.setTitle(scopeEditor.getTitle());
 				dlg.setResizable(true);
 				dlg.pack();

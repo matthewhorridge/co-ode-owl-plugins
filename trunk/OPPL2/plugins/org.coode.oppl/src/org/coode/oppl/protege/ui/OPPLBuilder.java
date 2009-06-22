@@ -28,6 +28,7 @@ import org.coode.oppl.OPPLScript;
 import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.VariableExtractor;
+import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
@@ -84,7 +85,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 			final JDialog dlg = optionPane.createDialog(
 					OPPLBuilder.this.owlEditorKit.getWorkspace(), null);
 			// The editor shouldn't be modal (or should it?)
-			dlg.setModal(false);
+			dlg.setModal(true);
 			dlg.setTitle("Action editor");
 			dlg.setResizable(true);
 			dlg.pack();
@@ -163,7 +164,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 			final JDialog dlg = optionPane.createDialog(
 					OPPLBuilder.this.owlEditorKit.getWorkspace(), null);
 			// The editor shouldn't be modal (or should it?)
-			dlg.setModal(false);
+			dlg.setModal(true);
 			dlg.setTitle("Action editor");
 			dlg.setResizable(true);
 			dlg.pack();
@@ -252,7 +253,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 			final JDialog dlg = optionPane.createDialog(
 					OPPLBuilder.this.owlEditorKit.getWorkspace(), null);
 			// The editor shouldn't be modal (or should it?)
-			dlg.setModal(false);
+			dlg.setModal(true);
 			dlg.setTitle("Action editor");
 			dlg.setResizable(true);
 			dlg.pack();
@@ -422,12 +423,11 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 			final JDialog dlg = optionPane.createDialog(
 					OPPLBuilder.this.owlEditorKit.getWorkspace(), null);
 			// The editor shouldn't be modal (or should it?)
-			dlg.setModal(false);
+			dlg.setModal(true);
 			dlg.setTitle("Variable editor");
 			dlg.setResizable(true);
 			dlg.pack();
-			dlg.setLocationRelativeTo(OPPLBuilder.this.owlEditorKit
-					.getWorkspace());
+			dlg.setLocationRelativeTo(OPPLBuilder.this);
 			dlg.addComponentListener(new ComponentAdapter() {
 				@Override
 				public void componentHidden(ComponentEvent e) {
@@ -570,10 +570,16 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 	private ConstraintSystem constraintSystem = OPPLParser.getOPPLFactory()
 			.createConstraintSystem();
 	private OPPLScript opplScript;
+	private final OPPLScriptValidator validator;
 
 	public OPPLBuilder(OWLEditorKit owlEditorKit) {
+		this(owlEditorKit, null);
+	}
+
+	public OPPLBuilder(OWLEditorKit owlEditorKit, OPPLScriptValidator validator) {
 		this.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
 		this.owlEditorKit = owlEditorKit;
+		this.validator = validator;
 		// Setup the variable list on the left
 		JPanel variablePanel = new JPanel(new BorderLayout());
 		this.variableList = new OPPLVariableList(this.owlEditorKit);
@@ -621,9 +627,16 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 
 	private boolean check() {
 		// The numbers include the section headers
-		return this.variableList.getModel().getSize() > 2
+		boolean areThereMinimalElements = this.variableList.getModel()
+				.getSize() > 2
 				&& this.selectList.getModel().getSize() > 1
 				&& this.actionList.getModel().getSize() > 1;
+		OPPLScript builtOPPLScript = OPPLParser.getOPPLFactory()
+				.buildOPPLScript(this.constraintSystem, this.getVariables(),
+						this.getOPPLQuery(), this.getActions());
+		return areThereMinimalElements
+				&& (this.validator == null || this.validator
+						.accept(builtOPPLScript));
 	}
 
 	public void handleChange() {
