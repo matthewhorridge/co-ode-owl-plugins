@@ -83,7 +83,7 @@ public class OPPLSelectClauseListItem implements MListItem {
 		final JDialog dlg = optionPane.createDialog(this.owlEditorKit
 				.getWorkspace(), null);
 		// The editor shouldn't be modal (or should it?)
-		dlg.setModal(false);
+		dlg.setModal(true);
 		dlg.setTitle("Clause editor");
 		dlg.setResizable(true);
 		dlg.pack();

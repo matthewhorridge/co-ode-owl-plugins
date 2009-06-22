@@ -101,7 +101,7 @@ public class OPPLConstraintList extends MList {
 		final JDialog dlg = optionPane.createDialog(this.owlEditorKit
 				.getWorkspace(), null);
 		// The editor shouldn't be modal (or should it?)
-		dlg.setModal(false);
+		dlg.setModal(true);
 		dlg.setTitle("Constraint editor");
 		dlg.setResizable(true);
 		dlg.pack();
