@@ -51,11 +51,15 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.coode.oppl.ChangeExtractor;
+import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLScript;
+import org.coode.oppl.OPPLScriptVisitorEx;
 import org.coode.oppl.protege.ui.rendering.BindingTreeRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.ProtegeParserFactory;
+import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.jdesktop.swingworker.SwingWorker;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -63,9 +67,11 @@ import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
+import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.protege.editor.owl.ui.list.OWLLinkedObjectList;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
+import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLException;
@@ -79,6 +85,34 @@ import org.semanticweb.owl.model.OWLOntologyChangeListener;
 public class OPPLView extends AbstractOWLViewComponent implements
 		InputVerificationStatusChangedListener, OWLOntologyChangeListener,
 		OWLModelManagerListener {
+	private final class ReasonerOPPLScriptValiator implements
+			OPPLScriptValidator {
+		public boolean accept(OPPLScript script) {
+			OWLReasoner reasoner = OPPLView.this.getOWLEditorKit()
+					.getModelManager().getReasoner();
+			return !(reasoner instanceof NoOpReasoner)
+					|| script.accept(new OPPLScriptVisitorEx<Boolean>() {
+						public Boolean visitActions(
+								List<OWLAxiomChange> changes, Boolean p) {
+							return p == null ? true : p;
+						}
+
+						public Boolean visit(OPPLQuery q, Boolean p) {
+							return p == null ? true : p;
+						}
+
+						public Boolean visit(Variable v, Boolean p) {
+							return p == null ? v.getVariableScope() == null : p
+									|| v.getVariableScope() == null;
+						}
+					});
+		}
+
+		public String getValidationRuleDescription() {
+			return "If the script contains scoped variables the selected reasoner cannot be NoOpReasoner";
+		}
+	}
+
 	class OPPLExecutorSwingWorker extends
 			SwingWorker<List<OWLAxiomChange>, OPPLScript> {
 		private final List<OWLAxiomChange> changes;
@@ -115,7 +149,6 @@ public class OPPLView extends AbstractOWLViewComponent implements
 			List<OWLAxiomChange> changes;
 			try {
 				changes = this.get();
-				// OPPLView.this.opplStatementExpressionEditor.createObject();
 				ActionListModel model = (ActionListModel) OPPLView.this.affectedAxioms
 						.getModel();
 				model.clear();
@@ -146,11 +179,6 @@ public class OPPLView extends AbstractOWLViewComponent implements
 			} catch (ExecutionException e) {
 				e.printStackTrace();
 			}
-			// catch (OWLExpressionParserException e) {
-			// e.printStackTrace();
-			// } catch (OWLException e) {
-			// e.printStackTrace();
-			// }
 		}
 
 		@Override
@@ -172,6 +200,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	private static final long serialVersionUID = 1897093057453176659L;
 	private static final String OPPL_COMPUTATION_IN_PROGRESS_PLEASE_WAIT = "OPPL Computation in progress...please wait";
 	private OPPLEditor editor;
+	private final ReasonerOPPLScriptValiator validator = new ReasonerOPPLScriptValiator();
 	private JButton evaluate = new JButton("Evaluate");
 	private JButton execute = new JButton("Execute");
 	private ActionList affectedAxioms;
@@ -232,7 +261,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.getOWLEditorKit().getModelManager().addListener(this);
 		this.getOWLModelManager().getOWLOntologyManager()
 				.addOntologyChangeListener(this);
-		this.editor = new OPPLEditor(this.getOWLEditorKit());
+		this.editor = new OPPLEditor(this.getOWLEditorKit(), this.validator);
 		this.editor.setPreferredSize(new Dimension(200, 300));
 		statementPanel.add(ComponentFactory.createScrollPane(this.editor),
 				BorderLayout.NORTH);

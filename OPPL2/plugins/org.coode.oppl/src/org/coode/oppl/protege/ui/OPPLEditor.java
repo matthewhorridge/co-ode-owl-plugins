@@ -145,8 +145,15 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 	}
 
 	protected void handleChange() {
-		boolean newStatus = this.getOPPLScript() != null;
+		boolean newStatus = this.check();
 		this.notifyListeners(newStatus);
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean check() {
+		return this.getOPPLScript() != null;
 	}
 
 	/**
