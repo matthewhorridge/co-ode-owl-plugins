@@ -37,7 +37,7 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
 /**
  * @author Luigi Iannone
  * 
- * Jun 16, 2008
+ *         Jun 16, 2008
  */
 public interface AbstractPatternModelFactory {
 	/**
@@ -53,11 +53,13 @@ public interface AbstractPatternModelFactory {
 	 * @param rendering
 	 * @param constraintSystem
 	 * @return a PatternModel
+	 * @throws UnsuitableOPPLScriptException
 	 */
 	PatternModel createPatternModel(String name, List<Variable> variables,
 			List<OWLAxiomChange> actions, Variable returnClause,
 			String rendering, ConstraintSystem constraintSystem)
-			throws EmptyVariableListException, EmptyActionListException;
+			throws EmptyVariableListException, EmptyActionListException,
+			UnsuitableOPPLScriptException;
 
 	/**
 	 * Builds a PatternModel instance starting from the input opplScript

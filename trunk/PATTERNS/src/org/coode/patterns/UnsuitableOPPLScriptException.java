@@ -27,7 +27,7 @@ import org.coode.oppl.OPPLScript;
 /**
  * @author Luigi Iannone
  * 
- * Nov 25, 2008
+ *         Nov 25, 2008
  */
 public class UnsuitableOPPLScriptException extends PatternException {
 	/**
@@ -37,6 +37,12 @@ public class UnsuitableOPPLScriptException extends PatternException {
 
 	public UnsuitableOPPLScriptException(OPPLScript opplScript) {
 		super("The OPPL Script provided is unsuitable for creating a pattern: "
-				+ opplScript);
+				+ opplScript.render());
+	}
+
+	public UnsuitableOPPLScriptException(OPPLScript opplScript, String string) {
+		super(
+				"Failed pattern creation as The OPPL Script provided is unsuitable for creating a pattern: "
+						+ opplScript.render() + " does not respect " + string);
 	}
 }

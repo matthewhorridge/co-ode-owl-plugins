@@ -36,11 +36,13 @@ import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.OPPLScriptVisitor;
 import org.coode.oppl.OPPLScriptVisitorEx;
+import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.InputVariable;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.patterns.syntax.PatternParser;
 import org.coode.patterns.utils.Utils;
+import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLAnnotationAxiom;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
@@ -101,9 +103,27 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
  * 
  *         Jun 10, 2008
  */
-public class PatternModel implements
-// MListItem,
-		OPPLScript, PatternOPPLScript {
+public class PatternModel implements OPPLScript, PatternOPPLScript {
+	private final static class PatternOPPLScriptValidator implements
+			OPPLScriptValidator {
+		public boolean accept(OPPLScript script) {
+			boolean toReturn = script.getQuery() == null;
+			if (toReturn) {
+				List<OWLAxiomChange> actions = script.getActions();
+				Iterator<OWLAxiomChange> it = actions.iterator();
+				while (toReturn && it.hasNext()) {
+					OWLAxiomChange action = it.next();
+					toReturn = action instanceof AddAxiom;
+				}
+			}
+			return toReturn;
+		}
+
+		public String getValidationRuleDescription() {
+			return "The Script can only have ADD as its actions and cannot have any query";
+		}
+	}
+
 	class ClassPatternDetector implements OWLAxiomVisitorEx<Boolean>,
 			OPPLScriptVisitorEx<Boolean> {
 		private OWLClass thisClass = PatternModel.this.ontologyManager
@@ -604,37 +624,33 @@ public class PatternModel implements
 	protected String rendering = null;
 	private URI uri = null;
 	private final OPPLScript opplStatement;
-	OWLOntologyManager ontologyManager = null;
+	private final OWLOntologyManager ontologyManager;
 	protected boolean valid = true;
-	Set<PatternModelChangeListener> listeners = new HashSet<PatternModelChangeListener>();
+	private final Set<PatternModelChangeListener> listeners = new HashSet<PatternModelChangeListener>();
 	protected String unresolvedOPPLStatementString = null;
 	private Variable returnVariable = null;
 	public final static String NAMESPACE = "http://www.co-ode.org/patterns#";
 
 	public PatternModel(OPPLScript opplScript,
-			OWLOntologyManager ontologyManager) {
+			OWLOntologyManager ontologyManager)
+			throws UnsuitableOPPLScriptException {
+		if (opplScript == null) {
+			throw new NullPointerException("The OPPL script cannot be null");
+		}
+		if (ontologyManager == null) {
+			throw new NullPointerException(
+					"The ontology manager cannot be null");
+		}
+		if (!getScriptValidator().accept(opplScript)) {
+			throw new UnsuitableOPPLScriptException(opplScript,
+					getScriptValidator().getValidationRuleDescription());
+		}
 		this.opplStatement = opplScript;
 		this.ontologyManager = ontologyManager;
 	}
 
-	// public String getTooltip() {
-	// return this.getRendering();
-	// }
-	//
-	// public boolean handleDelete() {
-	// return false;
-	// }
-	//
-	// public void handleEdit() {
-	// }
-	//
-	// public boolean isDeleteable() {
-	// return false;
-	// }
-	//
-	// public boolean isEditable() {
-	// return false;
-	// }
+	private final static OPPLScriptValidator scriptValidator = new PatternOPPLScriptValidator();
+
 	public List<Variable> getVariables() {
 		List<Variable> toReturn = new ArrayList<Variable>();
 		if (this.opplStatement != null) {
@@ -1048,5 +1064,12 @@ public class PatternModel implements
 		if (this.opplStatement != null) {
 			this.opplStatement.addVariable(variable);
 		}
+	}
+
+	/**
+	 * @return the scriptValidator
+	 */
+	public static final OPPLScriptValidator getScriptValidator() {
+		return scriptValidator;
 	}
 }
