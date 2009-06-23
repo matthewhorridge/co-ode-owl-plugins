@@ -58,6 +58,7 @@ public class PatternEditor extends
 		this.patternBuilder
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
 					public void verifiedStatusChanged(boolean newState) {
+						PatternEditor.this.patternModel = null;
 						if (newState) {
 							PatternEditor.this.patternModel = PatternEditor.this.patternBuilder
 									.getEditedObject();
@@ -68,6 +69,7 @@ public class PatternEditor extends
 		this.patternTextEditor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
 					public void verifiedStatusChanged(boolean newState) {
+						PatternEditor.this.patternModel = null;
 						if (newState) {
 							PatternEditor.this.patternModel = PatternEditor.this.patternTextEditor
 									.getEditedObject();
@@ -80,7 +82,7 @@ public class PatternEditor extends
 	}
 
 	protected void handleChange() {
-		boolean newState = this.patternBuilder != null;
+		boolean newState = this.patternModel != null;
 		this.notifyListeners(newState);
 	}
 
@@ -108,6 +110,7 @@ public class PatternEditor extends
 		if (listener == null) {
 			throw new NullPointerException("The listener cannot be null");
 		}
+		listener.verifiedStatusChanged(this.patternModel != null);
 		this.listeners.add(listener);
 	}
 

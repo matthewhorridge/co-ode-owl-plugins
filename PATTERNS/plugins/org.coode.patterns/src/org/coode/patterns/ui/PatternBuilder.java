@@ -23,6 +23,8 @@
 package org.coode.patterns.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -36,14 +38,19 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -67,6 +74,7 @@ import org.coode.patterns.EmptyVariableListException;
 import org.coode.patterns.PatternConstraintSystem;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.PatternModelChangeListener;
+import org.coode.patterns.UnsuitableOPPLScriptException;
 import org.coode.patterns.syntax.PatternParser;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
@@ -491,6 +499,22 @@ public class PatternBuilder extends
 		}
 	}
 
+	private class ErrorListCellRenderer implements ListCellRenderer {
+		private final DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
+
+		public Component getListCellRendererComponent(JList list, Object value,
+				int index, boolean isSelected, boolean cellHasFocus) {
+			Component toReturn = this.defaultListCellRenderer
+					.getListCellRendererComponent(list, value, index,
+							isSelected, cellHasFocus);
+			if (toReturn instanceof JLabel) {
+				((JLabel) toReturn).setIcon(new ImageIcon(this.getClass()
+						.getClassLoader().getResource("error.png")));
+			}
+			return toReturn;
+		}
+	}
+
 	/**
 	 * 
 	 */
@@ -520,10 +544,18 @@ public class PatternBuilder extends
 			PatternBuilder.this.handleChange();
 		}
 	};
+	private final DefaultListModel errorListModel = new DefaultListModel();
+	private final JList errorList = new JList(this.errorListModel);
 
 	public PatternBuilder(OWLEditorKit owlEditorKit) {
 		this.mainPanel.setLayout(new BorderLayout());
 		this.mainPanel.setName("Pattern Builder");
+		JPanel errorPanel = new JPanel(new BorderLayout());
+		errorPanel.setBorder(ComponentFactory.createTitledBorder("Errors:"));
+		errorPanel.add(ComponentFactory.createScrollPane(this.errorList));
+		errorPanel.setPreferredSize(new Dimension(200, 75));
+		this.errorList.setCellRenderer(new ErrorListCellRenderer());
+		JPanel builderPanel = new JPanel(new BorderLayout());
 		this.owlEditorKit = owlEditorKit;
 		this.nameEditor = new ExpressionEditor<String>(owlEditorKit,
 				new OWLExpressionChecker<String>() {
@@ -557,7 +589,7 @@ public class PatternBuilder extends
 				});
 		patternNamePanel.setBorder(ComponentFactory
 				.createTitledBorder("Pattern name"));
-		this.mainPanel.add(patternNamePanel, BorderLayout.NORTH);
+		builderPanel.add(patternNamePanel, BorderLayout.NORTH);
 		this.removeKeyListeners();
 		JPanel patternBodyPanel = new JPanel(new BorderLayout());
 		this.variableList = new PatternVariableList(this.owlEditorKit);
@@ -604,7 +636,7 @@ public class PatternBuilder extends
 		patternBodyPanel.add(
 				ComponentFactory.createScrollPane(this.actionList),
 				BorderLayout.CENTER);
-		this.mainPanel.add(patternBodyPanel, BorderLayout.CENTER);
+		builderPanel.add(patternBodyPanel, BorderLayout.CENTER);
 		this.rendering = new ExpressionEditor<String>(this.owlEditorKit,
 				new OWLExpressionChecker<String>() {
 					private String renderingString;
@@ -679,8 +711,10 @@ public class PatternBuilder extends
 		JPanel southPanel = new JPanel(new BorderLayout());
 		southPanel.add(renderingPanelBorder, BorderLayout.NORTH);
 		southPanel.add(returnPanelBorder, BorderLayout.CENTER);
-		this.mainPanel.add(southPanel, BorderLayout.SOUTH);
-		this.mainPanel.revalidate();
+		builderPanel.add(southPanel, BorderLayout.SOUTH);
+		builderPanel.revalidate();
+		this.mainPanel.add(errorPanel, BorderLayout.NORTH);
+		this.mainPanel.add(builderPanel, BorderLayout.CENTER);
 	}
 
 	/**
@@ -705,6 +739,8 @@ public class PatternBuilder extends
 	}
 
 	public void handleChange() {
+		this.patternModel = null;
+		this.errorListModel.clear();
 		boolean newState = this.check();
 		if (newState) {
 			ListModel model = this.variableList.getModel();
@@ -735,14 +771,16 @@ public class PatternBuilder extends
 					this.patternModel
 							.setReturnVariable(((VariableListItem) this.returnValuesComboBox
 									.getSelectedItem()).getVariable());
-					System.out.println("Return value: "
-							+ ((VariableListItem) this.returnValuesComboBox
-									.getSelectedItem()).getVariable());
 				}
 			} catch (EmptyVariableListException e) {
-				throw new RuntimeException(e);
+				this.patternModel = null;
+				this.errorListModel.addElement("No variables");
 			} catch (EmptyActionListException e) {
-				throw new RuntimeException(e);
+				this.patternModel = null;
+				this.errorListModel.addElement("No actions");
+			} catch (UnsuitableOPPLScriptException e) {
+				this.patternModel = null;
+				this.errorListModel.addElement("Failed " + e.getMessage());
 			}
 		} else {
 			this.patternModel = null;
@@ -849,17 +887,27 @@ public class PatternBuilder extends
 			// section
 			// headers must be taken
 			// into account
-			return this.variableList.getModel().getSize() > 2
-					&& this.actionList.getModel().getSize() > 1
+			boolean enoughVariables = this.variableList.getModel().getSize() > 2;
+			boolean enoughActions = this.actionList.getModel().getSize() > 1;
+			if (!enoughVariables) {
+				this.errorListModel.addElement("No Variables");
+			}
+			if (!enoughActions) {
+				this.errorListModel.addElement("No actions");
+			}
+			return enoughVariables
+					&& enoughActions
 					&& (!this.allowReturnValueCheckBox.isSelected() || this.returnValuesComboBox
 							.getSelectedItem() instanceof VariableListItem);
 		} catch (OWLExpressionParserException e) {
 			this.constraintSystem = PatternParser.getPatternModelFactory()
 					.createConstraintSystem();
+			this.errorListModel.addElement("Invalid name");
 			return false;
 		} catch (OWLException e) {
 			this.constraintSystem = PatternParser.getPatternModelFactory()
 					.createConstraintSystem();
+			this.errorListModel.addElement("Invalid name");
 			return false;
 		}
 	}

@@ -436,7 +436,6 @@ public class PatternManager implements OWLOntologyChangeListener {
 			OWLOntologyManager ontologyManager) {
 		PatternManager patternManager = instances.get(ontologyManager);
 		if (patternManager == null) {
-			System.out.println("PatternManager.getInstance() ");
 			patternManager = new PatternManager(ontologyManager);
 			instances.put(ontologyManager, patternManager);
 		}

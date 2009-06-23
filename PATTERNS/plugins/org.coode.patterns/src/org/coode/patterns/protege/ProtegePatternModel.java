@@ -26,6 +26,7 @@ import java.util.StringTokenizer;
 
 import org.coode.oppl.OPPLScript;
 import org.coode.patterns.PatternModel;
+import org.coode.patterns.UnsuitableOPPLScriptException;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.util.BidirectionalShortFormProvider;
@@ -43,9 +44,10 @@ public class ProtegePatternModel extends PatternModel {
 	/**
 	 * @param ontologyManager
 	 * @param modelManager
+	 * @throws UnsuitableOPPLScriptException
 	 */
 	public ProtegePatternModel(OPPLScript opplScript,
-			OWLModelManager modelManager) {
+			OWLModelManager modelManager) throws UnsuitableOPPLScriptException {
 		super(opplScript, modelManager.getOWLOntologyManager());
 		this.modelManager = modelManager;
 	}

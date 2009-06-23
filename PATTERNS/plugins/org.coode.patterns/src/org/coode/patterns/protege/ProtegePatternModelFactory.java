@@ -97,7 +97,7 @@ public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 
 	public void initOPPLParser(String string) {
 		org.coode.oppl.utils.ProtegeParserFactory.initParser(string,
-				this.modelManager);
+				this.modelManager, PatternModel.getScriptValidator());
 	}
 
 	public ManchesterOWLSyntaxObjectRenderer getRenderer(
@@ -114,7 +114,8 @@ public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 			List<Variable> variables, List<OWLAxiomChange> actions,
 			Variable returnClause, String rendering,
 			ConstraintSystem constraintSystem)
-			throws EmptyVariableListException, EmptyActionListException {
+			throws EmptyVariableListException, EmptyActionListException,
+			UnsuitableOPPLScriptException {
 		if (variables.isEmpty()) {
 			throw new EmptyVariableListException();
 		} else if (actions.isEmpty()) {
@@ -123,14 +124,10 @@ public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 			OPPLScript opplScript = OPPLParser
 					.getOPPLFactory()
 					.buildOPPLScript(constraintSystem, variables, null, actions);
-			try {
-				PatternModel patternModel = this.createPatternModel(opplScript);
-				patternModel.setRendering(rendering);
-				patternModel.setUri(URI.create(PatternModel.NAMESPACE + name));
-				return patternModel;
-			} catch (UnsuitableOPPLScriptException e) {
-				throw new RuntimeException(e);
-			}
+			PatternModel patternModel = this.createPatternModel(opplScript);
+			patternModel.setRendering(rendering);
+			patternModel.setUri(URI.create(PatternModel.NAMESPACE + name));
+			return patternModel;
 		}
 	}
 }

@@ -88,7 +88,7 @@ public class PatternModelFactory implements AbstractPatternModelFactory {
 
 	public void initOPPLParser(String string) {
 		org.coode.oppl.utils.ParserFactory.initParser(string, this.ontology,
-				this.ontologyManager, null);
+				this.ontologyManager, null, PatternModel.getScriptValidator());
 	}
 
 	public ManchesterOWLSyntaxObjectRenderer getRenderer(
