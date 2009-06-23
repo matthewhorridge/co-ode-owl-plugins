@@ -6,7 +6,6 @@ import org.coode.oppl.protege.ProtegeOPPLFactory;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.validation.OPPLScriptValidator;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcherImpl;
 
 public class ProtegeParserFactory {
 	static OPPLParser parser = null;
@@ -28,8 +27,6 @@ public class ProtegeParserFactory {
 					manager.getReasoner());
 		}
 		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager));
-		OPPLParser
-				.setAutoCompleterMatcher(new AutoCompleterMatcherImpl(manager));
 		OPPLParser.setOPPLScriptValidator(validator);
 		return parser;
 	}

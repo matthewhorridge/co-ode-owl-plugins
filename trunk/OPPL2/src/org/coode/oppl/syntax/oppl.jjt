@@ -14,46 +14,60 @@ options {
  
 PARSER_BEGIN(OPPLParser) 
 package org.coode.oppl.syntax;
-import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.VariableType;
-import org.coode.oppl.variablemansyntax.VariableImpl;
-import org.coode.oppl.variablemansyntax.VariableScopes.Direction;
-import org.coode.oppl.variablemansyntax.generated.*;
-import org.coode.oppl.*;
-import org.semanticweb.owl.model.*;
-import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.semanticweb.owl.util.BidirectionalShortFormProvider;
-import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
-import org.semanticweb.owl.util.SimpleShortFormProvider;
-import org.coode.oppl.variablemansyntax.VariableManchesterSyntaxExpressionChecker;
-import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.util.ReferencedEntitySetProvider;
-import org.coode.oppl.validation.OPPLScriptValidator;
-import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcher;
-
-import org.semanticweb.owl.model.OWLOntologyManager;
-import java.util.ArrayList;
-import java.util.*;
-import org.semanticweb.owl.expression.ParserException;
-import org.semanticweb.owl.apibinding.OWLManager;
-import java.net.URI;
 import java.io.Reader;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import org.coode.oppl.variablemansyntax.ExpressionParser;
-import org.coode.oppl.variablemansyntax.VariableShortFormEntityChecker;
-import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
+import org.coode.oppl.AbstractConstraint;
+import org.coode.oppl.InCollectionConstraint;
+import org.coode.oppl.InequalityConstraint;
+import org.coode.oppl.OPPLAbstractFactory;
+import org.coode.oppl.OPPLException;
+import org.coode.oppl.OPPLFactory;
+import org.coode.oppl.OPPLQuery;
+import org.coode.oppl.OPPLScript;
+import org.coode.oppl.utils.OPPLVariableMatcher;
+import org.coode.oppl.validation.OPPLScriptValidator;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.ExpressionParser;
+import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
 import org.coode.oppl.variablemansyntax.VariableScope;
 import org.coode.oppl.variablemansyntax.VariableScopes;
-import org.coode.oppl.OPPLException;
-import org.coode.oppl.utils.*;
+import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableScopes.Direction;
+import org.coode.oppl.variablemansyntax.generated.CollectionGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.ConcatGeneratedValues;
+import org.coode.oppl.variablemansyntax.generated.ConstantStringGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.VariableGeneratedValue;
+
+import org.semanticweb.owl.apibinding.OWLManager;
+import org.semanticweb.owl.expression.ParserException;
+import org.semanticweb.owl.inference.OWLReasoner;
+import org.semanticweb.owl.model.AddAxiom;
+import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owl.model.OWLAxiomChange;
+import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLObjectProperty;
+import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owl.model.RemoveAxiom;
 
 public class OPPLParser {
 	private static OWLOntologyManager owlOntologyManager;
 	
 	private static OPPLAbstractFactory opplFactory = null;
 	private static List completions = new ArrayList();
-	static private AutoCompleterMatcher matcher=null;
+	
 	private static OWLOntology ontology;
 	private static OWLReasoner reasoner;
 	private  static OPPLScriptValidator validator=null; 
@@ -67,9 +81,7 @@ public class OPPLParser {
 		return completions; 
 	}
 	
-	static public void setAutoCompleterMatcher(AutoCompleterMatcher matcher){
-		OPPLParser.matcher = matcher;
-	}
+	
 	
 	public static OPPLAbstractFactory getOPPLFactory(){
 		if(opplFactory ==null){
@@ -532,58 +544,9 @@ VariableScope typeScope(VariableScopes.Direction direction, VariableType variabl
 			toReturn = parseScope(direction,variableType,parser);
 				
 		} catch (ParserException e) {
-			if(matcher!=null){
-				
-				int lastIndexOfWhiteSpace = manSyntaxString.lastIndexOf(" ");
-				String word = lastIndexOfWhiteSpace == -1 ? manSyntaxString
-						: manSyntaxString.substring(lastIndexOfWhiteSpace).trim();
-				Set<OWLObject> matches = matcher
-						.getMatches(word, e.isClassNameExpected(), e
-								.isObjectPropertyNameExpected(), e
-								.isDataPropertyNameExpected(), e
-								.isIndividualNameExpected(), e
-								.isDatatypeNameExpected());
-				List kwMatches = new ArrayList(matches.size() + 10);
-				for (String s : e.getExpectedKeywords()) {
-					if (word.matches("(\\s)*") || s.toLowerCase().startsWith(word.toLowerCase())) {
-						kwMatches.add(s);
-					}
-				}
-				
-				completions.addAll(kwMatches);
-				completions.addAll(matches);
-				completions.addAll(OPPLVariableMatcher.matches(word,constraintSystem,e.isClassNameExpected(), e
-								.isObjectPropertyNameExpected(), e
-								.isDataPropertyNameExpected(), e
-								.isIndividualNameExpected(),false ));
-				}
 			throw new ParseException("Failed to parse the description "
 					+ manSyntaxString + " error: " + e.getMessage());
-		}
-		String expression = manSyntaxString+"**";	
-        ManchesterOWLSyntaxEditorParser completerParser = new ManchesterOWLSyntaxEditorParser(getOWLOntologyManager().getOWLDataFactory(),expression);
-        completerParser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
-        try{
-        	
-        	parseScope(direction,variableType,completerParser);
-		} catch (ParserException e) {
-				if(matcher!=null){
-				
-				int lastIndexOfWhiteSpace = expression.lastIndexOf(" ");
-				String word = lastIndexOfWhiteSpace == -1 ? ""
-						: manSyntaxString.substring(lastIndexOfWhiteSpace).trim();
-				
-				List kwMatches = new ArrayList(10);
-				for (String s : e.getExpectedKeywords()) {
-					if (word.matches("(\\s)*") || s.toLowerCase().startsWith(word.toLowerCase())) {
-						kwMatches.add(s);
-					}
-				}
-				completions.addAll(kwMatches);
-				
-				}
-			
-		}
+		}		
 		return toReturn;
 }
 
@@ -761,57 +724,9 @@ OWLAxiom Clause(ConstraintSystem constraintSystem){
 		toReturn = parser.parseAxiom();
 		
 	}catch(ParserException e){
-		if(matcher!=null){
-				
-				int lastIndexOfWhiteSpace = manSyntaxString.lastIndexOf(" ");
-				String word = lastIndexOfWhiteSpace == -1 ? manSyntaxString
-						: manSyntaxString.substring(lastIndexOfWhiteSpace).trim();
-				Set<OWLObject> matches = matcher
-						.getMatches(word, e.isClassNameExpected(), e
-								.isObjectPropertyNameExpected(), e
-								.isDataPropertyNameExpected(), e
-								.isIndividualNameExpected(), e
-								.isDatatypeNameExpected());
-				List kwMatches = new ArrayList(matches.size() + 10);
-				for (String s : e.getExpectedKeywords()) {
-					if (word.matches("(\\s)*") || s.toLowerCase().startsWith(word.toLowerCase())) {
-						kwMatches.add(s);
-					}
-				}
-				completions.addAll(kwMatches);
-				completions.addAll(matches);
-								completions.addAll(OPPLVariableMatcher.matches(word,constraintSystem,e.isClassNameExpected(), e
-								.isObjectPropertyNameExpected(), e
-								.isDataPropertyNameExpected(), e
-								.isIndividualNameExpected(),false ));
-				}
+		
 		throw new ParseException(e.getMessage());
 	}
-	String expression = manSyntaxString+"**";	
-        VariableManchesterOWLSyntaxParser completerParser = new VariableManchesterOWLSyntaxParser(expression, constraintSystem
-					);
-        completerParser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
-        try{
-        	
-        	completerParser.parseAxiom();
-		} catch (ParserException e) {
-				if(matcher!=null){
-				
-				int lastIndexOfWhiteSpace = expression.lastIndexOf(" ");
-				String word = lastIndexOfWhiteSpace == -1 ? ""
-						: manSyntaxString.substring(lastIndexOfWhiteSpace).trim();
-				
-				List kwMatches = new ArrayList(10);
-				for (String s : e.getExpectedKeywords()) {
-					if (word.matches("(\\s)*") || s.toLowerCase().startsWith(word.toLowerCase())) {
-						kwMatches.add(s);
-					}
-				}
-				completions.addAll(kwMatches);
-				
-				}
-			
-		}
-		return toReturn;
+return toReturn;
 }
 

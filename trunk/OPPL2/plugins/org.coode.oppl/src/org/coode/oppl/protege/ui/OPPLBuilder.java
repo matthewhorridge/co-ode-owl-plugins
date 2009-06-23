@@ -1,6 +1,7 @@
 package org.coode.oppl.protege.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
@@ -10,11 +11,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -43,6 +49,22 @@ import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLObject;
 
 public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
+	private class ErrorListCellRenderer implements ListCellRenderer {
+		private final DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
+
+		public Component getListCellRendererComponent(JList list, Object value,
+				int index, boolean isSelected, boolean cellHasFocus) {
+			Component toReturn = this.defaultListCellRenderer
+					.getListCellRendererComponent(list, value, index,
+							isSelected, cellHasFocus);
+			if (toReturn instanceof JLabel) {
+				((JLabel) toReturn).setIcon(new ImageIcon(this.getClass()
+						.getClassLoader().getResource("error.png")));
+			}
+			return toReturn;
+		}
+	}
+
 	/**
 	 * 
 	 */
@@ -571,20 +593,24 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 			.createConstraintSystem();
 	private OPPLScript opplScript;
 	private final OPPLScriptValidator validator;
+	private DefaultListModel errorListModel = new DefaultListModel();
+	private JList errorList = new JList(this.errorListModel);
 
 	public OPPLBuilder(OWLEditorKit owlEditorKit) {
 		this(owlEditorKit, null);
 	}
 
 	public OPPLBuilder(OWLEditorKit owlEditorKit, OPPLScriptValidator validator) {
-		this.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+		this.setOrientation(JSplitPane.VERTICAL_SPLIT);
+		JSplitPane builderPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		builderPane.setDividerLocation(.5);
 		this.owlEditorKit = owlEditorKit;
 		this.validator = validator;
 		// Setup the variable list on the left
 		JPanel variablePanel = new JPanel(new BorderLayout());
 		this.variableList = new OPPLVariableList(this.owlEditorKit);
 		variablePanel.add(this.variableList);
-		this.add(ComponentFactory.createScrollPane(this.variableList),
+		builderPane.add(ComponentFactory.createScrollPane(this.variableList),
 				JSplitPane.LEFT);
 		// Now setup the right hand side panel which will be further split into
 		// queries and actions
@@ -616,31 +642,56 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		actionPanel.add(ComponentFactory.createScrollPane(this.actionList));
 		queryActionSplitPane.add(queryConstraintSplitPane, JSplitPane.TOP);
 		queryActionSplitPane.add(actionPanel, JSplitPane.BOTTOM);
-		this.add(queryActionSplitPane, JSplitPane.RIGHT);
+		builderPane.add(queryActionSplitPane, JSplitPane.RIGHT);
 		queryConstraintSplitPane.setDividerLocation(.5);
 		queryConstraintSplitPane.setResizeWeight(.3);
 		queryActionSplitPane.setDividerLocation(.5);
 		queryActionSplitPane.setResizeWeight(.3);
 		this.setDividerLocation(.5);
 		this.setResizeWeight(.3);
+		JPanel errorPanel = new JPanel(new BorderLayout());
+		this.errorList.setCellRenderer(new ErrorListCellRenderer());
+		errorPanel.add(ComponentFactory.createScrollPane(this.errorList));
+		errorPanel.setBorder(ComponentFactory.createTitledBorder("Errors:"));
+		this.add(errorPanel, JSplitPane.TOP);
+		this.add(builderPane, JSplitPane.BOTTOM);
+		builderPane.setDividerLocation(.5);
+		builderPane.setResizeWeight(.3);
+		this.setDividerLocation(.3);
+		this.setResizeWeight(.3);
 	}
 
 	private boolean check() {
 		// The numbers include the section headers
-		boolean areThereMinimalElements = this.variableList.getModel()
-				.getSize() > 2
-				&& this.selectList.getModel().getSize() > 1
-				&& this.actionList.getModel().getSize() > 1;
+		boolean enoughVariables = this.variableList.getModel().getSize() > 2;
+		boolean enoughQueries = this.selectList.getModel().getSize() > 1;
+		boolean enoughActions = this.actionList.getModel().getSize() > 1;
+		boolean areThereMinimalElements = enoughVariables && enoughQueries
+				&& enoughActions;
 		OPPLScript builtOPPLScript = OPPLParser.getOPPLFactory()
 				.buildOPPLScript(this.constraintSystem, this.getVariables(),
 						this.getOPPLQuery(), this.getActions());
-		return areThereMinimalElements
-				&& (this.validator == null || this.validator
-						.accept(builtOPPLScript));
+		if (!enoughVariables) {
+			this.errorListModel.addElement("No variables ");
+		}
+		if (!enoughQueries) {
+			this.errorListModel.addElement("No query");
+		}
+		if (!enoughActions) {
+			this.errorListModel.addElement("No actions");
+		}
+		boolean validated = this.validator == null
+				|| this.validator.accept(builtOPPLScript);
+		if (!validated) {
+			this.errorListModel.addElement("Failed validation: "
+					+ this.validator.getValidationRuleDescription());
+		}
+		return areThereMinimalElements && validated;
 	}
 
 	public void handleChange() {
 		this.opplScript = null;
+		this.errorListModel.clear();
 		boolean isValid = this.check();
 		if (isValid) {
 			this.opplScript = OPPLParser.getOPPLFactory().buildOPPLScript(
