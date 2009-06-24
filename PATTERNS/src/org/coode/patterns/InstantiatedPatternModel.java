@@ -112,7 +112,7 @@ public class InstantiatedPatternModel implements InstantiatedOPPLScript,
 
 	public boolean isValid() {
 		boolean unassignedVariables = false;
-		Iterator<Variable> it = this.instantiations.keySet().iterator();
+		Iterator<? extends Variable> it = this.getInputVariables().iterator();
 		Variable variable;
 		while (!unassignedVariables && it.hasNext()) {
 			variable = it.next();
