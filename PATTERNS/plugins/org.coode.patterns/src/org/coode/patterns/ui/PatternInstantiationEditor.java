@@ -25,14 +25,19 @@ package org.coode.patterns.ui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.KeyListener;
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JList;
@@ -62,6 +67,7 @@ import org.coode.patterns.PatternConstant;
 import org.coode.patterns.PatternConstraintSystem;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.syntax.PatternParser;
+import org.coode.patterns.utils.Utils;
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.core.ui.list.MListItem;
 import org.protege.editor.core.ui.list.MListSectionHeader;
@@ -70,15 +76,12 @@ import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.core.ui.util.VerifyingOptionPane;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.model.description.OWLExpressionParserException;
-import org.protege.editor.owl.ui.clsdescriptioneditor.ExpressionEditor;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRowObjectEditor;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLException;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.RemoveAxiom;
 
@@ -89,7 +92,8 @@ import org.semanticweb.owl.model.RemoveAxiom;
  */
 public class PatternInstantiationEditor extends
 		AbstractOWLFrameSectionRowObjectEditor<InstantiatedPatternModel>
-		implements VerifiedInputEditor, InputVerificationStatusChangedListener,
+		implements VerifiedInputEditor,
+		// InputVerificationStatusChangedListener,
 		ListDataListener, ListSelectionListener {
 	private class VariableValuesMList extends MList {
 		/**
@@ -294,9 +298,41 @@ public class PatternInstantiationEditor extends
 		}
 	}
 
+	private final static class InstantiatedPatternCellRenderer implements
+			ListCellRenderer {
+		private final static DefaultListCellRenderer delegate = new DefaultListCellRenderer();
+
+		public Component getListCellRendererComponent(JList list, Object value,
+				int index, boolean isSelected, boolean cellHasFocus) {
+			Component toReturn = delegate.getListCellRendererComponent(list,
+					value, index, isSelected, cellHasFocus);
+			if (value instanceof InstantiatedPatternModel) {
+				InstantiatedPatternModel instantiatedPatternModel = (InstantiatedPatternModel) value;
+				StringWriter writer = new StringWriter();
+				writer.append(instantiatedPatternModel.getName());
+				writer.append("(");
+				List<InputVariable> inputVariables = instantiatedPatternModel
+						.getInputVariables();
+				boolean first = true;
+				for (InputVariable inputVariable : inputVariables) {
+					String comma = first ? "" : ", ";
+					first = first ? false : first;
+					writer.append(comma);
+					writer.append(inputVariable.getName());
+				}
+				writer.append(")");
+				toReturn = delegate.getListCellRendererComponent(list, writer
+						.toString(), index, isSelected, cellHasFocus);
+			}
+			return toReturn;
+		}
+	}
+
 	private OWLEditorKit owlEditorKit;
 	private JPanel mainPane;
-	private ExpressionEditor<InstantiatedPatternModel> nameEditor;
+	// private ExpressionEditor<InstantiatedPatternModel> nameEditor;
+	private DefaultComboBoxModel patternListModel = new DefaultComboBoxModel();
+	private JComboBox patternList = new JComboBox(this.patternListModel);
 	private InstantiatedPatternModel instantiatedPatternModel;
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private JPanel effectsBorder;
@@ -338,16 +374,59 @@ public class PatternInstantiationEditor extends
 	}
 
 	private void setup() {
-		this.nameEditor = new ExpressionEditor<InstantiatedPatternModel>(
-				this.owlEditorKit, new PatternReferenceExpressionChecker(
-						this.owlEditorKit));
-		// will go away when the completer will be removed from the expression
-		// editor
-		this.removeKeyListeners();
-		this.nameEditor.setPreferredSize(new Dimension(50, 20));
-		this.nameEditor.addStatusChangedListener(this);
+		Set<String> existingPatternNames = Utils
+				.getExistingPatternNames(this.owlEditorKit.getModelManager()
+						.getOWLOntologyManager());
+		this.patternList.setRenderer(new InstantiatedPatternCellRenderer());
+		for (String string : existingPatternNames) {
+			PatternModel patternModel = Utils.find(string, this.owlEditorKit
+					.getModelManager().getOWLOntologyManager());
+			InstantiatedPatternModel toAdd = PatternParser
+					.getPatternModelFactory().createInstantiatedPatternModel(
+							patternModel);
+			this.patternListModel.addElement(toAdd);
+		}
+		this.patternList.setPreferredSize(new Dimension(50, 20));
+		this.patternList.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				Object selectedItem = PatternInstantiationEditor.this.patternList
+						.getSelectedItem();
+				if (selectedItem instanceof InstantiatedPatternModel) {
+					PatternInstantiationEditor.this.instantiatedPatternModel = (InstantiatedPatternModel) selectedItem;
+					if (PatternInstantiationEditor.this.owlClass != null) {
+						PatternInstantiationEditor.this.instantiatedPatternModel
+								.getConstraintSystem()
+								.instantiateThisClass(
+										new PatternConstant<OWLClass>(
+												PatternConstraintSystem.THIS_CLASS_VARIABLE_NAME,
+												VariableType.CLASS,
+												PatternConstant
+														.createConstantGeneratedValue(PatternInstantiationEditor.this.owlClass)));
+					}
+					PatternInstantiationEditor.this.refreshInstantiationPanel();
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							PatternInstantiationEditor.this
+									.refreshEffectsPanel();
+						}
+					});
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							PatternInstantiationEditor.this.handleChange();
+						}
+					});
+					SwingUtilities.invokeLater(new Runnable() {
+						public void run() {
+							PatternInstantiationEditor.this.variableList
+									.setSelectedIndex(0);
+						}
+					});
+					PatternInstantiationEditor.this.handleChange();
+				}
+			}
+		});
 		JScrollPane editorPane = ComponentFactory
-				.createScrollPane(this.nameEditor);
+				.createScrollPane(this.patternList);
 		JPanel editorPanel = new JPanel(new BorderLayout());
 		editorPanel.add(editorPane);
 		this.instantiationPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -380,23 +459,12 @@ public class PatternInstantiationEditor extends
 		this.mainPane.add(centerPane, BorderLayout.CENTER);
 	}
 
-	/**
-	 * 
-	 */
-	private void removeKeyListeners() {
-		KeyListener[] keyListeners = this.nameEditor.getKeyListeners();
-		for (KeyListener keyListener : keyListeners) {
-			this.nameEditor.removeKeyListener(keyListener);
-		}
-	}
-
 	public void clear() {
 		this.mainPane.removeAll();
 		this.setup();
 	}
 
 	public void dispose() {
-		this.nameEditor.removeStatusChangedListener(this);
 		this.valueList.getModel().removeListDataListener(this);
 		this.variableList.removeListSelectionListener(this);
 	}
@@ -430,47 +498,46 @@ public class PatternInstantiationEditor extends
 		this.listeners.remove(listener);
 	}
 
-	public void verifiedStatusChanged(boolean newState) {
-		this.instantiatedPatternModel = null;
-		if (newState) {
-			try {
-				this.instantiatedPatternModel = this.nameEditor.createObject();
-				if (this.owlClass != null) {
-					this.instantiatedPatternModel
-							.getConstraintSystem()
-							.instantiateThisClass(
-									new PatternConstant<OWLClass>(
-											PatternConstraintSystem.THIS_CLASS_VARIABLE_NAME,
-											VariableType.CLASS,
-											PatternConstant
-													.createConstantGeneratedValue(this.owlClass)));
-				}
-			} catch (OWLExpressionParserException e) {
-				e.printStackTrace();
-			} catch (OWLException e) {
-				e.printStackTrace();
-			}
-		}
-		this.refreshInstantiationPanel();
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				PatternInstantiationEditor.this.refreshEffectsPanel();
-			}
-		});
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				PatternInstantiationEditor.this.handleChange();
-			}
-		});
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				PatternInstantiationEditor.this.variableList
-						.setSelectedIndex(0);
-			}
-		});
-		this.handleChange();
-	}
-
+	// public void verifiedStatusChanged(boolean newState) {
+	// this.instantiatedPatternModel = null;
+	// if (newState) {
+	// try {
+	// this.instantiatedPatternModel = this.nameEditor.createObject();
+	// if (this.owlClass != null) {
+	// this.instantiatedPatternModel
+	// .getConstraintSystem()
+	// .instantiateThisClass(
+	// new PatternConstant<OWLClass>(
+	// PatternConstraintSystem.THIS_CLASS_VARIABLE_NAME,
+	// VariableType.CLASS,
+	// PatternConstant
+	// .createConstantGeneratedValue(this.owlClass)));
+	// }
+	// } catch (OWLExpressionParserException e) {
+	// e.printStackTrace();
+	// } catch (OWLException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// this.refreshInstantiationPanel();
+	// SwingUtilities.invokeLater(new Runnable() {
+	// public void run() {
+	// PatternInstantiationEditor.this.refreshEffectsPanel();
+	// }
+	// });
+	// SwingUtilities.invokeLater(new Runnable() {
+	// public void run() {
+	// PatternInstantiationEditor.this.handleChange();
+	// }
+	// });
+	// SwingUtilities.invokeLater(new Runnable() {
+	// public void run() {
+	// PatternInstantiationEditor.this.variableList
+	// .setSelectedIndex(0);
+	// }
+	// });
+	// this.handleChange();
+	// }
 	private void refreshEffectsPanel() {
 		DefaultListModel model = (DefaultListModel) this.actionList.getModel();
 		model.clear();
@@ -571,7 +638,16 @@ public class PatternInstantiationEditor extends
 	public void setInstantiatedPatternModel(
 			InstantiatedPatternModel patternModel) {
 		this.instantantiatedPatternModel2CopyFrom = patternModel;
-		this.nameEditor.setText(patternModel.getName());
+		boolean found = false;
+		for (int i = 0; i < this.patternListModel.getSize() && !found; i++) {
+			Object element = this.patternListModel.getElementAt(i);
+			found = element instanceof InstantiatedPatternModel
+					&& patternModel.getName().compareTo(
+							((InstantiatedPatternModel) element).getName()) == 0;
+			if (found) {
+				this.patternList.setSelectedItem(element);
+			}
+		}
 	}
 
 	public void contentsChanged(ListDataEvent e) {
