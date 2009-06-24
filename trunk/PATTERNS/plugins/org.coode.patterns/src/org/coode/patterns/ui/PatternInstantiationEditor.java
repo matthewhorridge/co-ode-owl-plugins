@@ -374,21 +374,11 @@ public class PatternInstantiationEditor extends
 	}
 
 	private void setup() {
-		Set<String> existingPatternNames = Utils
-				.getExistingPatternNames(this.owlEditorKit.getModelManager()
-						.getOWLOntologyManager());
-		this.patternList.setRenderer(new InstantiatedPatternCellRenderer());
-		for (String string : existingPatternNames) {
-			PatternModel patternModel = Utils.find(string, this.owlEditorKit
-					.getModelManager().getOWLOntologyManager());
-			InstantiatedPatternModel toAdd = PatternParser
-					.getPatternModelFactory().createInstantiatedPatternModel(
-							patternModel);
-			this.patternListModel.addElement(toAdd);
-		}
+		this.refillPatternList();
 		this.patternList.setPreferredSize(new Dimension(50, 20));
 		this.patternList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
+				PatternInstantiationEditor.this.instantiatedPatternModel = null;
 				Object selectedItem = PatternInstantiationEditor.this.patternList
 						.getSelectedItem();
 				if (selectedItem instanceof InstantiatedPatternModel) {
@@ -425,10 +415,11 @@ public class PatternInstantiationEditor extends
 				}
 			}
 		});
-		JScrollPane editorPane = ComponentFactory
-				.createScrollPane(this.patternList);
+		JPanel namePanel = new JPanel(new BorderLayout());
+		namePanel.setBorder(ComponentFactory.createTitledBorder("Pattern:"));
+		namePanel.add(ComponentFactory.createScrollPane(this.patternList));
 		JPanel editorPanel = new JPanel(new BorderLayout());
-		editorPanel.add(editorPane);
+		editorPanel.add(namePanel);
 		this.instantiationPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
 		this.instantiationPanel.setBorder(ComponentFactory
 				.createTitledBorder("Variables:"));
@@ -459,6 +450,26 @@ public class PatternInstantiationEditor extends
 		this.mainPane.add(centerPane, BorderLayout.CENTER);
 	}
 
+	/**
+	 * 
+	 */
+	private void refillPatternList() {
+		this.patternListModel.removeAllElements();
+		Set<String> existingPatternNames = Utils
+				.getExistingPatternNames(this.owlEditorKit.getModelManager()
+						.getOWLOntologyManager());
+		this.patternList.setRenderer(new InstantiatedPatternCellRenderer());
+		for (String string : existingPatternNames) {
+			PatternModel patternModel = Utils.find(string, this.owlEditorKit
+					.getModelManager().getOWLOntologyManager());
+			InstantiatedPatternModel toAdd = PatternParser
+					.getPatternModelFactory().createInstantiatedPatternModel(
+							patternModel);
+			this.patternListModel.addElement(toAdd);
+			this.patternList.setSelectedItem(null);
+		}
+	}
+
 	public void clear() {
 		this.mainPane.removeAll();
 		this.setup();
@@ -478,19 +489,18 @@ public class PatternInstantiationEditor extends
 	}
 
 	/**
+	 * @param newState
 	 * @param listener
 	 */
-	private void notifyListener(InputVerificationStatusChangedListener listener) {
-		boolean valid = this.instantiatedPatternModel != null ? this.instantiatedPatternModel
-				.isValid()
-				: false;
-		listener.verifiedStatusChanged(valid);
+	private void notifyListener(boolean newState,
+			InputVerificationStatusChangedListener listener) {
+		listener.verifiedStatusChanged(newState);
 	}
 
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		this.notifyListener(listener);
+		this.notifyListener(this.check(), listener);
 	}
 
 	public void removeStatusChangedListener(
@@ -630,9 +640,17 @@ public class PatternInstantiationEditor extends
 	}
 
 	public void handleChange() {
+		boolean newState = this.check();
 		for (InputVerificationStatusChangedListener listener : this.listeners) {
-			this.notifyListener(listener);
+			this.notifyListener(newState, listener);
 		}
+	}
+
+	private boolean check() {
+		boolean valid = this.instantiatedPatternModel != null ? this.instantiatedPatternModel
+				.isValid()
+				: false;
+		return valid;
 	}
 
 	public void setInstantiatedPatternModel(
