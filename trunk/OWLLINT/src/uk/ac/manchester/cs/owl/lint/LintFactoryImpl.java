@@ -23,8 +23,9 @@
 package uk.ac.manchester.cs.owl.lint;
 
 import java.lang.reflect.Constructor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasoner;
@@ -39,9 +40,9 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 14, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 14, 2008
  */
 public class LintFactoryImpl implements LintFactory {
 	protected OWLReasoner reasoner;
@@ -91,7 +92,8 @@ public class LintFactoryImpl implements LintFactory {
 			} catch (Exception e) {
 				Logger
 						.getLogger(this.getClass().toString())
-						.warn(
+						.log(
+								Level.WARNING,
 								"Unable to load the default reasoner - NoOpReasoner will be used",
 								e);
 				NoOpReasoner noOpReasoner = new NoOpReasoner(OWLManager
