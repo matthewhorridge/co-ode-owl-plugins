@@ -25,8 +25,9 @@ package uk.ac.manchester.cs.owl.lint.examples;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.log4j.Logger;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
@@ -118,7 +119,8 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern {
 		} catch (LintException e) {
 			Logger logger = Logger.getLogger(this.getClass().getName());
 			logger
-					.warn("Unable to create reasoner... only asserted taxonomy will be used");
+					.log(Level.WARNING,
+							"Unable to create reasoner... only asserted taxonomy will be used");
 			for (OWLClass cls : ontology.getReferencedClasses()) {
 				if (cls.getSubClasses(ontology).size() == 1) {
 					toReturn.add(cls);
