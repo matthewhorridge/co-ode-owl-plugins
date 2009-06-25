@@ -344,6 +344,9 @@ public class PatternInstantiationEditor extends
 	private VariableValuesMList valueList;
 	private JScrollPane variablePane;
 	private JScrollPane valuePane;
+	private final JPanel problemPanel = new JPanel(new BorderLayout());
+	private final DefaultListModel problemListModel = new DefaultListModel();
+	private final JList problemList = new JList(this.problemListModel);
 
 	/**
 	 * Builds a PatternInstantiationEditor for a specific class, i.e.: an editor
@@ -374,6 +377,7 @@ public class PatternInstantiationEditor extends
 	}
 
 	private void setup() {
+		this.mainPane.setPreferredSize(new Dimension(500, 600));
 		this.refillPatternList();
 		this.patternList.setPreferredSize(new Dimension(50, 20));
 		this.patternList.addActionListener(new ActionListener() {
@@ -417,7 +421,13 @@ public class PatternInstantiationEditor extends
 		});
 		JPanel namePanel = new JPanel(new BorderLayout());
 		namePanel.setBorder(ComponentFactory.createTitledBorder("Pattern:"));
-		namePanel.add(ComponentFactory.createScrollPane(this.patternList));
+		namePanel.add(ComponentFactory.createScrollPane(this.patternList),
+				BorderLayout.NORTH);
+		this.problemPanel.setBorder(ComponentFactory
+				.createTitledBorder("Problems"));
+		this.problemPanel.add(ComponentFactory
+				.createScrollPane(this.problemList));
+		namePanel.add(this.problemPanel, BorderLayout.SOUTH);
 		JPanel editorPanel = new JPanel(new BorderLayout());
 		editorPanel.add(namePanel);
 		this.instantiationPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -508,46 +518,6 @@ public class PatternInstantiationEditor extends
 		this.listeners.remove(listener);
 	}
 
-	// public void verifiedStatusChanged(boolean newState) {
-	// this.instantiatedPatternModel = null;
-	// if (newState) {
-	// try {
-	// this.instantiatedPatternModel = this.nameEditor.createObject();
-	// if (this.owlClass != null) {
-	// this.instantiatedPatternModel
-	// .getConstraintSystem()
-	// .instantiateThisClass(
-	// new PatternConstant<OWLClass>(
-	// PatternConstraintSystem.THIS_CLASS_VARIABLE_NAME,
-	// VariableType.CLASS,
-	// PatternConstant
-	// .createConstantGeneratedValue(this.owlClass)));
-	// }
-	// } catch (OWLExpressionParserException e) {
-	// e.printStackTrace();
-	// } catch (OWLException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// this.refreshInstantiationPanel();
-	// SwingUtilities.invokeLater(new Runnable() {
-	// public void run() {
-	// PatternInstantiationEditor.this.refreshEffectsPanel();
-	// }
-	// });
-	// SwingUtilities.invokeLater(new Runnable() {
-	// public void run() {
-	// PatternInstantiationEditor.this.handleChange();
-	// }
-	// });
-	// SwingUtilities.invokeLater(new Runnable() {
-	// public void run() {
-	// PatternInstantiationEditor.this.variableList
-	// .setSelectedIndex(0);
-	// }
-	// });
-	// this.handleChange();
-	// }
 	private void refreshEffectsPanel() {
 		DefaultListModel model = (DefaultListModel) this.actionList.getModel();
 		model.clear();
@@ -644,6 +614,7 @@ public class PatternInstantiationEditor extends
 		for (InputVerificationStatusChangedListener listener : this.listeners) {
 			this.notifyListener(newState, listener);
 		}
+		this.problemPanel.setVisible(!this.problemListModel.isEmpty());
 	}
 
 	private boolean check() {
