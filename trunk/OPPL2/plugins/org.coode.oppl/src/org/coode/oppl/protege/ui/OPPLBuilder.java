@@ -1,7 +1,7 @@
 package org.coode.oppl.protege.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
@@ -11,16 +11,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
@@ -31,6 +27,8 @@ import org.coode.oppl.InCollectionConstraint;
 import org.coode.oppl.InequalityConstraint;
 import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLScript;
+import org.coode.oppl.protege.ui.message.Error;
+import org.coode.oppl.protege.ui.message.MessageListCellRenderer;
 import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.VariableExtractor;
@@ -49,22 +47,6 @@ import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLObject;
 
 public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
-	private class ErrorListCellRenderer implements ListCellRenderer {
-		private final DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
-
-		public Component getListCellRendererComponent(JList list, Object value,
-				int index, boolean isSelected, boolean cellHasFocus) {
-			Component toReturn = this.defaultListCellRenderer
-					.getListCellRendererComponent(list, value, index,
-							isSelected, cellHasFocus);
-			if (toReturn instanceof JLabel) {
-				((JLabel) toReturn).setIcon(new ImageIcon(this.getClass()
-						.getClassLoader().getResource("error.png")));
-			}
-			return toReturn;
-		}
-	}
-
 	/**
 	 * 
 	 */
@@ -314,7 +296,6 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 			this.purgeActions(v);
 			this.purgeSelect(v);
 			this.purgeConstraints(v);
-			OPPLBuilder.this.handleChange();
 			return true;
 		}
 
@@ -489,6 +470,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 
 		public void contentsChanged(ListDataEvent e) {
 			this.updateOPPLScriptModel();
+			OPPLBuilder.this.handleChange();
 		}
 
 		/**
@@ -513,10 +495,12 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 
 		public void intervalAdded(ListDataEvent e) {
 			this.updateOPPLScriptModel();
+			OPPLBuilder.this.handleChange();
 		}
 
 		public void intervalRemoved(ListDataEvent e) {
 			this.updateOPPLScriptModel();
+			OPPLBuilder.this.handleChange();
 		}
 
 		/**
@@ -595,6 +579,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 	private final OPPLScriptValidator validator;
 	private DefaultListModel errorListModel = new DefaultListModel();
 	private JList errorList = new JList(this.errorListModel);
+	private final JPanel errorPanel = new JPanel(new BorderLayout());
 
 	public OPPLBuilder(OWLEditorKit owlEditorKit) {
 		this(owlEditorKit, null);
@@ -649,11 +634,12 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		queryActionSplitPane.setResizeWeight(.3);
 		this.setDividerLocation(.5);
 		this.setResizeWeight(.3);
-		JPanel errorPanel = new JPanel(new BorderLayout());
-		this.errorList.setCellRenderer(new ErrorListCellRenderer());
-		errorPanel.add(ComponentFactory.createScrollPane(this.errorList));
-		errorPanel.setBorder(ComponentFactory.createTitledBorder("Errors:"));
-		this.add(errorPanel, JSplitPane.TOP);
+		this.errorList.setCellRenderer(new MessageListCellRenderer());
+		this.errorPanel.add(ComponentFactory.createScrollPane(this.errorList));
+		this.errorPanel.setBorder(ComponentFactory
+				.createTitledBorder("Errors:"));
+		this.errorPanel.setPreferredSize(new Dimension(100, 500));
+		this.add(this.errorPanel, JSplitPane.TOP);
 		this.add(builderPane, JSplitPane.BOTTOM);
 		builderPane.setDividerLocation(.5);
 		builderPane.setResizeWeight(.3);
@@ -672,19 +658,19 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 				.buildOPPLScript(this.constraintSystem, this.getVariables(),
 						this.getOPPLQuery(), this.getActions());
 		if (!enoughVariables) {
-			this.errorListModel.addElement("No variables ");
+			this.errorListModel.addElement(new Error("No variables "));
 		}
 		if (!enoughQueries) {
-			this.errorListModel.addElement("No query");
+			this.errorListModel.addElement(new Error("No query"));
 		}
 		if (!enoughActions) {
-			this.errorListModel.addElement("No actions");
+			this.errorListModel.addElement(new Error("No actions"));
 		}
 		boolean validated = this.validator == null
 				|| this.validator.accept(builtOPPLScript);
 		if (!validated) {
-			this.errorListModel.addElement("Failed validation: "
-					+ this.validator.getValidationRuleDescription());
+			this.errorListModel.addElement(new Error("Failed validation: "
+					+ this.validator.getValidationRuleDescription()));
 		}
 		return areThereMinimalElements && validated;
 	}
@@ -698,9 +684,16 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 					this.constraintSystem, this.getVariables(),
 					this.getOPPLQuery(), this.getActions());
 		}
+		this.errorPanel.setVisible(!this.errorListModel.isEmpty());
+		if (this.errorPanel.isVisible()) {
+			this.setDividerLocation(.3);
+		}
 		this.notifyListeners(isValid);
 	}
 
+	/**
+	 * 
+	 */
 	private void notifyListeners(boolean status) {
 		for (InputVerificationStatusChangedListener listener : this.listeners) {
 			listener.verifiedStatusChanged(status);
