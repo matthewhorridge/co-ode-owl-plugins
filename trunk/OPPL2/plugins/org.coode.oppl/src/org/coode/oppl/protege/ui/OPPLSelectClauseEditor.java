@@ -122,9 +122,8 @@ public class OPPLSelectClauseEditor extends JPanel implements
 		boolean isValid = this.check();
 		if (isValid) {
 			this.selectListItem = new OPPLSelectClauseListItem(
-					this.owlEditorKit, this.assertedCheckBox.getModel()
-							.isSelected(), this.axiomEditor.getAxiom(),
-					this.constraintSystem);
+					this.assertedCheckBox.getModel().isSelected(),
+					this.axiomEditor.getAxiom());
 		}
 		this.notifyListeners(isValid);
 	}

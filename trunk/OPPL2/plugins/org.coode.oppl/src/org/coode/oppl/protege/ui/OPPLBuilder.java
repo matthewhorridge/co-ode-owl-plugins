@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,9 +18,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.ListModel;
-import javax.swing.event.ListDataEvent;
-import javax.swing.event.ListDataListener;
 
 import org.coode.oppl.AbstractConstraint;
 import org.coode.oppl.ConstraintVisitorEx;
@@ -31,7 +29,7 @@ import org.coode.oppl.protege.ui.message.Error;
 import org.coode.oppl.protege.ui.message.MessageListCellRenderer;
 import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
 import org.coode.oppl.syntax.OPPLParser;
-import org.coode.oppl.utils.VariableExtractor;
+import org.coode.oppl.utils.NamedVariableDetector;
 import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
@@ -47,6 +45,305 @@ import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLObject;
 
 public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
+	private final class OPPLBuilderModel {
+		private final List<OWLAxiomChange> actions = new ArrayList<OWLAxiomChange>();
+		private final List<OWLAxiom> assertedQueryAxioms = new ArrayList<OWLAxiom>();
+		private final List<OWLAxiom> plainQueryAxioms = new ArrayList<OWLAxiom>();
+		private final List<AbstractConstraint> constraints = new ArrayList<AbstractConstraint>();
+		private ConstraintSystem constraintSystem = OPPLParser.getOPPLFactory()
+				.createConstraintSystem();
+		private final List<Variable> variables = new ArrayList<Variable>();
+
+		public void addAction(OWLAxiomChange action) {
+			boolean modified = this.actions.add(action);
+			if (modified) {
+				this.notifyBuilder();
+			}
+		}
+
+		public void addVariable(Variable v) {
+			boolean modified = this.variables.add(v);
+			if (modified) {
+				this.constraintSystem.importVariable(v);
+				this.notifyBuilder();
+			}
+		}
+
+		public boolean check() {
+			boolean enoughVariables = !this.variables.isEmpty();
+			boolean enoughQueries = !this.assertedQueryAxioms.isEmpty()
+					|| !this.plainQueryAxioms.isEmpty()
+					|| !this.constraints.isEmpty();
+			boolean enoughActions = !this.actions.isEmpty();
+			boolean areThereMinimalElements = enoughVariables
+					&& (enoughQueries || enoughActions);
+			OPPLScript builtOPPLScript = OPPLParser.getOPPLFactory()
+					.buildOPPLScript(this.constraintSystem,
+							this.getVariables(), this.getOPPLQuery(),
+							this.getActions());
+			if (!enoughVariables) {
+				OPPLBuilder.this.errorListModel.addElement(new Error(
+						"No variables "));
+			}
+			if (!areThereMinimalElements) {
+				OPPLBuilder.this.errorListModel
+						.addElement(new Error(
+								"The must be at least either one action, or one query, or one constraint"));
+			}
+			boolean validated = OPPLBuilder.this.validator == null
+					|| OPPLBuilder.this.validator.accept(builtOPPLScript);
+			if (!validated) {
+				OPPLBuilder.this.errorListModel.addElement(new Error(
+						"Failed validation: "
+								+ OPPLBuilder.this.validator
+										.getValidationRuleDescription()));
+			}
+			return areThereMinimalElements && validated;
+		}
+
+		private OPPLQuery getOPPLQuery() {
+			OPPLQuery query = OPPLParser.getOPPLFactory().buildNewQuery(
+					this.getConstraintSystem());
+			for (OWLAxiom axiom : this.getAssertedQueryAxioms()) {
+				query.addAssertedAxiom(axiom);
+			}
+			for (OWLAxiom axiom : this.getPlainQueryAxioms()) {
+				query.addAxiom(axiom);
+			}
+			for (AbstractConstraint constraint : this.getConstraints()) {
+				query.addConstraint(constraint);
+			}
+			return query;
+		}
+
+		/**
+		 * @return the constraintSystem
+		 */
+		public final ConstraintSystem getConstraintSystem() {
+			return this.constraintSystem;
+		}
+
+		/**
+		 * @return the variables
+		 */
+		public List<Variable> getVariables() {
+			return new ArrayList<Variable>(this.variables);
+		}
+
+		public void notifyBuilder() {
+			OPPLBuilder.this.handleChange();
+		}
+
+		private void purgeQuery(Variable v) {
+			this.purgeAssertedAxioms(v);
+			this.purgePlainAxioms(v);
+			this.purgeConstraints(v);
+		}
+
+		private void purgeConstraints(final Variable v) {
+			for (AbstractConstraint constraint : this.getConstraints()) {
+				boolean affected = constraint
+						.accept(new ConstraintVisitorEx<Boolean>() {
+							public Boolean visit(
+									InCollectionConstraint<? extends OWLObject> c) {
+								boolean toReturn = c.getVariable().equals(v);
+								if (!toReturn) {
+									Collection<? extends OWLObject> collection = c
+											.getCollection();
+									Iterator<? extends OWLObject> it = collection
+											.iterator();
+									NamedVariableDetector variableDetector = new NamedVariableDetector(
+											v, OPPLBuilderModel.this
+													.getConstraintSystem());
+									boolean detected = false;
+									while (!detected && it.hasNext()) {
+										OWLObject object = it.next();
+										detected = object
+												.accept(variableDetector);
+									}
+									toReturn = detected;
+								}
+								return toReturn;
+							}
+
+							public Boolean visit(InequalityConstraint c) {
+								return c.getVariable().equals(v)
+										|| c
+												.getExpression()
+												.accept(
+														new NamedVariableDetector(
+																v,
+																OPPLBuilderModel.this
+																		.getConstraintSystem()));
+							}
+						});
+				if (affected) {
+					this.constraints.remove(constraint);
+				}
+			}
+		}
+
+		private void purgePlainAxioms(Variable v) {
+			Set<OWLAxiom> toRemove = new HashSet<OWLAxiom>();
+			for (OWLAxiom axiom : this.plainQueryAxioms) {
+				Set<Variable> axiomVariables = this.getConstraintSystem()
+						.getAxiomVariables(axiom);
+				if (axiomVariables.contains(v)) {
+					toRemove.add(axiom);
+				}
+			}
+			this.plainQueryAxioms.removeAll(toRemove);
+		}
+
+		private void purgeAssertedAxioms(Variable v) {
+			Set<OWLAxiom> toRemove = new HashSet<OWLAxiom>();
+			for (OWLAxiom axiom : this.assertedQueryAxioms) {
+				Set<Variable> axiomVariables = this.getConstraintSystem()
+						.getAxiomVariables(axiom);
+				if (axiomVariables.contains(v)) {
+					toRemove.add(axiom);
+				}
+			}
+			this.assertedQueryAxioms.removeAll(toRemove);
+		}
+
+		/**
+		 * @param v
+		 */
+		private void purgeActions(Variable v) {
+			Set<OWLAxiomChange> toRemove = new HashSet<OWLAxiomChange>();
+			for (OWLAxiomChange action : this.actions) {
+				OWLAxiom axiom = action.getAxiom();
+				Set<Variable> axiomVariables = this.getConstraintSystem()
+						.getAxiomVariables(axiom);
+				if (axiomVariables.contains(v)) {
+					toRemove.add(action);
+				}
+			}
+			this.actions.removeAll(toRemove);
+		}
+
+		public void removeAction(OWLAxiomChange action) {
+			boolean modified = this.actions.remove(action);
+			if (modified) {
+				this.notifyBuilder();
+			}
+		}
+
+		public void removeVariable(Variable v) {
+			boolean modified = this.variables.remove(v);
+			if (modified) {
+				this.purgeQuery(v);
+				this.purgeActions(v);
+				this.constraintSystem.removeVariable(v);
+				this.notifyBuilder();
+			}
+		}
+
+		public void replaceVariable(Variable oldVariable, Variable newVariable) {
+			boolean modified = this.variables.remove(oldVariable);
+			if (modified) {
+				if (oldVariable.getType() != newVariable.getType()) {
+					this.purgeActions(oldVariable);
+					this.purgeQuery(oldVariable);
+				}
+				this.variables.add(newVariable);
+				this.constraintSystem.removeVariable(oldVariable);
+				this.constraintSystem.importVariable(newVariable);
+				this.notifyBuilder();
+			}
+		}
+
+		public void reset() {
+			this.variables.clear();
+			this.assertedQueryAxioms.clear();
+			this.plainQueryAxioms.clear();
+			this.constraints.clear();
+			this.actions.clear();
+			this.notifyBuilder();
+		}
+
+		/**
+		 * @return the assertedQueryAxioms
+		 */
+		public final List<OWLAxiom> getAssertedQueryAxioms() {
+			return new ArrayList<OWLAxiom>(this.assertedQueryAxioms);
+		}
+
+		public void addPlainQueryAxiom(OWLAxiom axiom) {
+			boolean modified = this.plainQueryAxioms.add(axiom);
+			if (modified) {
+				this.notifyBuilder();
+			}
+		}
+
+		/**
+		 * @return the plainQueryAxioms
+		 */
+		public final List<OWLAxiom> getPlainQueryAxioms() {
+			return new ArrayList<OWLAxiom>(this.plainQueryAxioms);
+		}
+
+		public void addAddAssertedQueryAxiom(OWLAxiom axiom) {
+			boolean modified = this.assertedQueryAxioms.add(axiom);
+			if (modified) {
+				this.notifyBuilder();
+			}
+		}
+
+		/**
+		 * @return the constraints
+		 */
+		public final List<AbstractConstraint> getConstraints() {
+			return new ArrayList<AbstractConstraint>(this.constraints);
+		}
+
+		public void addConstraint(AbstractConstraint constraint) {
+			boolean modified = this.constraints.add(constraint);
+			if (modified) {
+				this.notifyBuilder();
+			}
+		}
+
+		/**
+		 * @return the actions
+		 */
+		public final List<OWLAxiomChange> getActions() {
+			return this.actions;
+		}
+
+		public void importOPPLScript(OPPLScript opplScript) {
+			this.reset();
+			this.variables.addAll(opplScript.getVariables());
+			this.constraintSystem.clearVariables();
+			Set<Variable> variablesToImport = opplScript.getConstraintSystem()
+					.getVariables();
+			for (Variable variable : variablesToImport) {
+				this.constraintSystem.importVariable(variable);
+			}
+			this.plainQueryAxioms.addAll(opplScript.getQuery().getAxioms());
+			this.assertedQueryAxioms.addAll(opplScript.getQuery()
+					.getAssertedAxioms());
+			this.constraints.addAll(opplScript.getQuery().getConstraints());
+			this.actions.addAll(opplScript.getActions());
+			this.notifyBuilder();
+		}
+
+		public void removeAssertedAxiom(OWLAxiom axiom) {
+			boolean modified = this.assertedQueryAxioms.remove(axiom);
+			if (modified) {
+				this.notifyBuilder();
+			}
+		}
+
+		public void removePlainAxiom(OWLAxiom axiom) {
+			boolean modified = this.plainQueryAxioms.remove(axiom);
+			if (modified) {
+				this.notifyBuilder();
+			}
+		}
+	}
+
 	/**
 	 * 
 	 */
@@ -55,14 +352,15 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 	private class OPPLActionList extends ActionList {
 		public OPPLActionList() {
 			super(OPPLBuilder.this.owlEditorKit,
-					OPPLBuilder.this.constraintSystem, true);
+					OPPLBuilder.this.opplBuilderModel.getConstraintSystem(),
+					true);
 		}
 
 		@Override
 		protected void handleAdd() {
 			final OWLAxiomChangeEditor actionEditor = new OWLAxiomChangeEditor(
 					OPPLBuilder.this.owlEditorKit,
-					OPPLBuilder.this.constraintSystem);
+					OPPLBuilder.this.opplBuilderModel.getConstraintSystem());
 			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
 					actionEditor) {
 				/**
@@ -117,11 +415,22 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		}
 
 		@Override
+		protected void handleDelete() {
+			Object selectedValue = this.getSelectedValue();
+			if (OPPLActionListItem.class.isAssignableFrom(selectedValue
+					.getClass())) {
+				OPPLActionListItem item = (OPPLActionListItem) selectedValue;
+				OWLAxiomChange action = item.getAxiomChange();
+				OPPLBuilder.this.opplBuilderModel.removeAction(action);
+			}
+		}
+
+		@Override
 		public void setConstraintSystem(ConstraintSystem constraintSystem) {
 			this.setCellRenderer(new VariableOWLCellRenderer(
 					OPPLBuilder.this.owlEditorKit,
-					OPPLBuilder.this.constraintSystem, new OWLCellRenderer(
-							OPPLBuilder.this.owlEditorKit)));
+					OPPLBuilder.this.opplBuilderModel.getConstraintSystem(),
+					new OWLCellRenderer(OPPLBuilder.this.owlEditorKit)));
 		}
 
 		/**
@@ -140,7 +449,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		public void handleEdit() {
 			final OWLAxiomChangeEditor actionEditor = new OWLAxiomChangeEditor(
 					OPPLBuilder.this.owlEditorKit,
-					OPPLBuilder.this.constraintSystem);
+					OPPLBuilder.this.opplBuilderModel.getConstraintSystem());
 			actionEditor.setOWLAxiomChange(this.getAxiomChange());
 			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
 					actionEditor) {
@@ -181,13 +490,10 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
 						OWLAxiomChange action = actionEditor
 								.getOwlAxiomChange();
-						DefaultListModel model = (DefaultListModel) OPPLBuilder.this.actionList
-								.getModel();
-						model.removeElement(OPPLBuilder.this.actionList
-								.getSelectedValue());
-						model.addElement(new OPPLActionListItem(action, true,
-								true));
-						OPPLBuilder.this.handleChange();
+						OPPLBuilder.this.opplBuilderModel
+								.removeAction(OPPLActionListItem.this
+										.getAxiomChange());
+						OPPLBuilder.this.opplBuilderModel.addAction(action);
 					}
 					actionEditor
 							.removeStatusChangedListener(verificationListener);
@@ -226,7 +532,8 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		 */
 		@Override
 		public void handleEdit() {
-			ConstraintSystem cs = OPPLBuilder.this.constraintSystem;
+			ConstraintSystem cs = OPPLBuilder.this.opplBuilderModel
+					.getConstraintSystem();
 			final AbstractVariableEditor variableEditor = this.getVariable() instanceof GeneratedVariable ? new GeneratedVariableEditor(
 					OPPLBuilder.this.owlEditorKit, cs)
 					: new VariableEditor(OPPLBuilder.this.owlEditorKit, cs);
@@ -268,18 +575,11 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 				public void componentHidden(ComponentEvent e) {
 					Object retVal = optionPane.getValue();
 					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
-						Variable variable = variableEditor.getVariable();
-						DefaultListModel model = (DefaultListModel) OPPLBuilder.this.variableList
-								.getModel();
-						model.removeElement(OPPLBuilder.this.variableList
-								.getSelectedValue());
-						OPPLBuilder.this.variableList
-								.placeListItem(new OPPLVariableListItem(
-										variable,
-										OPPLBuilder.this.owlEditorKit, true,
-										true));
-						OPPLVariableListItem.this.purgeActions(variable);
-						OPPLBuilder.this.handleChange();
+						Variable newVariable = variableEditor.getVariable();
+						Variable oldVariable = OPPLVariableListItem.this
+								.getVariable();
+						OPPLBuilder.this.opplBuilderModel.replaceVariable(
+								oldVariable, newVariable);
 					}
 					variableEditor
 							.removeStatusChangedListener(verificationListener);
@@ -289,120 +589,35 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 			});
 			dlg.setVisible(true);
 		}
-
-		@Override
-		public boolean handleDelete() {
-			Variable v = this.getVariable();
-			this.purgeActions(v);
-			this.purgeSelect(v);
-			this.purgeConstraints(v);
-			return true;
-		}
-
-		private void purgeConstraints(final Variable v) {
-			DefaultListModel model = (DefaultListModel) OPPLBuilder.this.constraintList
-					.getModel();
-			for (int i = 0; i < model.getSize(); i++) {
-				Object e = model.getElementAt(i);
-				if (e instanceof OPPLConstraintListItem) {
-					AbstractConstraint constraint = ((OPPLConstraintListItem) e)
-							.getConstraint();
-					boolean contains = constraint
-							.accept(new ConstraintVisitorEx<Boolean>() {
-								public Boolean visit(
-										InCollectionConstraint<? extends OWLObject> c) {
-									boolean toReturn = c.getVariable()
-											.equals(v);
-									if (!toReturn) {
-										boolean found = false;
-										Iterator<? extends OWLObject> it = c
-												.getCollection().iterator();
-										while (!found && it.hasNext()) {
-											OWLObject owlObject = it.next();
-											found = owlObject
-													.accept(
-															new VariableExtractor(
-																	OPPLBuilder.this.constraintSystem))
-													.contains(v);
-											if (found) {
-												toReturn = true;
-											}
-										}
-									}
-									return toReturn;
-								}
-
-								public Boolean visit(InequalityConstraint c) {
-									return c.getVariable().equals(v)
-											|| c
-													.getExpression()
-													.accept(
-															new VariableExtractor(
-																	OPPLBuilder.this.constraintSystem))
-													.contains(v);
-								}
-							});
-					if (contains) {
-						model.remove(i);
-					}
-				}
-			}
-		}
-
-		private void purgeSelect(Variable v) {
-			DefaultListModel model = (DefaultListModel) OPPLBuilder.this.selectList
-					.getModel();
-			for (int i = 0; i < model.getSize(); i++) {
-				Object e = model.getElementAt(i);
-				if (e instanceof OPPLSelectClauseListItem) {
-					OWLAxiom axiom = ((OPPLSelectClauseListItem) e).getAxiom();
-					Set<Variable> axiomVariables = OPPLBuilder.this.constraintSystem
-							.getAxiomVariables(axiom);
-					if (axiomVariables.contains(v)) {
-						model.remove(i);
-					}
-				}
-			}
-		}
-
-		/**
-		 * @param v
-		 */
-		private void purgeActions(Variable v) {
-			DefaultListModel model = (DefaultListModel) OPPLBuilder.this.actionList
-					.getModel();
-			for (int i = 0; i < model.getSize(); i++) {
-				Object e = model.getElementAt(i);
-				if (e instanceof OPPLActionListItem) {
-					OWLAxiomChange action = ((OPPLActionListItem) e)
-							.getAxiomChange();
-					OWLAxiom axiom = action.getAxiom();
-					Set<Variable> axiomVariables = OPPLBuilder.this.constraintSystem
-							.getAxiomVariables(axiom);
-					if (axiomVariables.contains(v)) {
-						model.remove(i);
-					}
-				}
-			}
-		}
 	}
 
-	private class OPPLVariableList extends VariableList implements
-			ListDataListener {
+	private class OPPLVariableList extends VariableList {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = -2540053052502672472L;
 
 		@Override
+		protected void handleDelete() {
+			Object selectedValue = this.getSelectedValue();
+			if (OPPLVariableListItem.class.isAssignableFrom(selectedValue
+					.getClass())) {
+				OPPLVariableListItem item = (OPPLVariableListItem) selectedValue;
+				OPPLBuilder.this.opplBuilderModel.removeVariable(item
+						.getVariable());
+			}
+		}
+
+		@Override
 		protected void handleAdd() {
 			final AbstractVariableEditor variableEditor = this
 					.getSelectedValue() instanceof InputVariableSectionHeader ? new VariableEditor(
 					OPPLBuilder.this.owlEditorKit,
-					OPPLBuilder.this.constraintSystem)
+					OPPLBuilder.this.opplBuilderModel.getConstraintSystem())
 					: new GeneratedVariableEditor(
 							OPPLBuilder.this.owlEditorKit,
-							OPPLBuilder.this.constraintSystem);
+							OPPLBuilder.this.opplBuilderModel
+									.getConstraintSystem());
 			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
 					variableEditor) {
 				/**
@@ -437,11 +652,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 					Object retVal = optionPane.getValue();
 					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
 						Variable variable = variableEditor.getVariable();
-						OPPLVariableListItem listItem = new OPPLVariableListItem(
-								variable, OPPLBuilder.this.owlEditorKit, true,
-								true);
-						OPPLVariableList.this.placeListItem(listItem);
-						OPPLBuilder.this.handleChange();
+						OPPLBuilder.this.opplBuilderModel.addVariable(variable);
 					}
 					variableEditor
 							.removeStatusChangedListener(verificationListener);
@@ -452,12 +663,12 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		}
 
 		public OPPLVariableList(OWLEditorKit owlEditorKit) {
-			super(owlEditorKit, OPPLBuilder.this.constraintSystem);
+			super(owlEditorKit, OPPLBuilder.this.opplBuilderModel
+					.getConstraintSystem());
 			((DefaultListModel) this.getModel())
 					.addElement(new InputVariableSectionHeader());
 			((DefaultListModel) this.getModel())
 					.addElement(new GeneratedVariableSectionHeader());
-			this.getModel().addListDataListener(this);
 		}
 
 		public void clear() {
@@ -466,41 +677,6 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 					.addElement(new InputVariableSectionHeader());
 			((DefaultListModel) this.getModel())
 					.addElement(new GeneratedVariableSectionHeader());
-		}
-
-		public void contentsChanged(ListDataEvent e) {
-			this.updateOPPLScriptModel();
-			OPPLBuilder.this.handleChange();
-		}
-
-		/**
-		 * 
-		 */
-		private void updateOPPLScriptModel() {
-			ListModel model = this.getModel();
-			for (int i = 0; i < model.getSize(); i++) {
-				Object element = model.getElementAt(i);
-				if (element instanceof OPPLVariableListItem) {
-					OPPLVariableListItem item = (OPPLVariableListItem) element;
-					if (OPPLBuilder.this.opplScript != null) {
-						if (!OPPLBuilder.this.opplScript.getVariables()
-								.contains(item.getVariable())) {
-							OPPLBuilder.this.opplScript.addVariable(item
-									.getVariable());
-						}
-					}
-				}
-			}
-		}
-
-		public void intervalAdded(ListDataEvent e) {
-			this.updateOPPLScriptModel();
-			OPPLBuilder.this.handleChange();
-		}
-
-		public void intervalRemoved(ListDataEvent e) {
-			this.updateOPPLScriptModel();
-			OPPLBuilder.this.handleChange();
 		}
 
 		/**
@@ -532,54 +708,58 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 	private OWLEditorKit owlEditorKit;
 	private OPPLVariableList variableList;
 	private OPPLSelectClauseList selectList;
-	private transient ListDataListener selectListListener = new ListDataListener() {
-		public void contentsChanged(ListDataEvent e) {
-			OPPLBuilder.this.handleChange();
-		}
-
-		public void intervalAdded(ListDataEvent e) {
-			OPPLBuilder.this.handleChange();
-		}
-
-		public void intervalRemoved(ListDataEvent e) {
-			OPPLBuilder.this.handleChange();
-		}
-	};
-	private transient ListDataListener constraintListListener = new ListDataListener() {
-		public void contentsChanged(ListDataEvent e) {
-			OPPLBuilder.this.handleChange();
-		}
-
-		public void intervalAdded(ListDataEvent e) {
-			OPPLBuilder.this.handleChange();
-		}
-
-		public void intervalRemoved(ListDataEvent e) {
-			OPPLBuilder.this.handleChange();
-		}
-	};
+	// private transient ListDataListener selectListListener = new
+	// ListDataListener() {
+	// public void contentsChanged(ListDataEvent e) {
+	// OPPLBuilder.this.handleChange();
+	// }
+	//
+	// public void intervalAdded(ListDataEvent e) {
+	// OPPLBuilder.this.handleChange();
+	// }
+	//
+	// public void intervalRemoved(ListDataEvent e) {
+	// OPPLBuilder.this.handleChange();
+	// }
+	// };
+	// private transient ListDataListener constraintListListener = new
+	// ListDataListener() {
+	// public void contentsChanged(ListDataEvent e) {
+	// OPPLBuilder.this.handleChange();
+	// }
+	//
+	// public void intervalAdded(ListDataEvent e) {
+	// OPPLBuilder.this.handleChange();
+	// }
+	//
+	// public void intervalRemoved(ListDataEvent e) {
+	// OPPLBuilder.this.handleChange();
+	// }
+	// };
 	private OPPLConstraintList constraintList;
 	private ActionList actionList;
-	private transient ListDataListener actionListListener = new ListDataListener() {
-		public void contentsChanged(ListDataEvent e) {
-			OPPLBuilder.this.handleChange();
-		}
-
-		public void intervalAdded(ListDataEvent e) {
-			OPPLBuilder.this.handleChange();
-		}
-
-		public void intervalRemoved(ListDataEvent e) {
-			OPPLBuilder.this.handleChange();
-		}
-	};
-	private ConstraintSystem constraintSystem = OPPLParser.getOPPLFactory()
-			.createConstraintSystem();
+	// private transient ListDataListener actionListListener = new
+	// ListDataListener() {
+	// public void contentsChanged(ListDataEvent e) {
+	// OPPLBuilder.this.handleChange();
+	// }
+	//
+	// public void intervalAdded(ListDataEvent e) {
+	// OPPLBuilder.this.handleChange();
+	// }
+	//
+	// public void intervalRemoved(ListDataEvent e) {
+	// OPPLBuilder.this.handleChange();
+	// }
+	// };
+	// private ConstraintSystem constraintSystem = OPPLParser.getOPPLFactory()
+	// .createConstraintSystem();
 	private OPPLScript opplScript;
 	private final OPPLScriptValidator validator;
 	private DefaultListModel errorListModel = new DefaultListModel();
 	private JList errorList = new JList(this.errorListModel);
 	private final JPanel errorPanel = new JPanel(new BorderLayout());
+	private final OPPLBuilderModel opplBuilderModel = new OPPLBuilderModel();
 
 	public OPPLBuilder(OWLEditorKit owlEditorKit) {
 		this(owlEditorKit, null);
@@ -607,15 +787,176 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		// Now the select part
 		JPanel queryPanel = new JPanel(new BorderLayout());
 		this.selectList = new OPPLSelectClauseList(this.owlEditorKit,
-				this.constraintSystem);
-		this.selectList.getModel().addListDataListener(this.selectListListener);
+				this.opplBuilderModel.getConstraintSystem()) {
+			@Override
+			protected void handleEdit() {
+				if (this.getSelectedValue() instanceof OPPLSelectClauseListItem) {
+					final OPPLSelectClauseListItem item = (OPPLSelectClauseListItem) this
+							.getSelectedValue();
+					/**
+					 * @see org.protege.editor.core.ui.list.MListItem#handleEdit()
+					 */
+					final OPPLSelectClauseEditor editor = new OPPLSelectClauseEditor(
+							this.getOwlEditorKit(), this.getConstraintSystem());
+					editor.setSelectListItem(item);
+					final VerifyingOptionPane optionPane = new VerifyingOptionPane(
+							editor) {
+						/**
+							 * 
+							 */
+						private static final long serialVersionUID = 7816306100172449202L;
+
+						/**
+							 * 
+							 */
+						@Override
+						public void selectInitialValue() {
+							// This is overridden so that the option pane dialog
+							// default
+							// button
+							// doesn't get the focus.
+						}
+					};
+					final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
+						public void verifiedStatusChanged(boolean verified) {
+							optionPane.setOKEnabled(verified);
+						}
+					};
+					editor.addStatusChangedListener(verificationListener);
+					final JDialog dlg = optionPane.createDialog(this
+							.getOwlEditorKit().getWorkspace(), null);
+					// The editor shouldn't be modal (or should it?)
+					dlg.setModal(true);
+					dlg.setTitle("Clause editor");
+					dlg.setResizable(true);
+					dlg.pack();
+					dlg.setLocationRelativeTo(this.getOwlEditorKit()
+							.getWorkspace());
+					dlg.addComponentListener(new ComponentAdapter() {
+						@Override
+						public void componentHidden(ComponentEvent e) {
+							Object retVal = optionPane.getValue();
+							if (retVal != null
+									&& retVal.equals(JOptionPane.OK_OPTION)) {
+								OPPLSelectClauseListItem newItem = editor
+										.getSelectListItem();
+								if (item.isAsserted()) {
+									OPPLBuilder.this.opplBuilderModel
+											.removeAssertedAxiom(item
+													.getAxiom());
+								} else {
+									OPPLBuilder.this.opplBuilderModel
+											.removePlainAxiom(item.getAxiom());
+								}
+								if (newItem.isAsserted()) {
+									OPPLBuilder.this.opplBuilderModel
+											.addAddAssertedQueryAxiom(newItem
+													.getAxiom());
+								} else {
+									OPPLBuilder.this.opplBuilderModel
+											.addPlainQueryAxiom(newItem
+													.getAxiom());
+								}
+							}
+							editor
+									.removeStatusChangedListener(verificationListener);
+							editor.dispose();
+						}
+					});
+					dlg.setVisible(true);
+				}
+			}
+
+			@Override
+			protected void handleDelete() {
+				if (this.getSelectedValue() instanceof OPPLSelectClauseListItem) {
+					OPPLSelectClauseListItem item = (OPPLSelectClauseListItem) this
+							.getSelectedValue();
+					if (item.isAsserted()) {
+						OPPLBuilder.this.opplBuilderModel
+								.removeAssertedAxiom(item.getAxiom());
+					} else {
+						OPPLBuilder.this.opplBuilderModel.removePlainAxiom(item
+								.getAxiom());
+					}
+				}
+			}
+
+			/**
+					 * 
+					 */
+			private static final long serialVersionUID = -567785735962335293L;
+
+			@Override
+			protected void handleAdd() {
+				final OPPLSelectClauseEditor editor = new OPPLSelectClauseEditor(
+						this.getOwlEditorKit(), this.getConstraintSystem());
+				final VerifyingOptionPane optionPane = new VerifyingOptionPane(
+						editor) {
+					/**
+					 * 
+					 */
+					private static final long serialVersionUID = 7816306100172449202L;
+
+					/**
+					 * 
+					 */
+					@Override
+					public void selectInitialValue() {
+						// This is overridden so that the option pane dialog
+						// default
+						// button
+						// doesn't get the focus.
+					}
+				};
+				final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
+					public void verifiedStatusChanged(boolean verified) {
+						optionPane.setOKEnabled(verified);
+					}
+				};
+				editor.addStatusChangedListener(verificationListener);
+				final JDialog dlg = optionPane.createDialog(this
+						.getOwlEditorKit().getWorkspace(), null);
+				// The editor shouldn't be modal (or should it?)
+				dlg.setModal(true);
+				dlg.setTitle("Clause editor");
+				dlg.setResizable(true);
+				dlg.pack();
+				dlg.setLocationRelativeTo(OPPLBuilder.this);
+				dlg.addComponentListener(new ComponentAdapter() {
+					@Override
+					public void componentHidden(ComponentEvent e) {
+						Object retVal = optionPane.getValue();
+						if (retVal != null
+								&& retVal.equals(JOptionPane.OK_OPTION)) {
+							OPPLSelectClauseListItem selectListItem = editor
+									.getSelectListItem();
+							if (selectListItem.isAsserted()) {
+								OPPLBuilder.this.opplBuilderModel
+										.addAddAssertedQueryAxiom(selectListItem
+												.getAxiom());
+							} else {
+								OPPLBuilder.this.opplBuilderModel
+										.addPlainQueryAxiom(selectListItem
+												.getAxiom());
+							}
+						}
+						editor
+								.removeStatusChangedListener(verificationListener);
+						editor.dispose();
+					}
+				});
+				dlg.setVisible(true);
+			}
+		};
+		// this.selectList.getModel().addListDataListener(this.selectListListener);
 		queryPanel.add(ComponentFactory.createScrollPane(this.selectList));
 		// Now the constraints
 		JPanel constraintPanel = new JPanel(new BorderLayout());
 		this.constraintList = new OPPLConstraintList(this.owlEditorKit,
-				this.constraintSystem);
-		this.constraintList.getModel().addListDataListener(
-				this.constraintListListener);
+				this.opplBuilderModel.getConstraintSystem());
+		// this.constraintList.getModel().addListDataListener(
+		// this.constraintListListener);
 		constraintPanel.add(ComponentFactory
 				.createScrollPane(this.constraintList));
 		queryConstraintSplitPane.add(queryPanel, JSplitPane.LEFT);
@@ -623,7 +964,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		// Now setup the action panel
 		JPanel actionPanel = new JPanel(new BorderLayout());
 		this.actionList = new OPPLActionList();
-		this.actionList.getModel().addListDataListener(this.actionListListener);
+		// this.actionList.getModel().addListDataListener(this.actionListListener);
 		actionPanel.add(ComponentFactory.createScrollPane(this.actionList));
 		queryActionSplitPane.add(queryConstraintSplitPane, JSplitPane.TOP);
 		queryActionSplitPane.add(actionPanel, JSplitPane.BOTTOM);
@@ -645,50 +986,59 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		builderPane.setResizeWeight(.3);
 		this.setDividerLocation(.3);
 		this.setResizeWeight(.3);
-	}
-
-	private boolean check() {
-		// The numbers include the section headers
-		boolean enoughVariables = this.variableList.getModel().getSize() > 2;
-		boolean enoughQueries = this.selectList.getModel().getSize() > 1;
-		boolean enoughActions = this.actionList.getModel().getSize() > 1;
-		boolean areThereMinimalElements = enoughVariables && enoughQueries
-				&& enoughActions;
-		OPPLScript builtOPPLScript = OPPLParser.getOPPLFactory()
-				.buildOPPLScript(this.constraintSystem, this.getVariables(),
-						this.getOPPLQuery(), this.getActions());
-		if (!enoughVariables) {
-			this.errorListModel.addElement(new Error("No variables "));
-		}
-		if (!enoughQueries) {
-			this.errorListModel.addElement(new Error("No query"));
-		}
-		if (!enoughActions) {
-			this.errorListModel.addElement(new Error("No actions"));
-		}
-		boolean validated = this.validator == null
-				|| this.validator.accept(builtOPPLScript);
-		if (!validated) {
-			this.errorListModel.addElement(new Error("Failed validation: "
-					+ this.validator.getValidationRuleDescription()));
-		}
-		return areThereMinimalElements && validated;
+		this.opplBuilderModel.check();
 	}
 
 	public void handleChange() {
 		this.opplScript = null;
 		this.errorListModel.clear();
-		boolean isValid = this.check();
+		boolean isValid = this.opplBuilderModel.check();
 		if (isValid) {
 			this.opplScript = OPPLParser.getOPPLFactory().buildOPPLScript(
-					this.constraintSystem, this.getVariables(),
-					this.getOPPLQuery(), this.getActions());
+					this.opplBuilderModel.getConstraintSystem(),
+					this.opplBuilderModel.getVariables(),
+					this.opplBuilderModel.getOPPLQuery(),
+					this.opplBuilderModel.getActions());
 		}
 		this.errorPanel.setVisible(!this.errorListModel.isEmpty());
 		if (this.errorPanel.isVisible()) {
 			this.setDividerLocation(.3);
 		}
 		this.notifyListeners(isValid);
+		this.updateGUI();
+	}
+
+	private void updateGUI() {
+		List<Variable> variables = this.opplBuilderModel.getVariables();
+		this.variableList.clear();
+		for (Variable variable : variables) {
+			this.variableList.placeListItem(new OPPLVariableListItem(variable,
+					this.owlEditorKit, true, true));
+		}
+		this.selectList.clear();
+		for (OWLAxiom axiom : this.opplBuilderModel.getAssertedQueryAxioms()) {
+			((DefaultListModel) this.selectList.getModel())
+					.addElement(new OPPLSelectClauseListItem(true, axiom));
+		}
+		for (OWLAxiom axiom : this.opplBuilderModel.getPlainQueryAxioms()) {
+			((DefaultListModel) this.selectList.getModel())
+					.addElement(new OPPLSelectClauseListItem(false, axiom));
+		}
+		this.constraintList.clear();
+		List<AbstractConstraint> constraints = this.opplBuilderModel
+				.getConstraints();
+		for (AbstractConstraint constraint : constraints) {
+			((DefaultListModel) this.constraintList.getModel())
+					.addElement(new OPPLConstraintListItem(this.owlEditorKit,
+							constraint, this.opplBuilderModel
+									.getConstraintSystem()));
+		}
+		this.actionList.clear();
+		List<OWLAxiomChange> actions = this.opplBuilderModel.getActions();
+		for (OWLAxiomChange axiomChange : actions) {
+			((DefaultListModel) this.actionList.getModel())
+					.addElement(new OPPLActionListItem(axiomChange, true, true));
+		}
 	}
 
 	/**
@@ -700,67 +1050,10 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 		}
 	}
 
-	private OPPLQuery getOPPLQuery() {
-		OPPLQuery toReturn = OPPLParser.getOPPLFactory().buildNewQuery(
-				this.constraintSystem);
-		ListModel model = this.selectList.getModel();
-		for (int i = 0; i < model.getSize(); i++) {
-			Object e = model.getElementAt(i);
-			if (e instanceof OPPLSelectClauseListItem) {
-				OPPLSelectClauseListItem selectListItem = (OPPLSelectClauseListItem) e;
-				OWLAxiom axiom = selectListItem.getAxiom();
-				if (selectListItem.isAsserted()) {
-					toReturn.addAssertedAxiom(axiom);
-				} else {
-					toReturn.addAxiom(axiom);
-				}
-			}
-		}
-		model = this.constraintList.getModel();
-		for (int i = 0; i < model.getSize(); i++) {
-			Object e = model.getElementAt(i);
-			if (e instanceof OPPLConstraintListItem) {
-				OPPLConstraintListItem constraintListItem = (OPPLConstraintListItem) e;
-				toReturn.addConstraint(constraintListItem.getConstraint());
-			}
-		}
-		return toReturn;
-	}
-
-	private List<OWLAxiomChange> getActions() {
-		ListModel model = this.actionList.getModel();
-		List<OWLAxiomChange> toReturn = new ArrayList<OWLAxiomChange>(model
-				.getSize());
-		if (model.getSize() > 0) {
-			for (int i = 0; i < model.getSize(); i++) {
-				Object elementAt = model.getElementAt(i);
-				if (elementAt instanceof ActionListItem) {
-					ActionListItem actionListItem = (ActionListItem) elementAt;
-					toReturn.add(actionListItem.getAxiomChange());
-				}
-			}
-		}
-		return toReturn;
-	}
-
-	private List<Variable> getVariables() {
-		ListModel model = this.variableList.getModel();
-		// There is a section header so the initial capacity is the size -1
-		List<Variable> toReturn = new ArrayList<Variable>(model.getSize() - 1);
-		for (int i = 0; i < model.getSize(); i++) {
-			Object elementAt = model.getElementAt(i);
-			if (elementAt instanceof VariableListItem) {
-				VariableListItem variableListItem = (VariableListItem) elementAt;
-				toReturn.add(variableListItem.getVariable());
-			}
-		}
-		return toReturn;
-	}
-
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		listener.verifiedStatusChanged(this.check());
+		listener.verifiedStatusChanged(this.opplScript != null);
 	}
 
 	public void removeStatusChangedListener(
@@ -780,56 +1073,11 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor {
 	 *            the opplScript to set
 	 */
 	public void setOPPLScript(OPPLScript opplScript) {
-		this.clear();
-		this.constraintSystem = opplScript.getConstraintSystem();
-		this.actionList.setConstraintSystem(this.constraintSystem);
-		this.selectList.setCellRenderer(new VariableOWLCellRenderer(
-				this.owlEditorKit, this.constraintSystem, new OWLCellRenderer(
-						this.owlEditorKit)));
-		List<Variable> variables = opplScript.getVariables();
-		for (Variable variable : variables) {
-			OPPLVariableListItem item = new OPPLVariableListItem(variable,
-					this.owlEditorKit, true, true);
-			this.variableList.placeListItem(item);
-		}
-		OPPLQuery query = opplScript.getQuery();
-		List<OWLAxiom> assertedAxioms = query.getAssertedAxioms();
-		for (OWLAxiom axiom : assertedAxioms) {
-			((DefaultListModel) this.selectList.getModel())
-					.addElement(new OPPLSelectClauseListItem(this.owlEditorKit,
-							true, axiom, this.constraintSystem));
-		}
-		List<OWLAxiom> axioms = query.getAxioms();
-		for (OWLAxiom axiom : axioms) {
-			((DefaultListModel) this.selectList.getModel())
-					.addElement(new OPPLSelectClauseListItem(this.owlEditorKit,
-							false, axiom, this.constraintSystem));
-		}
-		List<AbstractConstraint> constraints = query.getConstraints();
-		for (AbstractConstraint abstractConstraint : constraints) {
-			((DefaultListModel) this.constraintList.getModel())
-					.addElement(new OPPLConstraintListItem(this.owlEditorKit,
-							abstractConstraint, this.constraintSystem));
-		}
-		List<OWLAxiomChange> actions = opplScript.getActions();
-		for (OWLAxiomChange axiomChange : actions) {
-			((DefaultListModel) this.actionList.getModel())
-					.addElement(new OPPLActionListItem(axiomChange, true, true));
-		}
-		this.handleChange();
+		this.opplBuilderModel.importOPPLScript(opplScript);
 	}
 
 	public void clear() {
-		this.variableList.clear();
-		this.selectList.clear();
-		this.selectList.getModel().addListDataListener(this.selectListListener);
-		this.constraintList.clear();
-		this.constraintList.getModel().addListDataListener(
-				this.constraintListListener);
-		this.actionList.clear();
-		this.actionList.getModel().addListDataListener(this.actionListListener);
-		this.constraintSystem = OPPLParser.getOPPLFactory()
-				.createConstraintSystem();
+		this.opplBuilderModel.reset();
 	}
 
 	@Override

@@ -119,8 +119,7 @@ import org.semanticweb.owl.model.SWRLSameAsAtom;
  * @author Luigi Iannone
  * 
  */
-public class VariableExtractor implements
-		OWLObjectVisitorEx<Set<Variable>> {
+public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 	protected ConstraintSystem constraintSystem;
 
 	/**
@@ -618,7 +617,7 @@ public class VariableExtractor implements
 		boolean isVariable = this.constraintSystem.isVariable(node);
 		if (isVariable) {
 			Variable variable = this.constraintSystem.getVariable(node
-					.toString());
+					.getLiteral());
 			toReturn.add(variable);
 		}
 		return toReturn;
@@ -629,7 +628,7 @@ public class VariableExtractor implements
 		boolean isVariable = this.constraintSystem.isVariable(node);
 		if (isVariable) {
 			Variable variable = this.constraintSystem.getVariable(node
-					.toString());
+					.getLiteral());
 			toReturn.add(variable);
 		}
 		return toReturn;

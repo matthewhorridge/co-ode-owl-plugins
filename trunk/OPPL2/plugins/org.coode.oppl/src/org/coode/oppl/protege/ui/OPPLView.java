@@ -190,7 +190,8 @@ public class OPPLView extends AbstractOWLViewComponent implements
 					OPPLView.this.statementModel.getConstraintSystem(),
 					OPPLView.this.considerImportClosureCheckBox.isSelected());
 			System.out.println(OPPLView.this.statementModel.toString());
-			return OPPLView.this.statementModel.accept(changeExtractor);
+			List<OWLAxiomChange> result = OPPLView.this.statementModel.accept(changeExtractor);
+			return result;
 		}
 	}
 

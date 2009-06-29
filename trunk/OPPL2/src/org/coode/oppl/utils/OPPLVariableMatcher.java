@@ -44,8 +44,8 @@ public class OPPLVariableMatcher {
 	 * @param matchIndividuals
 	 * @param matchConstants
 	 * @return the Set of Variable instances whose names start with the input
-	 *         String from the input ConstraintSystem, provided thei type has to
-	 *         be included.
+	 *         String from the input ConstraintSystem, provided their type has
+	 *         to be included.
 	 */
 	public static Set<Variable> matches(String name,
 			ConstraintSystem constraintSystem, boolean matchClasses,
