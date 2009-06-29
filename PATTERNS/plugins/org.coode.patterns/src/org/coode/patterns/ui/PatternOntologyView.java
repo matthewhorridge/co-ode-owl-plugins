@@ -26,11 +26,15 @@ import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
+import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.border.Border;
 
 import org.coode.oppl.protege.ProtegeOPPLFactory;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.patterns.PatternManager;
+import org.coode.patterns.PatternModel;
 import org.coode.patterns.protege.ProtegePatternModelFactory;
 import org.coode.patterns.syntax.PatternParser;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -43,7 +47,7 @@ import org.semanticweb.owl.model.OWLOntologyChange;
 /**
  * @author Luigi Iannone
  * 
- * Jul 3, 2008
+ *         Jul 3, 2008
  */
 public class PatternOntologyView extends AbstractActiveOntologyViewComponent {
 	/**
@@ -100,6 +104,23 @@ public class PatternOntologyView extends AbstractActiveOntologyViewComponent {
 					PatternOntologyView.this.getOWLEditorKit()
 							.getModelManager().applyChange(change);
 				}
+			}
+
+			@Override
+			protected Border createListItemBorder(JList list, Object value,
+					int index, boolean isSelected, boolean cellHasFocus) {
+				Border border = super.createListItemBorder(list, value, index,
+						isSelected, cellHasFocus);
+				Border toReturn = border;
+				if (value instanceof PatternOntologyFrameSectionRow) {
+					PatternModel patternModel = ((PatternOntologyFrameSectionRow) value)
+							.getPatternModel();
+					PatternBorder patternBorder = new PatternBorder(
+							patternModel);
+					toReturn = BorderFactory.createCompoundBorder(border,
+							patternBorder);
+				}
+				return toReturn;
 			}
 		};
 		this.list.setRootObject(this.getOWLEditorKit().getModelManager()
