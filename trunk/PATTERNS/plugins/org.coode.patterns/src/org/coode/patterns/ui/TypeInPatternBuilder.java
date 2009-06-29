@@ -100,10 +100,12 @@ public class TypeInPatternBuilder extends
 					private void updateURI() {
 						URI anURI = null;
 						try {
-							anURI = new URI(
+							anURI = TypeInPatternBuilder.this.patternNameTextField
+									.getText().length() > 0 ? new URI(
 									PatternModel.NAMESPACE
 											+ TypeInPatternBuilder.this.patternNameTextField
-													.getText());
+													.getText())
+									: null;
 						} catch (URISyntaxException e) {
 							anURI = null;
 						} finally {
@@ -119,41 +121,6 @@ public class TypeInPatternBuilder extends
 						this.updateURI();
 					}
 				});
-		// this.patternNameTextField.getDocument().addDocumentListener(
-		// new DocumentListener() {
-		// public void changedUpdate(DocumentEvent e) {
-		// this.updateURI();
-		// }
-		//
-		// /**
-		// *
-		// */
-		// private void updateURI() {
-		// URI anURI = null;
-		// try {
-		// anURI = new URI(
-		// Constants.NAMESPACE
-		// + TypeInPatternBuilder.this.patternNameTextField
-		// .getText());
-		// } catch (URISyntaxException e) {
-		// anURI = null;
-		// } finally {
-		// if (TypeInPatternBuilder.this.patternModel != null) {
-		// TypeInPatternBuilder.this.patternModel
-		// .setUri(anURI);
-		// }
-		// }
-		// TypeInPatternBuilder.this.handleChange();
-		// }
-		//
-		// public void insertUpdate(DocumentEvent e) {
-		// this.updateURI();
-		// }
-		//
-		// public void removeUpdate(DocumentEvent e) {
-		// this.updateURI();
-		// }
-		// });
 		patternNamePanel.setBorder(ComponentFactory
 				.createTitledBorder("Pattern name"));
 		this.mainPanel.add(patternNamePanel, BorderLayout.NORTH);

@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.coode.patterns.PatternModel;
 import org.coode.patterns.utils.Utils;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.frame.OWLFrame;
@@ -39,7 +40,7 @@ import org.semanticweb.owl.model.OWLSubClassAxiom;
 /**
  * @author Luigi Iannone
  * 
- * Jul 24, 2008
+ *         Jul 24, 2008
  */
 public class PatternOWLSubCLassAxiomFrameSection extends
 		OWLSubClassAxiomFrameSection {
@@ -52,24 +53,6 @@ public class PatternOWLSubCLassAxiomFrameSection extends
 		super(editorKit, frame);
 	}
 
-	// /**
-	// * Refills the section with rows. This method will be called by the system
-	// * and should be directly called.
-	// */
-	// @Override
-	// protected void refill(OWLOntology ontology) {
-	// for (OWLSubClassAxiom ax : ontology.getSubClassAxiomsForLHS(this
-	// .getRootObject())) {
-	// Set<OWLAxiomAnnotationAxiom> annotationAxioms = ax
-	// .getAnnotationAxioms(ontology);
-	// if (Utils.isPatternGenerated(annotationAxioms)) {
-	// this.addRow(new PatternOWLSubClassAxiomFrameSectionRow(this
-	// .getOWLEditorKit(), this, ontology, this
-	// .getRootObject(), ax));
-	// this.added.add(ax.getSuperClass());
-	// }
-	// }
-	// }
 	@Override
 	protected Set<OWLSubClassAxiom> getClassAxioms(OWLDescription descr,
 			OWLOntology ont) {
@@ -90,10 +73,22 @@ public class PatternOWLSubCLassAxiomFrameSection extends
 	}
 
 	@Override
-	protected void addAxiom(OWLSubClassAxiom ax, OWLOntology ont) {
-		this.addRow(new PatternOWLSubClassAxiomFrameSectionRow(this
-				.getOWLEditorKit(), this, ont, this.getRootObject()
-				.asOWLClass(), ax));
+	protected void addAxiom(OWLSubClassAxiom ax, OWLOntology ontology) {
+		Set<OWLAxiomAnnotationAxiom> annotationAxioms = ax
+				.getAnnotationAxioms(ontology);
+		boolean isPatternGenerated = Utils.isPatternGenerated(annotationAxioms);
+		if (isPatternGenerated) {
+			PatternModel generatingPatternModel = Utils
+					.getGeneratingPatternModel(annotationAxioms, this
+							.getOWLEditorKit().getModelManager()
+							.getOWLOntologyManager());
+			if (generatingPatternModel != null) {
+				this.addRow(new PatternOWLSubClassAxiomFrameSectionRow(this
+						.getOWLEditorKit(), this, ontology, this
+						.getRootObject().asOWLClass(), ax,
+						generatingPatternModel));
+			}
+		}
 	}
 
 	@Override

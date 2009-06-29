@@ -282,4 +282,10 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	public void importVariable(Variable v) {
 		this.constraintSystem.importVariable(v);
 	}
+
+	@Override
+	public void clearVariables() {
+		this.constraintSystem.clearVariables();
+		this.init();
+	}
 }

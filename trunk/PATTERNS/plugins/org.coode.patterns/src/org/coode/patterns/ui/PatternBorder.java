@@ -22,51 +22,57 @@
  */
 package org.coode.patterns.ui;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Insets;
+
+import javax.swing.border.Border;
+
 import org.coode.patterns.PatternModel;
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.frame.OWLSubClassAxiomFrameSectionRow;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLSubClassAxiom;
 
 /**
  * @author Luigi Iannone
  * 
- *         Jul 24, 2008
  */
-public class PatternOWLSubClassAxiomFrameSectionRow extends
-		OWLSubClassAxiomFrameSectionRow {
-	private final PatternModel generatingPatternModel;
+public class PatternBorder implements Border {
+	private final PatternModel patternModel;
 
 	/**
-	 * @param owlEditorKit
-	 * @param section
-	 * @param ontology
-	 * @param rootObject
-	 * @param axiom
+	 * @param patternModel
 	 */
-	public PatternOWLSubClassAxiomFrameSectionRow(OWLEditorKit owlEditorKit,
-			PatternOWLSubCLassAxiomFrameSection section, OWLOntology ontology,
-			OWLClass rootObject, OWLSubClassAxiom axiom,
-			PatternModel generatingPatternModel) {
-		super(owlEditorKit, section, ontology, rootObject, axiom);
-		this.generatingPatternModel = generatingPatternModel;
+	public PatternBorder(PatternModel patternModel) {
+		this.patternModel = patternModel;
 	}
 
-	@Override
-	public boolean isDeleteable() {
-		return false;
+	/**
+	 * @see javax.swing.border.Border#getBorderInsets(java.awt.Component)
+	 */
+	public Insets getBorderInsets(Component c) {
+		return new Insets(0,
+				c.getFontMetrics(c.getFont()).getStringBounds(
+						this.patternModel.getName(), c.getGraphics())
+						.getBounds().width + 8, 0, 0);
 	}
 
-	@Override
-	public boolean isEditable() {
+	/**
+	 * @see javax.swing.border.Border#isBorderOpaque()
+	 */
+	public boolean isBorderOpaque() {
 		return false;
 	}
 
 	/**
-	 * @return the generatingPatternModel
+	 * @see javax.swing.border.Border#paintBorder(java.awt.Component,
+	 *      java.awt.Graphics, int, int, int, int)
 	 */
-	public final PatternModel getGeneratingPatternModel() {
-		return this.generatingPatternModel;
+	public void paintBorder(Component component, Graphics g, int x, int y,
+			int width, int height) {
+		Color oldColor = g.getColor();
+		g.setColor(Color.BLUE);
+		g.drawString(this.patternModel.getName(), x + 4, y + 2
+				+ g.getFontMetrics().getAscent()
+				+ g.getFontMetrics().getLeading());
+		g.setColor(oldColor);
 	}
 }

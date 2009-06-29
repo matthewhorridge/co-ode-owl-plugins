@@ -60,12 +60,12 @@ import org.semanticweb.owl.model.RemoveAxiom;
 /**
  * @author Luigi Iannone
  * 
- * Jun 9, 2008
+ *         Jun 9, 2008
  */
 public class PatternClassFrameSectionRow
 		extends
 		AbstractOWLFrameSectionRow<OWLClass, OWLEntityAnnotationAxiom, InstantiatedPatternModel> {
-	private InstantiatedPatternModel patternModel;
+	private final InstantiatedPatternModel patternModel;
 
 	protected PatternClassFrameSectionRow(
 			OWLEditorKit owlEditorKit,
@@ -87,7 +87,8 @@ public class PatternClassFrameSectionRow
 		OWLConstant constant = dataFactory.getOWLTypedConstant(editedObject
 				.toString());
 		URI annotationURI = URI.create(PatternModel.NAMESPACE
-				+ this.getOWLModelManager().getRendering(this.getRootObject())
+				// +
+				// this.getOWLModelManager().getRendering(this.getRootObject())
 				+ editedObject.getInstantiatedPatternLocalName()
 				+ "PatternInstantiation");
 		OWLConstantAnnotation annotation = dataFactory
@@ -99,8 +100,6 @@ public class PatternClassFrameSectionRow
 
 	@Override
 	protected OWLFrameSectionRowObjectEditor<InstantiatedPatternModel> getObjectEditor() {
-		// TypeInClassPatternEditor editor = new TypeInClassPatternEditor(this
-		// .getOWLEditorKit());
 		PatternInstantiationEditor editor = new PatternInstantiationEditor(this
 				.getOWLEditorKit(), this.getRootObject());
 		OWLEntityAnnotationAxiom annotationAxiom = (OWLEntityAnnotationAxiom) this
@@ -157,5 +156,12 @@ public class PatternClassFrameSectionRow
 		} else {
 			super.handleEditingFinished(editedObjects);
 		}
+	}
+
+	/**
+	 * @return the patternModel
+	 */
+	public final InstantiatedPatternModel getPatternModel() {
+		return this.patternModel;
 	}
 }

@@ -252,4 +252,11 @@ public class PatternOntologyFrameSectionRow
 			}
 		}
 	}
+
+	/**
+	 * @return the patternModel
+	 */
+	final PatternModel getPatternModel() {
+		return this.patternModel;
+	}
 }

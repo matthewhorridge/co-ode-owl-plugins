@@ -86,7 +86,8 @@ public class PatternClassFrameSection
 		OWLConstant constant = dataFactory
 				.getOWLTypedConstant(instantiatedPattern.toString());
 		URI annotationURI = URI.create(PatternModel.NAMESPACE
-				+ this.getOWLModelManager().getRendering(this.getRootObject())
+				// +
+				// this.getOWLModelManager().getRendering(this.getRootObject())
 				+ instantiatedPattern.getInstantiatedPatternLocalName()
 				+ "PatternInstantiation");
 		OWLConstantAnnotation annotation = dataFactory

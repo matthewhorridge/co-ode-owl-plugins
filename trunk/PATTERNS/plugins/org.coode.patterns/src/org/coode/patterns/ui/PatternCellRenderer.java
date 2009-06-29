@@ -22,11 +22,8 @@
  */
 package org.coode.patterns.ui;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,6 +38,7 @@ import org.coode.patterns.PatternOPPLScript;
 import org.coode.patterns.syntax.PatternParser;
 import org.coode.patterns.utils.Utils;
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.model.OWLAnnotation;
 import org.semanticweb.owl.model.OWLAnnotationAxiom;
 import org.semanticweb.owl.model.OWLAxiomAnnotationAxiom;
@@ -56,9 +54,16 @@ import org.semanticweb.owl.model.OWLSubClassAxiom;
  */
 public class PatternCellRenderer implements ListCellRenderer {
 	private OWLEditorKit owlEditorKit;
+	private final OWLCellRenderer owlCellRenderer;
 
 	public PatternCellRenderer(OWLEditorKit owlEditorKit) {
+		if (owlEditorKit == null) {
+			throw new NullPointerException("The OWL Editor Kit cannot be null");
+		}
 		this.owlEditorKit = owlEditorKit;
+		this.owlCellRenderer = new OWLCellRenderer(this.owlEditorKit);
+		this.owlCellRenderer.setHighlightKeywords(true);
+		this.owlCellRenderer.setWrap(true);
 	}
 
 	public Component getListCellRendererComponent(JList list, Object value,
@@ -76,9 +81,6 @@ public class PatternCellRenderer implements ListCellRenderer {
 					.accept(patternExtractor);
 			if (patternModel != null) {
 				valueRendering.setText(patternModel.getRendering());
-				JLabel nameLabel = new JLabel(patternModel.getName());
-				nameLabel.setForeground(Color.BLUE);
-				toReturn.add(nameLabel);
 			} else {
 				valueRendering.setText(value.toString());
 			}
@@ -92,9 +94,6 @@ public class PatternCellRenderer implements ListCellRenderer {
 			PatternModel patternModel = (PatternModel) annotation
 					.accept(patternExtractor);
 			if (patternModel != null) {
-				JLabel nameLabel = new JLabel(patternModel.getName());
-				nameLabel.setForeground(Color.BLUE);
-				toReturn.add(nameLabel);
 				toReturn.add(new JLabel(patternModel.getRendering()));
 			} else {
 				toReturn.add(new JLabel(value.toString()));
@@ -106,28 +105,14 @@ public class PatternCellRenderer implements ListCellRenderer {
 					.getAnnotationAxioms(this.owlEditorKit.getModelManager()
 							.getActiveOntology());
 			if (Utils.isPatternGenerated(annotationAxioms)) {
-				String string = Utils.getGeneratedPatternName(annotationAxioms)
-						+ " ";
-				JLabel nameLabel = new JLabel(string);
-				nameLabel.setForeground(Color.BLUE);
-				toReturn.add(nameLabel);
-			}
-			Set<OWLDescription> descriptions = new HashSet<OWLDescription>(
-					annotationAxiom.getDescriptions());
-			descriptions
-					.remove(((PatternOWLEquivalentClassesAxiomFrameSectionRow) value)
-							.getRoot());
-			StringWriter writer = new StringWriter();
-			for (OWLDescription description : descriptions) {
-				writer.append(this.owlEditorKit.getModelManager().getRendering(
-						description));
-				writer.append(" ");
-			}
-			toReturn.add(new JLabel(writer.toString()));
-			try {
-				writer.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+				Set<OWLDescription> descriptions = new HashSet<OWLDescription>(
+						annotationAxiom.getDescriptions());
+				descriptions
+						.remove(((PatternOWLEquivalentClassesAxiomFrameSectionRow) value)
+								.getRoot());
+				return this.owlCellRenderer.getListCellRendererComponent(list,
+						descriptions.iterator().next(), index, isSelected,
+						cellHasFocus);
 			}
 		} else if (value instanceof PatternOWLSubClassAxiomFrameSectionRow) {
 			OWLSubClassAxiom annotationAxiom = ((PatternOWLSubClassAxiomFrameSectionRow) value)
@@ -136,14 +121,10 @@ public class PatternCellRenderer implements ListCellRenderer {
 					.getAnnotationAxioms(this.owlEditorKit.getModelManager()
 							.getActiveOntology());
 			if (Utils.isPatternGenerated(annotationAxioms)) {
-				String string = Utils.getGeneratedPatternName(annotationAxioms)
-						+ " ";
-				JLabel nameLabel = new JLabel(string);
-				nameLabel.setForeground(Color.BLUE);
-				toReturn.add(nameLabel);
+				return this.owlCellRenderer.getListCellRendererComponent(list,
+						annotationAxiom.getSuperClass(), index, isSelected,
+						cellHasFocus);
 			}
-			toReturn.add(new JLabel(this.owlEditorKit.getModelManager()
-					.getRendering(annotationAxiom.getSuperClass())));
 		}
 		return toReturn;
 	}

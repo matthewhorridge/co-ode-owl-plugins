@@ -152,6 +152,36 @@ public class Utils {
 		return isPatternGenerated;
 	}
 
+	public static PatternModel getGeneratingPatternModel(
+			Set<OWLAxiomAnnotationAxiom> annotationAxioms,
+			OWLOntologyManager manager) {
+		PatternModel toReturn = null;
+		boolean isPatternGenerated = false;
+		String name = null;
+		Iterator<OWLAxiomAnnotationAxiom> it = annotationAxioms.iterator();
+		while (!isPatternGenerated && it.hasNext()) {
+			OWLAxiomAnnotationAxiom axiomAnnotationAxiom = it.next();
+			URI annotationURI = axiomAnnotationAxiom.getAnnotation()
+					.getAnnotationURI();
+			String uriString = annotationURI.toString();
+			isPatternGenerated = uriString.startsWith(PatternModel.NAMESPACE);
+			if (isPatternGenerated) {
+				URI patternURI = URI.create(axiomAnnotationAxiom
+						.getAnnotation().getAnnotationValueAsConstant()
+						.getLiteral());
+				String fragment = patternURI.getFragment();
+				if (fragment != null) {
+					name = fragment.substring(0, fragment
+							.indexOf("PatternInstantiation"));
+				}
+			}
+		}
+		if (name != null) {
+			toReturn = Utils.find(name, manager);
+		}
+		return toReturn;
+	}
+
 	public static boolean isPatternGenerated(String patternName,
 			Set<OWLAxiomAnnotationAxiom> annotationAxioms) {
 		boolean isPatternGenerated = false;

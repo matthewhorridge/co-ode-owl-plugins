@@ -24,9 +24,13 @@ package org.coode.patterns.ui;
 
 import java.awt.BorderLayout;
 
+import javax.swing.BorderFactory;
+import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.border.Border;
 
 import org.coode.patterns.PatternManager;
+import org.coode.patterns.PatternModel;
 import org.coode.patterns.protege.ProtegePatternModelFactory;
 import org.coode.patterns.syntax.PatternParser;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -39,7 +43,7 @@ import org.semanticweb.owl.model.OWLClass;
  * 
  */
 public class ClassPatternView extends AbstractOWLClassViewComponent {
-	protected OWLFrameList2<OWLClass> list;
+	private OWLFrameList2<OWLClass> list;
 	private JScrollPane listPane = null;
 	private PatternManager patternManager;
 	/**
@@ -54,7 +58,48 @@ public class ClassPatternView extends AbstractOWLClassViewComponent {
 	public void initialiseClassView() throws Exception {
 		this.setLayout(new BorderLayout());
 		this.list = new OWLFrameList2<OWLClass>(this.getOWLEditorKit(),
-				new PatternClassFrame(this.getOWLEditorKit()));
+				new PatternClassFrame(this.getOWLEditorKit())) {
+			/**
+			* 
+			*/
+			private static final long serialVersionUID = 1068899822314449303L;
+
+			@Override
+			protected Border createListItemBorder(JList list, Object value,
+					int index, boolean isSelected, boolean cellHasFocus) {
+				Border border = super.createListItemBorder(list, value, index,
+						isSelected, cellHasFocus);
+				Border toReturn = border;
+				if (value instanceof PatternOWLEquivalentClassesAxiomFrameSectionRow) {
+					PatternOWLEquivalentClassesAxiomFrameSectionRow row = (PatternOWLEquivalentClassesAxiomFrameSectionRow) value;
+					PatternModel generatingPatternModel = row
+							.getGeneratingPatternModel();
+					PatternBorder patternBorder = new PatternBorder(
+							generatingPatternModel);
+					toReturn = BorderFactory.createCompoundBorder(border,
+							patternBorder);
+				}
+				if (value instanceof PatternOWLSubClassAxiomFrameSectionRow) {
+					PatternOWLSubClassAxiomFrameSectionRow row = (PatternOWLSubClassAxiomFrameSectionRow) value;
+					PatternModel generatingPatternModel = row
+							.getGeneratingPatternModel();
+					PatternBorder patternBorder = new PatternBorder(
+							generatingPatternModel);
+					toReturn = BorderFactory.createCompoundBorder(border,
+							patternBorder);
+				}
+				if (value instanceof PatternClassFrameSectionRow) {
+					PatternClassFrameSectionRow row = (PatternClassFrameSectionRow) value;
+					PatternModel generatingPatternModel = row.getPatternModel()
+							.getInstantiatedPattern();
+					PatternBorder patternBorder = new PatternBorder(
+							generatingPatternModel);
+					toReturn = BorderFactory.createCompoundBorder(border,
+							patternBorder);
+				}
+				return toReturn;
+			}
+		};
 		this.list.setCellRenderer(new PatternCellRenderer(this
 				.getOWLEditorKit()));
 		this.listPane = ComponentFactory.createScrollPane(this.list);
