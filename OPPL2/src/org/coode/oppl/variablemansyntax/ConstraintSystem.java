@@ -35,6 +35,7 @@ import org.coode.oppl.AxiomQuery;
 import org.coode.oppl.ConstraintChecker;
 import org.coode.oppl.InferredAxiomQuery;
 import org.coode.oppl.OPPLException;
+import org.coode.oppl.utils.VariableDetector;
 import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
@@ -155,7 +156,6 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	private void updateBindings(OWLAxiom axiom) {
 		if (this.isVariableAxiom(axiom)) {
 			this.updateLeaves(axiom);
-			this.instantiatedAxioms.clear();
 			System.out.println("Initial size: "
 					+ (this.leaves == null ? "empty" : this.leaves.size()));
 			AxiomQuery query = this.reasoner == null
@@ -164,7 +164,22 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 					: new InferredAxiomQuery(this.ontologies, this,
 							this.dataFactory, this.reasoner);
 			axiom.accept(query);
-			this.instantiatedAxioms.putAll(query.getInstantiations());
+			Map<BindingNode, Set<OWLAxiom>> queryInstantiations = query
+					.getInstantiations();
+			// Update the instantiated axioms
+			for (BindingNode node : queryInstantiations.keySet()) {
+				Set<OWLAxiom> earlierInstantiations = this.instantiatedAxioms
+						.get(node);
+				// If the binding node already exists I add the instantiated
+				// axioms resulting from the last query
+				if (earlierInstantiations != null) {
+					earlierInstantiations.addAll(queryInstantiations.get(node));
+				} else {
+					// I create a new one.
+					this.instantiatedAxioms.put(node, queryInstantiations
+							.get(node));
+				}
+			}
 			System.out.println("Currently instantiated axioms count: "
 					+ this.instantiatedAxioms.size());
 		}
@@ -195,7 +210,6 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 					+ (this.leaves == null ? "empty" : this.leaves.size()));
 			AxiomQuery query = new AssertedAxiomQuery(this.ontologies, this);
 			axiom.accept(query);
-			this.instantiatedAxioms.clear();
 			this.instantiatedAxioms.putAll(query.getInstantiations());
 			System.out.println("Current size: "
 					+ this.instantiatedAxioms.size());
@@ -449,7 +463,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public boolean isVariable(OWLConstant node) {
-		return node.toString().trim().startsWith("\"?");
+		return node.getLiteral().startsWith("?");
 	}
 
 	public void setLeaves(Set<BindingNode> newLeaves) {
@@ -635,5 +649,9 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 
 	public void importVariable(Variable v) {
 		this.variables.put(v.getName(), v);
+	}
+
+	public void clearVariables() {
+		this.variables.clear();
 	}
 }

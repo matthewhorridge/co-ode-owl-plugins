@@ -1,0 +1,27 @@
+?island:INDIVIDUAL[instanceOf Island],
+?height:CONSTANT
+SELECT ASSERTED ?island hasHeight ?height
+BEGIN
+ 	REMOVE ?island hasHeight ?height,
+ 	ADD ?island hasMaximumHeight ?height
+END;
+
+?region:INDIVIDUAL[instanceOf TierOneAdministrativeDivision],
+?neighbour:INDIVIDUAL[instanceOf TierOneAdministrativeDivision],
+?boundaryFragment:INDIVIDUAL = create(?region.RENDERING+"_"+ ?neighbour.RENDERING+ "BoundaryFragment")
+SELECT ASSERTED ?region directPartOf italy,
+ASSERTED ?region nextTo ?neighbour
+BEGIN
+REMOVE ?region nextTo ?neighbour,
+ADD ?region hasBoundary ?boundaryFragment
+END;
+
+?region:INDIVIDUAL[instanceOf TierTwoAdministrativeRegion],
+?neighbour:INDIVIDUAL[instanceOf TierTwoAdministrativeRegion],
+?boundaryFragment:INDIVIDUAL = create(?region.RENDERING+"_"+ ?neighbour.RENDERING+ "BoundaryFragment")
+SELECT  ?region partOf united_kingdom,
+ASSERTED ?region nextTo ?neighbour
+BEGIN
+REMOVE ?region nextTo ?neighbour,
+ADD ?region hasBoundary ?boundaryFragment
+END;

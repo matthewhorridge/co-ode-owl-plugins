@@ -208,4 +208,51 @@ public class VariableListItem implements MListItem, OPPLMacroStatusChange {
 	protected final OWLEditorKit getOwlEditorKit() {
 		return this.owlEditorKit;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (this.isDeleteable ? 1231 : 1237);
+		result = prime * result + (this.isEditable ? 1231 : 1237);
+		result = prime * result
+				+ (this.variable == null ? 0 : this.variable.hashCode());
+		return result;
+	}
+
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		VariableListItem other = (VariableListItem) obj;
+		if (this.isDeleteable != other.isDeleteable) {
+			return false;
+		}
+		if (this.isEditable != other.isEditable) {
+			return false;
+		}
+		if (this.variable == null) {
+			if (other.variable != null) {
+				return false;
+			}
+		} else if (!this.variable.equals(other.variable)) {
+			return false;
+		}
+		return true;
+	}
 }

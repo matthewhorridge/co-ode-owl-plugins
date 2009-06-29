@@ -558,7 +558,8 @@ public class VariableManchesterOWLSyntaxParser extends
 				return this.getDataFactory()
 						.getOWLObjectPropertyAssertionAxiom(individual,
 								objectProperty, filler);
-			} else if (tok.compareToIgnoreCase("InstanceOf") == 0) {
+			} else if (tok.compareToIgnoreCase("InstanceOf") == 0
+					|| tok.compareToIgnoreCase("types") == 0) {
 				this.consumeToken();
 				OWLDescription description = this.parseDescription();
 				return this.getDataFactory().getOWLClassAssertionAxiom(
