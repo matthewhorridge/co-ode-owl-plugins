@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+
+<plugin>
+
+    <extension id="org.coode.taxonomy.DescendantsView"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Descendant Names"/>
+        <class value="org.coode.taxonomy.DescendantsView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
+    </extension>
+
+    <extension id="org.coode.taxonomy.TabbedHierarchyView"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Tabbed Subclasses"/>
+        <class value="org.coode.taxonomy.TabbedHierarchyView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
+    </extension>
+
+</plugin>
