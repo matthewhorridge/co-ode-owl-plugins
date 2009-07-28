@@ -40,8 +40,8 @@ import org.semanticweb.owl.model.OWLObject;
  */
 public class InCollectionConstraint<P extends OWLObject> implements
 		AbstractConstraint {
-	final Variable variable;
-	final Collection<P> collection;
+	private final Variable variable;
+	private final Collection<P> collection;
 	private ConstraintSystem constraintSystem;
 
 	/**
