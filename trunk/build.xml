@@ -2,9 +2,6 @@
 <project name = "Co-ODE Installer" default = "usage" basedir = "."> 
     <property file="local.properties"/>
 
-    <property name = "owlhtml.lib"    location="./owlhtml/build/owlhtml.jar"/>
-    <property name = "owlmanager.lib" location="./owlmanager/build/owlmanager.jar"/>
-
     <target name="init">
         <taskdef resource="svntask.properties" classpathref="svn.classpath"/>
     </target>
@@ -20,18 +17,6 @@
 
     <target name="invoke">
         <echo message = "======================= Invoking ${sub.target} build step on co-ode projects"/>
-
-        <!-- libraries must come first -->
-
-        <echo message = "Building owlhtml library}"/>
-        <ant antfile="./build.xml"
-             dir="./owlhtml"
-             target="${sub.target}"/>
-
-        <echo message = "Building owlmanager library}"/>
-        <ant antfile="./build.xml"
-             dir="./owlmanager"
-             target="${sub.target}"/>
 
         <!-- now do the plugins -->
 
