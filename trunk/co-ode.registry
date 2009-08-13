@@ -1,0 +1,37 @@
+// Annotate View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.annotate/update.properties
+
+// Bookmark View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/bookmark/update.properties
+
+// Cardinality View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/cardinality/update.properties
+
+// Change View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.change/update.properties
+
+// Cloud Views
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/cloud/update.properties
+
+// Outline View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/existentialtree/update.properties
+
+// Matrix Views
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/matrix/update.properties
+
+// OWLDoc
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.owldoc/update.properties
+
+// Search
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.search/update.properties
+
+// Example Tabbed Subclasses
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/taxonomy/update.properties
+
+// Beanshell
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.shell/update.properties
+
+// OBO tools
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/obotools/update.properties
+
+// TODO calculations
