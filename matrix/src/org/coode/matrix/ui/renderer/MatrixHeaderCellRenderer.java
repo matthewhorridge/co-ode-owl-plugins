@@ -1,4 +1,10 @@
-package org.coode.shell.view;/*
+package org.coode.matrix.ui.renderer;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import java.awt.*;
+/*
 * Copyright (C) 2007, University of Manchester
 *
 * Modifications to the initial code base are copyright of their
@@ -27,19 +33,25 @@ package org.coode.shell.view;/*
  * <p/>
  * The University Of Manchester<br>
  * Bio Health Informatics Group<br>
- * Date: Jun 18, 2008<br><br>
+ * Date: Jul 27, 2009<br><br>
  */
-public class MyThing {
+public class MatrixHeaderCellRenderer extends DefaultTableCellRenderer {
 
-    public String getName() {
-        return name;
-    }
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int col) {
+        // use getColumnName from the model
+        col = table.convertColumnIndexToModel(col);
+        value = table.getModel().getColumnName(col);
+        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, col);
+        // Inherit the colors and font from the header component
+        JTableHeader header = table.getTableHeader();
+        if (header != null) {
+            setForeground(header.getForeground());
+            setBackground(header.getBackground());
+            setFont(header.getFont());
+        }
 
-
-    private String name;
-
-
-    public MyThing(String name) {
-        this.name = name;
+        setBorder(UIManager.getBorder("TableHeader.cellBorder"));
+        setHorizontalAlignment(JLabel.CENTER);
+        return this;
     }
 }

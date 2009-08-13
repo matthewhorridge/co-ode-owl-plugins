@@ -1,11 +1,13 @@
 package org.coode.obotools.hierarchy;
 
-import org.protege.editor.owl.ui.clshierarchy.AbstractOWLClassHierarchyViewComponent;
-import org.protege.editor.owl.ui.clshierarchy.ToldOWLClassHierarchyViewComponent;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owl.model.OWLClass;
 
-import java.net.URI;
+import org.coode.owlapi.obo.parser.OBOVocabulary;
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.protege.editor.owl.ui.view.cls.ToldOWLClassHierarchyViewComponent;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -42,11 +44,12 @@ public class OBOClassHierarchyViewComponent extends ToldOWLClassHierarchyViewCom
     private OWLObjectHierarchyProvider<OWLClass> hp;
 
 
-    protected OWLObjectHierarchyProvider<OWLClass> getOWLClassHierarchyProvider() {
+    protected OWLObjectHierarchyProvider<OWLClass> getHierarchyProvider() {
         if (hp == null){
-            hp = new OBOEntitiesHierarchyProvider<OWLClass>(super.getOWLClassHierarchyProvider(),
-                                                         URI.create("http://www.geneontology.org/formats/oboInOwl#is_obsolete"),
-                                                         getOWLModelManager().getOWLDataFactory().getOWLUntypedConstant("true"),
+            final OWLDataFactory df = getOWLModelManager().getOWLDataFactory();
+            hp = new OBOEntitiesHierarchyProvider<OWLClass>(super.getHierarchyProvider(),
+                                                         df.getOWLAnnotationProperty(IRI.create(OBOVocabulary.IS_OBSOLETE.getURI())),
+                                                         df.getOWLStringLiteral("true"),
                                                          getOWLModelManager());
         }
         return hp;

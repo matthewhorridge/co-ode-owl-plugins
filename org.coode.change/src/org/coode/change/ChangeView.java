@@ -1,19 +1,16 @@
 package org.coode.change;
 
-import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-import org.protege.editor.owl.ui.framelist.OWLFrameList2;
-import org.protege.editor.owl.ui.frame.AxiomListFrame;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLOntologyChange;
-import org.semanticweb.owl.model.OWLOntologyChangeListener;
-import org.semanticweb.owl.model.OWLException;
+import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 
 import javax.swing.*;
-import javax.swing.tree.TreeModel;
-import java.util.Set;
+import java.awt.*;
 import java.util.List;
-import java.awt.*;/*
+
+/*
 * Copyright (C) 2007, University of Manchester
 *
 * Modifications to the initial code base are copyright of their

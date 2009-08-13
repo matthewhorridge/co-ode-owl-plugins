@@ -4,7 +4,7 @@
 
     <extension id="BeanShellView"
                point="org.protege.editor.core.application.ViewComponent">
-        <label value="Bean Shell"/>
+        <label value="Beanshell"/>
         <class value="org.coode.shell.view.BeanShellView"/>
     </extension>
 

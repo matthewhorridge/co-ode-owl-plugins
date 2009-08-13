@@ -1,8 +1,8 @@
 package org.coode.taxonomy;
 
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent;
-import org.semanticweb.owl.model.OWLClass;
+import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
+import org.semanticweb.owlapi.model.OWLClass;
 
 import javax.swing.*;
 import java.awt.*;
@@ -53,7 +53,7 @@ public class DescendantsView extends AbstractOWLClassViewComponent {
 
     protected OWLClass updateView(OWLClass selectedClass) {
         namesComponent.setText("");
-        OWLObjectHierarchyProvider<OWLClass> hp = getOWLModelManager().getOWLClassHierarchyProvider();
+        OWLObjectHierarchyProvider<OWLClass> hp = getOWLModelManager().getOWLHierarchyManager().getOWLClassHierarchyProvider();
         if (selectedClass != null) {
         	for (OWLClass sub: hp.getDescendants(selectedClass)){
         		namesComponent.append(getOWLModelManager().getRendering(sub));
@@ -64,6 +64,6 @@ public class DescendantsView extends AbstractOWLClassViewComponent {
     }
 
     public void disposeView() {
-        //@@TODO implement
+        // do nothing
     }
 }

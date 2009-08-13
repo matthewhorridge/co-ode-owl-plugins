@@ -1,5 +1,4 @@
-http://www.w3.org/2000/01/rdf-schema#label,text
-http://www.w3.org/2000/01/rdf-schema#comment,multiline
-#group
-http://purl.org/dc/elements/1.1/date,text
-http://purl.org/dc/elements/1.1/creator,multiline
+http://www.w3.org/2000/01/rdf-schema#label, text
+http://purl.org/dc/elements/1.1/creator, text
+http://purl.org/dc/elements/1.1/date, text
+http://www.w3.org/2000/01/rdf-schema#comment, multiline

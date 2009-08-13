@@ -1,22 +1,17 @@
 package org.coode.search.view;
 
-import org.protege.editor.owl.ui.OWLObjectComparator;
+import org.coode.search.ResultsTreeCellRenderer;
+import org.coode.search.ui.FlatButton;
 import org.protege.editor.owl.ui.tree.OWLLinkedObjectTree;
-import org.protege.editor.owl.ui.tree.OWLObjectTreeCellRenderer;
 import org.protege.editor.owl.ui.view.AbstractActiveOntologyViewComponent;
-import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.*;
 import java.util.List;
 /*
@@ -58,7 +53,11 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
 
     private JComponent filterPanel;
 
-    private Map<AnnotationFilterUI, Set<OWLAxiom>> resultsMap = new HashMap<AnnotationFilterUI, Set<OWLAxiom>>();
+    private Map<AnnotationFilterUI, Set<OWLAnnotationAssertionAxiom>> resultsMap = new HashMap<AnnotationFilterUI, Set<OWLAnnotationAssertionAxiom>>();
+
+    private ResultsTreeCellRenderer cellRenderer;
+
+    private JScrollPane scroller;
 
 
     protected void initialiseOntologyView() throws Exception {
@@ -67,7 +66,9 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
         resultsTree = new OWLLinkedObjectTree(getOWLEditorKit());
         resultsTree.setDrawNodeSeperators(true);
         resultsTree.setModel(new DefaultTreeModel(new DefaultMutableTreeNode("results (0)")));
-        resultsTree.setCellRenderer(new OWLObjectTreeCellRenderer(getOWLEditorKit()));
+
+        cellRenderer = new ResultsTreeCellRenderer(getOWLEditorKit());
+        resultsTree.setCellRenderer(cellRenderer);
 
         add(new JScrollPane(resultsTree), BorderLayout.CENTER);
 
@@ -94,11 +95,11 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
 
 
     private void addFilter(int index) {
-        final AnnotationFilterUI filter = new AnnotationFilterUI(this, getOWLModelManager());
+        final AnnotationFilterUI filter = new AnnotationFilterUI(this, getOWLEditorKit());
         final JComponent filterHolder = new JPanel();
         filterHolder.setLayout(new BoxLayout(filterHolder, BoxLayout.LINE_AXIS));
         filterHolder.add(filter);
-        filterHolder.add(new MyButton(new AbstractAction("-"){
+        filterHolder.add(new FlatButton(new AbstractAction("-"){
             public void actionPerformed(ActionEvent event) {
                 if (filters.size() > 1){
                     filters.remove(filter);
@@ -110,7 +111,7 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
                 }
             }
         }));
-        filterHolder.add(new MyButton(new AbstractAction("+"){
+        filterHolder.add(new FlatButton(new AbstractAction("+"){
             public void actionPerformed(ActionEvent event) {
                 // add after the current one
                 addFilter(filters.indexOf(filter)+1);
@@ -138,35 +139,21 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
 
 
     private void refresh() {
-        List<Set<OWLAxiom>> results = new ArrayList<Set<OWLAxiom>>();
+        List<Set<OWLAnnotationAssertionAxiom>> results = new ArrayList<Set<OWLAnnotationAssertionAxiom>>();
+        cellRenderer.clearSearches();
         for (AnnotationFilterUI filter : filters){
+            final String search = filter.getSearchText();
+            cellRenderer.addSearch(search);
             results.add(resultsMap.get(filter));
         }
-        resultsTree.setModel(new ResultsTreeModel(results, new OWLObjectComparator(getOWLModelManager())));
-    }
+        resultsTree.setModel(new ResultsTreeModel(results, getOWLModelManager()));
 
-
-    private class MyButton extends JButton {
-
-        public final Border MOUSE_OVER_BORDER = new LineBorder(Color.BLACK, 1);
-        public final Border MOUSE_OUT_BORDER = new EmptyBorder(1, 1, 1, 1);
-        private Color normalBackground;
-
-        public MyButton(AbstractAction action) {
-            super(action);
-            addMouseListener(new MouseAdapter(){
-                public void mouseEntered(MouseEvent event) {
-                    setBorder(MOUSE_OVER_BORDER);
-                    setBackground(Color.DARK_GRAY);
-                }
-                public void mouseExited(MouseEvent event) {
-                    setBorder(MOUSE_OUT_BORDER);
-                    setBackground(normalBackground);
-                }
-            });
-            setPreferredSize(new Dimension(20, 20));
-            setBorder(MOUSE_OUT_BORDER);
-            normalBackground = getBackground();
+        final int rootCount = resultsTree.getRowCount();
+        if (rootCount > 0){
+            resultsTree.setSelectionRow(0);
+            for (int i=Math.min(rootCount, 20); i>=0; i--){
+                resultsTree.expandRow(i);
+            }
         }
     }
 }

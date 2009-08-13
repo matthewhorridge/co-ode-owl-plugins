@@ -1,15 +1,16 @@
 package org.coode.change;
 
-import org.semanticweb.owl.model.OWLOntologyChange;
 import org.protege.editor.owl.model.history.HistoryManager;
-import org.apache.log4j.or.RendererMap;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
 
+import javax.swing.event.TreeModelEvent;
+import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import javax.swing.event.TreeModelListener;
-import javax.swing.event.TreeModelEvent;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.ArrayList;/*
+
+/*
 * Copyright (C) 2007, University of Manchester
 *
 * Modifications to the initial code base are copyright of their

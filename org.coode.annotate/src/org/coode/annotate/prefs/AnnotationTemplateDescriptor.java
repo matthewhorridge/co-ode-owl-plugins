@@ -3,6 +3,9 @@ package org.coode.annotate.prefs;
 import org.apache.log4j.Logger;
 import org.coode.annotate.EditorType;
 import org.protege.editor.core.prefs.Preferences;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 
 import java.io.*;
 import java.net.URI;
@@ -44,51 +47,56 @@ public class AnnotationTemplateDescriptor {
     private static final Logger logger = Logger.getLogger(AnnotationTemplateDescriptor.class);
 
 
-    private List<URI> uris = new ArrayList<URI>();
+    private List<OWLAnnotationProperty> properties;
 
-    private Map<URI, EditorType> uri2EditorMap = new HashMap<URI, EditorType>();
+    private Map<OWLAnnotationProperty, EditorType> prop2EditorMap;
 
 
-    public AnnotationTemplateDescriptor(InputStream stream) throws IOException {
-        parse(stream);
+    public AnnotationTemplateDescriptor(InputStream stream, OWLDataFactory df) throws IOException {
+        properties = new ArrayList<OWLAnnotationProperty>();
+        prop2EditorMap = new HashMap<OWLAnnotationProperty, EditorType>();
+        parse(stream, df);
     }
 
 
-    public AnnotationTemplateDescriptor(Preferences prefs, String key) {
+    public AnnotationTemplateDescriptor(Preferences prefs, String key, OWLDataFactory df) {
+        properties = new ArrayList<OWLAnnotationProperty>();
+        prop2EditorMap = new HashMap<OWLAnnotationProperty, EditorType>();
         for (String line : prefs.getStringList(key, new ArrayList<String>())){
-            parseLine(line);
+            parseLine(line, df);
         }
     }
 
 
     public AnnotationTemplateDescriptor(AnnotationTemplateDescriptor descriptor) {
-        uris = new ArrayList<URI>(descriptor.uris);
-        uri2EditorMap = new HashMap<URI, EditorType>(descriptor.uri2EditorMap);
+        properties = new ArrayList<OWLAnnotationProperty>(descriptor.properties);
+        prop2EditorMap = new HashMap<OWLAnnotationProperty, EditorType>(descriptor.prop2EditorMap);
     }
 
 
-    public void addRow(URI uri, EditorType editorType) {
-        if (!uris.contains(uri)){
-            uris.add(uri);
-            uri2EditorMap.put(uri, editorType);
+    public void addRow(OWLAnnotationProperty property, EditorType editorType) {
+        if (!properties.contains(property)){
+            properties.add(property);
+            prop2EditorMap.put(property, editorType);
         }
     }
 
 
-    private void parse(InputStream stream) throws IOException {
+    private void parse(InputStream stream, OWLDataFactory df) throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         while(reader.ready()){
             String line = reader.readLine();
-            parseLine(line);
+            parseLine(line, df);
         }
     }
 
 
-    private void parseLine(String line) {
+    private void parseLine(String line, OWLDataFactory df) {
         if (line != null && !"".equals(line) && !line.startsWith("//") && !line.startsWith("#")){
             String[] rawData = line.split(",");
             try {
-                URI uri = new URI(rawData[0].trim());
+                IRI iri = IRI.create(new URI(rawData[0].trim()));
+                OWLAnnotationProperty property = df.getOWLAnnotationProperty(iri);
                 EditorType editorType = EditorType.text; // default is text
                 if (rawData.length > 1){
                     try{
@@ -98,7 +106,7 @@ public class AnnotationTemplateDescriptor {
                         logger.warn("Could not determine editor type from param: " + rawData[1].trim());
                     }
                 }
-                addRow(uri, editorType);
+                addRow(property, editorType);
             }
             catch (URISyntaxException e) {
                 logger.warn("Could not import template row for annotation: " + rawData[0].trim() + " (not a URI)");
@@ -108,60 +116,60 @@ public class AnnotationTemplateDescriptor {
 
 
     public void export(PrintStream out) {
-        for (URI uri : uris){
-            out.println(uri + ", " + uri2EditorMap.get(uri));
+        for (OWLAnnotationProperty property : properties){
+            out.println(property.getURI() + ", " + prop2EditorMap.get(property));
         }
     }
 
 
     public boolean isEmpty() {
-        return uris.isEmpty();
+        return properties.isEmpty();
     }
 
 
     public List<String> exportStringList() {
         List<String> list = new ArrayList<String>();
-        for (URI uri : uris){
-            list.add(uri + ", " + uri2EditorMap.get(uri));
+        for (OWLAnnotationProperty property : properties){
+            list.add(property.getURI() + ", " + prop2EditorMap.get(property));
         }
         return list;
     }
 
 
-    public List<URI> getURIs() {
-        return Collections.unmodifiableList(uris);
+    public List<OWLAnnotationProperty> getProperties() {
+        return Collections.unmodifiableList(properties);
     }
 
 
-    public EditorType getEditor(URI uri){
-        return uri2EditorMap.get(uri);
+    public EditorType getEditor(OWLAnnotationProperty property){
+        return prop2EditorMap.get(property);
     }
 
 
-    public void changeURI(URI uri, URI uri2) {
-        int index = uris.indexOf(uri);
+    public void changeProperty(OWLAnnotationProperty property, OWLAnnotationProperty property2) {
+        int index = properties.indexOf(property);
         if (index >= 0){
-            uris.set(index, uri2);
-            EditorType type = uri2EditorMap.remove(uri);
-            uri2EditorMap.put(uri2, type);
+            properties.set(index, property2);
+            EditorType type = prop2EditorMap.remove(property);
+            prop2EditorMap.put(property2, type);
         }
     }
 
 
-    public void setEditor(URI uri, EditorType editorType) {
-        uri2EditorMap.put(uri, editorType);
+    public void setEditor(OWLAnnotationProperty property, EditorType editorType) {
+        prop2EditorMap.put(property, editorType);
     }
 
 
     public void move(int start, int end, int to) {
-        List<URI> sel = new ArrayList<URI>(uris.subList(start, end+1));
-        uris.removeAll(sel);
-        uris.addAll(to, sel);
+        List<OWLAnnotationProperty> sel = new ArrayList<OWLAnnotationProperty>(properties.subList(start, end+1));
+        properties.removeAll(sel);
+        properties.addAll(to, sel);
     }
 
 
-    public void remove(URI uri) {
-        uris.remove(uri);
-        uri2EditorMap.remove(uri);
+    public void remove(OWLAnnotationProperty property) {
+        properties.remove(property);
+        prop2EditorMap.remove(property);
     }
 }

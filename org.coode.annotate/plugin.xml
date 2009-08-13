@@ -4,14 +4,14 @@
 
     <extension id="AnnotateView"
                point="org.protege.editor.core.application.ViewComponent">
-        <label value="Annotation Template"/>
+        <label value="Annotation template"/>
         <class value="org.coode.annotate.AnnotationTemplateView"/>
     </extension>
 
     <extension
          id="AnnotationViewPreferencesPanel"
          point="org.protege.editor.core.application.preferencespanel">
-        <label value="Annotation Template"/>
+        <label value="Annotation template"/>
         <class value="org.coode.annotate.prefs.AnnotationTemplatePrefsPanel"/>
     </extension>
 

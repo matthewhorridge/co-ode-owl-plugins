@@ -2,9 +2,14 @@ package org.coode.annotate.prefs;
 
 import org.protege.editor.core.prefs.Preferences;
 import org.protege.editor.core.prefs.PreferencesManager;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -48,6 +53,9 @@ public class AnnotationTemplatePrefs {
 
     private AnnotationTemplateDescriptor descriptor;
 
+    private List<ChangeListener> listeners = new ArrayList<ChangeListener>();
+
+
     public static AnnotationTemplatePrefs getInstance(){
         if (instance == null){
             instance = new AnnotationTemplatePrefs();
@@ -56,16 +64,16 @@ public class AnnotationTemplatePrefs {
     }
 
     
-    public AnnotationTemplateDescriptor getDefaultDescriptor() {
+    public AnnotationTemplateDescriptor getDefaultDescriptor(OWLDataFactory df) {
         if (descriptor == null){
             Preferences prefs = PreferencesManager.getInstance().getPreferencesForSet(ANNOTATION_VIEW_PREFERENCES_PANEL, ANNOTATE_PREFS);
 
-            descriptor = new AnnotationTemplateDescriptor(prefs, TEMPLATE);
+            descriptor = new AnnotationTemplateDescriptor(prefs, TEMPLATE, df);
 
             if (descriptor.isEmpty()){
                 InputStream stream = getClass().getClassLoader().getResourceAsStream(PROPS_FILENAME);
                 try {
-                    descriptor = new AnnotationTemplateDescriptor(stream);
+                    descriptor = new AnnotationTemplateDescriptor(stream, df);
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -80,5 +88,20 @@ public class AnnotationTemplatePrefs {
         Preferences prefs = PreferencesManager.getInstance().getPreferencesForSet(ANNOTATION_VIEW_PREFERENCES_PANEL, ANNOTATE_PREFS);
         prefs.putStringList(TEMPLATE, descriptor.exportStringList());
         this.descriptor = descriptor;
+
+        final ChangeEvent event = new ChangeEvent(this);
+        for (ChangeListener l : listeners){
+            l.stateChanged(event);
+        }
+    }
+
+
+    public void addChangeListener(ChangeListener l){
+        listeners.add(l);
+    }
+
+
+    public void removeChangeListener(ChangeListener l){
+        listeners.remove(l);
     }
 }

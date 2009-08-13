@@ -1,10 +1,8 @@
 package org.coode.browser.protege;
 
-import org.coode.owl.mngr.NamedObjectShortFormProvider;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLNamedObject;
-import org.semanticweb.owl.util.NamespaceUtil;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.util.ShortFormProvider;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -36,7 +34,7 @@ import org.semanticweb.owl.util.NamespaceUtil;
  * Bio Health Informatics Group<br>
  * Date: Sep 5, 2007<br><br>
  */
-public class ProtegeShortformProviderWrapper implements NamedObjectShortFormProvider {
+public class ProtegeShortformProviderWrapper implements ShortFormProvider {
 
     private OWLModelManager mngr;
 
@@ -44,17 +42,9 @@ public class ProtegeShortformProviderWrapper implements NamedObjectShortFormProv
         this.mngr = mngr;
     }
 
-    public String getShortForm(OWLNamedObject owlNamedObject) {
-        if (owlNamedObject instanceof OWLEntity){
-            return mngr.getRendering(owlNamedObject);
-        }
-        // else it is an ontology
-        return new NamespaceUtil().generatePrefix(owlNamedObject.getURI().toString());
-    }
 
-
-    public String getShortForm(OWLEntity owlEntity) {
-        return getShortForm((OWLNamedObject)owlEntity);
+    public String getShortForm(OWLEntity entity) {
+        return mngr.getRendering(entity);
     }
 
 

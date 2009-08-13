@@ -8,9 +8,9 @@ import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
 import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
 import org.protege.editor.owl.ui.frame.AxiomListFrameSection;
-import org.protege.editor.owl.ui.framelist.OWLFrameList2;
+import org.protege.editor.owl.ui.framelist.OWLFrameList;
 import org.protege.editor.owl.ui.renderer.OWLOntologyCellRenderer;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,7 +56,7 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     private OWLEditorKit eKit;
 
     private JComboBox ontologySelector;
-    private OWLFrameList2<Set<OWLAxiom>> list;
+    private OWLFrameList <Set<OWLAxiom>> list;
     private OWLOntology currentOntology;
 
     private OntologySelector diff;
@@ -108,28 +108,34 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     };
 
 
+    private boolean showAnnotations = true;
+
+    private boolean showDisjointClasses = true;
+
+
     AxiomsPanel(OWLEditorKit eKit) {
         setLayout(new BorderLayout());
 
         this.eKit = eKit;
 
+        setOntology(eKit.getOWLModelManager().getActiveOntology());
+        
         ontologySelector = new JComboBox();
         reloadOntologySelector();
         ontologySelector.setRenderer(new OWLOntologyCellRenderer(eKit));
-        ontologySelector.addItemListener(itemSelectorListener);
 
         OWLAxiomListFrame frame = new OWLAxiomListFrame(eKit);
-        list = new OWLFrameList2<Set<OWLAxiom>>(eKit, frame);
+        list = new OWLFrameList<Set<OWLAxiom>>(eKit, frame);
 
         add(ontologySelector, BorderLayout.NORTH);
         add(new JScrollPane(list), BorderLayout.CENTER);
 
         OWLModelManager mngr = eKit.getOWLModelManager();
 
-        setOntology(mngr.getActiveOntology());
-
         mngr.addOntologyChangeListener(ontChangeListener);
         mngr.addListener(mngrListener);
+
+        ontologySelector.addItemListener(itemSelectorListener);
 
         addHierarchyListener(componentHierarchyListener);
     }
@@ -148,7 +154,7 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
 
 
     void setOntology(OWLOntology ontology) {
-        currentOntology = ontology;
+        this.currentOntology = ontology;
         for (OWLOntologySelectionListener l : listeners){
             l.selectionChanged(currentOntology);
         }
@@ -159,12 +165,18 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     private void reloadOntologySelector() {
         Set<OWLOntology> ontologies = eKit.getOWLModelManager().getOntologies();
         ontologySelector.setModel(new DefaultComboBoxModel(ontologies.toArray()));
+        if (ontologies.contains(currentOntology)){
+            ontologySelector.setSelectedItem(currentOntology);
+        }
     }
 
 
     private void refresh() {
         if (isShowing()){
-            final Set<OWLAxiom> axioms = new HashSet<OWLAxiom>(currentOntology.getAxioms());
+            final Set<OWLAxiom> axioms = new HashSet<OWLAxiom>(isShowAnnotations() ? currentOntology.getAxioms() : currentOntology.getLogicalAxioms());
+            if (!showDisjointClasses){
+                axioms.removeAll(currentOntology.getAxioms(AxiomType.DISJOINT_CLASSES));
+            }
             if (diff != null &&
                 diff.getSelectedOntology() != null &&
                 !diff.getSelectedOntology().equals(currentOntology)){
@@ -217,8 +229,24 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     }
 
 
+    public boolean isShowAnnotations() {
+        return showAnnotations;
+    }
 
-    class OWLAxiomListFrame extends AbstractOWLFrame<Set<OWLAxiom>>{
+
+    public void setShowAnnotations(boolean showAnnotations) {
+        this.showAnnotations = showAnnotations;
+        refresh();
+    }
+
+
+    public void setShowDisjointClasses(boolean showDisjointClasses) {
+        this.showDisjointClasses = showDisjointClasses;
+        refresh();
+    }
+
+
+    class OWLAxiomListFrame extends AbstractOWLFrame<Set<OWLAxiom>> {
 
         public OWLAxiomListFrame(OWLEditorKit owlEditorKit) {
             super(owlEditorKit.getModelManager().getOWLOntologyManager());

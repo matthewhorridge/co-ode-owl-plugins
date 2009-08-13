@@ -116,7 +116,7 @@ public class BeanShellView extends AbstractOWLViewComponent {
         interpreter.set("mngr", getOWLModelManager());
 
         interpreter.eval("import org.protege.editor.core.*;");
-        interpreter.eval("import org.semanticweb.owl.model.*;"); // for all OWL constructs
+        interpreter.eval("import org.semanticweb.owlapi.model.*;"); // for all OWL constructs
         interpreter.eval("import org.protege.editor.owl.ui.*;"); // for UIHelper etc
 
         new Thread(interpreter).start();

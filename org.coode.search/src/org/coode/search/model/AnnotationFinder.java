@@ -1,15 +1,13 @@
 package org.coode.search.model;
 
-import org.semanticweb.owl.model.*;
-import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.*;
 
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Collections;
-import java.util.regex.Pattern;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.net.URI;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -43,33 +41,42 @@ import java.net.URI;
  */
 public class AnnotationFinder {
 
-    public Set<OWLAxiom> getAnnotationAxioms(URI uri, String str, Set<OWLOntology> onts) {
-        return getAnnotationAxioms(Collections.singleton(uri), str, onts);
+    private Set<OWLAnnotationAssertionAxiom> annotAxioms;
+
+    public Set<OWLAnnotationAssertionAxiom> getAnnotationAxioms(OWLAnnotationProperty property, String str, Set<OWLOntology> onts) {
+        return getAnnotationAxioms(Collections.singleton(property), str, onts);
     }
 
-    public Set<OWLAxiom> getAnnotationAxioms(Set<URI> uris, String str, Set<OWLOntology> onts) {
-        Set<OWLAxiom> annotAxioms = new HashSet<OWLAxiom>();
-        Pattern p = null;
+    public Set<OWLAnnotationAssertionAxiom> getAnnotationAxioms(Set<OWLAnnotationProperty> properties, String str, Set<OWLOntology> onts) {
+        annotAxioms = new HashSet<OWLAnnotationAssertionAxiom>();
+
+        Pattern pattern = null;
         try{
             if (str != null){
-                p = Pattern.compile(str);
+                pattern = Pattern.compile(str);
             }
         }
         catch (PatternSyntaxException e){
             e.printStackTrace();
         }
+
         for (OWLOntology ont : onts){
-            for (OWLEntityAnnotationAxiom ax : ont.getAxioms(AxiomType.ENTITY_ANNOTATION)){
-                if (uris.contains(ax.getAnnotation().getAnnotationURI())){
-                    if (p != null){
-                        String annotValue = ax.getAnnotation().getAnnotationValueAsConstant().getLiteral();
-                        Matcher matcher = p.matcher(annotValue);
-                        if (matcher.matches()){
+            for (OWLAnnotationProperty p : properties){
+                for (OWLAxiom refAx : ont.getReferencingAxioms(p)){
+                    if (refAx.isOfType(AxiomType.ANNOTATION_ASSERTION)){
+                        OWLAnnotationAssertionAxiom ax = (OWLAnnotationAssertionAxiom)refAx;
+                        if (pattern != null){
+                            if (ax.getAnnotation().getValue() instanceof OWLLiteral){
+                                String strValue = ((OWLLiteral)ax.getAnnotation().getValue()).getLiteral();
+                                Matcher matcher = pattern.matcher(strValue);
+                                if (matcher.matches()){
+                                    annotAxioms.add(ax);
+                                }
+                            }
+                        }
+                        else{
                             annotAxioms.add(ax);
                         }
-                    }
-                    else{
-                        annotAxioms.add(ax);
                     }
                 }
             }

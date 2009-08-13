@@ -1,10 +1,8 @@
 package org.coode.annotate;
 
 import org.protege.editor.core.ui.util.Icons;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.util.SimpleURIShortFormProvider;
-import org.semanticweb.owl.util.URIShortFormProvider;
+import org.semanticweb.owlapi.model.OWLAnnotationSubject;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import javax.swing.*;
 import java.awt.*;
@@ -47,8 +45,6 @@ public class Template extends JComponent implements Scrollable {
 
     private TemplateModel model;
 
-    URIShortFormProvider uriShortFormProvider;
-
     private TemplateModelListener modelListener = new TemplateModelListener(){
         public void modelStructureChanged() {
             rebuildUI();
@@ -60,18 +56,17 @@ public class Template extends JComponent implements Scrollable {
         setLayout(new GridBagLayout());
         setVisible(true);
         this.model = model;
-        uriShortFormProvider = new SimpleURIShortFormProvider();
         model.addModelListener(modelListener);
     }
 
-    public void setEntity(OWLEntity entity){
-        model.setEntity(entity);
+    public void setSubject(OWLAnnotationSubject subject){
+        model.setSubject(subject);
     }
 
     private void rebuildUI() {
         removeAll();
 
-        if (model.getEntity() != null){
+        if (model.getSubject() != null){
             GridBagConstraints gbConstr = new GridBagConstraints();
             gbConstr.gridy = 0;
             gbConstr.insets = new Insets(2, 2, 2, 2);
@@ -82,8 +77,8 @@ public class Template extends JComponent implements Scrollable {
                 gbConstr.gridx = 0;
                 gbConstr.weightx = 0.0;
 
-                final JLabel jLabel = new JLabel(uriShortFormProvider.getShortForm(c.getURI()));
-                jLabel.setToolTipText(c.getURI().toString());
+                final JLabel jLabel = new JLabel(model.getOWLModelManager().getRendering(c.getProperty()));
+                jLabel.setToolTipText(c.getProperty().getIRI().toString());
                 jLabel.setAlignmentX(1.0f);
                 jLabel.setForeground(LABEL_COLOUR);
                 add(jLabel, gbConstr);
@@ -120,7 +115,7 @@ public class Template extends JComponent implements Scrollable {
             if (str.length() > 0){
                 str += "\n";
             }
-            str += ont.getURI().toString();
+            str += ont.getOntologyID().toString();
         }
         return str.length() == 0 ? null : "Asserted in: " + str;
     }
@@ -146,11 +141,6 @@ public class Template extends JComponent implements Scrollable {
     }
 
 
-    public void setURIShortFormProvider(URIShortFormProvider sfp) {
-        uriShortFormProvider = sfp;
-    }
-
-
     class RemoveAxiomListener extends MouseAdapter {
 
         private TemplateRow c;
@@ -173,7 +163,7 @@ public class Template extends JComponent implements Scrollable {
         }
 
         public void mouseReleased(MouseEvent mouseEvent) {
-            model.addRow(c.getURI());
+            model.addRow(c.getProperty());
         }
     }
 }

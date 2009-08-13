@@ -1,18 +1,16 @@
 package org.coode.change;
 
-import org.semanticweb.owl.model.OWLOntologyChange;
-import org.semanticweb.owl.model.AddAxiom;
-import org.semanticweb.owl.model.RemoveAxiom;
 import org.protege.editor.core.ui.util.Icons;
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.ui.renderer.OWLObjectRenderer;
-import org.protege.editor.owl.ui.renderer.OWLEntityRenderer;
-import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.RemoveAxiom;
 
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.*;
-import java.awt.*;/*
+import java.awt.*;
+
+/*
 * Copyright (C) 2007, University of Manchester
 *
 * Modifications to the initial code base are copyright of their

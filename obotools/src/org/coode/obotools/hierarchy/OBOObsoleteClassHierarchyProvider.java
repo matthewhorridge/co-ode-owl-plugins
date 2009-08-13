@@ -1,11 +1,10 @@
 package org.coode.obotools.hierarchy;
 
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLEntity;
-
-import java.net.URI;
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLEntity;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -39,13 +38,13 @@ import java.net.URI;
  */
 public class OBOObsoleteClassHierarchyProvider<N extends OWLEntity> extends OBOEntitiesHierarchyProvider<N> {
 
-    public OBOObsoleteClassHierarchyProvider(OWLObjectHierarchyProvider<N> delegate, URI annotationURI, OWLModelManager mngr) {
-        super(delegate, annotationURI, mngr);
+    public OBOObsoleteClassHierarchyProvider(OWLObjectHierarchyProvider<N> delegate, OWLAnnotationProperty property, OWLModelManager mngr) {
+        super(delegate, property, mngr);
     }
 
 
-    public OBOObsoleteClassHierarchyProvider(OWLObjectHierarchyProvider<N> delegate, URI annotationURI, OWLObject annotationValue, OWLModelManager mngr) {
-        super(delegate, annotationURI, annotationValue, mngr);
+    public OBOObsoleteClassHierarchyProvider(OWLObjectHierarchyProvider<N> delegate, OWLAnnotationProperty property, OWLAnnotationValue value, OWLModelManager mngr) {
+        super(delegate, property, value, mngr);
     }
 
 

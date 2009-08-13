@@ -1,12 +1,13 @@
 package org.coode.change;
 
-import org.protege.editor.owl.ui.frame.OWLFrame;
-import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
-import org.protege.editor.owl.OWLEditorKit;
-import org.semanticweb.owl.model.OWLOntologyChange;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
-import java.util.Set;/*
+import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+
+import java.util.Set;
+
+/*
 * Copyright (C) 2007, University of Manchester
 *
 * Modifications to the initial code base are copyright of their

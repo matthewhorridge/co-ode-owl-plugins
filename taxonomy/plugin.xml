@@ -4,7 +4,7 @@
 
     <extension id="org.coode.taxonomy.DescendantsView"
             point="org.protege.editor.core.application.ViewComponent">
-        <label value="Descendant Names"/>
+        <label value="Descendant names"/>
         <class value="org.coode.taxonomy.DescendantsView"/>
         <headerColor value="@org.protege.classcolor"/>
         <category value="@org.protege.classcategory"/>
@@ -12,8 +12,16 @@
 
     <extension id="org.coode.taxonomy.TabbedHierarchyView"
             point="org.protege.editor.core.application.ViewComponent">
-        <label value="Tabbed Subclasses"/>
+        <label value="Tabbed subclasses"/>
         <class value="org.coode.taxonomy.TabbedHierarchyView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
+    </extension>
+
+    <extension id="org.coode.taxonomy.InferredTabbedHierarchyView"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Tabbed subclasses (inferred)"/>
+        <class value="org.coode.taxonomy.InferredTabbedHierarchyView"/>
         <headerColor value="@org.protege.classcolor"/>
         <category value="@org.protege.classcategory"/>
     </extension>

@@ -1,8 +1,8 @@
 package org.coode.taxonomy;
 
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent;
-import org.semanticweb.owl.model.OWLClass;
+import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
+import org.semanticweb.owlapi.model.OWLClass;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,7 +46,7 @@ public class TabbedHierarchyView extends AbstractOWLClassViewComponent {
     private JTextArea namesComponent;
 
     // convenience class for querying the asserted subsumption hierarchy directly
-    private OWLObjectHierarchyProvider<OWLClass> assertedHierarchyProvider;
+    private OWLObjectHierarchyProvider<OWLClass> hp;
 
     // create the GUI
     public void initialiseClassView() throws Exception {
@@ -61,7 +61,7 @@ public class TabbedHierarchyView extends AbstractOWLClassViewComponent {
     protected OWLClass updateView(OWLClass selectedClass) {
         namesComponent.setText("");
         if (selectedClass != null){
-            assertedHierarchyProvider = getOWLModelManager().getOWLClassHierarchyProvider();
+            hp = getOWLModelManager().getOWLHierarchyManager().getOWLClassHierarchyProvider();
             render(selectedClass, 0);
         }
         return selectedClass;
@@ -75,7 +75,7 @@ public class TabbedHierarchyView extends AbstractOWLClassViewComponent {
         namesComponent.append(getOWLModelManager().getRendering(selectedClass));
         namesComponent.append("\n");
         // the hierarchy provider gets subclasses for us
-        for (OWLClass sub: assertedHierarchyProvider.getChildren(selectedClass)){
+        for (OWLClass sub: hp.getChildren(selectedClass)){
             render(sub, indent+1);
         }
     }

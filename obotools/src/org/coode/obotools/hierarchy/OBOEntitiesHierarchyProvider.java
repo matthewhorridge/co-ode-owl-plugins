@@ -1,15 +1,14 @@
 package org.coode.obotools.hierarchy;
 
-import org.semanticweb.owl.model.*;
+import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProviderListener;
-import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.*;
 
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
-import java.net.URI;
+import java.util.Set;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -47,9 +46,9 @@ public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObj
 
     private OWLModelManager mngr;
 
-    private URI annotationURI;
+    private OWLAnnotationProperty annotationProperty;
 
-    private OWLObject annotationValue;
+    private OWLAnnotationValue annotationValue;
 
     private OWLObjectHierarchyProvider<N> delegate;
 
@@ -73,18 +72,18 @@ public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObj
     };
 
 
-    public OBOEntitiesHierarchyProvider(OWLObjectHierarchyProvider<N> delegate, URI annotationURI, OWLModelManager mngr) {
-        this(delegate, annotationURI, null, mngr);
+    public OBOEntitiesHierarchyProvider(OWLObjectHierarchyProvider<N> delegate, OWLAnnotationProperty annotationProperty, OWLModelManager mngr) {
+        this(delegate, annotationProperty, null, mngr);
     }
 
 
     public OBOEntitiesHierarchyProvider(OWLObjectHierarchyProvider<N> delegate,
-                                               URI annotationURI,
-                                               OWLObject annotationValue,
+                                               OWLAnnotationProperty annotationProperty,
+                                               OWLAnnotationValue annotationValue,
                                                OWLModelManager mngr) {
         this.delegate = delegate;
         this.delegate.addListener(delegateListener);
-        this.annotationURI = annotationURI;
+        this.annotationProperty = annotationProperty;
         this.annotationValue = annotationValue;
         this.mngr = mngr;
     }
@@ -96,8 +95,8 @@ public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObj
         }
         for (OWLOntology ont : mngr.getActiveOntologies())
             for (OWLAnnotation annot : entity.getAnnotations(ont)){
-                if (annot.getAnnotationURI().equals(annotationURI)){
-                    if (annotationValue == null || annot.getAnnotationValue().equals(annotationValue)){
+                if (annot.getProperty().equals(annotationProperty)){
+                    if (annotationValue == null || annot.getValue().equals(annotationValue)){
                         filtered.add(entity);
                         return false;
                     }
@@ -160,7 +159,7 @@ public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObj
 
 
     public boolean containsReference(N object) {
-        return (passesFilter(object) && delegate.containsReference(object));
+        return passesFilter(object) && delegate.containsReference(object);
     }
 
 

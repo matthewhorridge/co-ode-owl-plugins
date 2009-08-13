@@ -4,6 +4,8 @@ import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -41,19 +43,53 @@ public class DiffView extends AbstractOWLViewComponent {
 
     private AxiomsPanel right;
 
+    private JCheckBox showAnnotationsCheckbox;
+    private JCheckBox showDisjointsCheckbox;
+
 
     protected void initialiseOWLView() throws Exception {
         setLayout(new BorderLayout());
+
         left = new AxiomsPanel(getOWLEditorKit());
-        right = new AxiomsPanel(getOWLEditorKit());
         left.setName("LEFT");
+
+        right = new AxiomsPanel(getOWLEditorKit());
         right.setName("RIGHT");
 
         left.setDiff(right);
         right.setDiff(left);
 
         JSplitPane splitter = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, right);
+        splitter.setContinuousLayout(true);
+        splitter.setDividerLocation(0.5f);
+
+        showAnnotationsCheckbox = new JCheckBox("Show annotations");
+        showAnnotationsCheckbox.setSelected(true);
+        showAnnotationsCheckbox.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent event) {
+                left.setShowAnnotations(showAnnotationsCheckbox.isSelected());
+                right.setShowAnnotations(showAnnotationsCheckbox.isSelected());
+            }
+        });
+
+        showDisjointsCheckbox = new JCheckBox("Show disjoints");
+        showDisjointsCheckbox.setSelected(true);
+        showDisjointsCheckbox.addActionListener(new ActionListener(){
+
+            public void actionPerformed(ActionEvent event) {
+                left.setShowDisjointClasses(showDisjointsCheckbox.isSelected());
+                right.setShowDisjointClasses(showDisjointsCheckbox.isSelected());
+            }
+        });
+
+        Box controls = new Box(BoxLayout.LINE_AXIS);
+        controls.add(showAnnotationsCheckbox);
+        controls.add(showDisjointsCheckbox);
+
+        add(controls, BorderLayout.NORTH);
         add(splitter, BorderLayout.CENTER);
+
     }
 
 
