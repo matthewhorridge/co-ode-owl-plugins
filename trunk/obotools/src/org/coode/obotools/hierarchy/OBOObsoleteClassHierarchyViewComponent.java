@@ -1,10 +1,12 @@
 package org.coode.obotools.hierarchy;
 
-import org.protege.editor.owl.ui.clshierarchy.AbstractOWLClassHierarchyViewComponent;
+import org.coode.owlapi.obo.parser.OBOVocabulary;
+import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owl.model.OWLClass;
-
-import java.net.URI;
+import org.protege.editor.owl.ui.view.cls.AbstractOWLClassHierarchyViewComponent;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -45,12 +47,14 @@ public class OBOObsoleteClassHierarchyViewComponent extends AbstractOWLClassHier
     }
 
 
-    protected OWLObjectHierarchyProvider<OWLClass> getOWLClassHierarchyProvider() {
+    protected OWLObjectHierarchyProvider<OWLClass> getHierarchyProvider() {
         if (hp == null){
-            hp = new OBOObsoleteClassHierarchyProvider<OWLClass>(getOWLModelManager().getOWLHierarchyManager().getOWLClassHierarchyProvider(),
-                                                         URI.create("http://www.geneontology.org/formats/oboInOwl#is_obsolete"),
-                                                         getOWLModelManager().getOWLDataFactory().getOWLUntypedConstant("true"),
-                                                         getOWLModelManager());
+            final OWLModelManager mngr = getOWLModelManager();
+            final OWLDataFactory df = mngr.getOWLDataFactory();
+            hp = new OBOObsoleteClassHierarchyProvider<OWLClass>(mngr.getOWLHierarchyManager().getOWLClassHierarchyProvider(),
+                                                                 df.getOWLAnnotationProperty(IRI.create(OBOVocabulary.IS_OBSOLETE.getURI())),
+                                                                 df.getOWLStringLiteral("true"),
+                                                                 mngr);
         }
         return hp;
     }

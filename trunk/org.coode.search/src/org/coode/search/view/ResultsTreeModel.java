@@ -1,9 +1,10 @@
 package org.coode.search.view;
 
-import org.semanticweb.owl.model.AxiomType;
-import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLEntityAnnotationAxiom;
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLEntity;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -43,23 +44,27 @@ public class ResultsTreeModel implements TreeModel {
 
     private Comparator comparator;
 
-    private List<Set<OWLAxiom>> results;
+    private List<Set<OWLAnnotationAssertionAxiom>> results;
 
-    final Map<OWLEntity, Set<OWLEntityAnnotationAxiom>> entityAnnotationsMap = new HashMap<OWLEntity, Set<OWLEntityAnnotationAxiom>>();
+    final Map<OWLEntity, Set<OWLAnnotation>> entityAnnotationsMap = new HashMap<OWLEntity, Set<OWLAnnotation >>();
 
     private List<OWLEntity> sortedEntities;
 
+    private OWLModelManager mngr;
 
-    /**
-     *
-     * @param results evaluation is by the order of results
-     * @param comparator for displaying the tree
-     */
-    ResultsTreeModel(List<Set<OWLAxiom>> results, Comparator comparator) {
+
+    ResultsTreeModel(List<Set<OWLAnnotationAssertionAxiom>> results, OWLModelManager mngr) {
         this.results = results;
-        this.comparator = comparator;
+        this.mngr = mngr;
+
+        comparator = mngr.getOWLObjectComparator();
 
         rebuildTree();
+    }
+
+
+    public void setComparator(Comparator comparator){
+        this.comparator = comparator;
     }
 
 
@@ -67,52 +72,54 @@ public class ResultsTreeModel implements TreeModel {
         entityAnnotationsMap.clear();
         boolean started = false;
         // generate the intersection of results by subject of the annotations
-        for (Set<OWLAxiom> result : results){
+        for (Set<OWLAnnotationAssertionAxiom> result : results){
             if (result != null){ // ignore those that have not yet run
-            if (!started){
-                for (OWLAxiom ax : result){
-                    if (ax.getAxiomType().equals(AxiomType.ENTITY_ANNOTATION)){
-                        final OWLEntity entity = ((OWLEntityAnnotationAxiom) ax).getSubject();
-                        Set<OWLEntityAnnotationAxiom> annotations = entityAnnotationsMap.get(entity);
-                        if (annotations == null){
-                            annotations = new HashSet<OWLEntityAnnotationAxiom>();
+                if (!started){
+                    for (OWLAnnotationAssertionAxiom ax : result){
+                        IRI subjectIRI = (IRI)ax.getSubject(); // we know this must be on an IRI already
+                        for (OWLEntity entity : mngr.getOWLEntityFinder().getEntities(subjectIRI)){
+                            Set<OWLAnnotation> annotations = entityAnnotationsMap.get(entity);
+                            if (annotations == null){
+                                annotations = new HashSet<OWLAnnotation>();
+                            }
+                            annotations.add(ax.getAnnotation());
+                            entityAnnotationsMap.put(entity, annotations);
                         }
-                        annotations.add((OWLEntityAnnotationAxiom)ax);
-                        entityAnnotationsMap.put(entity, annotations);
                     }
+                    started = true;
                 }
-                started = true;
-            }
-            else{
-                if (!entityAnnotationsMap.isEmpty()){ // don't bother getting any more unless there is something already in the set
-                    Set<OWLEntity> markedEntities = new HashSet<OWLEntity>();
-                    for (OWLAxiom ax : result){
-                        if (ax.getAxiomType().equals(AxiomType.ENTITY_ANNOTATION)){
-                            OWLEntity entity = ((OWLEntityAnnotationAxiom)ax).getSubject();
-                            Set<OWLEntityAnnotationAxiom> annotations = entityAnnotationsMap.get(entity);
-                            if (annotations != null){
-                                annotations.add((OWLEntityAnnotationAxiom)ax);
-                                entityAnnotationsMap.put(entity, annotations);
-                                markedEntities.add(entity);
+                else{
+                    if (!entityAnnotationsMap.isEmpty()){ // don't bother getting any more unless there is something already in the set
+                        Set<OWLEntity> markedEntities = new HashSet<OWLEntity>();
+                        for (OWLAnnotationAssertionAxiom ax : result){
+                            IRI subjectIRI = (IRI)ax.getSubject(); // we know this must be on an IRI already
+                            for (OWLEntity entity : mngr.getOWLEntityFinder().getEntities(subjectIRI)){
+                                Set<OWLAnnotation> annotations = entityAnnotationsMap.get(entity);
+                                if (annotations != null){
+                                    annotations.add(ax.getAnnotation());
+                                    entityAnnotationsMap.put(entity, annotations);
+                                    markedEntities.add(entity);
+                                }
+                            }
+                        }
+
+                        Iterator<OWLEntity> it = entityAnnotationsMap.keySet().iterator();
+                        while (it.hasNext()){
+                            OWLEntity entity = it.next();
+                            if (!markedEntities.contains(entity)){
+                                it.remove();
                             }
                         }
                     }
-
-                    Iterator<OWLEntity> it = entityAnnotationsMap.keySet().iterator();
-                    while (it.hasNext()){
-                        OWLEntity entity = it.next();
-                        if (!markedEntities.contains(entity)){
-                            it.remove();
-                        }
-                    }
                 }
-            }
             }
         }
 
         // sort the entities once (as this will always have to be done)
         sortedEntities = new ArrayList<OWLEntity>(entityAnnotationsMap.keySet());
-        Collections.sort(sortedEntities, comparator);
+        if (comparator != null){
+            Collections.sort(sortedEntities, comparator);
+        }
     }
 
 
@@ -123,11 +130,13 @@ public class ResultsTreeModel implements TreeModel {
 
     public Object getChild(Object o, int i) {
         if (o instanceof OWLEntity){
-            final List<OWLEntityAnnotationAxiom> l = new ArrayList<OWLEntityAnnotationAxiom>(entityAnnotationsMap.get(o));
-            Collections.sort(l, comparator);
+            final List<OWLAnnotation> l = new ArrayList<OWLAnnotation>(entityAnnotationsMap.get(o));
+            if (comparator != null){
+                Collections.sort(l, comparator);
+            }
             return l.get(i);
         }
-        else if (o instanceof OWLEntityAnnotationAxiom){
+        else if (o instanceof OWLAnnotation){
             return null;
         }
         return sortedEntities.get(i);
@@ -138,7 +147,7 @@ public class ResultsTreeModel implements TreeModel {
         if (o instanceof OWLEntity){
             return entityAnnotationsMap.get(o).size();
         }
-        else if (o instanceof OWLEntityAnnotationAxiom){
+        else if (o instanceof OWLAnnotation){
             return 0;
         }
         return entityAnnotationsMap.keySet().size();
@@ -146,7 +155,7 @@ public class ResultsTreeModel implements TreeModel {
 
 
     public boolean isLeaf(Object o) {
-        return o instanceof OWLEntityAnnotationAxiom || entityAnnotationsMap.isEmpty();
+        return o instanceof OWLAnnotation || entityAnnotationsMap.isEmpty();
     }
 
 
@@ -157,11 +166,13 @@ public class ResultsTreeModel implements TreeModel {
 
     public int getIndexOfChild(Object parent, Object child) {
         if (parent instanceof OWLEntity){
-            final List<OWLEntityAnnotationAxiom> l = new ArrayList<OWLEntityAnnotationAxiom>(entityAnnotationsMap.get(parent));
-            Collections.sort(l, comparator);
+            final List<OWLAnnotation> l = new ArrayList<OWLAnnotation>(entityAnnotationsMap.get(parent));
+            if (comparator != null){
+                Collections.sort(l, comparator);
+            }
             return l.indexOf(child);
         }
-        else if (parent instanceof OWLEntityAnnotationAxiom){
+        else if (parent instanceof OWLAnnotation){
             return 0;
         }
         return sortedEntities.indexOf(child);

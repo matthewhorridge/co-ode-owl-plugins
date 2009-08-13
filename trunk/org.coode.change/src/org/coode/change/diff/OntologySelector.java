@@ -1,6 +1,6 @@
 package org.coode.change.diff;
 
-import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntology;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -33,6 +33,7 @@ import org.semanticweb.owl.model.OWLOntology;
  * Date: Dec 24, 2008<br><br>
  */
 public interface OntologySelector{
+    
     OWLOntology getSelectedOntology();
 
     void addOntologySelectionListener(OWLOntologySelectionListener l);

@@ -5,8 +5,11 @@ import org.coode.annotate.EditorType;
 import org.protege.editor.core.ui.util.Icons;
 import org.protege.editor.core.ui.util.UIUtil;
 import org.protege.editor.owl.ui.OWLIcons;
-import org.protege.editor.owl.ui.frame.AnnotationURIList;
+import org.protege.editor.owl.ui.UIHelper;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
+import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -14,8 +17,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -128,48 +129,26 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         add(toolbar, BorderLayout.NORTH);
 
         // create a copy of the default descriptor
-        descriptor = new AnnotationTemplateDescriptor(AnnotationTemplatePrefs.getInstance().getDefaultDescriptor());
+        final OWLDataFactory df = getOWLModelManager().getOWLDataFactory();
+        descriptor = new AnnotationTemplateDescriptor(AnnotationTemplatePrefs.getInstance().getDefaultDescriptor(df));
         model = new MyTableModel(descriptor);
+
         table = new JTable(model);
         table.setRowHeight(table.getRowHeight() + 5);
         table.setShowVerticalLines(false);
 
-        setupEditors();
+        setupRenderersAndEditors();
 
         final JScrollPane scroller = new JScrollPane(table);
-//        scroller.setPreferredSize(new Dimension(400, 300));
         add(scroller, BorderLayout.CENTER);
     }
 
 
-    private void setupEditors() {
+    private void setupRenderersAndEditors() {
+        table.setDefaultRenderer(OWLAnnotationProperty.class, new OWLCellRenderer(getOWLEditorKit()));
+
         JComboBox comboBox = new JComboBox(EditorType.values());
         table.setDefaultEditor(EditorType.class, new DefaultCellEditor(comboBox));
-
-        table.setDefaultEditor(URI.class, new DefaultCellEditor(new JTextField()){
-            public URI oldValue;
-
-
-            public Object getCellEditorValue() {
-                String s = (String) super.getCellEditorValue();
-                try {
-                    URI uri = new URI(s);
-                    if (uri.isAbsolute()){
-                        return uri;
-                    }
-                }
-                catch (URISyntaxException e) {
-                    // invalid
-                }
-                return oldValue;
-            }
-
-
-            public Component getTableCellEditorComponent(JTable jTable, Object o, boolean b, int i, int i1) {
-                oldValue = (URI)o;
-                return super.getTableCellEditorComponent(jTable, o, b, i, i1);
-            }
-        });
     }
 
 
@@ -187,13 +166,9 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
     }
 
     private void handleAddAnnotation() {
-        AnnotationURIList list = new AnnotationURIList(getOWLEditorKit());
-        list.rebuildAnnotationURIList();
-        final JScrollPane scroller = new JScrollPane(list);
-        scroller.setPreferredSize(new Dimension(400, 300));
-        if (JOptionPane.showConfirmDialog(AnnotationTemplatePrefsPanel.this, scroller, "Pick an annotation",
-                                          JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE) == JOptionPane.OK_OPTION){
-            Object[] rowData = new Object[]{list.getSelectedURI(), EditorType.text};
+        OWLAnnotationProperty property = new UIHelper(getOWLEditorKit()).pickAnnotationProperty();
+        if (property != null){
+            Object[] rowData = new Object[]{property, EditorType.text};
             model.addRow(rowData);
             table.getSelectionModel().setSelectionInterval(model.getRowCount()-1, model.getRowCount()-1);
             dirty = true;
@@ -244,7 +219,7 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         if (importFile != null){
             try {
                 FileInputStream inStream = new FileInputStream(importFile);
-                descriptor = new AnnotationTemplateDescriptor(inStream);
+                descriptor = new AnnotationTemplateDescriptor(inStream, getOWLModelManager().getOWLDataFactory());
                 model = new MyTableModel(descriptor);
                 table.setModel(model);
                 dirty = true;
@@ -281,11 +256,11 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
     private class MyTableModel extends DefaultTableModel {
 
         private MyTableModel(AnnotationTemplateDescriptor descriptor) {
-            addColumn("Annotation URI");
+            addColumn("Annotation property");
             addColumn("Editor type");
 
-            for (URI uri : descriptor.getURIs()){
-                Object[] rowData = new Object[]{uri, descriptor.getEditor(uri)};
+            for (OWLAnnotationProperty property : descriptor.getProperties()){
+                Object[] rowData = new Object[]{property, descriptor.getEditor(property)};
                 super.addRow(rowData);
             }
         }
@@ -293,12 +268,12 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
         public void setValueAt(Object o, int row, int col) {
             super.setValueAt(o, row, col);
-            URI uri = descriptor.getURIs().get(row);
+            OWLAnnotationProperty property = descriptor.getProperties().get(row);
             if (col == 0){
-                descriptor.changeURI(uri, (URI)o);
+                descriptor.changeProperty(property, (OWLAnnotationProperty)o);
             }
             else if (col == 1){
-                descriptor.setEditor(uri, (EditorType)o);
+                descriptor.setEditor(property, (EditorType)o);
             }
         }
 
@@ -311,20 +286,20 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
         public void removeRow(int row) {
             super.removeRow(row);
-            URI uri = descriptor.getURIs().get(row);
-            descriptor.remove(uri);
+            OWLAnnotationProperty property = descriptor.getProperties().get(row);
+            descriptor.remove(property);
         }
 
 
         public void addRow(Object[] rowData) {
             super.addRow(rowData);
-            descriptor.addRow((URI)rowData[0], (EditorType)rowData[1]);
+            descriptor.addRow((OWLAnnotationProperty)rowData[0], (EditorType)rowData[1]);
         }
 
 
         public Class<?> getColumnClass(int col) {
             if (col == 0){
-                return URI.class;
+                return OWLAnnotationProperty.class;
             }
             else{
                 return EditorType.class;

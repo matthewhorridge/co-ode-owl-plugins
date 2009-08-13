@@ -1,17 +1,17 @@
 package org.coode.puntools.view;
 
-import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
-import org.protege.editor.owl.ui.view.AbstractOWLIndividualViewComponent;
+import org.protege.editor.core.ui.view.View;
 import org.protege.editor.core.ui.view.ViewsPane;
 import org.protege.editor.core.ui.view.ViewsPaneMemento;
-import org.protege.editor.core.ui.view.View;
-import org.semanticweb.owl.model.*;
+import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
+import org.protege.editor.owl.ui.view.individual.AbstractOWLIndividualViewComponent;
+import org.semanticweb.owlapi.model.*;
 
 import javax.swing.*;
-import java.net.URI;
-import java.net.URL;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.net.URI;
+import java.net.URL;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -92,10 +92,10 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
 
     private void handleAddPun() {
         OWLEntity currentEntity = getCurrentEntity();
-        if (currentEntity != null && !currentEntity.isOWLIndividual()){
+        if (currentEntity != null && !currentEntity.isOWLNamedIndividual()){
             final OWLOntology ont = getOWLModelManager().getActiveOntology();
             final OWLDataFactory df = getOWLModelManager().getOWLDataFactory();
-            OWLIndividual ind = df.getOWLIndividual(currentEntity.getURI());
+            OWLNamedIndividual ind = df.getOWLNamedIndividual(currentEntity.getURI());
             getOWLModelManager().applyChange(new AddAxiom(ont, df.getOWLDeclarationAxiom(ind)));
             updateViewContentAndHeader();
         }
@@ -117,16 +117,16 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
 
 
     protected OWLObject updateView() {
-        OWLIndividual pun = null;
+        OWLNamedIndividual pun = null;
         OWLEntity currentEntity = getCurrentEntity();
-        if (currentEntity == null || currentEntity.isOWLIndividual()){
+        if (currentEntity == null || currentEntity.isOWLNamedIndividual()){
             changeView(NONE_PANEL_ID);
         }
         else{
             URI uri = currentEntity.getURI();
             for (OWLOntology ont : getOWLModelManager().getActiveOntologies()){
                 if (ont.containsIndividualReference(uri)){
-                    pun = getOWLModelManager().getOWLDataFactory().getOWLIndividual(uri);
+                    pun = getOWLModelManager().getOWLDataFactory().getOWLNamedIndividual(uri);
                     break;
                 }
             }
@@ -136,7 +136,7 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
     }
 
 
-    private void refresh(OWLIndividual owlIndividual) {
+    private void refresh(OWLNamedIndividual owlIndividual) {
         if (owlIndividual == null){
             changeView(NEW_PANEL_ID);
         }

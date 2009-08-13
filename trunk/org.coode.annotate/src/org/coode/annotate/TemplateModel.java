@@ -1,12 +1,14 @@
 package org.coode.annotate;
 
 import org.apache.log4j.Logger;
+import org.coode.annotate.prefs.AnnotationTemplateDescriptor;
 import org.coode.annotate.prefs.AnnotationTemplatePrefs;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 
 /*
@@ -52,11 +54,17 @@ public class TemplateModel {
 
     private final OWLModelManager mngr;
 
-    private OWLEntity currentEntity;
+    private OWLAnnotationSubject subject;
 
     private OWLOntologyChangeListener ontChangeListener = new OWLOntologyChangeListener(){
         public void ontologiesChanged(List<? extends OWLOntologyChange> list) throws OWLException {
             handleOntologyChanges(list);
+        }
+    };
+
+    private ChangeListener layoutChangeListener = new ChangeListener(){
+        public void stateChanged(ChangeEvent event) {
+            refresh();
         }
     };
 
@@ -65,18 +73,20 @@ public class TemplateModel {
         this.mngr = mngr;
 
         mngr.addOntologyChangeListener(ontChangeListener);
+
+        AnnotationTemplatePrefs.getInstance().addChangeListener(layoutChangeListener);
     }
 
 
-    public EditorType getComponentType(URI uri){
-        return AnnotationTemplatePrefs.getInstance().getDefaultDescriptor().getEditor(uri);
+    public EditorType getComponentType(OWLAnnotationProperty property){
+        return getDefaultDescriptor().getEditor(property);
     }
 
 
-    public Set<OWLAnnotationAxiom> getAnnotations(OWLEntity entity) {
-        Set<OWLAnnotationAxiom> annotations = new HashSet<OWLAnnotationAxiom>();
+    public Set<OWLAnnotationAssertionAxiom> getAnnotations(OWLAnnotationSubject annotationSubject) {
+        Set<OWLAnnotationAssertionAxiom> annotations = new HashSet<OWLAnnotationAssertionAxiom>();
         for (OWLOntology ont : mngr.getActiveOntologies()){
-            annotations.addAll(entity.getAnnotationAxioms(ont));
+            annotations.addAll(ont.getAnnotationAssertionAxioms(annotationSubject));
         }
         return annotations;
     }
@@ -99,15 +109,15 @@ public class TemplateModel {
         return mngr;
     }
 
-    public OWLEntity getEntity() {
-        return currentEntity;
+    public OWLAnnotationSubject getSubject() {
+        return subject;
     }
 
     private void handleOntologyChanges(List<? extends OWLOntologyChange> changes) {
         for (OWLOntologyChange change : changes){
             if (change.isAxiomChange() &&
-                change.getAxiom() instanceof OWLEntityAnnotationAxiom &&
-                ((OWLEntityAnnotationAxiom)change.getAxiom()).getSubject().equals(currentEntity)){
+                change.getAxiom().isOfType(AxiomType.ANNOTATION_ASSERTION) &&
+                ((OWLAnnotationAssertionAxiom)change.getAxiom()).getSubject().equals(subject)){
                 refresh();
                 return;
             }
@@ -115,29 +125,29 @@ public class TemplateModel {
     }
 
     private void refresh(){
-        setEntity(currentEntity);
+        setSubject(subject);
     }
 
-    public void setEntity(OWLEntity entity) {
-        currentEntity = entity;
+    public void setSubject(OWLAnnotationSubject annotationSubject) {
+        subject = annotationSubject;
         cList.clear();
 
-        if (entity != null){
-            final List<URI> uris = AnnotationTemplatePrefs.getInstance().getDefaultDescriptor().getURIs();
+        if (annotationSubject != null){
+            final List<OWLAnnotationProperty> properties = getDefaultDescriptor().getProperties();
 
-            Set<OWLAnnotationAxiom> annots = getAnnotations(entity);
-            Set<URI> usedURIs = new HashSet<URI>();
-            for (OWLAnnotationAxiom annot : annots){
-                final URI annotationURI = annot.getAnnotation().getAnnotationURI();
-                if (uris.contains(annotationURI)){
-                    usedURIs.add(annotationURI);
+            Set<OWLAnnotationAssertionAxiom> annots = getAnnotations(annotationSubject);
+            Set<OWLAnnotationProperty> usedProperties = new HashSet<OWLAnnotationProperty>();
+            for (OWLAnnotationAssertionAxiom annot : annots){
+                final OWLAnnotationProperty property = annot.getAnnotation().getProperty();
+                if (properties.contains(property)){
+                    usedProperties.add(property);
                     cList.add(new TemplateRow(annot, this));
                 }
             }
 
-            for (URI uri : uris){
-                if (!usedURIs.contains(uri)){
-                    cList.add(new TemplateRow(entity, uri, this));
+            for (OWLAnnotationProperty property : properties){
+                if (!usedProperties.contains(property)){
+                    cList.add(new TemplateRow(annotationSubject, property, this));
                 }
             }
 
@@ -151,8 +161,8 @@ public class TemplateModel {
         return Collections.unmodifiableList(cList);
     }
 
-    public void addRow(URI uri) {
-        cList.add(new TemplateRow(currentEntity, uri, this));
+    public void addRow(OWLAnnotationProperty property) {
+        cList.add(new TemplateRow(subject, property, this));
         Collections.sort(cList, comparator);
         notifyStructureChanged();
     }
@@ -192,17 +202,25 @@ public class TemplateModel {
         }
     }
 
+
     public void dispose() {
         mngr.removeOntologyChangeListener(ontChangeListener);
+        AnnotationTemplatePrefs.getInstance().removeChangeListener(layoutChangeListener);        
         listeners.clear();
     }
+
+
+    private AnnotationTemplateDescriptor getDefaultDescriptor() {
+        return AnnotationTemplatePrefs.getInstance().getDefaultDescriptor(mngr.getOWLDataFactory());
+    }
+
 
     class AnnotationComponentComparator implements Comparator<TemplateRow> {
 
         public int compare(TemplateRow c1, TemplateRow c2) {
-            URI uri1 = c1.getURI();
-            URI uri2 = c2.getURI();
-            for (URI uri : AnnotationTemplatePrefs.getInstance().getDefaultDescriptor().getURIs()){
+            OWLAnnotationProperty uri1 = c1.getProperty();
+            OWLAnnotationProperty uri2 = c2.getProperty();
+            for (OWLAnnotationProperty uri : getDefaultDescriptor().getProperties()){
                 if (uri.equals(uri1)){
                     return -1;
                 }

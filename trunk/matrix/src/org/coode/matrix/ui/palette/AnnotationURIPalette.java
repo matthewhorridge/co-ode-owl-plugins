@@ -1,10 +1,6 @@
 package org.coode.matrix.ui.palette;
 
-import org.protege.editor.owl.ui.frame.AnnotationURIList;
-import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-
-import javax.swing.*;
-import java.awt.*;
+import org.protege.editor.owl.ui.view.annotationproperty.OWLAnnotationPropertyHierarchyViewComponent;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -36,21 +32,11 @@ import java.awt.*;
  * Bio Health Informatics Group<br>
  * Date: Jul 5, 2007<br><br>
  */
-public class AnnotationURIPalette extends AbstractOWLViewComponent {
+public class AnnotationURIPalette extends OWLAnnotationPropertyHierarchyViewComponent {
 
-    private AnnotationURIList uriList;
-
-    protected void initialiseOWLView() throws Exception {
-
-        setLayout(new BorderLayout());
-
-        uriList = new AnnotationURIList(getOWLEditorKit());
-        uriList.rebuildAnnotationURIList();
-
-        add(new JScrollPane(uriList), BorderLayout.CENTER);
-    }
-
-    protected void disposeOWLView() {
-        uriList = null;
+    protected void performExtraInitialisation() throws Exception {
+        super.performExtraInitialisation();
+        getView().setPinned(true);
+        getView().setSyncronizing(false);
     }
 }

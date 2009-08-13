@@ -1,15 +1,13 @@
 package org.coode.annotate;
 
 import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.util.URIShortFormProvider;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
-import java.net.URI;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -60,11 +58,6 @@ public class AnnotationTemplateView extends AbstractOWLSelectionViewComponent {
         setLayout(new BorderLayout());
         model = new TemplateModel(getOWLModelManager());
         form = new Template(model);
-        form.setURIShortFormProvider(new URIShortFormProvider(){
-            public String getShortForm(URI uri) {
-                return getOWLModelManager().getURIRendering(uri);
-            }
-        });
         JScrollPane scroller = new JScrollPane(form);
         add(scroller, BorderLayout.CENTER);
         addHierarchyListener(hListener);
@@ -77,7 +70,7 @@ public class AnnotationTemplateView extends AbstractOWLSelectionViewComponent {
     protected OWLObject updateView() {
         OWLEntity selectedEntity = getOWLWorkspace().getOWLSelectionModel().getSelectedEntity();
         if (isShowing()){
-            form.setEntity(selectedEntity);
+            form.setSubject(selectedEntity != null ? selectedEntity.getIRI() : null);
             updateRequired = false;
         }
         else{
@@ -102,6 +95,16 @@ public class AnnotationTemplateView extends AbstractOWLSelectionViewComponent {
 
 
     protected boolean isOWLIndividualView() {
+        return true;
+    }
+
+
+    protected boolean isOWLDatatypeView() {
+        return true;
+    }
+
+
+    protected boolean isOWLAnnotationPropertyView() {
         return true;
     }
 }

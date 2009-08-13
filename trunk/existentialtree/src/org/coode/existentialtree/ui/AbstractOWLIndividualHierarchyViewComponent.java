@@ -2,18 +2,16 @@ package org.coode.existentialtree.ui;
 
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.ui.OWLEntityComparator;
 import org.protege.editor.owl.ui.action.OWLObjectHierarchyDeleter;
 import org.protege.editor.owl.ui.tree.OWLModelManagerTree;
 import org.protege.editor.owl.ui.tree.OWLObjectTree;
 import org.protege.editor.owl.ui.tree.OWLObjectTreeCellRenderer;
-import org.protege.editor.owl.ui.view.AbstractOWLIndividualViewComponent;
 import org.protege.editor.owl.ui.view.ChangeListenerMediator;
 import org.protege.editor.owl.ui.view.Findable;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLIndividual;
-import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.util.OWLEntitySetProvider;
+import org.protege.editor.owl.ui.view.individual.AbstractOWLIndividualViewComponent;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.util.OWLEntitySetProvider;
 
 import javax.swing.event.*;
 import java.awt.*;
@@ -53,33 +51,31 @@ import java.util.Set;
  * Bio Health Informatics Group<br>
  * Date: Sep 11, 2007<br><br>
  *
- * Variant of AbstractOWLClassHierarchyViewComponent allowing OWLDescription nodes
+ * Variant of AbstractOWLClassHierarchyViewComponent allowing OWLClassExpression nodes
  *
  */
 public abstract class AbstractOWLIndividualHierarchyViewComponent extends AbstractOWLIndividualViewComponent
-        implements Findable<OWLIndividual> { //, Deleteable {
+        implements Findable<OWLNamedIndividual> { //, Deleteable {
 
-    private OWLModelManagerTree<OWLIndividual> tree;
+    private OWLModelManagerTree<OWLNamedIndividual> tree;
 
     private TreeSelectionListener listener;
 
-    private OWLObjectHierarchyDeleter<OWLIndividual> hierarchyDeleter;
+    private OWLObjectHierarchyDeleter<OWLNamedIndividual> hierarchyDeleter;
 
     final public void initialiseIndividualsView() throws Exception {
 
         setLayout(new BorderLayout(7, 7));
 
-        tree = new OWLModelManagerTree<OWLIndividual>(getOWLEditorKit(),
+        tree = new OWLModelManagerTree<OWLNamedIndividual>(getOWLEditorKit(),
                                                       getOWLIndividualHierarchyProvider());
-
-        tree.setOWLObjectComparator(new OWLEntityComparator<OWLIndividual>(getOWLModelManager()));
 
         tree.setCellRenderer(new OWLObjectTreeCellRenderer(getOWLEditorKit()));
 
         initSelectionManagement();
         add(ComponentFactory.createScrollPane(tree));
         performExtraInitialisation();
-        OWLIndividual individual = getSelectedOWLIndividual();
+        OWLNamedIndividual individual = getSelectedOWLIndividual();
         if (individual != null) {
             tree.setSelectedOWLObject(individual);
             if (tree.getSelectionPath() != null) {
@@ -113,11 +109,11 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
             }
         });
 
-        hierarchyDeleter = new OWLObjectHierarchyDeleter<OWLIndividual>(getOWLEditorKit(),
+        hierarchyDeleter = new OWLObjectHierarchyDeleter<OWLNamedIndividual>(getOWLEditorKit(),
                                                                         getOWLIndividualHierarchyProvider(),
-                                                                        new OWLEntitySetProvider<OWLIndividual>() {
-                                                                            public Set<OWLIndividual> getEntities() {
-                                                                                return new HashSet<OWLIndividual>(tree.getSelectedOWLObjects());
+                                                                        new OWLEntitySetProvider<OWLNamedIndividual>() {
+                                                                            public Set<OWLNamedIndividual> getEntities() {
+                                                                                return new HashSet<OWLNamedIndividual>(tree.getSelectedOWLObjects());
                                                                             }
                                                                         },
                                                                         "individuals");
@@ -125,9 +121,9 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     }
 
     private void ensureSelection() {
-        OWLIndividual ind = getSelectedOWLIndividual();
+        OWLNamedIndividual ind = getSelectedOWLIndividual();
         if (ind != null) {
-            OWLIndividual treeSel = tree.getSelectedOWLObject();
+            OWLNamedIndividual treeSel = tree.getSelectedOWLObject();
             if (treeSel == null || !treeSel.equals(ind)) {
                 tree.setSelectedOWLObject(ind);
             }
@@ -140,7 +136,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     }
 
 
-    protected OWLObjectTree<OWLIndividual> getTree() {
+    protected OWLObjectTree<OWLNamedIndividual> getTree() {
         return tree;
     }
 
@@ -164,9 +160,9 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     protected void transmitSelection() {
 //            deletableChangeListenerMediator.fireStateChanged(this);
         if (!isPinned()) {
-            OWLIndividual individual = tree.getSelectedOWLObject();
-            if (individual != null && individual instanceof OWLClass) {
-                setSelectedEntity(individual);
+            OWLNamedIndividual individual = tree.getSelectedOWLObject();
+            if (individual != null) {
+                setGlobalSelection(individual);
             }
             else {
                 // Update from OWL selection model
@@ -176,7 +172,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     }
 
 
-    public OWLIndividual updateView(OWLIndividual individual) {
+    public OWLNamedIndividual updateView(OWLNamedIndividual individual) {
         if (tree.getSelectedOWLObject() == null) {
             if (individual != null) {
                 tree.setSelectedOWLObject(individual);
@@ -195,7 +191,7 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     }
 
 
-    protected abstract OWLObjectHierarchyProvider<OWLIndividual> getOWLIndividualHierarchyProvider();
+    protected abstract OWLObjectHierarchyProvider<OWLNamedIndividual> getOWLIndividualHierarchyProvider();
 
 
     public void disposeView() {
@@ -246,12 +242,11 @@ public abstract class AbstractOWLIndividualHierarchyViewComponent extends Abstra
     /////////////////////////////////////////////////////////////////////////////////////
 
 
-    public java.util.List<OWLIndividual> find(String match) {
-        // Here we should just find individuals
-        return new ArrayList<OWLIndividual>(getOWLModelManager().getEntityFinder().getMatchingOWLIndividuals(match));
+    public java.util.List<OWLNamedIndividual> find(String match) {
+        return new ArrayList<OWLNamedIndividual>(getOWLModelManager().getOWLEntityFinder().getMatchingOWLIndividuals(match));
     }
 
-    public void show(OWLIndividual individual) {
+    public void show(OWLNamedIndividual individual) {
         getTree().setSelectedOWLObject(individual);
     }
 }

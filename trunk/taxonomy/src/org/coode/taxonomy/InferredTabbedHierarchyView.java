@@ -4,9 +4,9 @@
 package org.coode.taxonomy;
 
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.ui.OWLEntityComparator;
-import org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent;
-import org.semanticweb.owl.model.OWLClass;
+import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
+import org.protege.editor.owl.ui.OWLObjectComparator;
+import org.semanticweb.owlapi.model.OWLClass;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,7 +30,6 @@ public class InferredTabbedHierarchyView extends AbstractOWLClassViewComponent {
     // convenience class for querying the asserted subsumption hierarchy directly
     private OWLObjectHierarchyProvider<OWLClass> hp;
 
-    private OWLEntityComparator<OWLClass> owlEntityComparator;
 
     // create the GUI
     public void initialiseClassView() throws Exception {
@@ -45,8 +44,7 @@ public class InferredTabbedHierarchyView extends AbstractOWLClassViewComponent {
     protected OWLClass updateView(OWLClass selectedClass) {
         namesComponent.setText("");
         if (selectedClass != null){
-            hp = getOWLModelManager().getInferredOWLClassHierarchyProvider();
-            owlEntityComparator = new OWLEntityComparator<OWLClass>(getOWLModelManager());
+            hp = getOWLModelManager().getOWLHierarchyManager().getInferredOWLClassHierarchyProvider();
             render(selectedClass, 0);
         }
         return selectedClass;
@@ -63,7 +61,7 @@ public class InferredTabbedHierarchyView extends AbstractOWLClassViewComponent {
 
         // the hierarchy provider gets subclasses for us
         final java.util.List<OWLClass> children = new ArrayList<OWLClass>(hp.getChildren(selectedClass));
-        Collections.sort(children, owlEntityComparator);
+        Collections.sort(children, getOWLModelManager().getOWLObjectComparator());
         for (OWLClass sub: children){
             render(sub, indent+1);
         }

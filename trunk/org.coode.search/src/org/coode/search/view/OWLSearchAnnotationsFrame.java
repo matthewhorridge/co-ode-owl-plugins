@@ -2,7 +2,7 @@ package org.coode.search.view;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
-import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntology;
 /*
 * Copyright (C) 2007, University of Manchester
 *

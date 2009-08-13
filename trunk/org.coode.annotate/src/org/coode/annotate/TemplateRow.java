@@ -1,14 +1,13 @@
 package org.coode.annotate;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.event.*;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -47,11 +46,13 @@ import java.util.Set;
  */
 public class TemplateRow {
 
-    private TemplateModel model;
-    private OWLAnnotationAxiom annotAxiom;
     private JComponent editor;
-    private URI uri;
-    private OWLEntity entity;
+
+    private TemplateModel model;
+
+    private OWLAnnotationAssertionAxiom annotAxiom;
+    private OWLAnnotationProperty property;
+    private OWLAnnotationSubject subject;
 
     private FocusListener focusListener = new FocusAdapter(){
         public void focusLost(FocusEvent focusEvent) {
@@ -67,22 +68,22 @@ public class TemplateRow {
     };
 
 
-    public TemplateRow(OWLAnnotationAxiom<OWLEntity> annotAxiom, TemplateModel model) {
-        this(annotAxiom.getSubject(), annotAxiom.getAnnotation().getAnnotationURI(),  model);
+    public TemplateRow(OWLAnnotationAssertionAxiom annotAxiom, TemplateModel model) {
+        this(annotAxiom.getSubject(), annotAxiom.getAnnotation().getProperty(),  model);
         this.annotAxiom = annotAxiom;
-        reload(annotAxiom.getAnnotation().getAnnotationValue());
+        reload(annotAxiom.getAnnotation().getValue());
     }
 
     // when the editor exists without a supporting axiom
-    public TemplateRow(OWLEntity entity, URI uri, TemplateModel model) {
+    public TemplateRow(OWLAnnotationSubject subject, OWLAnnotationProperty property, TemplateModel model) {
         super();
         this.model = model;
-        this.entity = entity;
-        this.uri = uri;
+        this.subject = subject;
+        this.property = property;
     }
 
-    public URI getURI(){
-        return uri;
+    public OWLAnnotationProperty getProperty(){
+        return property;
     }
 
 
@@ -90,17 +91,16 @@ public class TemplateRow {
 
         final OWLModelManager mngr = model.getOWLModelManager();
 
-        OWLEntityAnnotationAxiom newAxiom = null;
-        OWLConstant newValue = getValue();
+        OWLAnnotationAssertionAxiom newAxiom = null;
+        OWLLiteral newValue = getValue();
         if (newValue != null){
-            OWLConstantAnnotation annot = mngr.getOWLDataFactory().getOWLConstantAnnotation(uri, newValue);
-            newAxiom = mngr.getOWLDataFactory().getOWLEntityAnnotationAxiom(entity, annot);
+            newAxiom = mngr.getOWLDataFactory().getOWLAnnotationAssertionAxiom(property, subject, newValue);
         }
 
         List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 
         if (annotAxiom != null){
-            if (!annotAxiom.getAnnotation().getAnnotationValue().equals(newValue)){
+            if (!annotAxiom.getAnnotation().getValue().equals(newValue)){
                 for (OWLOntology ont : mngr.getActiveOntologies()){
                     if (ont.containsAxiom(annotAxiom)){
                         changes.add(new RemoveAxiom(ont, annotAxiom));
@@ -130,7 +130,7 @@ public class TemplateRow {
 
 
     private void reload(OWLObject value) {
-        EditorType type = model.getComponentType(uri);
+        EditorType type = model.getComponentType(property);
 
         switch(type){
             case text:      // FALLTHROUGH
@@ -140,8 +140,8 @@ public class TemplateRow {
                 }
                 else{
                     String rendering;
-                    if (value instanceof OWLConstant){
-                        rendering = ((OWLConstant)value).getLiteral();
+                    if (value instanceof OWLLiteral){
+                        rendering = ((OWLLiteral)value).getLiteral();
                     }
                     else{
                         rendering = value.toString();
@@ -157,26 +157,26 @@ public class TemplateRow {
 
 
     // all of this should be here or in the model
-    public OWLConstant getValue() {
-        EditorType type = model.getComponentType(uri);
+    public OWLLiteral getValue() {
+        EditorType type = model.getComponentType(property);
 
         switch(type){
             case text:      // FALLTHROUGH
             case multiline:
                 String text = ((JTextComponent) getEditor()).getText().trim();
                 if (text != null && !text.equals("")){
-                    return model.getOWLModelManager().getOWLDataFactory().getOWLUntypedConstant(text);
+                    return model.getOWLModelManager().getOWLDataFactory().getOWLStringLiteral(text);
                 }
                 break;
 //            case entity:
-//                return (OWLConstant)((JComboBox) getEditor()).getSelectedItem();
+//                return (OWLLiteral)((JComboBox) getEditor()).getSelectedItem();
         }
         return null;
     }
 
     public JComponent getEditor(){
         if (editor == null){
-            EditorType type = model.getComponentType(uri);
+            EditorType type = model.getComponentType(property);
 
             Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>();
             Set<AWTKeyStroke> newBackwardKeys = new HashSet<AWTKeyStroke>();
