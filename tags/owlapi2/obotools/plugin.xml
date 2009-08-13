@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+
+<plugin>
+
+    <extension id="OBOAssertedClassHierarchy"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="OBO class hierarchy"/>
+        <class value="org.coode.obotools.hierarchy.OBOClassHierarchyViewComponent"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
+        <navigates value="@org.protege.classcategory"/>
+    </extension>
+
+    <extension id="OBOObsoleteClassHierarchy"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="OBO obsolete class hierarchy"/>
+        <class value="org.coode.obotools.hierarchy.OBOObsoleteClassHierarchyViewComponent"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
+        <navigates value="@org.protege.classcategory"/>
+    </extension>
+
+</plugin>
