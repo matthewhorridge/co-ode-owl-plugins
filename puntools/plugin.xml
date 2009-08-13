@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+
+<plugin>
+
+    <extension id="PunIndividualView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Individual Pun"/>
+        <class value="org.coode.puntools.view.PunIndividualView"/>
+        <headerColor value="@org.protege.individualcolor"/>
+        <category value="@org.protege.individualcategory"/>
+    </extension>
+
+</plugin>
