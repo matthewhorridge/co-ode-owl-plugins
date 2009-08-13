@@ -1,0 +1,107 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<project name = "Co-ODE Installer" default = "usage" basedir = ".">
+    <property file="local.properties"/>
+
+    <target name="init">
+        <taskdef resource="svntask.properties" classpathref="svn.classpath"/>
+    </target>
+
+    <target name="usage">
+        <echo message="First set the PROTEGE_HOME environment variable"/>
+        <echo message = "to point to a Protege distribution."/>
+        <echo message = "jar: builds the Co-ode protege 4.1 plugins"/>
+        <echo message = "install: installs the Protege plugins"/>
+        <echo message = "clean: cleans all the projects (except build files)"/>
+        <!-- build libs code in http://smi-protege/repos/protege/protege4/co-ode/tags/owlapi2/build.xml revision 11988    -->
+    </target>
+
+    <target name="invoke">
+        <echo message = "======================= Invoking ${sub.target} build step on co-ode projects"/>
+
+        <!-- now do the plugins -->
+
+        <echo message = "Building annotate plugin}"/>
+        <ant antfile="./build.xml"
+             dir="./annotate"
+             target="${sub.target}"/>
+
+        <echo message = "Building bean shell plugin"/>
+        <ant antfile="./build.xml"
+             dir="./shell"
+             target="${sub.target}"/>
+
+        <echo message = "Building bookmark plugin}"/>
+        <ant antfile="./build.xml"
+             dir="./bookmark"
+             target="${sub.target}"/>
+
+        <echo message = "Building cardinality plugin"/>
+        <ant antfile="./build.xml"
+             dir="./cardinality"
+             target="${sub.target}"/>
+
+        <echo message = "Building changes plugin"/>
+        <ant antfile="./build.xml"
+             dir="./change"
+             target="${sub.target}"/>
+
+        <echo message = "Building cloud plugin"/>
+        <ant antfile="./build.xml"
+             dir="./cloud"
+             target="${sub.target}"/>
+
+        <echo message = "Building existential tree plugin"/>
+        <ant antfile="./build.xml"
+             dir="./existentialtree"
+             target="${sub.target}"/>
+
+        <echo message = "Building Matrix plugin"/>
+        <ant antfile="./build.xml"
+             dir="./matrix"
+             target="${sub.target}"/>
+
+        <echo message = "Building OWL Doc plugin"/>
+        <ant antfile="./build.xml"
+             dir="./owldoc"
+             target="${sub.target}"/>
+
+        <echo message = "Building taxonomy plugin"/>
+        <ant antfile="./build.xml"
+             dir="./taxonomy"
+             target="${sub.target}"/>
+
+
+        <echo message = "======================= Completed ${sub.target} build step on co-ode projects"/>
+    </target>
+
+    <!-- build libs code in http://smi-protege/repos/protege/protege4/co-ode/tags/owlapi2/build.xml revision 11988    -->
+
+    <target name="jar">
+        <antcall target="invoke">
+            <param name="sub.target" value="jar"/>
+        </antcall>
+        <copy todir="./co-ode.jars" flatten="true">
+            <fileset dir="." includes="**/org.coode.*.jar"/>
+        </copy>
+    </target>
+
+    <target name="install">
+        <antcall target="invoke">
+            <param name="sub.target" value="install"/>
+        </antcall>
+        <property environment="env"/>
+        <property name="protege.home"      location="${env.PROTEGE_HOME}"/>
+        <delete>
+            <fileset dir="${protege.home}/configuration">
+                <include name="org.eclipse.*"/>
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="clean">
+        <antcall target="invoke">
+            <param name="sub.target" value="clean"/>
+        </antcall>
+    </target>
+
+</project>
