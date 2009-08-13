@@ -1,0 +1,80 @@
+<?xml version="1.0" ?>
+
+<plugin>
+
+    <!-- classes clouds -->
+
+    <!--extension id="org.coode.ClassInterestingnessView">
+        <label" value="Class Interestingness"/>
+        <class" value="org.coode.cloud.view.ClassInterestingness"/>
+        <headerColor" value="@org.protege.classcolor"/>
+        <category" value="Cloud"/>
+    </extension-->
+
+    <extension id="ClassesByUsageView"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Classes By Usage"/>
+        <class value="org.coode.cloud.view.ClassesByUsage"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="Cloud"/>
+    </extension>
+
+    <extension id="ClassesByRestrCountView"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Classes By Restriction Count"/>
+        <class value="org.coode.cloud.view.ClassesByRestrCount"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="Cloud"/>
+    </extension>
+
+    <extension id="ClassesByDepth"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Classes By Asserted Hierarchy Depth"/>
+        <class value="org.coode.cloud.view.ClassesByDepth"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="Cloud"/>
+    </extension>
+
+    <extension id="ClassesByDescendantCount"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Classes By Descendant Count"/>
+        <class value="org.coode.cloud.view.ClassesByDescendants"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="Cloud"/>
+    </extension>
+
+    <extension id="ClassesBySiblingCount"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Classes By Sibling Count"/>
+        <class value="org.coode.cloud.view.ClassesBySiblingCount"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="Cloud"/>
+    </extension>
+
+    <extension id="IntervalRankView"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Classes By Interval Rank"/>
+        <class value="org.coode.cloud.view.IntervalRank"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="Cloud"/>
+    </extension>
+
+    <!-- properties -->
+
+    <extension id="ObjPropertiesByUsageView"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Object Properties By Usage"/>
+        <class value="org.coode.cloud.view.ObjectPropertiesByUsage"/>
+        <headerColor value="@org.protege.objectpropertycolor"/>
+        <category value="Cloud"/>
+    </extension>
+
+    <extension id="DataPropertiesByUsageView"
+            point="org.protege.editor.core.application.ViewComponent">
+        <label value="Data Properties By Usage"/>
+        <class value="org.coode.cloud.view.DataPropertiesByUsage"/>
+        <headerColor value="@org.protege.datapropertycolor"/>
+        <category value="Cloud"/>
+    </extension>
+
+</plugin>
