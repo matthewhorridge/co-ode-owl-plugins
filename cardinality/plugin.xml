@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+
+<plugin>
+
+    <extension id="CardinalityView"
+               point="org.protege.editor.core.application.ViewComponent">
+        <label value="Cardinality View"/>
+        <class value="org.coode.cardinality.ui.CardinalityView"/>
+        <headerColor value="@org.protege.classcolor"/>
+        <category value="@org.protege.classcategory"/>
+    </extension>
+
+</plugin>
+
