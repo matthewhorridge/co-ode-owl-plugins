@@ -123,10 +123,10 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
             changeView(NONE_PANEL_ID);
         }
         else{
-            URI uri = currentEntity.getURI();
+            IRI iri = currentEntity.getIRI();
             for (OWLOntology ont : getOWLModelManager().getActiveOntologies()){
-                if (ont.containsIndividualReference(uri)){
-                    pun = getOWLModelManager().getOWLDataFactory().getOWLNamedIndividual(uri);
+                if (ont.containsIndividualReference(iri)){
+                    pun = getOWLModelManager().getOWLDataFactory().getOWLNamedIndividual(iri);
                     break;
                 }
             }
