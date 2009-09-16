@@ -1,31 +1,30 @@
 <?xml version="1.0"?> 
-<project name="OWLCALCULATIONS" default="bundle" basedir="/Users/luigi/Documents/workspace/OWLCALCULATIONS">
-  
-  
-  <property name="classes" location="${basedir}/bin"/>
-  <property name="bundles" location="/Users/luigi/Documents/workspace/protege-standalone/build/dist/bundles"/>
-  <property name="dist" location="/Users/luigi/Documents/workspace/protege-standalone/build/dist/equinox"/>	
-  <property name="jardest" location="${dist}/plugins/org.coode.oae.jar"/>
-  	
-  
-  
-  
+<project name="OWLCALCULATIONS" default="bundle">
 
-	
+  <property name="classes" location="${basedir}/bin"/>
+  <property name="bundles" location="${protegestandalone.bundles}"/>
+  <property name="dist" location="${protegestandalone.equinox}"/>	
+  <property name="jardest" location="${dist}/plugins/org.coode.oae.jar"/>
+
   <target name="init"> 
     <echo message="---------------Building the Bundle-------------"/>
-  	
+  	<echo message="basedir: ${basedir}"/>
+  	<echo message="classes: ${classes}"/>
+    <echo message="bundles: ${protegestandalone.bundles}"/>
+    <echo message="dist:    ${protegestandalone.equinox}"/>
+    <echo message="jardest: ${jardest}"/>
+
     <mkdir dir="${classes}"/>
   </target>
-	
 
-	
-
-  <target name="bundle" depends="">
-
+  <target name="bundle" depends="init,javacc">
+  	<mkdir dir="${classes}/lib"/>
+  	<mkdir dir="${bundles}"/>
+  	<mkdir dir="${dist}"/>
+  	<mkdir dir="${dist}/configuration"/>
+  	<mkdir dir="${dist}/plugins"/>
   	<delete dir="${dist}/configuration/org.eclipse.core.runtime"/>
   	<delete dir="${dist}/configuration/org.eclipse.osgi"/>
-  	<mkdir dir="${classes}/lib"/>
   	<delete>
   		<fileset dir="${dist}/configuration/">
   			<include name="*.log"/>
@@ -44,6 +43,12 @@
          manifest = "${basedir}/plugins/org.coode.oae/META-INF/MANIFEST.MF" update="true" />
   </target> 
 
-	
-	
+  <target name="javacc">
+	<exec executable="sh" dir="${basedir}/src/uk/ac/manchester/mae/jjtree">
+		<arg line="${javacc.home}/bin/jjtree arithmetics.jjt"/>
+	</exec>
+	<exec executable="sh" dir="${basedir}/src/uk/ac/manchester/mae">
+		<arg line="${javacc.home}/bin/javacc arithmetics.jj"/>
+	</exec>
+  </target>
 </project>
