@@ -1,0 +1,527 @@
+/**
+* JJTree file
+*/
+
+options {
+  JDK_VERSION = "1.5";
+    VISITOR=true;
+    MULTI=true;
+    NODE_PREFIX="MAE";
+    NODE_PACKAGE="uk.ac.manchester.mae";
+    DEBUG_TOKEN_MANAGER=false;
+}
+ 
+PARSER_BEGIN(ArithmeticsParser) 
+package uk.ac.manchester.mae;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owl.expression.OWLEntityChecker;
+import org.semanticweb.owl.model.OWLObjectProperty;
+import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
+import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.expression.ParserException;
+import org.semanticweb.owl.apibinding.OWLManager;
+import org.semanticweb.owl.model.OWLObject;
+import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcher;
+
+public class ArithmeticsParser {
+	
+	static private OWLEntityChecker owlEntityChecker = null;
+	
+	static private AutoCompleterMatcher matcher;
+	
+	static private OWLDataFactory dataFactory = OWLManager.createOWLOntologyManager().getOWLDataFactory();
+	
+	static public void setOWLDataFactory(OWLDataFactory dataFactory){
+		ArithmeticsParser.dataFactory = dataFactory;
+	}
+	
+	static{
+		
+		initCompletions();
+	}
+	static public void setOWLEntityChecker(OWLEntityChecker owlEntityChecker){
+		ArithmeticsParser.owlEntityChecker = owlEntityChecker;
+	}
+	
+	static public void setAutoCompleterMatcher(AutoCompleterMatcher matcher){
+		ArithmeticsParser.matcher = matcher;
+	}
+	
+	// Unchecked on purpose as it must contain both OWLObject instances and String
+	private static List completions;
+	
+	public static List getCompletions(){
+		return completions;
+	}	
+	
+	private static void initCompletions(){
+		if(completions ==null){
+        			completions = new ArrayList();
+        }
+		completions.clear();
+		completions.add("$");
+		completions.add("APPLIESTO <");
+		completions.add("STORETO <");
+		completions.add("{");
+	}
+	
+	private static void initCompletions(boolean conflictExpressed,
+								 boolean appliesToExpressed, 
+								 boolean storeToExpressed,
+								 boolean bindingExpressed){
+		initCompletions();
+		if(conflictExpressed){
+				completions.remove("$");
+		}
+		if(appliesToExpressed){
+			completions.remove("$");
+			completions.remove("APPLIESTO <");
+		}
+		if(storeToExpressed){
+			completions.remove("$");
+			completions.remove("APPLIESTO <");
+			completions.remove("STORETO <");
+		}
+		if(bindingExpressed){
+			completions.remove("$");
+			completions.remove("APPLIESTO <");
+			completions.remove("STORETO <");
+			completions.remove("{");
+		}
+		
+	}
+	
+  public static void main(String args[]) {
+    System.out.println("Reading from standard input...");
+    System.out.print("Enter an expression like \"1+(2+3)*var;\" :");
+    new ArithmeticsParser(System.in);
+    try {
+      SimpleNode n = ArithmeticsParser.Start();
+      n.dump("");
+      System.out.println("Thank you.");
+    } catch (Exception e) {
+      System.out.println("Oops.");
+      System.out.println(e.getMessage());
+    }
+  }
+}
+PARSER_END(ArithmeticsParser)
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| <"//" (~["\n","\r"])* ("\n"|"\r"|"\r\n")>
+| <"/*" (~["*"])* "*" (~["/"] (~["*"])* "*")* "/">
+}
+
+TOKEN: /*DELIMITERS*/
+{
+	<BINDINGEND: "}->">
+	|<OPENCURLYBRACKET: "{">
+	| <CLOSEDCURLYBRACKET: "}">
+	| <EXCLAMATION: "!">
+}
+
+TOKEN : /* LITERALS */
+{
+  < INTEGER_LITERAL:
+        <DECIMAL_LITERAL> (["l","L"])?
+      | <HEX_LITERAL> (["l","L"])?
+      | <OCTAL_LITERAL> (["l","L"])?
+  >
+|
+  < #DECIMAL_LITERAL: ["1"-"9"] (["0"-"9"])* >
+|
+  < #HEX_LITERAL: "0" ["x","X"] (["0"-"9","a"-"f","A"-"F"])+ >
+|
+  < #OCTAL_LITERAL: "0" (["0"-"7"])* >
+}
+
+TOKEN: /*Strategies*/
+{
+	<STRATEGY: "OVERRIDING" | "OVERRIDDEN" | "EXCEPTION">
+}
+
+TOKEN:{
+	<NUMBER : <INTEGER_LITERAL> (<URISYMBOLS> <INTEGER_LITERAL>)?>
+}
+
+TOKEN : /* IDENTIFIERS */
+{
+  < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
+|
+  < #LETTER: ["_","a"-"z","A"-"Z"] >
+|
+  < #DIGIT: ["0"-"9"] >
+ 
+ | <URISYMBOLS: ":" | "." | "#" | "~">
+
+  
+}
+
+TOKEN : /* OPERATORS */
+{
+	
+	<SUM: ("+"|"-")>
+	|<MULTIPLY: ( "*" | "/" | "%" )>
+}
+
+
+
+
+SimpleNode Start() : {Set<String> variables = new HashSet<String>();
+								 boolean conflictExpressed = false;
+								 boolean appliesToExpressed = false; 
+								 boolean storeToExpressed = false;
+								 boolean bindingExpressed = false;}
+{
+
+  (ConflictStrategy()
+  {
+  	conflictExpressed = true;
+  }
+  )?
+  {
+	initCompletions(conflictExpressed, appliesToExpressed, storeToExpressed, bindingExpressed);
+  }
+  (AppliesTo()
+  {
+  	appliesToExpressed = true;
+  }
+  )?
+  {
+	initCompletions(conflictExpressed, appliesToExpressed, storeToExpressed, bindingExpressed);
+  }
+  (StoreTo()
+  	{
+  	 storeToExpressed = true;
+  	}
+  )?
+  {
+	initCompletions(conflictExpressed, appliesToExpressed, storeToExpressed, bindingExpressed);
+  }
+  ("{"
+  {
+  	initCompletions(conflictExpressed, appliesToExpressed, storeToExpressed, bindingExpressed);
+  }
+  Binding(variables) 
+  {
+  	bindingExpressed = true;
+  	completions.addAll(variables);
+  }   
+  ("," Binding(variables)
+  	{
+  		completions.addAll(variables);
+  	}
+  )* "}->")?
+   
+  (Expression(variables) | Function(variables)) ";"
+  { 	
+  	return jjtThis; 
+  }
+}
+
+
+void ConflictStrategy():{Token t;}
+{
+	 "$" {
+	  		completions.clear();
+            completions.add("$OVERRIDING$");
+            completions.add("$OVERRIDDEN$");
+            completions.add("$EXCEPTION$");
+	 }
+	 t = <STRATEGY>{
+	 	jjtThis.setStrategyName(t.image);
+	 }
+	"$"
+}
+
+void StoreTo():{}
+{
+	"STORETO <"
+	{ 
+		completions.clear();
+	}
+	 PropertyChain() ">"
+}
+
+void AppliesTo() #void :{}
+{
+	"APPLIESTO <"
+	{ 
+		completions.clear();
+	}
+		 manSyntaxClassExpression() ">"
+}
+
+
+JAVACODE
+
+	 void manSyntaxClassExpression(){
+		Token t;
+		while(true){
+			t = getToken(1);
+			if (t.image.equals(">") || t.image.equals("]") || t.kind == EOF){
+				break;
+			}else{
+				jjtThis.setContent(jjtThis.getContent()+(jjtThis.getContent().equals("")?"":" ")+t.image);
+				t = getNextToken();
+			}
+		}
+		String content = jjtThis.getContent();
+		ManchesterOWLSyntaxEditorParser parser = new ManchesterOWLSyntaxEditorParser(dataFactory,content);
+        parser.setOWLEntityChecker(owlEntityChecker);
+        
+        try {
+        	parser.parseDescription();
+        	
+        }catch(ParserException e){
+        	if(matcher!=null){
+				
+				int lastIndexOfWhiteSpace = content.lastIndexOf(" ");
+				String word = lastIndexOfWhiteSpace == -1 ? content
+						: content.substring(lastIndexOfWhiteSpace).trim();
+				Set<OWLObject> matches = matcher
+						.getMatches(word, e.isClassNameExpected(), e
+								.isObjectPropertyNameExpected(), e
+								.isDataPropertyNameExpected(), e
+								.isIndividualNameExpected(), e
+								.isDatatypeNameExpected());
+				List kwMatches = new ArrayList(matches.size() + 10);
+				for (String s : e.getExpectedKeywords()) {
+					if (word.matches("(\\s)*") || s.toLowerCase().startsWith(word.toLowerCase())) {
+						kwMatches.add(s);
+					}
+				}
+				completions.addAll(kwMatches);
+				completions.addAll(matches);
+				}
+        	throw new ParseException(e.getMessage());
+        	
+        }
+        String expression = content+"**";	
+        ManchesterOWLSyntaxEditorParser completerParser = new ManchesterOWLSyntaxEditorParser(dataFactory,expression);
+        completerParser.setOWLEntityChecker(owlEntityChecker);
+        try{
+        	
+        	completerParser.parseDescription();
+		} catch (ParserException e) {
+				if(matcher!=null){
+				
+				int lastIndexOfWhiteSpace = expression.lastIndexOf(" ");
+				String word = lastIndexOfWhiteSpace == -1 ? ""
+						: content.substring(lastIndexOfWhiteSpace).trim();
+				
+				List kwMatches = new ArrayList(10);
+				for (String s : e.getExpectedKeywords()) {
+					if (word.matches("(\\s)*") || s.toLowerCase().startsWith(word.toLowerCase())) {
+						kwMatches.add(s);
+					}
+				}
+				completions.addAll(kwMatches);
+				
+				}
+			
+		}
+		
+		
+       
+	}
+
+
+void Binding(Set<String> variables):{Token identifier; Token propertyName;}
+{
+	identifier=<IDENTIFIER>
+	{
+		variables.add(identifier.image);
+		jjtThis.setIdentifier(identifier.image);
+	}
+	"=" PropertyChain()
+}
+
+
+void PropertyChain(): {String propertyName; Token index;}
+{
+
+	propertyName= PropertyURI(){
+		jjtThis.setPropertyName(propertyName);
+	}
+	("[" PropertyFacet()
+	
+	"]")? (<EXCLAMATION> {
+		jjtThis.setEnd(false);
+	}
+		  (PropertyChain()))*
+}
+
+
+void PropertyFacet():{}
+{
+	manSyntaxClassExpression()
+}
+
+
+JAVACODE
+
+String PropertyURI() #void{
+		String toReturn = null;
+		String uriString = "";
+		Token t;
+		while (true) {
+			t = getToken(1);
+			if (t.kind == EXCLAMATION || t.image.startsWith("[")
+					|| t.kind == CLOSEDCURLYBRACKET || t.kind == BINDINGEND || t.image.startsWith("{") || t.image.startsWith(">") || t.kind==EOF) {
+				break;
+			}
+			uriString = (uriString + t.image).trim();
+			t = getNextToken();
+		}
+		if (owlEntityChecker != null) {
+			OWLDataProperty dataProperty = owlEntityChecker
+					.getOWLDataProperty(uriString);
+			if (dataProperty != null) {
+				toReturn = dataProperty.getURI().toString();
+			}
+			if(toReturn ==null){
+				OWLObjectProperty objectProperty = owlEntityChecker
+						.getOWLObjectProperty(uriString);
+				if (objectProperty != null) {
+					toReturn = objectProperty.getURI().toString();
+				}
+			}
+		}
+		if (toReturn == null) {
+			if(matcher !=null){
+            	completions.addAll(matcher.getMatches(uriString, false, true, true, false, false));
+            }
+			throw new ParseException(uriString + " invalid property URI or name");
+			
+		}
+		if(matcher !=null){
+			completions.addAll(matcher.getMatches(uriString, false, true, true, false, false));
+		}
+		return toReturn;
+} 
+
+void Expression(Set<String> variables) #void : {}
+{
+
+  AdditiveExpression(variables) 
+  
+}
+
+void AdditiveExpression(Set<String> variables) #void : {Token op =null;}
+{
+	
+  (
+  	 MultiplicativeExpression(variables) (  op=<SUM> {
+    	jjtThis.setSum(op == null || op.image.compareTo("+")==0);
+    	
+    } AdditiveExpression(variables) )*
+    
+    
+    
+  ) #Add(>1)
+}
+
+void MultiplicativeExpression(Set<String> variables) #void : {Token op =null;}
+{
+  (
+    UnaryExpression(variables) ( op =<MULTIPLY> { 
+     jjtThis.setMultiplication(op == null || op.image.compareTo("*")==0);
+     jjtThis.setPercentage(op != null && op.image.compareTo("%")==0);
+    }
+    MultiplicativeExpression(variables) )*
+  ) #Mult(>1)
+}
+
+void UnaryExpression(Set<String> variables) #void : {}
+{
+	LOOKAHEAD(2)
+	Power(variables)	
+  |"(" Expression(variables) ")"  
+  |  groundTerm(variables)
+}
+
+void Power(Set<String> variables) :{Double base=null; Double exp; Token baseId=null;}
+{
+	(
+		((base = Integer()) | baseId =<IDENTIFIER>{
+			if(!variables.contains(baseId.image)){
+				throw new ParseException("Unbound symbol: "+baseId.image);
+			}
+		}
+		) "^" exp = Integer()
+		{
+			if(base!=null){
+				jjtThis.setBase(base);
+			}else{
+				jjtThis.setSymbolic(true);
+				jjtThis.setBaseIdentifier(baseId.image);
+			}
+			jjtThis.setExp(exp);
+		}
+	)
+}
+
+
+double Integer() #IntNode :{Token t;} 
+{
+	
+t = <NUMBER> 
+{
+  	jjtThis.setValue(Double.parseDouble(t.image));
+  	jjtThis.setSymbolic(false);
+  	return jjtThis.getValue();
+  	}
+| t= <INTEGER_LITERAL>
+  {
+  	jjtThis.setValue(Double.parseDouble(t.image));
+  	jjtThis.setSymbolic(false);
+  	return jjtThis.getValue();
+  	}
+}
+
+
+
+
+void Identifier(Set<String> variables) #Identifier: {Token t;}
+{
+	t=<IDENTIFIER> 
+	{
+		if(!variables.contains(t.image)){
+			throw new ParseException("Unbound symbol: "+t.image);
+		}
+		jjtThis.setIdentifierName(t.image);
+		jjtThis.setSymbolic(true);
+	}
+}
+
+void groundTerm(Set<String> variables) #void: {}
+{
+	(Integer() |  Identifier(variables) ) 
+}
+
+void Function(Set<String> variables) #void:{}
+{  
+	
+	BigSum(variables)
+}
+
+void BigSum(Set<String> variables) :{}
+{
+	
+	("SUM("|"sum(")  Expression(variables)")" 
+}
