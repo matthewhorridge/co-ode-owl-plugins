@@ -25,9 +25,9 @@ package uk.ac.manchester.mae;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Mar 13, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Mar 13, 2008
  */
 public class ValueAlreadySetException extends EvaluationException {
 	public ValueAlreadySetException(String string) {

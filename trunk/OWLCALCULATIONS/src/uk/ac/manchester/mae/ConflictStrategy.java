@@ -35,9 +35,9 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Mar 13, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Mar 13, 2008
  */
 public interface ConflictStrategy {
 	void solve(OWLIndividual individual,

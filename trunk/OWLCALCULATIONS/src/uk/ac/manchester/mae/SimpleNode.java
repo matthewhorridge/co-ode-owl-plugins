@@ -2,93 +2,120 @@
 /* JavaCCOptions:MULTI=true,NODE_USES_PARSER=false,VISITOR=true,TRACK_TOKENS=false,NODE_PREFIX=MAE,NODE_EXTENDS=,NODE_FACTORY=,SUPPORT_CLASS_VISIBILITY_PUBLIC=true */
 package uk.ac.manchester.mae;
 
-public
-class SimpleNode implements Node {
+public class SimpleNode implements Node {
+	protected Node parent;
+	protected Node[] children;
+	protected int id;
+	protected ArithmeticsParser parser;
+	protected boolean isSymbolic;
 
-  protected Node parent;
-  protected Node[] children;
-  protected int id;
-  protected Object value;
-  protected ArithmeticsParser parser;
+	public SimpleNode(int i) {
+		this.id = i;
+	}
 
-  public SimpleNode(int i) {
-    id = i;
-  }
+	public SimpleNode(ArithmeticsParser p, int i) {
+		this(i);
+		this.parser = p;
+	}
 
-  public SimpleNode(ArithmeticsParser p, int i) {
-    this(i);
-    parser = p;
-  }
+	public void jjtOpen() {
+	}
 
-  public void jjtOpen() {
-  }
+	public void jjtClose() {
+	}
 
-  public void jjtClose() {
-  }
+	public void jjtSetParent(Node n) {
+		this.parent = n;
+	}
 
-  public void jjtSetParent(Node n) { parent = n; }
-  public Node jjtGetParent() { return parent; }
+	public Node jjtGetParent() {
+		return this.parent;
+	}
 
-  public void jjtAddChild(Node n, int i) {
-    if (children == null) {
-      children = new Node[i + 1];
-    } else if (i >= children.length) {
-      Node c[] = new Node[i + 1];
-      System.arraycopy(children, 0, c, 0, children.length);
-      children = c;
-    }
-    children[i] = n;
-  }
+	public void jjtAddChild(Node n, int i) {
+		if (this.children == null) {
+			this.children = new Node[i + 1];
+		} else if (i >= this.children.length) {
+			Node c[] = new Node[i + 1];
+			System.arraycopy(this.children, 0, c, 0, this.children.length);
+			this.children = c;
+		}
+		this.children[i] = n;
+	}
 
-  public Node jjtGetChild(int i) {
-    return children[i];
-  }
+	public Node jjtGetChild(int i) {
+		return this.children[i];
+	}
 
-  public int jjtGetNumChildren() {
-    return (children == null) ? 0 : children.length;
-  }
+	public int jjtGetNumChildren() {
+		return this.children == null ? 0 : this.children.length;
+	}
 
-  public void jjtSetValue(Object value) { this.value = value; }
-  public Object jjtGetValue() { return value; }
+	/** Accept the visitor. * */
+	public Object jjtAccept(ArithmeticsParserVisitor visitor, Object data) {
+		return visitor.visit(this, data);
+	}
 
-  /** Accept the visitor. **/
-  public Object jjtAccept(ArithmeticsParserVisitor visitor, Object data) {
-    return visitor.visit(this, data);
-  }
+	/** Accept the visitor. */
+	public Object childrenAccept(ArithmeticsParserVisitor visitor, Object data) {
+		if (this.children != null) {
+			for (int i = 0; i < this.children.length; ++i) {
+				this.children[i].jjtAccept(visitor, data);
+			}
+		}
+		return data;
+	}
 
-  /** Accept the visitor. **/
-  public Object childrenAccept(ArithmeticsParserVisitor visitor, Object data) {
-    if (children != null) {
-      for (int i = 0; i < children.length; ++i) {
-        children[i].jjtAccept(visitor, data);
-      }
-    }
-    return data;
-  }
+	/*
+	 * You can override these two methods in subclasses of SimpleNode to
+	 * customize the way the node appears when the tree is dumped. If your
+	 * output uses more than one line you should override toString(String),
+	 * otherwise overriding toString() is probably all you need to do.
+	 */
+	@Override
+	public String toString() {
+		return ArithmeticsParserTreeConstants.jjtNodeName[this.id];
+	}
 
-  /* You can override these two methods in subclasses of SimpleNode to
-     customize the way the node appears when the tree is dumped.  If
-     your output uses more than one line you should override
-     toString(String), otherwise overriding toString() is probably all
-     you need to do. */
+	public String toString(String prefix) {
+		return prefix + this.toString();
+	}
 
-  public String toString() { return ArithmeticsParserTreeConstants.jjtNodeName[id]; }
-  public String toString(String prefix) { return prefix + toString(); }
+	/*
+	 * Override this method if you want to customize how the node dumps out its
+	 * children.
+	 */
+	public void dump(String prefix) {
+		System.out.println(this.toString(prefix));
+		if (this.children != null) {
+			for (int i = 0; i < this.children.length; ++i) {
+				SimpleNode n = (SimpleNode) this.children[i];
+				if (n != null) {
+					n.dump(prefix + " ");
+				}
+			}
+		}
+	}
 
-  /* Override this method if you want to customize how the node dumps
-     out its children. */
+	public boolean isSymbolic() {
+		return this.isSymbolic;
+	}
 
-  public void dump(String prefix) {
-    System.out.println(toString(prefix));
-    if (children != null) {
-      for (int i = 0; i < children.length; ++i) {
-        SimpleNode n = (SimpleNode)children[i];
-        if (n != null) {
-          n.dump(prefix + " ");
-        }
-      }
-    }
-  }
+	public void setSymbolic(boolean isSymbolic) {
+		this.isSymbolic = isSymbolic;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return this.toString().equals(obj.toString());
+	}
+
+	@Override
+	public int hashCode() {
+		return this.toString().hashCode();
+	}
 }
-
-/* JavaCC - OriginalChecksum=a423f48b9841f08701e8684b47ef468a (do not edit this line) */
+/*
+ * JavaCC - OriginalChecksum=a423f48b9841f08701e8684b47ef468a (do not edit this
+ * line)
+ */
