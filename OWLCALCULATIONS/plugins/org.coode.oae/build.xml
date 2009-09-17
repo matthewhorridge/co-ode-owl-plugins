@@ -17,7 +17,7 @@
     <mkdir dir="${classes}"/>
   </target>
 
-  <target name="bundle" depends="init,javacc">
+  <target name="bundle" depends="init">
   	<mkdir dir="${classes}/lib"/>
   	<mkdir dir="${bundles}"/>
   	<mkdir dir="${dist}"/>
