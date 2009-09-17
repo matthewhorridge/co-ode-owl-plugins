@@ -25,9 +25,9 @@ package uk.ac.manchester.mae;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Mar 14, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Mar 14, 2008
  */
 public class MoreThanOneValueForFunctionalPropertyException extends
 		EvaluationException {

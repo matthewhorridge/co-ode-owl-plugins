@@ -39,9 +39,9 @@ import org.semanticweb.owl.util.NamespaceUtil;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Mar 12, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Mar 12, 2008
  */
 public class PropertyVisitor implements OWLPropertyExpressionVisitor {
 	protected Set<String> extractedFormulaStrings = new HashSet<String>();

@@ -36,9 +36,9 @@ import org.semanticweb.owl.model.RemoveAxiom;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Mar 13, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Mar 13, 2008
  */
 public class OverridingStrategy extends BuiltInConflictStrategy {
 	static OverridingStrategy theInstance = null;
