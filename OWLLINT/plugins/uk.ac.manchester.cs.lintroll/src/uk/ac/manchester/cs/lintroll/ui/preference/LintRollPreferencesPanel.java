@@ -31,9 +31,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -45,26 +42,16 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.border.Border;
 
-import org.coode.oppl.lint.OPPLLintScript;
+import org.coode.oppl.lint.protege.ProtegeOPPLLintFactory;
 import org.coode.oppl.lint.syntax.OPPLLintParser;
-import org.coode.oppl.protege.ProtegeOPPLLintFactory;
-import org.coode.oppl.protege.ui.OPPLLintEditor;
 import org.coode.oppl.protege.ui.OPPLLintListCellRederer;
-import org.coode.oppl.protege.ui.OPPLLintMListItem;
-import org.protege.editor.core.ui.list.MList;
-import org.protege.editor.core.ui.list.MListSectionHeader;
 import org.protege.editor.core.ui.util.ComponentFactory;
-import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
-import org.protege.editor.core.ui.util.VerifyingOptionPane;
 import org.protege.editor.owl.ui.framelist.OWLFrameList2;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.owl.lint.Lint;
@@ -82,182 +69,182 @@ import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
  */
 public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 		LintRollPreferenceChangeListener {
-	private static class PersonalOPPLLintSectionHeader implements
-			MListSectionHeader {
-		public boolean canAdd() {
-			return true;
-		}
-
-		public String getName() {
-			return "Personal OPPL Lints";
-		}
-	}
-
-	/**
-	 * @author Luigi Iannone
-	 * 
-	 */
-	private class PersonalOPPLList extends MList {
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -2690725449571814371L;
-
-		public PersonalOPPLList() {
-			super.setModel(new DefaultListModel());
-			DefaultListModel model = (DefaultListModel) this.getModel();
-			model.addElement(new PersonalOPPLLintSectionHeader());
-			this.setCellRenderer(new OPPLLintListCellRederer());
-			Collection<? extends OPPLLintScript> personalLints = LintRollPreferences
-					.getPersonalLints();
-			for (OPPLLintScript lint : personalLints) {
-				model.addElement(new OPPLLintMListItem(lint));
-			}
-		}
-
-		@Override
-		protected void handleDelete() {
-			final Object val = this.getSelectedValue();
-			if (val != null && val instanceof OPPLLintMListItem) {
-				((DefaultListModel) PersonalOPPLList.this.getModel())
-						.removeElement(val);
-				LintRollPreferences
-						.removePersonalOPPLLint(((OPPLLintMListItem) val)
-								.getLint());
-			}
-		}
-
-		public void reset() {
-			DefaultListModel model = new DefaultListModel();
-			model.addElement(new PersonalOPPLLintSectionHeader());
-			this.setModel(model);
-		}
-
-		@Override
-		protected void handleEdit() {
-			final OPPLLintMListItem val = (OPPLLintMListItem) this
-					.getSelectedValue();
-			// If we don't have any editing component then just return
-			final OPPLLintEditor editor = new OPPLLintEditor(
-					LintRollPreferencesPanel.this.getOWLEditorKit());
-			editor.setOPPLLintScript(val.getLint());
-			final JComponent editorComponent = editor.getEditorComponent();
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					editorComponent) {
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = -4226856195992115262L;
-
-				@Override
-				public void selectInitialValue() {
-					// This is overriden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
-			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
-				public void verifiedStatusChanged(boolean verified) {
-					optionPane.setOKEnabled(verified);
-				}
-			};
-			editor.addStatusChangedListener(verificationListener);
-			final JDialog dlg = optionPane.createDialog(
-					LintRollPreferencesPanel.this, null);
-			// The editor shouldn't be modal (or should it?)
-			dlg.setModal(true);
-			dlg.setResizable(true);
-			dlg.pack();
-			dlg.setLocationRelativeTo(LintRollPreferencesPanel.this
-					.getOWLEditorKit().getWorkspace());
-			dlg.addComponentListener(new ComponentAdapter() {
-				@Override
-				public void componentHidden(ComponentEvent e) {
-					Object retVal = optionPane.getValue();
-					editorComponent.setPreferredSize(editorComponent.getSize());
-					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
-						LintRollPreferences.removePersonalOPPLLint(val
-								.getLint());
-						((DefaultListModel) PersonalOPPLList.this.getModel())
-								.removeElement(val);
-						OPPLLintScript editedObject = editor.getEditedObject();
-						LintRollPreferences.addPersonalOPPLLint(editedObject);
-						OPPLLintMListItem item = new OPPLLintMListItem(
-								editedObject);
-						((DefaultListModel) PersonalOPPLList.this.getModel())
-								.addElement(item);
-					}
-					editor.removeStatusChangedListener(verificationListener);
-					editor.dispose();
-				}
-			});
-			dlg.setVisible(true);
-		}
-
-		@Override
-		protected void handleAdd() {
-			// If we don't have any editing component then just return
-			final OPPLLintEditor editor = new OPPLLintEditor(
-					LintRollPreferencesPanel.this.getOWLEditorKit());
-			final JComponent editorComponent = editor.getEditorComponent();
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					editorComponent) {
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = -4226856195992115262L;
-
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
-			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
-				public void verifiedStatusChanged(boolean verified) {
-					optionPane.setOKEnabled(verified);
-				}
-			};
-			editor.addStatusChangedListener(verificationListener);
-			final JDialog dlg = optionPane.createDialog(
-					LintRollPreferencesPanel.this, null);
-			// The editor shouldn't be modal (or should it?)
-			dlg.setModal(true);
-			dlg.setResizable(true);
-			dlg.pack();
-			dlg.setLocationRelativeTo(LintRollPreferencesPanel.this
-					.getOWLEditorKit().getWorkspace());
-			dlg.addComponentListener(new ComponentAdapter() {
-				@Override
-				public void componentHidden(ComponentEvent e) {
-					Object retVal = optionPane.getValue();
-					editorComponent.setPreferredSize(editorComponent.getSize());
-					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
-						OPPLLintScript editedObject = editor.getEditedObject();
-						LintRollPreferences.addPersonalOPPLLint(editedObject);
-						OPPLLintMListItem item = new OPPLLintMListItem(
-								editedObject);
-						((DefaultListModel) PersonalOPPLList.this.getModel())
-								.addElement(item);
-					}
-					editor.removeStatusChangedListener(verificationListener);
-					editor.dispose();
-				}
-			});
-			dlg.setVisible(true);
-		}
-
-		@Override
-		protected Border createListItemBorder(JList list, Object value,
-				int index, boolean isSelected, boolean cellHasFocus) {
-			Border border = super.createListItemBorder(list, value, index,
-					isSelected, cellHasFocus);
-			return BorderFactory.createCompoundBorder(border,
-					new OPPLLintBorder());
-		}
-	}
-
+	// private static class PersonalOPPLLintSectionHeader implements
+	// MListSectionHeader {
+	// public boolean canAdd() {
+	// return true;
+	// }
+	//
+	// public String getName() {
+	// return "Personal OPPL Lints";
+	// }
+	// }
+	// /**
+	// * @author Luigi Iannone
+	// *
+	// */
+	// private class PersonalOPPLList extends MList {
+	// /**
+	// *
+	// */
+	// private static final long serialVersionUID = -2690725449571814371L;
+	//
+	// public PersonalOPPLList() {
+	// super.setModel(new DefaultListModel());
+	// DefaultListModel model = (DefaultListModel) this.getModel();
+	// model.addElement(new PersonalOPPLLintSectionHeader());
+	// this.setCellRenderer(new OPPLLintListCellRederer());
+	// Collection<? extends OPPLLintScript> personalLints = LintRollPreferences
+	// .getPersonalLints();
+	// for (OPPLLintScript lint : personalLints) {
+	// model.addElement(new OPPLLintMListItem(lint));
+	// }
+	// }
+	//
+	// @Override
+	// protected void handleDelete() {
+	// final Object val = this.getSelectedValue();
+	// if (val != null && val instanceof OPPLLintMListItem) {
+	// ((DefaultListModel) PersonalOPPLList.this.getModel())
+	// .removeElement(val);
+	// LintRollPreferences
+	// .removePersonalOPPLLint(((OPPLLintMListItem) val)
+	// .getLint());
+	// }
+	// }
+	//
+	// public void reset() {
+	// DefaultListModel model = new DefaultListModel();
+	// model.addElement(new PersonalOPPLLintSectionHeader());
+	// this.setModel(model);
+	// }
+	//
+	// @Override
+	// protected void handleEdit() {
+	// final OPPLLintMListItem val = (OPPLLintMListItem) this
+	// .getSelectedValue();
+	// // If we don't have any editing component then just return
+	// final OPPLLintEditor editor = new OPPLLintEditor(
+	// LintRollPreferencesPanel.this.getOWLEditorKit());
+	// editor.setOPPLLintScript(val.getLint());
+	// final JComponent editorComponent = editor.getEditorComponent();
+	// final VerifyingOptionPane optionPane = new VerifyingOptionPane(
+	// editorComponent) {
+	// /**
+	// *
+	// */
+	// private static final long serialVersionUID = -4226856195992115262L;
+	//
+	// @Override
+	// public void selectInitialValue() {
+	// // This is overriden so that the option pane dialog default
+	// // button
+	// // doesn't get the focus.
+	// }
+	// };
+	// final InputVerificationStatusChangedListener verificationListener = new
+	// InputVerificationStatusChangedListener() {
+	// public void verifiedStatusChanged(boolean verified) {
+	// optionPane.setOKEnabled(verified);
+	// }
+	// };
+	// editor.addStatusChangedListener(verificationListener);
+	// final JDialog dlg = optionPane.createDialog(
+	// LintRollPreferencesPanel.this, null);
+	// // The editor shouldn't be modal (or should it?)
+	// dlg.setModal(true);
+	// dlg.setResizable(true);
+	// dlg.pack();
+	// dlg.setLocationRelativeTo(LintRollPreferencesPanel.this
+	// .getOWLEditorKit().getWorkspace());
+	// dlg.addComponentListener(new ComponentAdapter() {
+	// @Override
+	// public void componentHidden(ComponentEvent e) {
+	// Object retVal = optionPane.getValue();
+	// editorComponent.setPreferredSize(editorComponent.getSize());
+	// if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
+	// LintRollPreferences.removePersonalOPPLLint(val
+	// .getLint());
+	// ((DefaultListModel) PersonalOPPLList.this.getModel())
+	// .removeElement(val);
+	// OPPLLintScript editedObject = editor.getEditedObject();
+	// LintRollPreferences.addPersonalOPPLLint(editedObject);
+	// OPPLLintMListItem item = new OPPLLintMListItem(
+	// editedObject);
+	// ((DefaultListModel) PersonalOPPLList.this.getModel())
+	// .addElement(item);
+	// }
+	// editor.removeStatusChangedListener(verificationListener);
+	// editor.dispose();
+	// }
+	// });
+	// dlg.setVisible(true);
+	// }
+	//
+	// @Override
+	// protected void handleAdd() {
+	// // If we don't have any editing component then just return
+	// final OPPLLintEditor editor = new OPPLLintEditor(
+	// LintRollPreferencesPanel.this.getOWLEditorKit());
+	// final JComponent editorComponent = editor.getEditorComponent();
+	// final VerifyingOptionPane optionPane = new VerifyingOptionPane(
+	// editorComponent) {
+	// /**
+	// *
+	// */
+	// private static final long serialVersionUID = -4226856195992115262L;
+	//
+	// @Override
+	// public void selectInitialValue() {
+	// // This is overridden so that the option pane dialog default
+	// // button
+	// // doesn't get the focus.
+	// }
+	// };
+	// final InputVerificationStatusChangedListener verificationListener = new
+	// InputVerificationStatusChangedListener() {
+	// public void verifiedStatusChanged(boolean verified) {
+	// optionPane.setOKEnabled(verified);
+	// }
+	// };
+	// editor.addStatusChangedListener(verificationListener);
+	// final JDialog dlg = optionPane.createDialog(
+	// LintRollPreferencesPanel.this, null);
+	// // The editor shouldn't be modal (or should it?)
+	// dlg.setModal(true);
+	// dlg.setResizable(true);
+	// dlg.pack();
+	// dlg.setLocationRelativeTo(LintRollPreferencesPanel.this
+	// .getOWLEditorKit().getWorkspace());
+	// dlg.addComponentListener(new ComponentAdapter() {
+	// @Override
+	// public void componentHidden(ComponentEvent e) {
+	// Object retVal = optionPane.getValue();
+	// editorComponent.setPreferredSize(editorComponent.getSize());
+	// if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
+	// OPPLLintScript editedObject = editor.getEditedObject();
+	// LintRollPreferences.addPersonalOPPLLint(editedObject);
+	// OPPLLintMListItem item = new OPPLLintMListItem(
+	// editedObject);
+	// ((DefaultListModel) PersonalOPPLList.this.getModel())
+	// .addElement(item);
+	// }
+	// editor.removeStatusChangedListener(verificationListener);
+	// editor.dispose();
+	// }
+	// });
+	// dlg.setVisible(true);
+	// }
+	//
+	// @Override
+	// protected Border createListItemBorder(JList list, Object value,
+	// int index, boolean isSelected, boolean cellHasFocus) {
+	// Border border = super.createListItemBorder(list, value, index,
+	// isSelected, cellHasFocus);
+	// return BorderFactory.createCompoundBorder(border,
+	// new OPPLLintBorder());
+	// }
+	// }
 	private class OntologyOPPLLintList extends OWLFrameList2<OWLOntology> {
 		/**
 		 * 
@@ -318,8 +305,8 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 	private JPanel holder;
 	private JScrollPane boxPane;
 	private OWLFrameList2<OWLOntology> ontologyOPPLLint;
-	private PersonalOPPLList personalOPPLLint;
 
+	// private PersonalOPPLList personalOPPLLint;
 	/**
 	 * @see org.protege.editor.core.ui.preferences.PreferencesPanel#applyChanges()
 	 */
@@ -395,7 +382,7 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 		resetAllButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				LintRollPreferences.resetAll();
-				LintRollPreferencesPanel.this.personalOPPLLint.reset();
+				// LintRollPreferencesPanel.this.personalOPPLLint.reset();
 			}
 		});
 		JPanel buttonPanel = new JPanel();
@@ -411,9 +398,9 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 		this.ontologyOPPLLint = new OntologyOPPLLintList();
 		additionPanel.add(ComponentFactory
 				.createScrollPane(this.ontologyOPPLLint));
-		this.personalOPPLLint = new PersonalOPPLList();
-		additionPanel.add(ComponentFactory
-				.createScrollPane(this.personalOPPLLint));
+		// this.personalOPPLLint = new PersonalOPPLList();
+		// additionPanel.add(ComponentFactory
+		// .createScrollPane(this.personalOPPLLint));
 		this.add(additionPanel, BorderLayout.SOUTH);
 		LintRollPreferences.addLintRollPreferenceChangeListener(this);
 		this.setPreferredSize(new Dimension(800, 500));

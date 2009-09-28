@@ -41,8 +41,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.apache.log4j.Logger;
+import org.coode.oppl.lint.protege.ProtegeOPPLLintFactory;
 import org.coode.oppl.lint.syntax.OPPLLintParser;
-import org.coode.oppl.protege.ProtegeOPPLLintFactory;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.model.event.EventType;
 import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;

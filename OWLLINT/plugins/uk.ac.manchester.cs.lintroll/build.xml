@@ -17,7 +17,6 @@
 <project name="lintroll plugin" default="bundle" basedir="..">
 	<property file="${basedir}/uk.ac.manchester.cs.lintroll/build.properties" />
 	<property name="src" location="${basedir}/uk.ac.manchester.cs.lintroll/src" />
-	
 	<property name="source" location="1.5" />
 	<property name="jardest" location="${dist}/plugins/uk.ac.manchester.cs.lintroll.jar" />
 	<property name="releasedownloads" location="/Users/luigi/Documents/workspace/PROTEGEDOCS/WebContent/lintRoll/downloads" />
@@ -52,7 +51,7 @@
 	<target name="init">
 		<echo message="---------------Building the Bundle-------------" />
 
-		<mkdir dir="${classes}" />
+		
 		<delete dir="${projectLocation}/release">
 		</delete>
 	</target>
@@ -75,7 +74,7 @@
 		</delete>
 		<copy toFile="${classes}/plugin.xml" file="${basedir}/uk.ac.manchester.cs.lintroll/plugin.xml" overwrite="true" />
 		<copy overwrite="true" todir="${classes}/lib">
-			<fileset dir="${basedir}/uk.ac.manchester.cs.lintroll/lib" />
+			<fileset dir="${projectLocation}/lib" />
 		</copy>
 
 		<copy overwrite="true" todir="${classes}">
