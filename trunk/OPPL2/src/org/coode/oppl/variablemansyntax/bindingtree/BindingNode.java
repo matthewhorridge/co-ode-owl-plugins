@@ -22,15 +22,20 @@
  */
 package org.coode.oppl.variablemansyntax.bindingtree;
 
+import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.coode.oppl.entity.OWLEntityRenderer;
+import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.InputVariable;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.Variable.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.Variable.VariableVisitor;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
 /**
@@ -83,6 +88,29 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 				+ "\n"
 				+ (this.unassignedVariables.isEmpty() ? ""
 						: this.unassignedVariables);
+	}
+
+	public String render(ConstraintSystem cs) {
+		boolean first = true;
+		StringWriter stringWriter = new StringWriter();
+		OWLEntityRenderer entityRenderer = OPPLParser.getOPPLFactory()
+				.getOWLEntityRenderer(cs);
+		for (Assignment assignment : this.assignments) {
+			OWLObject value = assignment.getAssignment();
+			String assignmentRendering = value instanceof OWLEntity ? entityRenderer
+					.render((OWLEntity) value)
+					: value.toString();
+			String commaString = first ? "" : ", ";
+			stringWriter.append(commaString);
+			first = false;
+			stringWriter.append(assignment.getAssignedVariable().getName()
+					+ " = " + assignmentRendering);
+		}
+		if (!this.unassignedVariables.isEmpty()) {
+			stringWriter.append(" ");
+			stringWriter.append(this.unassignedVariables.toString());
+		}
+		return stringWriter.toString();
 	}
 
 	public OWLObject getAssignmentValue(Variable variable) {

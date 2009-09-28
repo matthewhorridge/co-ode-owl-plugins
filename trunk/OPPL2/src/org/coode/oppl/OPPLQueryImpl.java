@@ -159,6 +159,7 @@ public class OPPLQueryImpl implements OPPLQuery {
 			first = true;
 			for (AbstractConstraint c : this.getConstraints()) {
 				String commaString = first ? "" : ", ";
+				first = false;
 				buffer.append(commaString);
 				buffer.append(c.render());
 				buffer.append("\n");

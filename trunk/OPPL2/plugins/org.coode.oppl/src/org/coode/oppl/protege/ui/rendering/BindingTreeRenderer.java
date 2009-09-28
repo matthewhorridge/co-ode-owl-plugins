@@ -28,6 +28,8 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.model.OWLObject;
@@ -38,9 +40,22 @@ import org.semanticweb.owl.model.OWLObject;
  */
 public class BindingTreeRenderer extends OWLCellRenderer {
 	private final DefaultTreeCellRenderer defaultTreeCellRenderer = new DefaultTreeCellRenderer();
+	private final ConstraintSystem constraintSystem;
 
-	public BindingTreeRenderer(OWLEditorKit owlEditorKit) {
+	/**
+	 * @return the constraintSystem
+	 */
+	public ConstraintSystem getConstraintSystem() {
+		return this.constraintSystem;
+	}
+
+	public BindingTreeRenderer(OWLEditorKit owlEditorKit, ConstraintSystem cs) {
 		super(owlEditorKit);
+		if (cs == null) {
+			throw new NullPointerException(
+					"The constraint system cannot be null");
+		}
+		this.constraintSystem = cs;
 	}
 
 	@Override
@@ -52,12 +67,17 @@ public class BindingTreeRenderer extends OWLCellRenderer {
 		if (value instanceof DefaultMutableTreeNode) {
 			Object userObject = ((DefaultMutableTreeNode) value)
 					.getUserObject();
+			toReturn = this.defaultTreeCellRenderer
+					.getTreeCellRendererComponent(tree, value, selected,
+							expanded, leaf, row, hasFocus);
 			if (userObject instanceof OWLObject) {
 				toReturn = super.getTreeCellRendererComponent(tree, userObject,
 						selected, expanded, leaf, row, hasFocus);
-			} else {
+			} else if (userObject instanceof BindingNode) {
 				toReturn = this.defaultTreeCellRenderer
-						.getTreeCellRendererComponent(tree, value, selected,
+						.getTreeCellRendererComponent(tree,
+								((BindingNode) userObject).render(this
+										.getConstraintSystem()), selected,
 								expanded, leaf, row, hasFocus);
 			}
 		}

@@ -468,6 +468,12 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 
 	public void setLeaves(Set<BindingNode> newLeaves) {
 		this.leaves = newLeaves;
+		for (BindingNode bindingNode : new HashSet<BindingNode>(
+				this.instantiatedAxioms.keySet())) {
+			if (!this.leaves.contains(bindingNode)) {
+				this.instantiatedAxioms.remove(bindingNode);
+			}
+		}
 	}
 
 	public void addConstraint(AbstractConstraint c) {
