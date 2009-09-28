@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.coode.oppl.lint.AbstractParserFactory;
 import org.coode.oppl.lint.OPPLLintScript;
-import org.coode.oppl.lint.ParserFactory;
 import org.coode.oppl.lint.syntax.OPPLLintParser;
 import org.coode.oppl.lint.syntax.ParseException;
 import org.coode.oppl.protege.ui.OPPLLintEditor;
@@ -40,7 +40,7 @@ public class OPPLLintFrameSectionRow
 		super(owlEditorKit, section, ontology, rootObject, axiom);
 		OWLAnnotation<? extends OWLObject> annotation = axiom.getAnnotation();
 		String value = annotation.getAnnotationValueAsConstant().getLiteral();
-		ParserFactory.initParser(value);
+		AbstractParserFactory.getInstance().initParser(value);
 		try {
 			this.lint = OPPLLintParser.Start();
 		} catch (ParseException e) {

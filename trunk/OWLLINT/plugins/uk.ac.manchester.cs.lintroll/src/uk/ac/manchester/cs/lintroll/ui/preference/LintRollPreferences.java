@@ -39,12 +39,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.coode.oppl.lint.AbstractParserFactory;
 import org.coode.oppl.lint.OPPLLintScript;
-import org.coode.oppl.lint.ParserFactory;
 import org.coode.oppl.lint.syntax.OPPLLintParser;
 import org.coode.oppl.lint.syntax.ParseException;
-import org.coode.oppl.protege.repository.OPPLLintRepository;
-import org.coode.oppl.protege.repository.TextFileOPPLLintRepository;
 import org.protege.editor.core.prefs.Preferences;
 import org.protege.editor.core.prefs.PreferencesManager;
 import org.semanticweb.owl.apibinding.OWLManager;
@@ -86,7 +84,8 @@ public class LintRollPreferences {
 						String lintString = ((OWLOntologyAnnotationAxiom) axiom)
 								.getAnnotation().getAnnotationValueAsConstant()
 								.getLiteral();
-						ParserFactory.initParser(lintString);
+						AbstractParserFactory.getInstance().initParser(
+								lintString);
 						try {
 							OPPLLintScript lint = OPPLLintParser.Start();
 							if (AddAxiom.class.isAssignableFrom(axiomChange
@@ -172,38 +171,35 @@ public class LintRollPreferences {
 		personalOPPLLints = prefs.getStringList(
 				LintRollPreferences.OPPL_LINTS_PREF_NAME,
 				new ArrayList<String>());
-		Set<Lint> opplLoadedLint = loadOPPLLint();
-		for (Lint lint : opplLoadedLint) {
-			addLoadedLint(lint);
-		}
+		// Set<Lint> opplLoadedLint = loadOPPLLint();
+		// for (Lint lint : opplLoadedLint) {
+		// addLoadedLint(lint);
+		// }
 	}
 
-	private static Set<Lint> loadOPPLLint() {
-		OPPLLintRepository repository = getOPPLLintRepository();
-		Set<OPPLLintScript> lintScripts = repository.getOPPLLintScripts();
-		Set<Lint> toReturn = new HashSet<Lint>(lintScripts);
-		toReturn.addAll(getPersonalLints());
-		return toReturn;
-	}
-
-	public static Collection<? extends OPPLLintScript> getPersonalLints() {
-		Set<OPPLLintScript> toReturn = new HashSet<OPPLLintScript>();
-		for (String personalLintString : personalOPPLLints) {
-			ParserFactory.initParser(personalLintString);
-			try {
-				OPPLLintScript personalLint = OPPLLintParser.Start();
-				toReturn.add(personalLint);
-			} catch (ParseException e) {
-				e.printStackTrace();
-			}
-		}
-		return toReturn;
-	}
-
-	public static OPPLLintRepository getOPPLLintRepository() {
-		return new TextFileOPPLLintRepository();
-	}
-
+	// private static Set<Lint> loadOPPLLint() {
+	// // OPPLLintRepository repository = getOPPLLintRepository();
+	// // Set<OPPLLintScript> lintScripts = repository.getOPPLLintScripts();
+	// // Set<Lint> toReturn = new HashSet<Lint>(lintScripts);
+	// // // toReturn.addAll(getPersonalLints());
+	// // return toReturn;
+	// }
+	// public static Collection<? extends OPPLLintScript> getPersonalLints() {
+	// Set<OPPLLintScript> toReturn = new HashSet<OPPLLintScript>();
+	// for (String personalLintString : personalOPPLLints) {
+	// ParserFactory.initParser(personalLintString);
+	// try {
+	// OPPLLintScript personalLint = OPPLLintParser.Start();
+	// toReturn.add(personalLint);
+	// } catch (ParseException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// return toReturn;
+	// }
+	// public static OPPLLintRepository getOPPLLintRepository() {
+	// return new TextFileOPPLLintRepository();
+	// }
 	/**
 	 * @return the selectedLints
 	 */

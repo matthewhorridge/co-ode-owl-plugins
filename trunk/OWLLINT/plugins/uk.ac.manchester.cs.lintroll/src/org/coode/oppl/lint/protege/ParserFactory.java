@@ -20,54 +20,39 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oppl.lint;
+package org.coode.oppl.lint.protege;
 
+import org.coode.oppl.lint.AbstractParserFactory;
 import org.coode.oppl.lint.syntax.OPPLLintParser;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import org.protege.editor.owl.model.OWLModelManager;
 
 /**
  * @author Luigi Iannone
  * 
  */
 public class ParserFactory extends AbstractParserFactory {
-	private final OWLOntologyManager ontologyManager;
-	private final OWLOntology ontology;
+	private final OWLModelManager modelManager;
 
 	/**
-	 * @param ontology
-	 * @param ontologyManager
+	 * @param modelManager
 	 */
-	public ParserFactory(OWLOntology ontology,
-			OWLOntologyManager ontologyManager) {
-		if (ontology == null) {
-			throw new NullPointerException("The ontology cannot be null");
+	public ParserFactory(OWLModelManager modelManager) {
+		if (modelManager == null) {
+			throw new NullPointerException("The model manager cannot be null");
 		}
-		if (ontologyManager == null) {
-			throw new NullPointerException(
-					"The ontology manager cannot be null");
-		}
-		this.ontology = ontology;
-		this.ontologyManager = ontologyManager;
+		this.modelManager = modelManager;
 	}
 
 	/**
-	 * @return the ontologyManager
+	 * @return the modelManager
 	 */
-	public OWLOntologyManager getOntologyManager() {
-		return this.ontologyManager;
-	}
-
-	/**
-	 * @return the ontology
-	 */
-	public OWLOntology getOntology() {
-		return this.ontology;
+	public OWLModelManager getModelManager() {
+		return this.modelManager;
 	}
 
 	@Override
 	protected void initOPPLLintFactory() {
-		OPPLLintParser.setOPPLLintAbstractFactory(new OPPLLintFactory(this
-				.getOntology(), this.getOntologyManager()));
+		OPPLLintParser.setOPPLLintAbstractFactory(new ProtegeOPPLLintFactory(
+				this.getModelManager()));
 	}
 }

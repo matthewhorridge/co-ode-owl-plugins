@@ -4,8 +4,8 @@ import java.net.URI;
 import java.util.Comparator;
 import java.util.Set;
 
+import org.coode.oppl.lint.AbstractParserFactory;
 import org.coode.oppl.lint.OPPLLintScript;
-import org.coode.oppl.lint.ParserFactory;
 import org.coode.oppl.lint.syntax.OPPLLintParser;
 import org.coode.oppl.lint.syntax.ParseException;
 import org.coode.oppl.protege.ui.OPPLLintEditor;
@@ -75,7 +75,7 @@ public class OPPLLintFrameSection
 							.compareTo(LintRollPreferences.OPPL_LINT_NAMESPACE_URI_STRING) == 0) {
 				String value = annotation.getAnnotationValueAsConstant()
 						.getLiteral();
-				ParserFactory.initParser(value);
+				AbstractParserFactory.getInstance().initParser(value);
 				try {
 					OPPLLintScript lint = OPPLLintParser.Start();
 					this.addRow(new OPPLLintFrameSectionRow(this

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.coode.oppl.protege;
+package org.coode.oppl.lint.protege;
 
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.lint.OPPLLintAbstractFactory;
