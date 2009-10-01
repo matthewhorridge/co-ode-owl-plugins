@@ -22,42 +22,59 @@
  */
 package uk.ac.manchester.mae.evaluation;
 
-import java.io.StringWriter;
+import java.util.List;
 
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLProperty;
-import org.semanticweb.owl.util.SimpleShortFormProvider;
-
-import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 10, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 10, 2008
  */
 @SuppressWarnings("unchecked")
 public class PropertyChainModel {
-	protected OWLProperty property;
-	protected PropertyChainModel child = null;
-	protected OWLDescription facet = null;
+	protected final PropertyChainCell cell;
+	protected PropertyChainModel child;
 
 	/**
 	 * @param property
 	 * @param index
 	 */
 	public PropertyChainModel(OWLProperty property, OWLDescription facet) {
-		this.property = property;
-		this.facet = facet;
+		this.cell = new PropertyChainCell(property, facet);
+	}
+
+	protected PropertyChainModel(List<PropertyChainCell> cells, int i) {
+		this.cell = cells.get(i);
+		if (i < cells.size() - 1) {
+			this.child = new PropertyChainModel(cells, i + 1);
+		}
+	}
+
+	public PropertyChainModel(List<PropertyChainCell> cells) {
+		this(cells, 0);
 	}
 
 	/**
 	 * @return the property
 	 */
 	public OWLProperty getProperty() {
-		return this.property;
+		return this.cell.getProperty();
+	}
+
+	public OWLDescription getFacet() {
+		return this.cell.getFacet();
+	}
+
+	/**
+	 * @param descriptionFacet
+	 */
+	public void setFacet(OWLDescription descriptionFacet) {
+		this.cell.setFacet(descriptionFacet);
 	}
 
 	public PropertyChainModel getChild() {
@@ -70,51 +87,21 @@ public class PropertyChainModel {
 
 	@Override
 	public String toString() {
-		String toReturn = "";
-		PropertyChainModel propertyChainModel = this;
-		toReturn += propertyChainModel.getProperty().getURI().toString();
-		if (this.facet != null) {
-			StringWriter stringWriter = new StringWriter();
-			ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
-					stringWriter);
-			renderer.setShortFormProvider(new SimpleShortFormProvider());
-			this.facet.accept(renderer);
-			String rendering = stringWriter.toString();
-			toReturn += "[" + rendering + "]";
-		}
-		boolean endReached = propertyChainModel.getChild() == null;
-		while (!endReached) {
-			propertyChainModel = propertyChainModel.getChild();
-			toReturn += "!" + propertyChainModel.toString();
-			endReached = propertyChainModel.getChild() == null;
+		String toReturn = this.cell.toString();
+		if (this.child != null) {
+			toReturn += "!" + this.child.toString();
 		}
 		return toReturn;
 	}
 
-	public OWLDescription getFacet() {
-		return this.facet;
-	}
-
-	/**
-	 * @param descriptionFacet
-	 */
-	public void setFacet(OWLDescription descriptionFacet) {
-		this.facet = descriptionFacet;
+	public PropertyChainCell getCell() {
+		return this.cell;
 	}
 
 	public String render(OWLModelManager manager) {
-		String toReturn = "";
-		PropertyChainModel propertyChainModel = this;
-		toReturn += manager.getRendering(this.getProperty());
-		if (this.facet != null) {
-			String rendering = manager.getRendering(this.facet);
-			toReturn += "[" + rendering + "]";
-		}
-		boolean endReached = propertyChainModel.getChild() == null;
-		while (!endReached) {
-			propertyChainModel = propertyChainModel.getChild();
-			toReturn += "!" + propertyChainModel.render(manager);
-			endReached = propertyChainModel.getChild() == null;
+		String toReturn = this.cell.render(manager);
+		if (this.child != null) {
+			toReturn += "!" + this.child.render(manager);
 		}
 		return toReturn;
 	}

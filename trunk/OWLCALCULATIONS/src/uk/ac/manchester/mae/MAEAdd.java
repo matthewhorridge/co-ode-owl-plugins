@@ -34,8 +34,8 @@ public class MAEAdd extends SimpleNode {
 		for (Node node : this.children) {
 			if (!isFirst) {
 				toReturn += operator;
-				isFirst = false;
 			}
+			isFirst = false;
 			toReturn += node instanceof MAEIntNode
 					|| node instanceof MAEIdentifier ? node.toString() : "("
 					+ node.toString() + ")";

@@ -25,9 +25,9 @@ package uk.ac.manchester.mae.evaluation;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 10, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 10, 2008
  */
 public class BindingModel {
 	String identifier;
@@ -79,9 +79,14 @@ public class BindingModel {
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj instanceof BindingModel
-				&& ((BindingModel) obj).identifier.compareTo(this
-						.getIdentifier()) == 0;
+		if (obj == null) {
+			return false;
+		}
+		if (obj == this) {
+			return true;
+		}
+		return obj.getClass().equals(this.getClass())
+				&& ((BindingModel) obj).identifier.equals(getIdentifier());
 	}
 
 	@Override

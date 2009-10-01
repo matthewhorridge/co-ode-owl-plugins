@@ -53,7 +53,7 @@ public class OWLCalculationsFormulaClassFrameSection
 	public OWLFrameSectionRowObjectEditor<FormulaModel> getObjectEditor() {
 		// return new OWLArithmeticFormulaEditor(this.getOWLEditorKit(), this
 		// .getRootObject(), false, this.formulaAnnotationURIs);
-		return new OWLCalculationsFormulaEditor(this.getOWLEditorKit());
+		return new OWLCalculationsFormulaEditor(getOWLEditorKit());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -65,12 +65,12 @@ public class OWLCalculationsFormulaClassFrameSection
 					.getAnnotationAxioms(ontology);
 			for (OWLAnnotationAxiom annotationAxiom : annotationAxioms) {
 				OWLArithmeticsAxiomFormulaExtractor visitor = new OWLArithmeticsAxiomFormulaExtractor(
-						this.getRootObject(), this.getOWLModelManager());
+						getRootObject(), getOWLModelManager());
 				annotationAxiom.accept(visitor);
 				if (visitor.getExtractedFormula() != null) {
-					this.addRow(new OWLCalculationsFormulaClassFrameSectionRow(
-							this.getOWLEditorKit(), this, ontology, this
-									.getRootObject(), annotationAxiom));
+					addRow(new OWLCalculationsFormulaClassFrameSectionRow(
+							getOWLEditorKit(), this, ontology, getRootObject(),
+							annotationAxiom));
 				}
 			}
 		}
@@ -80,13 +80,13 @@ public class OWLCalculationsFormulaClassFrameSection
 	@Override
 	protected void refillInferred() throws OWLReasonerException {
 		if (this.inferredFormulas) {
-			boolean isSatisfiable = this.getOWLModelManager().getReasoner()
-					.isSatisfiable(this.getRootObject());
+			boolean isSatisfiable = getOWLModelManager().getReasoner()
+					.isSatisfiable(getRootObject());
 			if (isSatisfiable) {
-				for (Set<OWLClass> superClassSet : this.getOWLModelManager()
-						.getReasoner().getAncestorClasses(this.getRootObject())) {
+				for (Set<OWLClass> superClassSet : getOWLModelManager()
+						.getReasoner().getAncestorClasses(getRootObject())) {
 					for (OWLClass superClass : superClassSet) {
-						for (OWLOntology ontology : this.getOWLModelManager()
+						for (OWLOntology ontology : getOWLModelManager()
 								.getOntologies()) {
 							for (OWLDataProperty dataProperty : ontology
 									.getReferencedDataProperties()) {
@@ -94,16 +94,13 @@ public class OWLCalculationsFormulaClassFrameSection
 										.getAnnotationAxioms(ontology);
 								for (OWLAnnotationAxiom annotationAxiom : annotationAxioms) {
 									OWLArithmeticsAxiomFormulaExtractor visitor = new OWLArithmeticsAxiomFormulaExtractor(
-											superClass, this
-													.getOWLModelManager());
+											superClass, getOWLModelManager());
 									annotationAxiom.accept(visitor);
 									if (visitor.getExtractedFormula() != null) {
-										this
-												.addRow(new OWLCalculationsFormulaClassFrameSectionRow(
-														this.getOWLEditorKit(),
-														this, null,
-														this.getRootObject(),
-														annotationAxiom));
+										addRow(new OWLCalculationsFormulaClassFrameSectionRow(
+												getOWLEditorKit(), this, null,
+												getRootObject(),
+												annotationAxiom));
 									}
 								}
 							}
@@ -121,10 +118,10 @@ public class OWLCalculationsFormulaClassFrameSection
 	@Override
 	public void visit(OWLEntityAnnotationAxiom axiom) {
 		OWLArithmeticsAxiomFormulaExtractor visitor = new OWLArithmeticsAxiomFormulaExtractor(
-				this.getRootObject(), this.getOWLModelManager());
+				getRootObject(), getOWLModelManager());
 		axiom.accept(visitor);
 		if (visitor.getExtractedFormula() != null) {
-			this.reset();
+			reset();
 		}
 	}
 }

@@ -28,7 +28,6 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.coode.xml.OWLOntologyNamespaceManager;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
@@ -52,9 +51,9 @@ import uk.ac.manchester.mae.visitor.Writer;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 30, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 30, 2008
  */
 public class Evaluator {
 	private Set<OWLOntology> ontologies;
@@ -72,7 +71,7 @@ public class Evaluator {
 		this.ontology = ontology;
 		this.ontologyManager = ontologyManager;
 		this.report = new EvaluationReport();
-		new OWLOntologyNamespaceManager(this.ontologyManager, ontology);
+		// new OWLOntologyNamespaceManager(this.ontologyManager, ontology);
 		this.ontologies = this.ontologyManager.getImportsClosure(ontology);
 		this.reasoner = reasoner;
 		this.reasoner.loadOntologies(this.ontologies);
@@ -91,8 +90,9 @@ public class Evaluator {
 			}
 			if (this.reasoner.hasType(individual, description, false)) {
 				// Must pick only one formula for each individual
-				AlternativeFormulaPicker picker = new AlternativeFormulaPicker(individual, formula,
-						this.ontologies, this.reasoner, this.ontologyManager);
+				AlternativeFormulaPicker picker = new AlternativeFormulaPicker(
+						individual, formula, this.ontologies, this.reasoner,
+						this.ontologyManager);
 				dataProperty.accept(picker);
 				MAEStart pickedFormula = picker.pickFormula();
 				if (pickedFormula == null) {
@@ -135,7 +135,7 @@ public class Evaluator {
 				}
 			}
 		} catch (Exception e) {
-			EvaluationReport evaluationReport = this.getReport();
+			EvaluationReport evaluationReport = getReport();
 			ExceptionReportWriter erw = new ExceptionReportWriter(dataProperty,
 					formula, e);
 			evaluationReport.accept(erw, null);
@@ -167,7 +167,8 @@ public class Evaluator {
 	public PropertyEvaluationResult evaluate(OWLDataProperty dataProperty,
 			boolean write) {
 		PropertyEvaluationResult toReturn = null;
-		PropertyVisitor propertyVisitor = new PropertyVisitor(this.ontologies);
+		PropertyVisitor propertyVisitor = new PropertyVisitor(this.ontologies,
+				this.ontologyManager);
 		dataProperty.accept(propertyVisitor);
 		Set<MAEStart> formulas = propertyVisitor.getExtractedFormulas();
 		if (!formulas.isEmpty()) {
