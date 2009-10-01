@@ -47,9 +47,9 @@ import uk.ac.manchester.mae.visitor.ClassExtractor;
  * 
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * May 1, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         May 1, 2008
  */
 public class AlternativeFormulaPicker implements OWLPropertyExpressionVisitor {
 	private Set<OWLOntology> ontologies;
@@ -82,7 +82,8 @@ public class AlternativeFormulaPicker implements OWLPropertyExpressionVisitor {
 	}
 
 	public void visit(OWLDataProperty property) {
-		PropertyVisitor propertyVisitor = new PropertyVisitor(this.ontologies);
+		PropertyVisitor propertyVisitor = new PropertyVisitor(this.ontologies,
+				this.ontologyManager);
 		property.accept(propertyVisitor);
 		this.formulas = propertyVisitor.getExtractedFormulas();
 		this.formulas.remove(this.formula);

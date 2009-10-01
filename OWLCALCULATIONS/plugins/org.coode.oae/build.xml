@@ -18,11 +18,11 @@
   </target>
 
   <target name="bundle" depends="init">
-  	<mkdir dir="${classes}/lib"/>
+  	<!--mkdir dir="${classes}/lib"/>
   	<mkdir dir="${bundles}"/>
   	<mkdir dir="${dist}"/>
   	<mkdir dir="${dist}/configuration"/>
-  	<mkdir dir="${dist}/plugins"/>
+  	<mkdir dir="${dist}/plugins"/-->
   	<delete dir="${dist}/configuration/org.eclipse.core.runtime"/>
   	<delete dir="${dist}/configuration/org.eclipse.osgi"/>
   	<delete>

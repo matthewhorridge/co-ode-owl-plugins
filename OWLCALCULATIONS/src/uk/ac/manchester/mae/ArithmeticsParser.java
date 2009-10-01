@@ -35,8 +35,8 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		initCompletions();
 	}
 
-	static public void setOWLEntityChecker(OWLEntityChecker owlEntityChecker) {
-		ArithmeticsParser.owlEntityChecker = owlEntityChecker;
+	public static void setOWLEntityChecker(OWLEntityChecker oec) {
+		owlEntityChecker = oec;
 	}
 
 	static public void setAutoCompleterMatcher(AutoCompleterMatcher matcher) {
@@ -113,80 +113,80 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		boolean bindingExpressed = false;
 		try {
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-			case 25:
-				ConflictStrategy();
-				conflictExpressed = true;
-				break;
-			default:
-				jj_la1[0] = jj_gen;
-				;
+				case 25:
+					ConflictStrategy();
+					conflictExpressed = true;
+					break;
+				default:
+					jj_la1[0] = jj_gen;
+					;
 			}
 			initCompletions(conflictExpressed, appliesToExpressed,
 					storeToExpressed, bindingExpressed);
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-			case 28:
-				AppliesTo();
-				appliesToExpressed = true;
-				break;
-			default:
-				jj_la1[1] = jj_gen;
-				;
+				case 28:
+					AppliesTo();
+					appliesToExpressed = true;
+					break;
+				default:
+					jj_la1[1] = jj_gen;
+					;
 			}
 			initCompletions(conflictExpressed, appliesToExpressed,
 					storeToExpressed, bindingExpressed);
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-			case 26:
-				StoreTo();
-				storeToExpressed = true;
-				break;
-			default:
-				jj_la1[2] = jj_gen;
-				;
+				case 26:
+					StoreTo();
+					storeToExpressed = true;
+					break;
+				default:
+					jj_la1[2] = jj_gen;
+					;
 			}
 			initCompletions(conflictExpressed, appliesToExpressed,
 					storeToExpressed, bindingExpressed);
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-			case OPENCURLYBRACKET:
-				jj_consume_token(OPENCURLYBRACKET);
-				initCompletions(conflictExpressed, appliesToExpressed,
-						storeToExpressed, bindingExpressed);
-				Binding(variables);
-				bindingExpressed = true;
-				completions.addAll(variables);
-				label_1: while (true) {
-					switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-					case 23:
-						;
-						break;
-					default:
-						jj_la1[3] = jj_gen;
-						break label_1;
-					}
-					jj_consume_token(23);
+				case OPENCURLYBRACKET:
+					jj_consume_token(OPENCURLYBRACKET);
+					initCompletions(conflictExpressed, appliesToExpressed,
+							storeToExpressed, bindingExpressed);
 					Binding(variables);
+					bindingExpressed = true;
 					completions.addAll(variables);
-				}
-				jj_consume_token(BINDINGEND);
-				break;
-			default:
-				jj_la1[4] = jj_gen;
-				;
+					label_1: while (true) {
+						switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+							case 23:
+								;
+								break;
+							default:
+								jj_la1[3] = jj_gen;
+								break label_1;
+						}
+						jj_consume_token(23);
+						Binding(variables);
+						completions.addAll(variables);
+					}
+					jj_consume_token(BINDINGEND);
+					break;
+				default:
+					jj_la1[4] = jj_gen;
+					;
 			}
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-			case INTEGER_LITERAL:
-			case NUMBER:
-			case IDENTIFIER:
-			case 32:
-				Expression(variables);
-				break;
-			case 35:
-			case 36:
-				Function(variables);
-				break;
-			default:
-				jj_la1[5] = jj_gen;
-				jj_consume_token(-1);
-				throw new ParseException();
+				case INTEGER_LITERAL:
+				case NUMBER:
+				case IDENTIFIER:
+				case 32:
+					Expression(variables);
+					break;
+				case 35:
+				case 36:
+					Function(variables);
+					break;
+				default:
+					jj_la1[5] = jj_gen;
+					jj_consume_token(-1);
+					throw new ParseException();
 			}
 			jj_consume_token(24);
 			jjtree.closeNodeScope(jjtn000, true);
@@ -429,23 +429,23 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 			propertyName = PropertyURI();
 			jjtn000.setPropertyName(propertyName);
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-			case 30:
-				jj_consume_token(30);
-				PropertyFacet();
-				jj_consume_token(31);
-				break;
-			default:
-				jj_la1[6] = jj_gen;
-				;
+				case 30:
+					jj_consume_token(30);
+					PropertyFacet();
+					jj_consume_token(31);
+					break;
+				default:
+					jj_la1[6] = jj_gen;
+					;
 			}
 			label_2: while (true) {
 				switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-				case EXCLAMATION:
-					;
-					break;
-				default:
-					jj_la1[7] = jj_gen;
-					break label_2;
+					case EXCLAMATION:
+						;
+						break;
+					default:
+						jj_la1[7] = jj_gen;
+						break label_2;
 				}
 				jj_consume_token(EXCLAMATION);
 				jjtn000.setEnd(false);
@@ -554,12 +554,12 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 			MultiplicativeExpression(variables);
 			label_3: while (true) {
 				switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-				case SUM:
-					;
-					break;
-				default:
-					jj_la1[8] = jj_gen;
-					break label_3;
+					case SUM:
+						;
+						break;
+					default:
+						jj_la1[8] = jj_gen;
+						break label_3;
 				}
 				op = jj_consume_token(SUM);
 				jjtn001.setSum(op == null || op.image.compareTo("+") == 0);
@@ -605,12 +605,12 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 			UnaryExpression(variables);
 			label_4: while (true) {
 				switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-				case MULTIPLY:
-					;
-					break;
-				default:
-					jj_la1[9] = jj_gen;
-					break label_4;
+					case MULTIPLY:
+						;
+						break;
+					default:
+						jj_la1[9] = jj_gen;
+						break label_4;
 				}
 				op = jj_consume_token(MULTIPLY);
 				jjtn001.setMultiplication(op == null
@@ -655,20 +655,20 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 			Power(variables);
 		} else {
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-			case 32:
-				jj_consume_token(32);
-				Expression(variables);
-				jj_consume_token(33);
-				break;
-			case INTEGER_LITERAL:
-			case NUMBER:
-			case IDENTIFIER:
-				groundTerm(variables);
-				break;
-			default:
-				jj_la1[10] = jj_gen;
-				jj_consume_token(-1);
-				throw new ParseException();
+				case 32:
+					jj_consume_token(32);
+					Expression(variables);
+					jj_consume_token(33);
+					break;
+				case INTEGER_LITERAL:
+				case NUMBER:
+				case IDENTIFIER:
+					groundTerm(variables);
+					break;
+				default:
+					jj_la1[10] = jj_gen;
+					jj_consume_token(-1);
+					throw new ParseException();
 			}
 		}
 	}
@@ -683,24 +683,24 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		Token baseId = null;
 		try {
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-			case INTEGER_LITERAL:
-			case NUMBER:
-				base = Integer();
-				break;
-			case IDENTIFIER:
-				baseId = jj_consume_token(IDENTIFIER);
-				if (!variables.contains(baseId.image)) {
-					{
-						if (true)
-							throw new ParseException("Unbound symbol: "
-									+ baseId.image);
+				case INTEGER_LITERAL:
+				case NUMBER:
+					base = Integer();
+					break;
+				case IDENTIFIER:
+					baseId = jj_consume_token(IDENTIFIER);
+					if (!variables.contains(baseId.image)) {
+						{
+							if (true)
+								throw new ParseException("Unbound symbol: "
+										+ baseId.image);
+						}
 					}
-				}
-				break;
-			default:
-				jj_la1[11] = jj_gen;
-				jj_consume_token(-1);
-				throw new ParseException();
+					break;
+				default:
+					jj_la1[11] = jj_gen;
+					jj_consume_token(-1);
+					throw new ParseException();
 			}
 			jj_consume_token(34);
 			exp = Integer();
@@ -751,32 +751,32 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		Token t;
 		try {
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-			case NUMBER:
-				t = jj_consume_token(NUMBER);
-				jjtree.closeNodeScope(jjtn000, true);
-				jjtc000 = false;
-				jjtn000.setValue(Double.parseDouble(t.image));
-				jjtn000.setSymbolic(false);
-				{
-					if (true)
-						return jjtn000.getValue();
-				}
-				break;
-			case INTEGER_LITERAL:
-				t = jj_consume_token(INTEGER_LITERAL);
-				jjtree.closeNodeScope(jjtn000, true);
-				jjtc000 = false;
-				jjtn000.setValue(Double.parseDouble(t.image));
-				jjtn000.setSymbolic(false);
-				{
-					if (true)
-						return jjtn000.getValue();
-				}
-				break;
-			default:
-				jj_la1[12] = jj_gen;
-				jj_consume_token(-1);
-				throw new ParseException();
+				case NUMBER:
+					t = jj_consume_token(NUMBER);
+					jjtree.closeNodeScope(jjtn000, true);
+					jjtc000 = false;
+					jjtn000.setValue(Double.parseDouble(t.image));
+					jjtn000.setSymbolic(false);
+					{
+						if (true)
+							return jjtn000.getValue();
+					}
+					break;
+				case INTEGER_LITERAL:
+					t = jj_consume_token(INTEGER_LITERAL);
+					jjtree.closeNodeScope(jjtn000, true);
+					jjtc000 = false;
+					jjtn000.setValue(Double.parseDouble(t.image));
+					jjtn000.setSymbolic(false);
+					{
+						if (true)
+							return jjtn000.getValue();
+					}
+					break;
+				default:
+					jj_la1[12] = jj_gen;
+					jj_consume_token(-1);
+					throw new ParseException();
 			}
 		} finally {
 			if (jjtc000) {
@@ -815,17 +815,17 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 	static final public void groundTerm(Set<String> variables)
 			throws ParseException {
 		switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-		case INTEGER_LITERAL:
-		case NUMBER:
-			Integer();
-			break;
-		case IDENTIFIER:
-			Identifier(variables);
-			break;
-		default:
-			jj_la1[13] = jj_gen;
-			jj_consume_token(-1);
-			throw new ParseException();
+			case INTEGER_LITERAL:
+			case NUMBER:
+				Integer();
+				break;
+			case IDENTIFIER:
+				Identifier(variables);
+				break;
+			default:
+				jj_la1[13] = jj_gen;
+				jj_consume_token(-1);
+				throw new ParseException();
 		}
 	}
 
@@ -842,16 +842,16 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		jjtree.openNodeScope(jjtn000);
 		try {
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
-			case 35:
-				jj_consume_token(35);
-				break;
-			case 36:
-				jj_consume_token(36);
-				break;
-			default:
-				jj_la1[14] = jj_gen;
-				jj_consume_token(-1);
-				throw new ParseException();
+				case 35:
+					jj_consume_token(35);
+					break;
+				case 36:
+					jj_consume_token(36);
+					break;
+				default:
+					jj_la1[14] = jj_gen;
+					jj_consume_token(-1);
+					throw new ParseException();
 			}
 			Expression(variables);
 			jj_consume_token(33);
@@ -1196,7 +1196,8 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 
 	static private int jj_ntk() {
 		if ((jj_nt = token.next) == null)
-			return (jj_ntk = (token.next = ArithmeticsParserTokenManager.getNextToken()).kind);
+			return (jj_ntk = (token.next = ArithmeticsParserTokenManager
+					.getNextToken()).kind);
 		else
 			return (jj_ntk = jj_nt.kind);
 	}
@@ -1290,9 +1291,9 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 						jj_la = p.arg;
 						jj_lastpos = jj_scanpos = p.first;
 						switch (i) {
-						case 0:
-							jj_3_1();
-							break;
+							case 0:
+								jj_3_1();
+								break;
 						}
 					}
 					p = p.next;

@@ -11,6 +11,7 @@ import org.protege.editor.owl.ui.frame.OWLFrameSectionRow;
 import org.protege.editor.owl.ui.frame.OWLFrameSectionRowObjectEditor;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLAnnotationAxiom;
+import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLEntityAnnotationAxiom;
 import org.semanticweb.owl.model.OWLOntology;
@@ -39,25 +40,16 @@ public class OWLCalculationsFormulaDataPropertyFrameSection
 	@Override
 	protected OWLAnnotationAxiom createAxiom(FormulaModel object) {
 		OWLAnnotationAxiom toReturn = null;
-		OWLDataProperty dataProperty = this.getRootObject();
+		OWLDataProperty dataProperty = getRootObject();
+		OWLDataFactory odf = getOWLDataFactory();
 		if (dataProperty != null) {
 			URI uri = object.getFormulaURI();
 			if (uri != null) {
 				try {
-					toReturn = this
-							.getOWLDataFactory()
-							.getOWLEntityAnnotationAxiom(
-									dataProperty,
-									uri,
-									this
-											.getOWLDataFactory()
-											.getOWLTypedConstant(
-													MAENodeAdapter
-															.toFormula(
-																	object,
-																	this
-																			.getOWLModelManager())
-															.toString()));
+					toReturn = odf.getOWLEntityAnnotationAxiom(dataProperty,
+							uri, odf.getOWLTypedConstant(MAENodeAdapter
+									.toFormula(object, getOWLModelManager())
+									.toString()));
 				} catch (ParseException e) {
 					// Impossible
 					e.printStackTrace();
@@ -71,22 +63,21 @@ public class OWLCalculationsFormulaDataPropertyFrameSection
 	public OWLFrameSectionRowObjectEditor<FormulaModel> getObjectEditor() {
 		// return new OWLArithmeticFormulaEditor(this.getOWLEditorKit(), null,
 		// true, this.formulaAnnotationURIs);
-		return new OWLCalculationsFormulaEditor(this.getOWLEditorKit());
+		return new OWLCalculationsFormulaEditor(getOWLEditorKit());
 	}
 
 	@Override
 	protected void refill(OWLOntology ontology) {
-		Set<OWLAnnotationAxiom> annotationAxioms = this.getRootObject()
+		Set<OWLAnnotationAxiom> annotationAxioms = getRootObject()
 				.getAnnotationAxioms(ontology);
 		for (OWLAnnotationAxiom annotationAxiom : annotationAxioms) {
 			OWLArithmeticsAxiomFormulaExtractor visitor = new OWLArithmeticsAxiomFormulaExtractor(
-					null, this.getOWLModelManager());
+					null, getOWLModelManager());
 			annotationAxiom.accept(visitor);
 			if (visitor.getExtractedFormula() != null) {
-				this
-						.addRow(new OWLCalculationsFormulaDataPropertyFrameSectionRow(
-								this.getOWLEditorKit(), this, ontology, this
-										.getRootObject(), annotationAxiom));
+				addRow(new OWLCalculationsFormulaDataPropertyFrameSectionRow(
+						getOWLEditorKit(), this, ontology, getRootObject(),
+						annotationAxiom));
 			}
 		}
 	}
@@ -94,24 +85,21 @@ public class OWLCalculationsFormulaDataPropertyFrameSection
 	@Override
 	protected void refillInferred() throws OWLReasonerException {
 		if (this.inferredFormulas) {
-			for (Set<OWLDataProperty> superPropertySet : this
-					.getOWLModelManager().getReasoner().getAncestorProperties(
-							this.getRootObject())) {
+			for (Set<OWLDataProperty> superPropertySet : getOWLModelManager()
+					.getReasoner().getAncestorProperties(getRootObject())) {
 				for (OWLDataProperty superProperty : superPropertySet) {
-					for (OWLOntology ontology : this.getOWLEditorKit()
+					for (OWLOntology ontology : getOWLEditorKit()
 							.getModelManager().getOntologies()) {
 						Set<OWLAnnotationAxiom> annotationAxioms = superProperty
 								.getAnnotationAxioms(ontology);
 						for (OWLAnnotationAxiom annotationAxiom : annotationAxioms) {
 							OWLArithmeticsAxiomFormulaExtractor visitor = new OWLArithmeticsAxiomFormulaExtractor(
-									null, this.getOWLModelManager());
+									null, getOWLModelManager());
 							annotationAxiom.accept(visitor);
 							if (visitor.getExtractedFormula() != null) {
-								this
-										.addRow(new OWLCalculationsFormulaDataPropertyFrameSectionRow(
-												this.getOWLEditorKit(), this,
-												null, this.getRootObject(),
-												annotationAxiom));
+								addRow(new OWLCalculationsFormulaDataPropertyFrameSectionRow(
+										getOWLEditorKit(), this, null,
+										getRootObject(), annotationAxiom));
 							}
 						}
 					}
@@ -127,10 +115,10 @@ public class OWLCalculationsFormulaDataPropertyFrameSection
 	@Override
 	public void visit(OWLEntityAnnotationAxiom axiom) {
 		OWLArithmeticsAxiomFormulaExtractor visitor = new OWLArithmeticsAxiomFormulaExtractor(
-				null, this.getOWLModelManager());
+				null, getOWLModelManager());
 		axiom.accept(visitor);
 		if (visitor.getExtractedFormula() != null) {
-			this.reset();
+			reset();
 		}
 	}
 }

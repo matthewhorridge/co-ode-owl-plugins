@@ -31,6 +31,7 @@ import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRow;
 import org.protege.editor.owl.ui.frame.OWLFrameSection;
 import org.protege.editor.owl.ui.frame.OWLFrameSectionRowObjectEditor;
 import org.semanticweb.owl.model.OWLAnnotationAxiom;
+import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
@@ -42,9 +43,9 @@ import uk.ac.manchester.mae.evaluation.FormulaModel;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 3, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 3, 2008
  */
 public class OWLCalculationsFormulaDataPropertyFrameSectionRow
 		extends
@@ -64,25 +65,16 @@ public class OWLCalculationsFormulaDataPropertyFrameSectionRow
 	protected OWLAnnotationAxiom<OWLDataProperty> createAxiom(
 			FormulaModel editedObject) {
 		OWLAnnotationAxiom toReturn = null;
-		OWLDataProperty dataProperty = this.getRootObject();
+		OWLDataProperty dataProperty = getRootObject();
+		OWLDataFactory odf = getOWLDataFactory();
 		if (dataProperty != null) {
 			URI uri = editedObject.getFormulaURI();
 			if (uri != null) {
 				try {
-					toReturn = this
-							.getOWLDataFactory()
-							.getOWLEntityAnnotationAxiom(
-									dataProperty,
-									uri,
-									this
-											.getOWLDataFactory()
-											.getOWLTypedConstant(
-													MAENodeAdapter
-															.toFormula(
-																	editedObject,
-																	this
-																			.getOWLModelManager())
-															.toString()));
+					toReturn = odf.getOWLEntityAnnotationAxiom(dataProperty,
+							uri, odf.getOWLTypedConstant(MAENodeAdapter
+									.toFormula(editedObject,
+											getOWLModelManager()).toString()));
 				} catch (ParseException e) {
 					// Impossible
 					e.printStackTrace();
@@ -95,15 +87,15 @@ public class OWLCalculationsFormulaDataPropertyFrameSectionRow
 	@Override
 	protected OWLFrameSectionRowObjectEditor<FormulaModel> getObjectEditor() {
 		OWLCalculationsFormulaEditor toReturn = new OWLCalculationsFormulaEditor(
-				this.getOWLEditorKit());
+				getOWLEditorKit());
 		AnnotationFormulaExtractor extractor = new AnnotationFormulaExtractor(
-				null, this.getOWLModelManager());
+				null, getOWLModelManager());
 		this.axiom.getAnnotation().accept(extractor);
 		MAEStart formula = extractor.getExtractedFormula();
 		if (formula != null) {
 			toReturn.setFormula(MAENodeAdapter.toFormulaModel(formula,
-					this.axiom.getAnnotation().getAnnotationURI(), this
-							.getOWLEditorKit()));
+					this.axiom.getAnnotation().getAnnotationURI(),
+					getOWLEditorKit()));
 		}
 		return toReturn;
 	}
