@@ -148,8 +148,8 @@ public class Evaluator {
 			MAEStart formula, boolean write) {
 		FormulaEvaluationResult toReturn = null;
 		Set<OWLIndividual> individuals = new HashSet<OWLIndividual>();
-		for (OWLOntology ontology : this.ontologies) {
-			individuals.addAll(ontology.getReferencedIndividuals());
+		for (OWLOntology onto : this.ontologies) {
+			individuals.addAll(onto.getReferencedIndividuals());
 		}
 		Set<IndividualEvaluationResult> individualEvaluationResults = new HashSet<IndividualEvaluationResult>();
 		for (OWLIndividual individual : individuals) {
@@ -167,8 +167,7 @@ public class Evaluator {
 	public PropertyEvaluationResult evaluate(OWLDataProperty dataProperty,
 			boolean write) {
 		PropertyEvaluationResult toReturn = null;
-		PropertyVisitor propertyVisitor = new PropertyVisitor(this.ontologies,
-				this.ontologyManager);
+		PropertyVisitor propertyVisitor = new PropertyVisitor(this.ontologies);
 		dataProperty.accept(propertyVisitor);
 		Set<MAEStart> formulas = propertyVisitor.getExtractedFormulas();
 		if (!formulas.isEmpty()) {
@@ -187,8 +186,8 @@ public class Evaluator {
 
 	public Set<PropertyEvaluationResult> evaluate(boolean write) {
 		Set<OWLDataProperty> properties = new HashSet<OWLDataProperty>();
-		for (OWLOntology ontology : this.ontologies) {
-			properties.addAll(ontology.getReferencedDataProperties());
+		for (OWLOntology onto : this.ontologies) {
+			properties.addAll(onto.getReferencedDataProperties());
 		}
 		Set<PropertyEvaluationResult> toReturn = new HashSet<PropertyEvaluationResult>(
 				properties.size());

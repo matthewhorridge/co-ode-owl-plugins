@@ -42,4 +42,16 @@ public class MAEAdd extends SimpleNode {
 		}
 		return toReturn;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		// equals and hashcode are the same as for superclass
+		return super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		// equals and hashcode are the same as for superclass
+		return super.hashCode();
+	}
 }

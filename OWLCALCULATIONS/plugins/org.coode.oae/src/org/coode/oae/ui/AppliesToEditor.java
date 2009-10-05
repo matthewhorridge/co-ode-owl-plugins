@@ -56,6 +56,7 @@ public class AppliesToEditor extends JPanel implements ActionListener {
 		init();
 	}
 
+	@SuppressWarnings("unchecked")
 	public OWLClass getAppliesTo() {
 		if (this.facetClassView.getSelectionModel().isSelectionEmpty()) {
 			return null;
@@ -73,7 +74,7 @@ public class AppliesToEditor extends JPanel implements ActionListener {
 		this.add(this.commit, BorderLayout.SOUTH);
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(this.commit)) {
 			if (this.facetClassView.getSelectedIndex() > -1) {
@@ -82,13 +83,12 @@ public class AppliesToEditor extends JPanel implements ActionListener {
 			} else {
 				this.facet = null;
 			}
-			this.editor.handleAppliesToCommit();
-			this.facetClassView.getSelectionModel().clearSelection();
+			handleCommit();
 		}
 	}
 
 	private void handleCommit() {
-		// TODO validation bits
 		this.editor.handleAppliesToCommit();
+		this.facetClassView.getSelectionModel().clearSelection();
 	}
 }

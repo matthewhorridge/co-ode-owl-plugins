@@ -15,15 +15,13 @@ import org.protege.editor.core.ui.list.MListItem;
 import org.protege.editor.core.ui.list.MListSectionHeader;
 
 public class StaticListModel<I> implements ListModel {
-	private final static class MySectionHeader implements MListSectionHeader {
+	protected final static class MySectionHeader implements MListSectionHeader {
 		String header;
 
-		@Override
 		public String getName() {
 			return this.header;
 		}
 
-		@Override
 		public boolean canAdd() {
 			return true;
 		}
@@ -43,27 +41,22 @@ public class StaticListModel<I> implements ListModel {
 			this.item = b;
 		}
 
-		@Override
 		public String getTooltip() {
 			return this.item.toString();
 		}
 
-		@Override
 		public boolean handleDelete() {
 			// TODO figure out how to configure this stuff for general use
 			return false;
 		}
 
-		@Override
 		public void handleEdit() {
 		}
 
-		@Override
 		public boolean isDeleteable() {
 			return false;
 		}
 
-		@Override
 		public boolean isEditable() {
 			return false;
 		}
@@ -102,23 +95,19 @@ public class StaticListModel<I> implements ListModel {
 		}
 	}
 
-	@Override
 	public void addListDataListener(ListDataListener l) {
 		ExceptionUtils.checkNullArg(l);
 		this.listeners.add(l);
 	}
 
-	@Override
 	public Object getElementAt(int index) {
 		return this.delegate.get(index);
 	}
 
-	@Override
 	public int getSize() {
 		return this.delegate.size();
 	}
 
-	@Override
 	public void removeListDataListener(ListDataListener l) {
 		this.listeners.remove(l);
 	}

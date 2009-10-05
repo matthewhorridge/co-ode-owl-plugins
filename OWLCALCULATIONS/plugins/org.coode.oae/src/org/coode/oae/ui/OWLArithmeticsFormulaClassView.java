@@ -25,6 +25,7 @@ package org.coode.oae.ui;
 import java.awt.BorderLayout;
 
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import org.protege.editor.owl.ui.framelist.OWLFrameList2;
 import org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent;
@@ -35,9 +36,9 @@ import org.semanticweb.owl.model.OWLClass;
  * 
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 2, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 2, 2008
  */
 public class OWLArithmeticsFormulaClassView extends
 		AbstractOWLClassViewComponent {
@@ -52,13 +53,14 @@ public class OWLArithmeticsFormulaClassView extends
 	 */
 	@Override
 	public void initialiseClassView() throws Exception {
-		this.list = new OWLFrameList2<OWLClass>(this.getOWLEditorKit(),
-				new OWLCalculationsFormulaClassFrame(this.getOWLEditorKit()));
-		this.setLayout(new BorderLayout());
+		this.list = new OWLFrameList2<OWLClass>(getOWLEditorKit(),
+				new OWLCalculationsFormulaClassFrame(getOWLEditorKit()));
+		setLayout(new BorderLayout());
 		JScrollPane sp = new JScrollPane(this.list);
-		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		this.list.setCellRenderer(new ViewFormulaCellRederer(true, this
-				.getOWLEditorKit()));
+		sp
+				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		this.list.setCellRenderer(new ViewFormulaCellRederer(true,
+				getOWLEditorKit()));
 		this.add(sp);
 	}
 
@@ -68,8 +70,8 @@ public class OWLArithmeticsFormulaClassView extends
 	 * 
 	 * @param selectedClass
 	 *            The class that the view should be updated with. Note that this
-	 *            may be <code>null</code>, which indicates that the view
-	 *            should be cleared
+	 *            may be <code>null</code>, which indicates that the view should
+	 *            be cleared
 	 * @return The actual class that the view is displaying after it has been
 	 *         updated (may be <code>null</code>)
 	 */

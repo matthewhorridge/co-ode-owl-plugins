@@ -138,9 +138,9 @@ public class OWLArithmeticsAxiomFormulaExtractor implements OWLAxiomVisitor {
 		AnnotationFormulaExtractor formulaExtractor = new AnnotationFormulaExtractor(
 				this.owlClass, this.modelManager);
 		axiom.getAnnotation().accept(formulaExtractor);
-		MAEStart extractedFormula = formulaExtractor.getExtractedFormula();
-		if (extractedFormula != null) {
-			this.extractedFormula = extractedFormula;
+		MAEStart extractedF = formulaExtractor.getExtractedFormula();
+		if (extractedF != null) {
+			this.extractedFormula = extractedF;
 		}
 	}
 
@@ -223,9 +223,9 @@ public class OWLArithmeticsAxiomFormulaExtractor implements OWLAxiomVisitor {
 		AnnotationFormulaExtractor formulaExtractor = new AnnotationFormulaExtractor(
 				this.owlClass, this.modelManager);
 		axiom.getAnnotation().accept(formulaExtractor);
-		MAEStart extractedFormula = formulaExtractor.getExtractedFormula();
-		if (extractedFormula != null) {
-			this.extractedFormula = extractedFormula;
+		MAEStart extractedF = formulaExtractor.getExtractedFormula();
+		if (extractedF != null) {
+			this.extractedFormula = extractedF;
 		}
 	}
 

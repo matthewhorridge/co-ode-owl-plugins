@@ -84,15 +84,15 @@ public class AnnotationFormulaExtractor implements OWLAnnotationVisitor {
 				.getLiteral().toString();
 				ParserFactory.initParser(formulaString, this.modelManager);
 				try {
-					MAEStart extractedFormula = (MAEStart) ArithmeticsParser
+					MAEStart extractedF = (MAEStart) ArithmeticsParser
 					.Start();
 					ProtegeClassExtractor classExtractor = new ProtegeClassExtractor(
 							this.modelManager);
-					extractedFormula.jjtAccept(classExtractor, null);
+					extractedF.jjtAccept(classExtractor, null);
 					Object extractedClass = classExtractor
 					.getClassDescription();
 					this.extractedFormula = this.owlClass == null
-					|| this.owlClass.equals(extractedClass) ? extractedFormula
+					|| this.owlClass.equals(extractedClass) ? extractedF
 							: null;
 				} catch (ParseException e) {
 

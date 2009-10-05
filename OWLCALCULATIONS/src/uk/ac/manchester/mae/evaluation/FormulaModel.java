@@ -23,7 +23,9 @@
 package uk.ac.manchester.mae.evaluation;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
@@ -34,9 +36,9 @@ import uk.ac.manchester.mae.ConflictStrategy;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 10, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 10, 2008
  */
 public class FormulaModel {
 	protected URI formulaURI;
@@ -122,37 +124,45 @@ public class FormulaModel {
 	}
 
 	public String render(OWLModelManager manager) {
-		String formulaString = "";
-		ConflictStrategy conflictStrategy = this.getConflictStrategy();
-		if (conflictStrategy != null) {
-			formulaString += "$" + conflictStrategy.toString() + "$ ";
+		StringBuilder toReturn = new StringBuilder();
+		if (this.conflictStrategy != null) {
+			toReturn.append("$");
+			toReturn.append(this.conflictStrategy.toString());
+			toReturn.append("$ ");
 		}
-		OWLDescription appliesTo = this.getAppliesTo();
-		if (appliesTo != null) {
-			String rendering = manager.getOWLObjectRenderer().render(appliesTo,
-					manager.getOWLEntityRenderer());
-			formulaString += "APPLIESTO <" + rendering + "> ";
+		if (this.appliesTo != null) {
+			String rendering = manager.getOWLObjectRenderer().render(
+					this.appliesTo, manager.getOWLEntityRenderer());
+			toReturn.append("APPLIESTO <");
+			toReturn.append(rendering);
+			toReturn.append("> ");
 		}
-		StorageModel storageModel = this.getStorageModel();
-		if (storageModel != null) {
-			formulaString += "STORETO <"
-					+ storageModel.getPropertyChainModel().render(manager)
-					+ ">";
+		if (this.storageModel != null) {
+			toReturn.append("STORETO <");
+			toReturn.append(this.storageModel.getPropertyChainModel().render(
+					manager));
+			toReturn.append(">");
 		}
-		Set<BindingModel> bindings = this.getBindings();
-		for (BindingModel bindingModel : bindings) {
-			formulaString += "{" + bindingModel.getIdentifier() + "=";
-			PropertyChainModel propertyChainModel = bindingModel
-					.getPropertyChainModel();
-			if (propertyChainModel != null) {
-				formulaString += propertyChainModel.render(manager);
+		if (!this.bindings.isEmpty()) {
+			toReturn.append("{");
+			List<BindingModel> listedBindings = new ArrayList<BindingModel>(
+					getBindings());
+			for (int i = 0; i < listedBindings.size(); i++) {
+				BindingModel bindingModel = listedBindings.get(i);
+				toReturn.append(bindingModel.getIdentifier());
+				toReturn.append("=");
+				PropertyChainModel propertyChainModel = bindingModel
+						.getPropertyChainModel();
+				if (propertyChainModel != null) {
+					toReturn.append(propertyChainModel.render(manager));
+				}
+				if (i < listedBindings.size() - 1) {
+					toReturn.append(",");
+				}
 			}
-			formulaString += "}";
+			toReturn.append("}->");
 		}
-		if (!bindings.isEmpty()) {
-			formulaString += "->";
-		}
-		formulaString += this.getFormulaBody();
-		return formulaString;
+		toReturn.append(getFormulaBody());
+		return toReturn.toString();
 	}
 }

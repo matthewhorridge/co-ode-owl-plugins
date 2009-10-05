@@ -32,8 +32,9 @@ import uk.ac.manchester.mae.evaluation.PropertyChainCell;
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;
 
 public class StoreToEditor extends JPanel implements ActionListener {
-	private class MyMList extends MList {
+	protected final class MyMList extends MList {
 		@Override
+		@SuppressWarnings("unchecked")
 		protected void handleDelete() {
 			StoreToEditor.this.propertyChainCells
 					.remove(((VariableListItem<PropertyChainCell>) getSelectedValue())
@@ -114,7 +115,7 @@ public class StoreToEditor extends JPanel implements ActionListener {
 		this.commitObjProp.addActionListener(this);
 		this.objectPropertiesView
 				.addListSelectionListener(new ListSelectionListener() {
-					@Override
+					@SuppressWarnings("unchecked")
 					public void valueChanged(ListSelectionEvent e) {
 						if (!e.getValueIsAdjusting()) {
 							if (StoreToEditor.this.objectPropertiesView
@@ -151,7 +152,7 @@ public class StoreToEditor extends JPanel implements ActionListener {
 		return this.pcm;
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource().equals(this.commitObjProp)) {
 			if (this.objectPropertiesView.getSelectedIndex() > -1) {
@@ -166,6 +167,7 @@ public class StoreToEditor extends JPanel implements ActionListener {
 				handlePropertyChainsUpdate();
 				this.objectPropertiesView.getSelectionModel().clearSelection();
 				this.facetClassView.getSelectionModel().clearSelection();
+				handleCommit();
 			}
 		}
 	}
@@ -176,7 +178,7 @@ public class StoreToEditor extends JPanel implements ActionListener {
 		this.editor.handleStoreToCommit();
 	}
 
-	private Set<OWLClass> getOWLClasses(OWLObjectProperty op) {
+	protected Set<OWLClass> getOWLClasses(OWLObjectProperty op) {
 		Set<OWLClass> ranges = new HashSet<OWLClass>();
 		for (OWLDescription d : op.getRanges(this.kit.getOWLModelManager()
 				.getActiveOntology())) {

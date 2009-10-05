@@ -23,7 +23,6 @@
 package org.coode.oae.ui;
 
 import java.net.URI;
-import java.util.Set;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
@@ -31,10 +30,8 @@ import javax.swing.tree.MutableTreeNode;
 import org.coode.oae.utils.ParserFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLDescription;
 
 import uk.ac.manchester.mae.ArithmeticsParser;
-import uk.ac.manchester.mae.ConflictStrategy;
 import uk.ac.manchester.mae.MAEBinding;
 import uk.ac.manchester.mae.MAEPropertyChain;
 import uk.ac.manchester.mae.MAEStart;
@@ -49,9 +46,9 @@ import uk.ac.manchester.mae.visitor.protege.ProtegeFormulaModelExtractor;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 7, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 7, 2008
  */
 public class MAENodeAdapter {
 	public static MutableTreeNode toTreeNode(MAEBinding binding,
@@ -98,7 +95,6 @@ public class MAENodeAdapter {
 		return toReturn;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static PropertyChainModel toPropertyChainModel(
 			DefaultMutableTreeNode propertyChainNode) {
 		PropertyChainModel toReturn = (PropertyChainModel) propertyChainNode
@@ -113,37 +109,8 @@ public class MAENodeAdapter {
 
 	public static MAEStart toFormula(FormulaModel formulaModel,
 			OWLModelManager modelManager) throws ParseException {
-		String formulaString = "";
-		ConflictStrategy conflictStrategy = formulaModel.getConflictStrategy();
-		if (conflictStrategy != null) {
-			formulaString += "$" + conflictStrategy.toString() + "$ ";
-		}
-		OWLDescription appliesTo = formulaModel.getAppliesTo();
-		if (appliesTo != null) {
-			String rendering = modelManager.getOWLObjectRenderer().render(
-					appliesTo, modelManager.getOWLEntityRenderer());
-			formulaString += "APPLIESTO <" + rendering + "> ";
-		}
-		StorageModel storageModel = formulaModel.getStorageModel();
-		if (storageModel != null) {
-			formulaString += "STORETO <"
-					+ storageModel.getPropertyChainModel().toString() + ">";
-		}
-		Set<BindingModel> bindings = formulaModel.getBindings();
-		for (BindingModel bindingModel : bindings) {
-			formulaString += "{" + bindingModel.getIdentifier() + "=";
-			PropertyChainModel propertyChainModel = bindingModel
-					.getPropertyChainModel();
-			if (propertyChainModel != null) {
-				formulaString += propertyChainModel.toString();
-			}
-			formulaString += "}";
-		}
-		if (!bindings.isEmpty()) {
-			formulaString += "->";
-		}
-		formulaString += formulaModel.getFormulaBody();
-		ParserFactory.initParser(formulaString, modelManager);
+		ParserFactory.initParser(formulaModel.render(modelManager),
+				modelManager);
 		return (MAEStart) ArithmeticsParser.Start();
 	}
 

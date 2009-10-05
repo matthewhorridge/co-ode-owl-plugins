@@ -25,6 +25,7 @@ package org.coode.oae.ui;
 import java.awt.BorderLayout;
 
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import org.protege.editor.owl.ui.framelist.OWLFrameList2;
 import org.protege.editor.owl.ui.view.AbstractOWLDataPropertyViewComponent;
@@ -35,9 +36,9 @@ import org.semanticweb.owl.model.OWLDataProperty;
  * 
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 2, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 2, 2008
  */
 public class OWLArithmeticsFormulaDataPropertyView extends
 		AbstractOWLDataPropertyViewComponent {
@@ -62,14 +63,14 @@ public class OWLArithmeticsFormulaDataPropertyView extends
 
 	@Override
 	public void initialiseView() throws Exception {
-		this.list = new OWLFrameList2<OWLDataProperty>(this.getOWLEditorKit(),
-				new OWLCalculationsFormulaDataPropertyFrame(this
-						.getOWLEditorKit()));
-		this.setLayout(new BorderLayout());
+		this.list = new OWLFrameList2<OWLDataProperty>(getOWLEditorKit(),
+				new OWLCalculationsFormulaDataPropertyFrame(getOWLEditorKit()));
+		setLayout(new BorderLayout());
 		JScrollPane sp = new JScrollPane(this.list);
-		sp.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		sp
+				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		this.add(sp);
-		this.list.setCellRenderer(new ViewFormulaCellRederer(false, this
-				.getOWLEditorKit()));
+		this.list.setCellRenderer(new ViewFormulaCellRederer(false,
+				getOWLEditorKit()));
 	}
 }

@@ -37,9 +37,9 @@ import uk.ac.manchester.mae.evaluation.IndividualEvaluationResult;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Mar 17, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Mar 17, 2008
  */
 public class FormulaEvaluationReport {
 	protected MAEStart formula;
@@ -100,17 +100,21 @@ public class FormulaEvaluationReport {
 	 *         null if the individual has no value for the formula
 	 */
 	public EvaluationResult getResult(OWLIndividual individual) {
-		EvaluationResult toReturn = null;
-		boolean found = false;
+		// EvaluationResult toReturn = null;
+		// boolean found = false;
 		Iterator<IndividualEvaluationResult> it = this.results.iterator();
 		IndividualEvaluationResult result = null;
-		while (!found && it.hasNext()) {
+		while (it.hasNext()) {
 			result = it.next();
-			found = result.getIndividual().equals(individual);
+			// found = ;
+			if (result.getIndividual().equals(individual)) {
+				return result.getResults();
+			}
 		}
-		if (found) {
-			toReturn = result.getResults();
-		}
-		return toReturn;
+		return null;
+		// if (found) {
+		// toReturn = result.getResults();
+		// }
+		// return toReturn;
 	}
 }

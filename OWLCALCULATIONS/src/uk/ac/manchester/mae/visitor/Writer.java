@@ -76,9 +76,9 @@ import uk.ac.manchester.mae.report.FormulaReportWriter;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 22, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 22, 2008
  */
 public class Writer implements ArithmeticsParserVisitor {
 	protected ConflictStrategy conflictStrategy = null;
@@ -144,8 +144,7 @@ public class Writer implements ArithmeticsParserVisitor {
 			storageChainModel.jjtAccept(this, data);
 		} else {
 			try {
-				this.write(this.currentIndividual, this.dataProperty,
-						this.results);
+				write(this.currentIndividual, this.dataProperty, this.results);
 			} catch (OWLOntologyChangeException e) {
 				FormulaReportWriter resultReportWriter = new ExceptionReportWriter(
 						this.dataProperty, node, e);
@@ -209,10 +208,9 @@ public class Writer implements ArithmeticsParserVisitor {
 					.getExtractedDescription() == null ? this.ontologyManager
 					.getOWLDataFactory().getOWLThing() : this.facetExtractor
 					.getExtractedDescription();
-			this.walkProperty(propertyName, facetDescription);
+			walkProperty(propertyName, facetDescription);
 			if (node.isEnd()) {
-				this.write(this.currentIndividual, this.dataProperty,
-						this.results);
+				write(this.currentIndividual, this.dataProperty, this.results);
 			} else {
 				node.childrenAccept(this, data);
 			}
@@ -236,7 +234,7 @@ public class Writer implements ArithmeticsParserVisitor {
 			OWLDescription facetDescription) throws URISyntaxException,
 			UnsupportedDataTypeException, OWLOntologyChangeException,
 			OWLReasonerException {
-		Collection<Object> fillers = this.fetch(this.currentIndividual,
+		Collection<Object> fillers = fetch(this.currentIndividual,
 				propertyName, false, facetDescription);
 		if (fillers != null && !fillers.isEmpty()) {
 			this.currentIndividual = (OWLIndividual) fillers.iterator().next();
@@ -322,64 +320,62 @@ public class Writer implements ArithmeticsParserVisitor {
 	}
 
 	@SuppressWarnings("unchecked")
-	private void write(OWLIndividual individual, OWLDataProperty dataProperty,
+	private void write(OWLIndividual individual, OWLDataProperty dataProp,
 			Object object) throws EvaluationException,
 			OWLOntologyChangeException, UnsupportedDataTypeException {
 		Set<OWLConstant> oldValues = individual.getDataPropertyValues(
-				this.startingOntology).get(dataProperty);
-		if (!dataProperty.isFunctional(this.ontologies) || oldValues == null
+				this.startingOntology).get(dataProp);
+		if (!dataProp.isFunctional(this.ontologies) || oldValues == null
 				|| oldValues.isEmpty()) {
 			if (object instanceof Collection) {
 				for (Object newValue : (Collection<Object>) object) {
-					this.writeSingleValue(individual, dataProperty, newValue);
+					writeSingleValue(individual, dataProp, newValue);
 				}
 			} else {
-				this.writeSingleValue(individual, dataProperty, object);
+				writeSingleValue(individual, dataProp, object);
 			}
-		} else if (dataProperty.isFunctional(this.ontologies)) {
+		} else if (dataProp.isFunctional(this.ontologies)) {
 			if (object instanceof Collection
 					&& ((Collection<Object>) object).size() > 1) {
 				throw new MoreThanOneValueForFunctionalPropertyException(
 						"More than one value for the functional property "
-								+ dataProperty + " for the individual "
+								+ dataProp + " for the individual "
 								+ individual.getURI().toString());
 			}
-			if (oldValues != null && !oldValues.isEmpty()) {
+			if (!oldValues.isEmpty()) {
 				OWLDataPropertyAssertionAxiom oldAssertion = this.ontologyManager
 						.getOWLDataFactory().getOWLDataPropertyAssertionAxiom(
-								individual, dataProperty,
+								individual, dataProp,
 								oldValues.iterator().next());
 				if (this.conflictStrategy != null) {
 					this.conflictStrategy
 							.solve(
 									individual,
 									oldAssertion,
-									this
-											.convert2OWLConstant(object instanceof Collection ? ((Collection) object)
-													.iterator().next()
-													: object), this.ontologies,
+									convert2OWLConstant(object instanceof Collection ? ((Collection) object)
+											.iterator().next()
+											: object), this.ontologies,
 									this.ontologyManager);
 				} else {
-					this
-							.writeSingleValue(
-									individual,
-									dataProperty,
-									object instanceof Collection ? ((Collection) object)
-											.iterator().next()
-											: object);
+					writeSingleValue(
+							individual,
+							dataProp,
+							object instanceof Collection ? ((Collection) object)
+									.iterator().next()
+									: object);
 				}
 			}
 		}
 	}
 
 	private void writeSingleValue(OWLIndividual individual,
-			OWLDataProperty dataProperty, Object newValue)
+			OWLDataProperty dataProp, Object newValue)
 			throws UnsupportedDataTypeException, OWLOntologyChangeException {
-		OWLConstant valueAsOWLConstant = this.convert2OWLConstant(newValue);
+		OWLConstant valueAsOWLConstant = convert2OWLConstant(newValue);
 		AddAxiom addAxiom = new AddAxiom(this.startingOntology,
 				this.ontologyManager.getOWLDataFactory()
 						.getOWLDataPropertyAssertionAxiom(individual,
-								dataProperty, valueAsOWLConstant));
+								dataProp, valueAsOWLConstant));
 		this.ontologyManager.applyChange(addAxiom);
 	}
 
@@ -396,7 +392,7 @@ public class Writer implements ArithmeticsParserVisitor {
 		return toReturn;
 	}
 
-	private Collection<Object> fetch(OWLIndividual currentIndividual,
+	private Collection<Object> fetch(OWLIndividual currentInd,
 			String propertyName, boolean isDatatype,
 			OWLDescription facetDescription) throws URISyntaxException,
 			UnsupportedDataTypeException, OWLReasonerException {
@@ -410,23 +406,22 @@ public class Writer implements ArithmeticsParserVisitor {
 		while (!found && it.hasNext()) {
 			ontology = it.next();
 			if (isDatatype) {
-				OWLDataProperty dataProperty = this.ontologyManager
+				OWLDataProperty dataProp = this.ontologyManager
 						.getOWLDataFactory().getOWLDataProperty(
 								new URI(propertyName));
-				Set<OWLConstant> values = currentIndividual
-						.getDataPropertyValues(ontology).get(dataProperty);
+				Set<OWLConstant> values = currentInd
+						.getDataPropertyValues(ontology).get(dataProp);
 				toReturn = new ArrayList<Object>();
 				if (!(values == null || values.isEmpty())) {
 					for (OWLConstant value : values) {
-						toReturn.add(this.convertValue(value
-								.asOWLTypedConstant()));
+						toReturn.add(convertValue(value.asOWLTypedConstant()));
 					}
 				}
 			} else {
 				OWLObjectProperty objectProperty = this.ontologyManager
 						.getOWLDataFactory().getOWLObjectProperty(
 								new URI(propertyName));
-				Set<OWLIndividual> fillers = currentIndividual
+				Set<OWLIndividual> fillers = currentInd
 						.getObjectPropertyValues(ontology).get(objectProperty);
 				toReturn = new HashSet<Object>();
 				if (!(fillers == null || fillers.isEmpty())) {

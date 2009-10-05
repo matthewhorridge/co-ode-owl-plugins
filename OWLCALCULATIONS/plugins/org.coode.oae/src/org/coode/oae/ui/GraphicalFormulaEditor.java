@@ -41,7 +41,7 @@ import uk.ac.manchester.mae.evaluation.StorageModel;
 
 public class GraphicalFormulaEditor extends JPanel implements
 		RefreshableComponent, VerifiedInputEditor, DocumentListener {
-	private class MyMList extends MList {
+	protected final class MyMList extends MList {
 		@Override
 		protected void handleAdd() {
 			GraphicalFormulaEditor.this.bindingEditor.setBindingModel(null);
@@ -49,6 +49,7 @@ public class GraphicalFormulaEditor extends JPanel implements
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		protected void handleDelete() {
 			GraphicalFormulaEditor.this.bindingModels
 					.remove(((VariableListItem<BindingModel>) getSelectedValue())
@@ -57,6 +58,7 @@ public class GraphicalFormulaEditor extends JPanel implements
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		protected void handleEdit() {
 			GraphicalFormulaEditor.this.bindingEditor
 					.setBindingModel(((VariableListItem<BindingModel>) getSelectedValue())
@@ -166,19 +168,16 @@ public class GraphicalFormulaEditor extends JPanel implements
 		return p4;
 	}
 
-	@Override
 	public void refreshComponent() {
 		// copied from ExpressionEditor
 		setFont(OWLRendererPreferences.getInstance().getFont());
 	}
 
-	@Override
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
 	}
 
-	@Override
 	public void removeStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.remove(listener);
@@ -319,17 +318,14 @@ public class GraphicalFormulaEditor extends JPanel implements
 		}
 	}
 
-	@Override
 	public void changedUpdate(DocumentEvent e) {
 		handleVerification();
 	}
 
-	@Override
 	public void insertUpdate(DocumentEvent e) {
 		handleVerification();
 	}
 
-	@Override
 	public void removeUpdate(DocumentEvent e) {
 		handleVerification();
 	}
