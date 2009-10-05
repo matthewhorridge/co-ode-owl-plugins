@@ -82,8 +82,7 @@ public class AlternativeFormulaPicker implements OWLPropertyExpressionVisitor {
 	}
 
 	public void visit(OWLDataProperty property) {
-		PropertyVisitor propertyVisitor = new PropertyVisitor(this.ontologies,
-				this.ontologyManager);
+		PropertyVisitor propertyVisitor = new PropertyVisitor(this.ontologies);
 		property.accept(propertyVisitor);
 		this.formulas = propertyVisitor.getExtractedFormulas();
 		this.formulas.remove(this.formula);

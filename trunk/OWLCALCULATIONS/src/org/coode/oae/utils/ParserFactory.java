@@ -27,39 +27,40 @@ import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcherImpl;
-import org.semanticweb.owl.expression.ShortFormEntityChecker;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
-import org.semanticweb.owl.util.SimpleShortFormProvider;
 
 import uk.ac.manchester.mae.ArithmeticsParser;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 9, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 9, 2008
  */
 public class ParserFactory {
 	static ArithmeticsParser parser = null;
 
 	public static ArithmeticsParser initParser(String formulaBody,
 			OWLOntologyManager ontologyManager) {
-		if (parser == null) {
-			parser = new ArithmeticsParser(new StringReader(formulaBody));
-		} else {
-			ArithmeticsParser.ReInit(new StringReader(formulaBody));
-		}
-		BidirectionalShortFormProviderAdapter bidirectionalShortFormProviderAdapter = new BidirectionalShortFormProviderAdapter(
-				ontologyManager.getOntologies(), new SimpleShortFormProvider());
-		ShortFormEntityChecker shortFormEntityChecker = new ShortFormEntityChecker(
-				bidirectionalShortFormProviderAdapter);
-		ArithmeticsParser
-				.setOWLDataFactory(ontologyManager.getOWLDataFactory());
-		ArithmeticsParser.setOWLEntityChecker(shortFormEntityChecker);
-		return parser;
+		return initParser(formulaBody, ontologyManager.getOntologies());
+		// if (parser == null) {
+		// parser = new ArithmeticsParser(new StringReader(formulaBody));
+		// } else {
+		// ArithmeticsParser.ReInit(new StringReader(formulaBody));
+		// }
+		// BidirectionalShortFormProviderAdapter
+		// bidirectionalShortFormProviderAdapter = new
+		// BidirectionalShortFormProviderAdapter(
+		// ontologyManager.getOntologies(), new SimpleShortFormProvider());
+		// ShortFormEntityChecker shortFormEntityChecker = new
+		// ShortFormEntityChecker(
+		// bidirectionalShortFormProviderAdapter);
+		// ArithmeticsParser
+		// .setOWLDataFactory(ontologyManager.getOWLDataFactory());
+		// ArithmeticsParser.setOWLEntityChecker(shortFormEntityChecker);
+		// return parser;
 	}
 
 	public static ArithmeticsParser initParser(String formulaBody,
@@ -69,11 +70,17 @@ public class ParserFactory {
 		} else {
 			ArithmeticsParser.ReInit(new StringReader(formulaBody));
 		}
-		BidirectionalShortFormProviderAdapter bidirectionalShortFormProviderAdapter = new BidirectionalShortFormProviderAdapter(
-				ontologies, new SimpleShortFormProvider());
-		ShortFormEntityChecker shortFormEntityChecker = new ShortFormEntityChecker(
-				bidirectionalShortFormProviderAdapter);
-		ArithmeticsParser.setOWLEntityChecker(shortFormEntityChecker);
+		// BidirectionalShortFormProviderAdapter
+		// bidirectionalShortFormProviderAdapter = new
+		// BidirectionalShortFormProviderAdapter(
+		// ontologies, new SimpleShortFormProvider());
+		// ShortFormEntityChecker shortFormEntityChecker = new
+		// ShortFormEntityChecker(
+		// bidirectionalShortFormProviderAdapter);
+		// ArithmeticsParser.setOWLEntityChecker(shortFormEntityChecker);
+		ArithmeticsParser
+				.setOWLEntityChecker(new RenderingOWLEntityCheckerNoModelManager(
+						ontologies));
 		return parser;
 	}
 

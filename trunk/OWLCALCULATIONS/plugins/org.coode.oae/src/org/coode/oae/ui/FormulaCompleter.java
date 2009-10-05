@@ -59,7 +59,7 @@ import uk.ac.manchester.mae.ParseException;
 /**
  * @author Luigi Iannone
  * 
- * Jul 2, 2008
+ *         Jul 2, 2008
  */
 @SuppressWarnings("unchecked")
 public class FormulaCompleter {
@@ -67,15 +67,15 @@ public class FormulaCompleter {
 			.getLogger(OWLDescriptionAutoCompleter.class);
 	public static final int DEFAULT_MAX_ENTRIES = 100;
 	private OWLEditorKit owlEditorKit;
-	private JTextComponent textComponent;
+	protected JTextComponent textComponent;
 	private KeyListener keyListener;
 	private Set<String> wordDelimeters;
 	// private AutoCompleterMatcher matcher;
 	private JList popupList;
-	private JWindow popupWindow;
+	protected JWindow popupWindow;
 	public static final int POPUP_WIDTH = 350;
 	public static final int POPUP_HEIGHT = 300;
-	private String lastTextUpdate = "*";
+	protected String lastTextUpdate = "*";
 	private int maxEntries = DEFAULT_MAX_ENTRIES;
 
 	public FormulaCompleter(OWLEditorKit owlEditorKit, JTextComponent tc,
@@ -131,11 +131,12 @@ public class FormulaCompleter {
 			}
 		});
 		this.popupList.setRequestFocusEnabled(false);
-		this.createPopupWindow();
+		createPopupWindow();
 		this.textComponent.addHierarchyListener(new HierarchyListener() {
 			/**
 			 * Called when the hierarchy has been changed. To discern the actual
-			 * type of change, call <code>HierarchyEvent.getChangeFlags()</code>.
+			 * type of change, call <code>HierarchyEvent.getChangeFlags()</code>
+			 * .
 			 * 
 			 * @see java.awt.event.HierarchyEvent#getChangeFlags()
 			 */
@@ -147,53 +148,53 @@ public class FormulaCompleter {
 		});
 	}
 
-	private void processKeyPressed(KeyEvent e) {
+	protected final void processKeyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE && e.isControlDown()) {
 			// Show popup
-			this.performAutoCompletion();
+			performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_TAB) {
 			e.consume();
-			this.performAutoCompletion();
+			performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			if (this.popupWindow.isVisible()) {
 				// Hide popup
 				e.consume();
-				this.hidePopup();
+				hidePopup();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if (this.popupWindow.isVisible()) {
 				// Complete
 				e.consume();
-				this.completeWithPopupSelection();
+				completeWithPopupSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			if (this.popupWindow.isVisible()) {
 				e.consume();
-				this.incrementSelection();
+				incrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 			if (this.popupWindow.isVisible()) {
 				e.consume();
-				this.decrementSelection();
+				decrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			this.hidePopup();
+			hidePopup();
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			this.hidePopup();
+			hidePopup();
 		}
 	}
 
-	private void completeWithPopupSelection() {
+	protected final void completeWithPopupSelection() {
 		if (this.popupWindow.isVisible()) {
 			Object selObject = this.popupList.getSelectedValue();
 			if (selObject != null) {
-				this.insertWord(this.getInsertText(selObject));
-				this.hidePopup();
+				insertWord(getInsertText(selObject));
+				hidePopup();
 			}
 		}
 	}
 
-	private List getMatches() {
+	protected final List getMatches() {
 		ParserFactory.initParser(this.textComponent.getText(),
 				this.owlEditorKit.getModelManager());
 		List completions;
@@ -204,8 +205,7 @@ public class FormulaCompleter {
 			completions = ArithmeticsParser.getCompletions();
 		}
 		List toReturn = new ArrayList(completions);
-		String wordToComplete = this.getWordToComplete().replaceAll("[<>{}]",
-				"");
+		String wordToComplete = getWordToComplete().replaceAll("[<>{}]", "");
 		wordToComplete = wordToComplete.replaceAll("(\\S)*!", "");
 		// System.out.println(wordToComplete);
 		if (wordToComplete.length() > 0) {
@@ -218,7 +218,7 @@ public class FormulaCompleter {
 		return toReturn;
 	}
 
-	private void createPopupWindow() {
+	protected final void createPopupWindow() {
 		JScrollPane sp = ComponentFactory.createScrollPane(this.popupList);
 		this.popupWindow = new JWindow((Window) SwingUtilities
 				.getAncestorOfClass(Window.class, this.textComponent));
@@ -229,28 +229,28 @@ public class FormulaCompleter {
 	}
 
 	private void performAutoCompletion() {
-		List matches = this.getMatches();
+		List matches = getMatches();
 		if (matches.size() == 1) {
 			// Don't show popup
-			this.insertWord(this.getInsertText(matches.iterator().next()));
+			insertWord(getInsertText(matches.iterator().next()));
 		} else if (matches.size() > 1) {
 			// Show popup
 			this.lastTextUpdate = this.textComponent.getText();
-			this.showPopup();
-			this.updatePopup(matches);
+			showPopup();
+			updatePopup(matches);
 		}
 	}
 
 	private void insertWord(String word) {
 		try {
-			String wordToComplete = this.getWordToComplete().replaceAll(
-					"[<>{}]", "");
+			String wordToComplete = getWordToComplete()
+					.replaceAll("[<>{}]", "");
 			wordToComplete = wordToComplete.replaceAll("(\\S)*!", "");
-			int prefixIndex = this.getWordToComplete().indexOf(wordToComplete);
-			String prefix = prefixIndex > 0 ? this.getWordToComplete()
-					.substring(0, prefixIndex) : "";
+			int prefixIndex = getWordToComplete().indexOf(wordToComplete);
+			String prefix = prefixIndex > 0 ? getWordToComplete().substring(0,
+					prefixIndex) : "";
 			if (wordToComplete.length() > 0 && word.startsWith(wordToComplete)) {
-				int index = this.getWordIndex();
+				int index = getWordIndex();
 				int caretIndex = this.textComponent.getCaretPosition();
 				this.textComponent.getDocument().remove(index,
 						caretIndex - index);
@@ -267,12 +267,12 @@ public class FormulaCompleter {
 
 	private void showPopup() {
 		if (this.popupWindow == null) {
-			this.createPopupWindow();
+			createPopupWindow();
 		}
 		if (!this.popupWindow.isVisible()) {
 			this.popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
 			try {
-				int wordIndex = this.getWordIndex();
+				int wordIndex = getWordIndex();
 				if (wordIndex < 0) {
 					wordIndex = 0;
 				}
@@ -295,7 +295,7 @@ public class FormulaCompleter {
 		this.popupList.setListData(new Object[0]);
 	}
 
-	private void updatePopup(List matches) {
+	protected final void updatePopup(List matches) {
 		int count = matches.size();
 		if (count > this.maxEntries) {
 			count = this.maxEntries;
@@ -366,7 +366,7 @@ public class FormulaCompleter {
 
 	private String getWordToComplete() {
 		try {
-			int index = this.getWordIndex();
+			int index = getWordIndex();
 			int caretIndex = this.textComponent.getCaretPosition();
 			String toReturn = this.textComponent.getDocument().getText(index,
 					caretIndex - index);

@@ -52,9 +52,9 @@ public class MAEPropertyChain extends SimpleNode {
 		for (int i = 0; i < jjtGetNumChildren() && !hasFacet; i++) {
 			facet = this.children[i];
 			hasFacet = facet instanceof MAEPropertyFacet;
-		}
-		if (hasFacet) {
-			toReturn += facet.toString();
+			if (hasFacet) {
+				toReturn += facet.toString();
+			}
 		}
 		if (!this.isEnd) {
 			boolean found = false;
@@ -62,11 +62,23 @@ public class MAEPropertyChain extends SimpleNode {
 			for (int i = 0; i < jjtGetNumChildren() && !found; i++) {
 				child = this.children[i];
 				found = child instanceof MAEPropertyChain;
-			}
-			if (found) {
-				toReturn += "!" + child.toString();
+				if (found) {
+					toReturn += "!" + child.toString();
+				}
 			}
 		}
 		return toReturn;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		// equals and hashcode are the same as for superclass
+		return super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		// equals and hashcode are the same as for superclass
+		return super.hashCode();
 	}
 }

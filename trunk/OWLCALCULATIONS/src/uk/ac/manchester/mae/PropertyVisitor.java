@@ -28,14 +28,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.coode.oae.utils.ParserFactory;
-import org.protege.editor.owl.model.hierarchy.OWLDataPropertyHierarchyProvider;
-import org.protege.editor.owl.model.hierarchy.OWLObjectPropertyHierarchyProvider;
 import org.semanticweb.owl.model.OWLAnnotation;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLObjectPropertyInverse;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.model.OWLPropertyExpressionVisitor;
 import org.semanticweb.owl.util.NamespaceUtil;
 
@@ -49,11 +46,11 @@ import org.semanticweb.owl.util.NamespaceUtil;
 public class PropertyVisitor implements OWLPropertyExpressionVisitor {
 	protected Set<String> extractedFormulaStrings = new HashSet<String>();
 	private Set<OWLOntology> ontologies;
-	private OWLOntologyManager manager;
 
-	public PropertyVisitor(Set<OWLOntology> ontologies, OWLOntologyManager m) {
+	// private OWLModelManager manager;
+	public PropertyVisitor(Set<OWLOntology> ontologies) {
 		this.ontologies = ontologies;
-		this.manager = m;
+		// this.manager = m;
 	}
 
 	/**
@@ -116,29 +113,29 @@ public class PropertyVisitor implements OWLPropertyExpressionVisitor {
 			try {
 				toReturn.add((MAEStart) ArithmeticsParser.Start());
 			} catch (ParseException e) {
-				// try alternate parser
-				ParserFactory.initParser(formulaBody, this.manager);
-				try {
-					toReturn.add((MAEStart) ArithmeticsParser.Start());
-				} catch (ParseException ex) {
-					Logger
-							.getLogger(this.getClass().toString())
-							.warn(
-									"The formula body "
-											+ formulaBody
-											+ " could not be correctly parsed it will be skipped\n"
-											+ e.getMessage() + "\n"
-											+ ex.getMessage(), ex);
-					if (ex.getMessage()
-							.endsWith("invalid property URI or name")) {
-						System.out
-								.println("PropertyVisitor.getExtractedFormulas() Available properties:\nObject:");
-						for (OWLObjectProperty op : getObjectProperties()) {
+				Logger
+						.getLogger(this.getClass().toString())
+						.warn(
+								"The formula body "
+										+ formulaBody
+										+ " could not be correctly parsed it will be skipped\n"
+										+ e.getMessage(), e);
+				if (e.getMessage().endsWith("invalid property URI or name")) {
+					System.out
+							.println("PropertyVisitor.getExtractedFormulas() Available properties:\nObject:");
+					for (OWLOntology onto : this.ontologies) {
+						for (OWLObjectProperty op : onto
+								.getReferencedObjectProperties()) {// getObjectProperties())
+							// {
 							System.out.println(op.getURI().toString());
 						}
-						System.out
-								.println("PropertyVisitor.getExtractedFormulas() Available properties:\nData:");
-						for (OWLDataProperty dp : getDataProperties()) {
+					}
+					System.out
+							.println("PropertyVisitor.getExtractedFormulas() Available properties:\nData:");
+					for (OWLOntology onto : this.ontologies) {
+						for (OWLDataProperty dp : onto
+								.getReferencedDataProperties()) {// getDataProperties())
+							// {
 							System.out.println(dp.getURI().toString());
 						}
 					}
@@ -147,26 +144,27 @@ public class PropertyVisitor implements OWLPropertyExpressionVisitor {
 		}
 		return toReturn;
 	}
-
-	private Set<OWLObjectProperty> getObjectProperties() {
-		Set<OWLObjectProperty> toReturn = new HashSet<OWLObjectProperty>();
-		OWLObjectPropertyHierarchyProvider p = new OWLObjectPropertyHierarchyProvider(
-				this.manager);
-		for (OWLObjectProperty op : p.getRoots()) {
-			toReturn.add(op);
-			toReturn.addAll(p.getDescendants(op));
-		}
-		return toReturn;
-	}
-
-	private Set<OWLDataProperty> getDataProperties() {
-		Set<OWLDataProperty> toReturn = new HashSet<OWLDataProperty>();
-		OWLDataPropertyHierarchyProvider p = new OWLDataPropertyHierarchyProvider(
-				this.manager);
-		for (OWLDataProperty op : p.getRoots()) {
-			toReturn.add(op);
-			toReturn.addAll(p.getDescendants(op));
-		}
-		return toReturn;
-	}
+	// private Set<OWLObjectProperty> getObjectProperties() {
+	// Set<OWLObjectProperty> toReturn = new HashSet<OWLObjectProperty>();
+	// OWLObjectPropertyHierarchyProvider p = new
+	// OWLObjectPropertyHierarchyProvider(
+	// this.manager);
+	// for (OWLObjectProperty op : p.getRoots()) {
+	// toReturn.add(op);
+	// toReturn.addAll(p.getDescendants(op));
+	// }
+	// return toReturn;
+	// }
+	//
+	// private Set<OWLDataProperty> getDataProperties() {
+	// Set<OWLDataProperty> toReturn = new HashSet<OWLDataProperty>();
+	// OWLDataPropertyHierarchyProvider p = new
+	// OWLDataPropertyHierarchyProvider(
+	// this.manager);
+	// for (OWLDataProperty op : p.getRoots()) {
+	// toReturn.add(op);
+	// toReturn.addAll(p.getDescendants(op));
+	// }
+	// return toReturn;
+	// }
 }

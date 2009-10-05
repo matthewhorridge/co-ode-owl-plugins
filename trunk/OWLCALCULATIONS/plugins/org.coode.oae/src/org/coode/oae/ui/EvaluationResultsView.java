@@ -45,9 +45,9 @@ import uk.ac.manchester.mae.report.ReportVisitor;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 28, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 28, 2008
  */
 @SuppressWarnings("serial")
 public class EvaluationResultsView extends AbstractOWLViewComponent implements
@@ -70,13 +70,13 @@ public class EvaluationResultsView extends AbstractOWLViewComponent implements
 	protected void initialiseOWLView() throws Exception {
 		EvaluationReport report = OWLCalculations.getLastEvaluationReport();
 		if (report != null) {
-			this.setLayout(new BorderLayout());
-			this.setBorder(LineBorder.createBlackLineBorder());
+			setLayout(new BorderLayout());
+			setBorder(LineBorder.createBlackLineBorder());
 			this.root = new DefaultMutableTreeNode("EVALUATION REPORT");
 			this.treeModel = new DefaultTreeModel(this.root);
 			this.tree = new JTree(this.treeModel);
-			this.tree.setCellRenderer(new ReportTreeCellRenderer(this
-					.getOWLEditorKit()));
+			this.tree.setCellRenderer(new ReportTreeCellRenderer(
+					getOWLEditorKit()));
 			report.accept(this, this.root);
 			this.add(new JScrollPane(this.tree));
 		}
@@ -155,8 +155,9 @@ public class EvaluationResultsView extends AbstractOWLViewComponent implements
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see uk.ac.manchester.mae.report.ReportVisitor#visitEvaluationReport(uk.ac.manchester.mae.report.EvaluationReport,
-	 *      java.lang.Object)
+	 * @see
+	 * uk.ac.manchester.mae.report.ReportVisitor#visitEvaluationReport(uk.ac
+	 * .manchester.mae.report.EvaluationReport, java.lang.Object)
 	 */
 	public Object visitPropertyEvaluationReport(
 			PropertyEvaluationReport propertyEvaluationReport, Object data) {

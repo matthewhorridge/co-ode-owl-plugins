@@ -114,7 +114,7 @@ public class OWLCalculationsFormulaEditor extends
 											+ OWLCalculationsFormulaEditor.this.nameTextField
 													.getText());
 						} catch (URISyntaxException e1) {
-							anUri = null;
+							// anUri = null;
 						} finally {
 							if (OWLCalculationsFormulaEditor.this.formulaModel != null) {
 								OWLCalculationsFormulaEditor.this.formulaModel

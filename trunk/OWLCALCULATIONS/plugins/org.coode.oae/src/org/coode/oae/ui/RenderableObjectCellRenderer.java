@@ -76,7 +76,7 @@ public class RenderableObjectCellRenderer implements TableCellRenderer,
 	private boolean renderIcon;
 	private boolean renderExpression;
 	private boolean strikeThrough;
-	private OWLOntology ontology;
+	protected OWLOntology ontology;
 	private Set<OWLObject> equivalentObjects;
 	private LinkedObjectComponent linkedObjectComponent;
 	private Font plainFont;
@@ -91,14 +91,14 @@ public class RenderableObjectCellRenderer implements TableCellRenderer,
 	private List<OWLEntityColorProvider> entityColorProviders;
 	// The object that determines which icon should be displayed.
 	private OWLObject iconObject;
-	private int leftMargin = 0;
+	// private int leftMargin = 0;
 	private int rightMargin = 40;
-	private JComponent componentBeingRendered;
-	private JPanel renderingComponent;
-	private JLabel iconLabel;
-	private JTextPane textPane;
-	private int preferredWidth;
-	private int minTextHeight;
+	protected JComponent componentBeingRendered;
+	protected JPanel renderingComponent;
+	protected JLabel iconLabel;
+	protected JTextPane textPane;
+	protected int preferredWidth;
+	protected int minTextHeight;
 	private OWLEntity focusedEntity;
 	private boolean commentedOut;
 	private boolean inferred;
@@ -427,7 +427,7 @@ public class RenderableObjectCellRenderer implements TableCellRenderer,
 		}
 	}
 
-	private class ActiveEntityVisitor implements OWLEntityVisitor {
+	protected final class ActiveEntityVisitor implements OWLEntityVisitor {
 		public void visit(OWLClass cls) {
 			if (!getOWLModelManager().getActiveOntology().getAxioms(cls)
 					.isEmpty()) {
@@ -498,6 +498,7 @@ public class RenderableObjectCellRenderer implements TableCellRenderer,
 		return this.renderingComponent;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected String getRendering(Object object) {
 		if (object == null) {
 			return "";
@@ -521,14 +522,14 @@ public class RenderableObjectCellRenderer implements TableCellRenderer,
 					+ b.getPropertyChainModel().render(getOWLModelManager());
 		}
 		if (object instanceof OWLObject) {
-			String rendering = getOWLModelManager().getRendering(
-					((OWLObject) object));
+			StringBuilder rendering = new StringBuilder(getOWLModelManager()
+					.getRendering(((OWLObject) object)));
 			for (OWLObject eqObj : this.equivalentObjects) {
 				// Add in the equivalent class symbol
-				rendering += " \u2261 "
-						+ getOWLModelManager().getRendering(eqObj);
+				rendering.append(" \u2261 ");
+				rendering.append(getOWLModelManager().getRendering(eqObj));
 			}
-			return rendering;
+			return rendering.toString();
 		}
 		return object.toString();
 	}
@@ -549,10 +550,10 @@ public class RenderableObjectCellRenderer implements TableCellRenderer,
 		}
 	}
 
-	private Composite disabledComposite = AlphaComposite.getInstance(
+	protected Composite disabledComposite = AlphaComposite.getInstance(
 			AlphaComposite.SRC_OVER, 0.5f);
 
-	private OWLModelManager getOWLModelManager() {
+	protected OWLModelManager getOWLModelManager() {
 		return this.owlEditorKit.getModelManager();
 	}
 
@@ -920,7 +921,8 @@ public class RenderableObjectCellRenderer implements TableCellRenderer,
 		setupFont();
 	}
 
-	private class OWLCellRendererLayoutManager implements LayoutManager2 {
+	protected final class OWLCellRendererLayoutManager implements
+			LayoutManager2 {
 		/**
 		 * Adds the specified component to the layout, using the specified
 		 * constraint object.
@@ -1022,7 +1024,7 @@ public class RenderableObjectCellRenderer implements TableCellRenderer,
 					.getPreferredSize().width;
 			iconHeight = RenderableObjectCellRenderer.this.iconLabel
 					.getPreferredSize().height;
-			Insets insets = parent.getInsets();
+			// Insets insets = parent.getInsets();
 			Insets rcInsets = RenderableObjectCellRenderer.this.renderingComponent
 					.getInsets();
 			if (RenderableObjectCellRenderer.this.preferredWidth != -1) {

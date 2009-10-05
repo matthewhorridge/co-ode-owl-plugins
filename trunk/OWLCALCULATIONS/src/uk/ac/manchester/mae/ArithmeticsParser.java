@@ -45,12 +45,15 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 
 	// Unchecked on purpose as it must contain both OWLObject instances and
 	// String
+	@SuppressWarnings("unchecked")
 	private static List completions;
 
+	@SuppressWarnings("unchecked")
 	public static List getCompletions() {
 		return completions;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void initCompletions() {
 		if (completions == null) {
 			completions = new ArrayList();
@@ -119,7 +122,6 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 					break;
 				default:
 					jj_la1[0] = jj_gen;
-					;
 			}
 			initCompletions(conflictExpressed, appliesToExpressed,
 					storeToExpressed, bindingExpressed);
@@ -130,7 +132,6 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 					break;
 				default:
 					jj_la1[1] = jj_gen;
-					;
 			}
 			initCompletions(conflictExpressed, appliesToExpressed,
 					storeToExpressed, bindingExpressed);
@@ -141,7 +142,6 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 					break;
 				default:
 					jj_la1[2] = jj_gen;
-					;
 			}
 			initCompletions(conflictExpressed, appliesToExpressed,
 					storeToExpressed, bindingExpressed);
@@ -156,7 +156,6 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 					label_1: while (true) {
 						switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
 							case 23:
-								;
 								break;
 							default:
 								jj_la1[3] = jj_gen;
@@ -170,7 +169,6 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 					break;
 				default:
 					jj_la1[4] = jj_gen;
-					;
 			}
 			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
 				case INTEGER_LITERAL:
@@ -226,6 +224,7 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		throw new Error("Missing return statement in function");
 	}
 
+	@SuppressWarnings("unchecked")
 	static final public void ConflictStrategy() throws ParseException {
 		/* @bgen(jjtree) ConflictStrategy */
 		MAEConflictStrategy jjtn000 = new MAEConflictStrategy(
@@ -332,7 +331,8 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 							.isDataPropertyNameExpected(), e
 							.isIndividualNameExpected(), e
 							.isDatatypeNameExpected());
-					List kwMatches = new ArrayList(matches.size() + 10);
+					List<String> kwMatches = new ArrayList<String>(matches
+							.size() + 10);
 					for (String s : e.getExpectedKeywords()) {
 						if (word.matches("(\u005c\u005cs)*")
 								|| s.toLowerCase().startsWith(
@@ -356,7 +356,7 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 					int lastIndexOfWhiteSpace = expression.lastIndexOf(" ");
 					String word = lastIndexOfWhiteSpace == -1 ? "" : content
 							.substring(lastIndexOfWhiteSpace).trim();
-					List kwMatches = new ArrayList(10);
+					List<String> kwMatches = new ArrayList<String>(10);
 					for (String s : e.getExpectedKeywords()) {
 						if (word.matches("(\u005c\u005cs)*")
 								|| s.toLowerCase().startsWith(
@@ -381,7 +381,7 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		boolean jjtc000 = true;
 		jjtree.openNodeScope(jjtn000);
 		Token identifier;
-		Token propertyName;
+		// Token propertyName;
 		try {
 			identifier = jj_consume_token(IDENTIFIER);
 			variables.add(identifier.image);
@@ -424,7 +424,7 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		boolean jjtc000 = true;
 		jjtree.openNodeScope(jjtn000);
 		String propertyName;
-		Token index;
+		// Token index;
 		try {
 			propertyName = PropertyURI();
 			jjtn000.setPropertyName(propertyName);
@@ -436,12 +436,10 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 					break;
 				default:
 					jj_la1[6] = jj_gen;
-					;
 			}
 			label_2: while (true) {
 				switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
 					case EXCLAMATION:
-						;
 						break;
 					default:
 						jj_la1[7] = jj_gen;
@@ -525,10 +523,10 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 			}
 		}
 		if (toReturn == null) {
-			if (matcher != null) {
-				completions.addAll(matcher.getMatches(uriString, false, true,
-						true, false, false));
-			}
+			// if (matcher != null) {
+			// completions.addAll(matcher.getMatches(uriString, false, true,
+			// true, false, false));
+			// }
 			throw new ParseException(uriString
 					+ " invalid property URI or name");
 		}
@@ -555,7 +553,6 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 			label_3: while (true) {
 				switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
 					case SUM:
-						;
 						break;
 					default:
 						jj_la1[8] = jj_gen;
@@ -606,7 +603,6 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 			label_4: while (true) {
 				switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
 					case MULTIPLY:
-						;
 						break;
 					default:
 						jj_la1[9] = jj_gen;
@@ -1138,6 +1134,9 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 	}
 
 	static private final class LookaheadSuccess extends java.lang.Error {
+		public LookaheadSuccess() {
+			// empty constructor
+		}
 	}
 
 	static final private LookaheadSuccess jj_ls = new LookaheadSuccess();
