@@ -26,6 +26,7 @@ import uk.ac.manchester.mae.evaluation.PropertyChainCell;
 
 public class ObjectPropertySelector extends JPanel implements
 		VerifiedInputEditor {
+	private static final long serialVersionUID = 1699848613778095787L;
 	protected MList objectPropertiesView = new MList();
 	protected MList facetClassView = new MList();
 	protected List<OWLObjectProperty> objectProperties = new ArrayList<OWLObjectProperty>();
@@ -93,9 +94,7 @@ public class ObjectPropertySelector extends JPanel implements
 										.addAll(getOWLClasses(p));
 								ObjectPropertySelector.this.facetClassesModel
 										.init();
-								for (InputVerificationStatusChangedListener i : ObjectPropertySelector.this.listeners) {
-									i.verifiedStatusChanged(true);
-								}
+								notifyVerified();
 							}
 						}
 					}
@@ -133,5 +132,11 @@ public class ObjectPropertySelector extends JPanel implements
 			return new PropertyChainCell(p, facet);
 		}
 		return null;
+	}
+
+	protected void notifyVerified() {
+		for (InputVerificationStatusChangedListener i : this.listeners) {
+			i.verifiedStatusChanged(true);
+		}
 	}
 }

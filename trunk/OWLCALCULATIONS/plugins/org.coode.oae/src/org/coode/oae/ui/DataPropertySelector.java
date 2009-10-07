@@ -31,7 +31,7 @@ public class DataPropertySelector extends JPanel implements VerifiedInputEditor 
 	protected StaticListModel<OWLDataProperty> dataPropertiesModel = new StaticListModel<OWLDataProperty>(
 			this.dataProperties, null);
 	protected MList dataPropertiesView = new MList();
-	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
+	protected Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private OWLEditorKit kit;
 
 	public void addStatusChangedListener(
@@ -67,9 +67,7 @@ public class DataPropertySelector extends JPanel implements VerifiedInputEditor 
 							if (DataPropertySelector.this.dataPropertiesView
 									.getSelectedIndex() > -1) {
 								// then status is OK
-								for (InputVerificationStatusChangedListener i : DataPropertySelector.this.listeners) {
-									i.verifiedStatusChanged(true);
-								}
+								notifyVerified();
 							}
 						}
 					}
@@ -102,5 +100,11 @@ public class DataPropertySelector extends JPanel implements VerifiedInputEditor 
 			return new PropertyChainCell(prop, null);
 		}
 		return null;
+	}
+
+	protected void notifyVerified() {
+		for (InputVerificationStatusChangedListener i : this.listeners) {
+			i.verifiedStatusChanged(true);
+		}
 	}
 }
