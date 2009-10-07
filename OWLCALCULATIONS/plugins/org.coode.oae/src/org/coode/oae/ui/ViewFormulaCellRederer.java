@@ -69,13 +69,13 @@ import uk.ac.manchester.mae.visitor.protege.ProtegeDescriptionFacetExtractor;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 28, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 28, 2008
  */
 @SuppressWarnings("serial")
 public class ViewFormulaCellRederer extends JPanel implements ListCellRenderer,
-ArithmeticsParserVisitor {
+		ArithmeticsParserVisitor {
 	protected OWLEditorKit owlEditorKit;
 	protected DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
 	protected String formulaString = "";
@@ -120,8 +120,8 @@ ArithmeticsParserVisitor {
 	public Component getListCellRendererComponent(JList list, Object value,
 			int index, boolean isSelected, boolean cellHasFocus) {
 		Component toReturn = this.defaultListCellRenderer
-		.getListCellRendererComponent(list, value, index, isSelected,
-				cellHasFocus);
+				.getListCellRendererComponent(list, value, index, isSelected,
+						cellHasFocus);
 		if (value instanceof AbstractOWLFrameSectionRow) {
 			AbstractOWLFrameSectionRow<Object, OWLAnnotationAxiom<OWLDataProperty>, ? extends Object> row = (AbstractOWLFrameSectionRow) value;
 			OWLAnnotationAxiom axiom = row.getAxiom();
@@ -130,7 +130,7 @@ ArithmeticsParserVisitor {
 			NamespaceUtil nsUtil = new NamespaceUtil();
 			String localName = nsUtil.split(uriString, null)[1];
 			String annotationValue = annotation.getAnnotationValueAsConstant()
-			.getLiteral();
+					.getLiteral();
 			ParserFactory.initParser(annotationValue, this.owlEditorKit
 					.getModelManager());
 			try {
@@ -138,10 +138,10 @@ ArithmeticsParserVisitor {
 				formula.jjtAccept(this, null);
 				String rendering = this.formulaString;
 				String propertyName = this.owlEditorKit.getModelManager()
-				.getRendering(axiom.getSubject());
+						.getRendering(axiom.getSubject());
 				if (this.isClassView) {
 					this.formulaURILabel
-					.setText(propertyName + " " + localName);
+							.setText(propertyName + " " + localName);
 				} else {
 					this.formulaURILabel.setText(localName);
 				}
@@ -158,7 +158,6 @@ ArithmeticsParserVisitor {
 				this.iconLabel.setVisible(this.isClassView);
 				toReturn = this;
 			} catch (ParseException e) {
-
 				e.printStackTrace();
 			}
 		}
@@ -202,7 +201,7 @@ ArithmeticsParserVisitor {
 
 	public Object visit(MAEStoreTo node, Object data) {
 		String toReturn = " STORETO <";
-		this.formulaString += " STORETO <";
+		this.formulaString += toReturn;
 		toReturn += node.childrenAccept(this, data);
 		this.formulaString += ">";
 		return toReturn + ">";
@@ -228,31 +227,30 @@ ArithmeticsParserVisitor {
 		OWLProperty property = node.isEnd() && !hasStoreToAncestor(node) ? this.owlEditorKit
 				.getModelManager().getOWLDataFactory().getOWLDataProperty(
 						URI.create(propertyName))
-						: this.owlEditorKit.getModelManager().getOWLDataFactory()
+				: this.owlEditorKit.getModelManager().getOWLDataFactory()
 						.getOWLObjectProperty(URI.create(propertyName));
-						toReturn += this.owlEditorKit.getModelManager().getRendering(property);
-						this.formulaString += toReturn;
-						ProtegeDescriptionFacetExtractor facetExtractor = new ProtegeDescriptionFacetExtractor(
-								this.owlEditorKit.getModelManager());
-						node.jjtAccept(facetExtractor, data);
-						String facetDescriptionString = facetExtractor
-						.getExtractedDescription() == null ? "" : "["
-							+ this.owlEditorKit.getModelManager().getRendering(
-									facetExtractor.getExtractedDescription()) + "]";
-						toReturn += facetDescriptionString;
-						this.formulaString += facetDescriptionString;
-						if (!node.isEnd()) {
-							this.formulaString += "!";
-							toReturn += node.childrenAccept(this, data);
-						}
-						return toReturn;
+		toReturn += this.owlEditorKit.getModelManager().getRendering(property);
+		this.formulaString += toReturn;
+		ProtegeDescriptionFacetExtractor facetExtractor = new ProtegeDescriptionFacetExtractor(
+				this.owlEditorKit.getModelManager());
+		node.jjtAccept(facetExtractor, data);
+		String facetDescriptionString = facetExtractor
+				.getExtractedDescription() == null ? "" : "["
+				+ this.owlEditorKit.getModelManager().getRendering(
+						facetExtractor.getExtractedDescription()) + "]";
+		toReturn += facetDescriptionString;
+		this.formulaString += facetDescriptionString;
+		if (!node.isEnd()) {
+			this.formulaString += "!";
+			toReturn += node.childrenAccept(this, data);
+		}
+		return toReturn;
 	}
 
 	private boolean hasStoreToAncestor(MAEPropertyChain node) {
 		if (node.jjtGetParent() != null
 				&& node.jjtGetParent() instanceof MAEPropertyChain) {
-			return hasStoreToAncestor((MAEPropertyChain) node
-					.jjtGetParent());
+			return hasStoreToAncestor((MAEPropertyChain) node.jjtGetParent());
 		} else {
 			return node.jjtGetParent() instanceof MAEStoreTo;
 		}

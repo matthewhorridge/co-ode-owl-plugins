@@ -62,6 +62,7 @@ public class OWLCalculationsFormulaDataPropertyFrameSectionRow
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	protected OWLAnnotationAxiom<OWLDataProperty> createAxiom(
 			FormulaModel editedObject) {
 		OWLAnnotationAxiom toReturn = null;

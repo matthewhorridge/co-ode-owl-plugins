@@ -76,6 +76,7 @@ public class PropertyVisitor implements OWLPropertyExpressionVisitor {
 	 * 
 	 * @see org.semanticweb.owl.model.OWLPropertyExpressionVisitor#visit(org.semanticweb.owl.model.OWLDataProperty)
 	 */
+	@SuppressWarnings("unchecked")
 	public void visit(OWLDataProperty property) {
 		Set<OWLAnnotation> annotations = new HashSet<OWLAnnotation>();
 		for (OWLOntology ontology : this.ontologies) {

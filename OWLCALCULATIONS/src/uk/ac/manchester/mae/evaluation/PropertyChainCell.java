@@ -10,9 +10,11 @@ import org.semanticweb.owl.util.SimpleShortFormProvider;
 import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
 
 public class PropertyChainCell {
+	@SuppressWarnings("unchecked")
 	protected final OWLProperty property;
 	protected OWLDescription facet = null;
 
+	@SuppressWarnings("unchecked")
 	public PropertyChainCell(OWLProperty p, OWLDescription f) {
 		this.property = p;
 		this.facet = f;
@@ -21,6 +23,7 @@ public class PropertyChainCell {
 	/**
 	 * @return the property
 	 */
+	@SuppressWarnings("unchecked")
 	public OWLProperty getProperty() {
 		return this.property;
 	}
