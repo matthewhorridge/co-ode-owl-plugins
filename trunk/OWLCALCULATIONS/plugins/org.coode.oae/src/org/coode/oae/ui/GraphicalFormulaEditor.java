@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,12 +43,18 @@ import uk.ac.manchester.mae.evaluation.PropertyChainModel;
 import uk.ac.manchester.mae.evaluation.StorageModel;
 
 public class GraphicalFormulaEditor extends JPanel implements
-		RefreshableComponent, VerifiedInputEditor, DocumentListener {
+		RefreshableComponent, VerifiedInputEditor, DocumentListener,
+		InputVerificationStatusChangedListener, ActionListener {
+	public static final Dimension LIST_PREFERRED_SIZE = new Dimension(300, 200);
+	private static final long serialVersionUID = 4697754251654457170L;
+
 	protected final class MyMList extends MList {
+		private static final long serialVersionUID = -6626947893443460240L;
+
 		@Override
 		protected void handleAdd() {
 			GraphicalFormulaEditor.this.bindingEditor.setBindingModel(null);
-			GraphicalFormulaEditor.this.bindingEditor.setVisible(true);
+			addBinding();
 		}
 
 		@Override
@@ -63,7 +72,7 @@ public class GraphicalFormulaEditor extends JPanel implements
 			GraphicalFormulaEditor.this.bindingEditor
 					.setBindingModel(((VariableListItem<BindingModel>) getSelectedValue())
 							.getItem());
-			GraphicalFormulaEditor.this.bindingEditor.setVisible(true);
+			addBinding();
 		}
 	}
 
@@ -72,7 +81,7 @@ public class GraphicalFormulaEditor extends JPanel implements
 	static ImageIcon delIcon = new ImageIcon(GraphicalFormulaEditor.class
 			.getClassLoader().getResource("delete.png"));
 	static Dimension REGULAR_FIELD_DIMENSION = new Dimension(150, 25);
-	static Dimension LONG_FIELD_DIMENSION = new Dimension(300, 25);
+	static Dimension LONG_FIELD_DIMENSION = new Dimension(200, 25);
 	static Dimension SHORT_FIELD_DIMENSION = new Dimension(75, 25);
 	private static String[] strategies = new String[] { "none",
 			OverridingStrategy.getInstance().toString(),
@@ -82,10 +91,7 @@ public class GraphicalFormulaEditor extends JPanel implements
 	private JComboBox conflictStrategy = new JComboBox(strategies);
 	private JComboBox function = new JComboBox(functions);
 	private JTextField expression = new JTextField();
-	private JTextField appliesTo = new JTextField();
-	private PropertyChainModel storeTo = null;
 	private StoreToEditor storeToEditor;
-	private OWLClass appliesToValue = null;
 	private AppliesToEditor appliesToEditor;
 	protected BindingEditor bindingEditor;
 	protected final Set<BindingModel> bindingModels = new HashSet<BindingModel>();
@@ -105,57 +111,53 @@ public class GraphicalFormulaEditor extends JPanel implements
 				new OWLCalculationsExpressionChecker(this.edKit));
 		this.editor.setBorder(new TitledBorder("Current formula"));
 		this.editor.setEditable(false);
-		this.bindingEditor = new BindingEditor(this.edKit, this);
-		this.storeToEditor = new StoreToEditor(this.edKit, this);
-		this.appliesToEditor = new AppliesToEditor(this.edKit, this);
-		this.bindingEditor.setVisible(false);
-		this.bindingView.setPreferredSize(new Dimension(360, 100));
+		this.bindingEditor = new BindingEditor(this.edKit);
+		this.storeToEditor = new StoreToEditor(this.edKit);
+		this.appliesToEditor = new AppliesToEditor(this.edKit);
+		this.storeToEditor.addStatusChangedListener(this);
+		this.appliesToEditor.addStatusChangedListener(this);
 		this.bindingView.setModel(this.bindingViewModel);
 		this.bindingView.setCellRenderer(new RenderableObjectCellRenderer(
 				this.edKit));
 		this.expression.getDocument().addDocumentListener(this);
-		this.conflictStrategy.setPreferredSize(REGULAR_FIELD_DIMENSION);
-		this.appliesTo.setPreferredSize(REGULAR_FIELD_DIMENSION);
 		setLayout(new BorderLayout());
 		this.add(this.editor, BorderLayout.NORTH);
-		this.add(leftside(), BorderLayout.WEST);
-		this.add(center(), BorderLayout.CENTER);
-		this.add(bottom(), BorderLayout.SOUTH);
+		this.add(leftside(), BorderLayout.CENTER);
 		this.bindingViewModel.init();
 	}
 
 	private Component center() {
-		JPanel toReturn = new JPanel(new BorderLayout());
-		toReturn.setBorder(new TitledBorder("Bindings:"));
-		JScrollPane center = new JScrollPane(this.bindingView);
-		// center.setPreferredSize(new Dimension(250, 300));
-		center
+		JPanel center = new JPanel();
+		center.setBorder(new TitledBorder("Bindings:"));
+		JScrollPane scroll = new JScrollPane(this.bindingView);
+		scroll
 				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		JScrollPane east = new JScrollPane(this.bindingEditor);
-		// east.setPreferredSize(new Dimension(250, 300));
-		east
-				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		toReturn.add(center, BorderLayout.NORTH);
-		toReturn.add(east, BorderLayout.CENTER);
-		return toReturn;
+		center.add(scroll);
+		return center;
 	}
 
 	private JPanel leftside() {
-		JPanel toReturn = new JPanel(new BorderLayout());
-		// mainleft.setPreferredSize(new Dimension(180, 500));
+		JPanel toReturn = new JPanel(new GridLayout(2, 2));
+		JPanel square1 = new JPanel(new GridLayout(2, 1));
 		JPanel p1 = new JPanel();
 		p1.setBorder(new TitledBorder("Conflict Strategy"));
+		this.conflictStrategy.setPreferredSize(REGULAR_FIELD_DIMENSION);
+		this.conflictStrategy.addActionListener(this);
 		p1.add(this.conflictStrategy);
-		toReturn.add(p1, BorderLayout.NORTH);
-		JPanel p2 = new JPanel(new BorderLayout());
+		square1.add(p1);
+		JPanel p2 = new JPanel();
 		p2.setBorder(new TitledBorder("Applies to:"));
-		p2.add(this.appliesTo, BorderLayout.NORTH);
-		p2.add(this.appliesToEditor, BorderLayout.CENTER);
-		toReturn.add(p2, BorderLayout.CENTER);
+		p2.add(this.appliesToEditor);
+		square1.add(p2);
+		toReturn.add(square1);
 		JPanel p3 = new JPanel();
 		p3.setBorder(new TitledBorder("Store to:"));
+		this.storeToEditor.setPreferredSize(LIST_PREFERRED_SIZE);
+		this.bindingView.setPreferredSize(LIST_PREFERRED_SIZE);
 		p3.add(this.storeToEditor);
-		toReturn.add(p3, BorderLayout.SOUTH);
+		toReturn.add(p3);
+		toReturn.add(center());
+		toReturn.add(bottom());
 		return toReturn;
 	}
 
@@ -163,6 +165,8 @@ public class GraphicalFormulaEditor extends JPanel implements
 		JPanel p4 = new JPanel(new FlowLayout());
 		p4.setBorder(new TitledBorder("Expression"));
 		p4.add(this.function);
+		this.function.setPreferredSize(REGULAR_FIELD_DIMENSION);
+		this.function.addActionListener(this);
 		this.expression.setPreferredSize(LONG_FIELD_DIMENSION);
 		p4.add(this.expression);
 		return p4;
@@ -189,9 +193,8 @@ public class GraphicalFormulaEditor extends JPanel implements
 
 	public void clear() {
 		this.conflictStrategy.setSelectedIndex(0);
-		this.appliesToValue = null;
-		this.appliesTo.setText("");
-		this.storeTo = null;
+		this.appliesToEditor.clear();
+		this.storeToEditor.clear();
 		this.bindingModels.clear();
 		this.function.setSelectedIndex(0);
 		this.expression.setText("");
@@ -205,9 +208,10 @@ public class GraphicalFormulaEditor extends JPanel implements
 					.getStrategy((String) this.conflictStrategy
 							.getSelectedItem()));
 		}
-		fm.setAppliesTo(this.appliesToValue);
-		if (this.storeTo != null) {
-			fm.setStorageModel(new StorageModel(this.storeTo));
+		fm.setAppliesTo(this.appliesToEditor.getAppliesTo());
+		PropertyChainModel pcm = this.storeToEditor.getPropertyChainModel();
+		if (pcm != null) {
+			fm.setStorageModel(new StorageModel(pcm));
 		} else {
 			fm.setStorageModel(null);
 		}
@@ -241,15 +245,13 @@ public class GraphicalFormulaEditor extends JPanel implements
 			// else select the first item, which is "none" by default
 			this.conflictStrategy.setSelectedIndex(0);
 		}
-		this.appliesToValue = (OWLClass) fm.getAppliesTo();
-		updateAppliesTo();
+		this.appliesToEditor.setAppliesTo((OWLClass) fm.getAppliesTo());
 		StorageModel storageModel = fm.getStorageModel();
 		if (storageModel != null) {
-			this.storeTo = storageModel.getPropertyChainModel();
+			this.storeToEditor.setStoreTo(storageModel.getPropertyChainModel());
 		} else {
-			this.storeTo = null;
+			this.storeToEditor.setStoreTo(null);
 		}
-		this.storeToEditor.setStoreTo(this.storeTo);
 		// XXX string bashing: a better way to check whether there is a function
 		// call must be implemented
 		String fbody = fm.getFormulaBody().trim();
@@ -289,32 +291,13 @@ public class GraphicalFormulaEditor extends JPanel implements
 		}
 	}
 
-	void handleCommit() {
+	void addBinding() {
 		BindingModel b = this.bindingEditor.getBindingModel();
-		this.bindingModels.remove(b);
-		this.bindingModels.add(b);
-		this.bindingEditor.setVisible(false);
-		handleChange();
-		handleVerification();
-	}
-
-	void handleStoreToCommit() {
-		this.storeTo = this.storeToEditor.getPropertyChainModel();
-		handleVerification();
-	}
-
-	void handleAppliesToCommit() {
-		this.appliesToValue = this.appliesToEditor.getAppliesTo();
-		updateAppliesTo();
-		handleVerification();
-	}
-
-	private void updateAppliesTo() {
-		if (this.appliesToValue != null) {
-			this.appliesTo.setText(this.edKit.getOWLModelManager()
-					.getRendering(this.appliesToValue));
-		} else {
-			this.appliesTo.setText("");
+		if (b != null) {
+			this.bindingModels.remove(b);
+			this.bindingModels.add(b);
+			handleChange();
+			handleVerification();
 		}
 	}
 
@@ -327,6 +310,14 @@ public class GraphicalFormulaEditor extends JPanel implements
 	}
 
 	public void removeUpdate(DocumentEvent e) {
+		handleVerification();
+	}
+
+	public void verifiedStatusChanged(boolean newState) {
+		handleVerification();
+	}
+
+	public void actionPerformed(ActionEvent e) {
 		handleVerification();
 	}
 }

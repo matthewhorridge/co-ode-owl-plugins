@@ -42,9 +42,7 @@ import org.semanticweb.owl.model.OWLDataProperty;
  */
 public class OWLArithmeticsFormulaDataPropertyView extends
 		AbstractOWLDataPropertyViewComponent {
-	/**
-	 * 
-	 */
+	private static final long serialVersionUID = -2353902183664081082L;
 	private OWLFrameList2<OWLDataProperty> list;
 
 	/**

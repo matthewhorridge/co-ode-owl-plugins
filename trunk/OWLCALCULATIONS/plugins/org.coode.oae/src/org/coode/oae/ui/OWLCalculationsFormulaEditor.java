@@ -23,7 +23,6 @@
 package org.coode.oae.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -55,8 +54,6 @@ import uk.ac.manchester.mae.evaluation.FormulaModel;
 public class OWLCalculationsFormulaEditor extends
 		AbstractOWLFrameSectionRowObjectEditor<FormulaModel> implements
 		VerifiedInputEditor, InputVerificationStatusChangedListener {
-	private static final Dimension PREFERRED_EDITOR_SIZE = new Dimension(800,
-			600);
 	private OWLEditorKit owlEditorKit;
 	protected FormulaModel formulaModel;
 	// private ExpressionEditor<FormulaModel> editor;
@@ -89,7 +86,6 @@ public class OWLCalculationsFormulaEditor extends
 		// .getExpressionChecker());
 		// this.editor.setPreferredSize(PREFERRED_EDITOR_SIZE);
 		// this.editor.addStatusChangedListener(this);
-		this.grapheditor.setPreferredSize(PREFERRED_EDITOR_SIZE);
 		this.grapheditor.addStatusChangedListener(this);
 		// JTabbedPane editorPanel = new JTabbedPane(JTabbedPane.TOP);
 		// JScrollPane editorPane = new JScrollPane(this.editor);

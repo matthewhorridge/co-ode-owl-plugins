@@ -1,40 +1,50 @@
 package org.coode.oae.ui;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
-import org.coode.oae.ui.StaticListModel.StaticListItem;
 import org.coode.oae.ui.VariableListModel.VariableListItem;
 import org.protege.editor.core.ui.list.MList;
+import org.protege.editor.core.ui.list.MListButton;
+import org.protege.editor.core.ui.list.MListSectionHeader;
+import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
+import org.protege.editor.core.ui.util.JOptionPaneEx;
+import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLDescription;
+import org.protege.editor.owl.ui.OWLIcons;
 import org.semanticweb.owl.model.OWLObjectProperty;
 
 import uk.ac.manchester.mae.evaluation.BindingModel;
 import uk.ac.manchester.mae.evaluation.PropertyChainCell;
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;
 
-public class BindingEditor extends JPanel implements ActionListener {
-	protected final class MyMList extends MList {
+public class BindingEditor extends JPanel implements ActionListener,
+		VerifiedInputEditor {
+	private static final long serialVersionUID = -2534565329159746844L;
+
+	protected final class TwoAddButtonsMList extends MList {
+		private static final long serialVersionUID = 7034517538254357642L;
+
 		@Override
 		@SuppressWarnings("unchecked")
 		protected void handleDelete() {
@@ -43,41 +53,61 @@ public class BindingEditor extends JPanel implements ActionListener {
 							.getItem());
 			handlePropertyChainsUpdate();
 		}
+
+		@Override
+		protected List<MListButton> getSectionButtons(MListSectionHeader header) {
+			List<MListButton> buttons = new ArrayList<MListButton>();
+			if (header.canAdd()) {
+				buttons.add(BindingEditor.this.addObjectProperty);
+				buttons.add(BindingEditor.this.addDataProperty);
+			}
+			return buttons;
+		}
 	}
 
+	private static class MyButton extends MListButton implements ImageObserver {
+		private Image image;
+
+		MyButton(String name, Color color, Image i, ActionListener l) {
+			super(name, color);
+			this.image = i;
+			setActionListener(l);
+		}
+
+		@Override
+		public void paintButtonContent(Graphics2D g) {
+			Rectangle r = getBounds();
+			g.drawImage(this.image, r.x, r.y, r.width, r.height, this);
+		}
+
+		public boolean imageUpdate(Image img, int infoflags, int x, int y,
+				int width, int height) {
+			// TODO Auto-generated method stub
+			return false;
+		}
+	}
+
+	private final ImageIcon objectPropertyIcon = (ImageIcon) OWLIcons
+			.getIcon("property.object.png");
+	private final ImageIcon dataPropertyIcon = (ImageIcon) OWLIcons
+			.getIcon("property.data.png");
+	protected MListButton addObjectProperty = new MyButton(
+			"Add Object Property", Color.BLUE, this.objectPropertyIcon
+					.getImage(), this);
+	protected MListButton addDataProperty = new MyButton(
+			"Add Datatype Property", Color.GREEN, this.dataPropertyIcon
+					.getImage(), this);
 	private BindingModel editedBindingModel;
-	private GraphicalFormulaEditor editor;
 	private OWLEditorKit kit;
 	private JTextField identifier = new JTextField();
-	private final MyMList propertychainsView = new MyMList();
-	protected MList objectPropertiesView = new MList();
-	protected MList dataPropertiesView = new MList();
-	protected MList facetClassView = new MList();
+	private final TwoAddButtonsMList propertychainsView = new TwoAddButtonsMList();
 	protected final List<PropertyChainCell> propertyChainCells = new ArrayList<PropertyChainCell>();
-	protected List<OWLObjectProperty> objectProperties = new ArrayList<OWLObjectProperty>();
-	protected List<OWLDataProperty> dataProperties = new ArrayList<OWLDataProperty>();
-	protected List<OWLClass> facetClasses = new ArrayList<OWLClass>();
 	protected final VariableListModel<PropertyChainCell> propertychainsModel = new VariableListModel<PropertyChainCell>(
-			this.propertyChainCells, "Property chain elements", false);
-	protected StaticListModel<OWLObjectProperty> objectPropertiesModel = new StaticListModel<OWLObjectProperty>(
-			this.objectProperties, null);
-	protected StaticListModel<OWLDataProperty> dataPropertiesModel = new StaticListModel<OWLDataProperty>(
-			this.dataProperties, null);
-	protected StaticListModel<OWLClass> facetClassesModel = new StaticListModel<OWLClass>(
-			this.facetClasses, null);
-	protected JButton commit = new JButton("Commit changes");
-	protected JButton commitObjProp = new JButton("Add object property");
-	protected JButton commitDataProp = new JButton("Add datatype property");
-	protected JLabel errorsLabel = new JLabel();
-
-	public boolean canAcceptObjectOrDatatypeProperty() {
-		if (this.propertyChainCells.size() == 0) {
-			return true;
-		}
-		PropertyChainCell c = this.propertyChainCells
-				.get(this.propertyChainCells.size() - 1);
-		return c.getProperty() instanceof OWLObjectProperty;
-	}
+			this.propertyChainCells, "Property chain elements", true);
+	private JTextArea errorsLabel = new JTextArea(4, 50);
+	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
+	private ObjectPropertySelector obp;
+	private DataPropertySelector dp;
 
 	public boolean isCorrect() {
 		if (this.propertyChainCells.size() == 0) {
@@ -103,44 +133,16 @@ public class BindingEditor extends JPanel implements ActionListener {
 	 *            the {@link BindingModel} to use; must not be null but can be
 	 *            empty
 	 */
-	public BindingEditor(OWLEditorKit k, GraphicalFormulaEditor main) {
+	public BindingEditor(OWLEditorKit k) {
 		super(new BorderLayout());
-		setPreferredSize(new Dimension(400, 300));
 		this.kit = k;
-		this.editor = main;
+		this.obp = new ObjectPropertySelector(k);
+		this.dp = new DataPropertySelector(k);
 		this.propertychainsView.setModel(this.propertychainsModel);
 		this.propertychainsView
 				.setCellRenderer(new RenderableObjectCellRenderer(this.kit));
-		this.objectPropertiesView
-				.setCellRenderer(new RenderableObjectCellRenderer(this.kit));
-		this.dataPropertiesView
-				.setCellRenderer(new RenderableObjectCellRenderer(this.kit));
-		this.facetClassView.setCellRenderer(new RenderableObjectCellRenderer(
-				this.kit));
-		this.objectPropertiesView.setModel(this.objectPropertiesModel);
-		this.dataPropertiesView.setModel(this.dataPropertiesModel);
-		this.facetClassView.setModel(this.facetClassesModel);
-		OWLObjectHierarchyProvider<OWLObjectProperty> opp = this.kit
-				.getOWLModelManager().getOWLHierarchyManager()
-				.getOWLObjectPropertyHierarchyProvider();
-		for (OWLObjectProperty op : opp.getRoots()) {
-			this.objectProperties.add(op);
-			for (OWLObjectProperty opd : opp.getDescendants(op)) {
-				this.objectProperties.add(opd);
-			}
-		}
-		OWLObjectHierarchyProvider<OWLDataProperty> dpp = this.kit
-				.getOWLModelManager().getOWLHierarchyManager()
-				.getOWLDataPropertyHierarchyProvider();
-		for (OWLDataProperty dp : dpp.getRoots()) {
-			this.dataProperties.add(dp);
-			for (OWLDataProperty dpd : dpp.getDescendants(dp)) {
-				this.dataProperties.add(dpd);
-			}
-		}
-		this.objectPropertiesModel.init();
-		this.dataPropertiesModel.init();
-		this.facetClassesModel.init();
+		this.propertychainsView
+				.setPreferredSize(GraphicalFormulaEditor.LIST_PREFERRED_SIZE);
 		init();
 	}
 
@@ -164,128 +166,81 @@ public class BindingEditor extends JPanel implements ActionListener {
 
 	protected void handlePropertyChainsUpdate() {
 		this.propertychainsModel.init();
-		boolean accept = canAcceptObjectOrDatatypeProperty();
-		this.commitObjProp.setEnabled(accept);
-		this.commitDataProp.setEnabled(accept);
 		boolean correct = isCorrect();
-		this.commit.setEnabled(correct);
-		if (!correct || this.identifier.getText().length() == 0) {
-			StringBuilder b = new StringBuilder();
-			if (this.identifier.getText().length() == 0) {
-				b.append(" An identifier must be specified; ");
-			}
-			if (!isCorrect()) {
-				b
-						.append(" The property chain must be made of object properties and end with a datatype property");
-			}
-			this.errorsLabel.setText(b.toString());
-		} else {
-			this.errorsLabel.setText("");
+		this.errorsLabel.setText("");
+		if (this.identifier.getText().length() == 0) {
+			this.errorsLabel.append("An identifier must be specified.\n");
+		}
+		if (!isCorrect()) {
+			this.errorsLabel
+					.append("The property chain must be made of object properties\nand end with a datatype property.");
+		}
+		for (InputVerificationStatusChangedListener i : this.listeners) {
+			i.verifiedStatusChanged(correct);
 		}
 	}
 
 	public BindingModel getBindingModel() {
-		return this.editedBindingModel;
+		int ret = showDialog("Create Bindings", this);
+		if (ret == JOptionPane.OK_OPTION) {
+			this.editedBindingModel = new BindingModel(this.identifier
+					.getText(), new PropertyChainModel(this.propertyChainCells));
+			return this.editedBindingModel;
+		} else {
+			return null;
+		}
 	}
 
 	public void init() {
-		JPanel report = new JPanel(new BorderLayout());
-		report.setPreferredSize(new Dimension(360, 130));
-		JScrollPane jpreport = new JScrollPane(report);
-		report.setBorder(new TitledBorder(
-				"Binding identifier and property chain"));
-		report.add(this.identifier, BorderLayout.NORTH);
-		report.add(this.propertychainsView, BorderLayout.CENTER);
-		this.add(jpreport, BorderLayout.NORTH);
-		JPanel pickpanel = new JPanel(new GridLayout(1, 3));
-		pickpanel.setPreferredSize(new Dimension(360, 100));
-		JPanel objs = new JPanel(new BorderLayout());
-		JScrollPane spobj = new JScrollPane(this.objectPropertiesView);
-		spobj.setBorder(new TitledBorder("Object property selection"));
-		JScrollPane spobjf = new JScrollPane(this.facetClassView);
-		spobjf.setBorder(new TitledBorder("Facet selection"));
-		objs.add(spobj, BorderLayout.CENTER);
-		objs.add(this.commitObjProp, BorderLayout.SOUTH);
-		JPanel datas = new JPanel(new BorderLayout());
-		JScrollPane spd = new JScrollPane(this.dataPropertiesView);
-		spd.setBorder(new TitledBorder("Data property selection"));
-		datas.add(spd);
-		datas.add(this.commitDataProp, BorderLayout.SOUTH);
-		pickpanel.add(objs);
-		pickpanel.add(spobjf);
-		pickpanel.add(datas);
-		this.add(pickpanel, BorderLayout.CENTER);
-		this.commit.addActionListener(this);
-		this.commitObjProp.addActionListener(this);
-		this.commitDataProp.addActionListener(this);
-		this.objectPropertiesView
-				.addListSelectionListener(new ListSelectionListener() {
-					@SuppressWarnings("unchecked")
-					public void valueChanged(ListSelectionEvent e) {
-						if (!e.getValueIsAdjusting()) {
-							if (BindingEditor.this.objectPropertiesView
-									.getSelectedIndex() > -1) {
-								OWLObjectProperty p = ((StaticListItem<OWLObjectProperty>) BindingEditor.this.objectPropertiesView
-										.getSelectedValue()).getItem();
-								BindingEditor.this.facetClasses.clear();
-								BindingEditor.this.facetClasses
-										.addAll(getOWLClasses(p));
-								BindingEditor.this.facetClassesModel.init();
-							}
-						}
-					}
-				});
-		JPanel commitBar = new JPanel(new GridLayout(2, 1));
-		commitBar.add(this.errorsLabel);
-		commitBar.add(this.commit);
-		this.add(commitBar, BorderLayout.SOUTH);
+		this.add(this.identifier, BorderLayout.NORTH);
+		this.add(this.propertychainsView, BorderLayout.CENTER);
+		this.errorsLabel.setEditable(false);
+		this.errorsLabel.setWrapStyleWord(true);
+		this.errorsLabel.setBorder(new TitledBorder("Error report"));
+		JScrollPane scroll = new JScrollPane(this.errorsLabel);
+		scroll
+				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		this.add(this.errorsLabel, BorderLayout.SOUTH);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource().equals(this.commit)) {
-			handleCommit();
-		}
-		if (e.getSource().equals(this.commitObjProp)) {
-			if (this.objectPropertiesView.getSelectedIndex() > -1) {
-				OWLObjectProperty p = ((StaticListItem<OWLObjectProperty>) this.objectPropertiesView
-						.getSelectedValue()).getItem();
-				OWLClass facet = null;
-				if (this.facetClassView.getSelectedIndex() > -1) {
-					facet = ((StaticListItem<OWLClass>) this.facetClassView
-							.getSelectedValue()).getItem();
+		if (e.getSource().equals(this.addObjectProperty)) {
+			int ret = showDialog("Select Object Property and Facet", this.obp);
+			if (ret == JOptionPane.OK_OPTION) {
+				PropertyChainCell p = this.obp.getCell();
+				if (p != null) {
+					this.propertyChainCells.add(p);
+					handlePropertyChainsUpdate();
 				}
-				this.propertyChainCells.add(new PropertyChainCell(p, facet));
-				handlePropertyChainsUpdate();
-				this.objectPropertiesView.getSelectionModel().clearSelection();
-				this.facetClassView.getSelectionModel().clearSelection();
 			}
+			this.obp.clear();
 		}
-		if (e.getSource().equals(this.commitDataProp)) {
-			if (this.dataPropertiesView.getSelectedIndex() > -1) {
-				OWLDataProperty prop = ((StaticListItem<OWLDataProperty>) this.dataPropertiesView
-						.getSelectedValue()).getItem();
-				this.propertyChainCells.add(new PropertyChainCell(prop, null));
-				handlePropertyChainsUpdate();
-				this.dataPropertiesView.getSelectionModel().clearSelection();
+		if (e.getSource().equals(this.addDataProperty)) {
+			int ret = showDialog("Select Datatype Property", this.dp);
+			if (ret == JOptionPane.OK_OPTION) {
+				PropertyChainCell p = this.dp.getCell();
+				if (p != null) {
+					this.propertyChainCells.add(p);
+					handlePropertyChainsUpdate();
+				}
+				this.dp.clear();
 			}
 		}
 	}
 
-	private void handleCommit() {
-		this.editedBindingModel = new BindingModel(this.identifier.getText(),
-				new PropertyChainModel(this.propertyChainCells));
-		this.editor.handleCommit();
+	public int showDialog(String title, JComponent component) {
+		return JOptionPaneEx.showValidatingConfirmDialog(getParent(), title,
+				component, JOptionPane.PLAIN_MESSAGE,
+				JOptionPane.OK_CANCEL_OPTION, null);
 	}
 
-	protected Set<OWLClass> getOWLClasses(OWLObjectProperty op) {
-		Set<OWLClass> ranges = new HashSet<OWLClass>();
-		for (OWLDescription d : op.getRanges(this.kit.getOWLModelManager()
-				.getActiveOntology())) {
-			if (d instanceof OWLClass) {
-				ranges.add((OWLClass) d);
-			}
-		}
-		return ranges;
+	public void addStatusChangedListener(
+			InputVerificationStatusChangedListener listener) {
+		this.listeners.add(listener);
+	}
+
+	public void removeStatusChangedListener(
+			InputVerificationStatusChangedListener listener) {
+		this.listeners.remove(listener);
 	}
 }

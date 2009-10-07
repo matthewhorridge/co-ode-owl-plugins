@@ -17,10 +17,10 @@ import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLObjectProperty;
 
 public class ArithmeticsParser/* @bgen(jjtree) */implements
-		ArithmeticsParserTreeConstants, ArithmeticsParserConstants {/*
-																	 * @bgen(jjtree
-																	 * )
-																	 */
+		ArithmeticsParserTreeConstants, ArithmeticsParserConstants {
+	/*
+	 * @bgen(jjtree )
+	 */
 	protected static JJTArithmeticsParserState jjtree = new JJTArithmeticsParserState();
 	static private OWLEntityChecker owlEntityChecker = null;
 	static private AutoCompleterMatcher matcher;
@@ -104,6 +104,7 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	static final public SimpleNode Start() throws ParseException {
 		/* @bgen(jjtree) Start */
 		MAEStart jjtn000 = new MAEStart(JJTSTART);
@@ -189,10 +190,7 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 			jj_consume_token(24);
 			jjtree.closeNodeScope(jjtn000, true);
 			jjtc000 = false;
-			{
-				if (true)
-					return jjtn000;
-			}
+			return jjtn000;
 		} catch (Throwable jjte000) {
 			if (jjtc000) {
 				jjtree.clearNodeScope(jjtn000);
@@ -201,27 +199,18 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 				jjtree.popNode();
 			}
 			if (jjte000 instanceof RuntimeException) {
-				{
-					if (true)
-						throw (RuntimeException) jjte000;
-				}
+				throw (RuntimeException) jjte000;
 			}
 			if (jjte000 instanceof ParseException) {
-				{
-					if (true)
-						throw (ParseException) jjte000;
-				}
+				throw (ParseException) jjte000;
 			}
-			{
-				if (true)
-					throw (Error) jjte000;
-			}
+			throw (Error) jjte000;
 		} finally {
 			if (jjtc000) {
 				jjtree.closeNodeScope(jjtn000, true);
 			}
 		}
-		throw new Error("Missing return statement in function");
+		// throw new Error("Missing return statement in function");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -295,6 +284,7 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		jj_consume_token(27);
 	}
 
+	@SuppressWarnings("unchecked")
 	static void manSyntaxClassExpression() throws ParseException {
 		/* @bgen(jjtree) manSyntaxClassExpression */
 		MAEmanSyntaxClassExpression jjtn000 = new MAEmanSyntaxClassExpression(
@@ -493,6 +483,7 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	static String PropertyURI() throws ParseException {
 		String toReturn = null;
 		String uriString = "";
@@ -522,6 +513,10 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 				}
 			}
 		}
+		if (matcher != null) {
+			completions.addAll(matcher.getMatches(uriString, false, true, true,
+					false, false));
+		}
 		if (toReturn == null) {
 			// if (matcher != null) {
 			// completions.addAll(matcher.getMatches(uriString, false, true,
@@ -529,10 +524,6 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 			// }
 			throw new ParseException(uriString
 					+ " invalid property URI or name");
-		}
-		if (matcher != null) {
-			completions.addAll(matcher.getMatches(uriString, false, true, true,
-					false, false));
 		}
 		return toReturn;
 	}
@@ -669,6 +660,7 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 		}
 	}
 
+	@SuppressWarnings("null")
 	static final public void Power(Set<String> variables) throws ParseException {
 		/* @bgen(jjtree) Power */
 		MAEPower jjtn000 = new MAEPower(JJTPOWER);
@@ -686,11 +678,8 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 				case IDENTIFIER:
 					baseId = jj_consume_token(IDENTIFIER);
 					if (!variables.contains(baseId.image)) {
-						{
-							if (true)
-								throw new ParseException("Unbound symbol: "
-										+ baseId.image);
-						}
+						throw new ParseException("Unbound symbol: "
+								+ baseId.image);
 					}
 					break;
 				default:
@@ -753,22 +742,14 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 					jjtc000 = false;
 					jjtn000.setValue(Double.parseDouble(t.image));
 					jjtn000.setSymbolic(false);
-					{
-						if (true)
-							return jjtn000.getValue();
-					}
-					break;
+					return jjtn000.getValue();
 				case INTEGER_LITERAL:
 					t = jj_consume_token(INTEGER_LITERAL);
 					jjtree.closeNodeScope(jjtn000, true);
 					jjtc000 = false;
 					jjtn000.setValue(Double.parseDouble(t.image));
 					jjtn000.setSymbolic(false);
-					{
-						if (true)
-							return jjtn000.getValue();
-					}
-					break;
+					return jjtn000.getValue();
 				default:
 					jj_la1[12] = jj_gen;
 					jj_consume_token(-1);
@@ -779,7 +760,6 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 				jjtree.closeNodeScope(jjtn000, true);
 			}
 		}
-		throw new Error("Missing return statement in function");
 	}
 
 	static final public void Identifier(Set<String> variables)
@@ -1134,6 +1114,8 @@ public class ArithmeticsParser/* @bgen(jjtree) */implements
 	}
 
 	static private final class LookaheadSuccess extends java.lang.Error {
+		private static final long serialVersionUID = -5265870618253739648L;
+
 		public LookaheadSuccess() {
 			// empty constructor
 		}
