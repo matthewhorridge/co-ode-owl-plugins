@@ -5,14 +5,11 @@ import java.util.Set;
 
 import javax.swing.JTextArea;
 
-import org.protege.editor.core.ui.util.ComponentFactory;
-
 public class ErrorReport extends JTextArea {
 	private static final long serialVersionUID = -3526147243215403368L;
 	private final Set<String> model = new HashSet<String>();
 
 	public ErrorReport() {
-		setBorder(ComponentFactory.createTitledBorder("Error report"));
 		setAutoscrolls(true);
 		setLineWrap(true);
 		setText("");

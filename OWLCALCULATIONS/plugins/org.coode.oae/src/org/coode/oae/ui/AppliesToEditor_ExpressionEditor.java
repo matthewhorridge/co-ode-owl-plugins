@@ -1,6 +1,5 @@
 package org.coode.oae.ui;
 
-import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.clsdescriptioneditor.ExpressionEditor;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLDescriptionChecker;
@@ -22,7 +21,6 @@ public class AppliesToEditor_ExpressionEditor extends
 	 */
 	public AppliesToEditor_ExpressionEditor(OWLEditorKit k) {
 		super(k, new OWLDescriptionChecker(k.getOWLModelManager()));
-		setBorder(ComponentFactory.createTitledBorder("Applies to"));
 	}
 
 	public void setAppliesTo(OWLDescription f) {

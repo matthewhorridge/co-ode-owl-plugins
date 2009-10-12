@@ -13,7 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
-import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 
@@ -35,7 +34,6 @@ public class ConflictStrategyRadioPanel extends JPanel implements
 	public ConflictStrategyRadioPanel() {
 		super(new GridLayout(1, 0));
 		// setBackground(Color.WHITE);
-		setBorder(ComponentFactory.createTitledBorder("Conflict Strategy"));
 		this.map.put(this.overriding, OverridingStrategy.getInstance());
 		this.map.put(this.overridden, OverriddenStrategy.getInstance());
 		this.map.put(this.exception, ExceptionStrategy.getInstance());
@@ -43,10 +41,10 @@ public class ConflictStrategyRadioPanel extends JPanel implements
 		this.theGroup.add(this.overridden);
 		this.theGroup.add(this.exception);
 		this.theGroup.add(this.none);
+		this.add(this.none);
 		this.add(this.overriding);
 		this.add(this.overridden);
 		this.add(this.exception);
-		this.add(this.none);
 		this.none.doClick();
 		this.overriding.addActionListener(this);
 		this.overridden.addActionListener(this);
