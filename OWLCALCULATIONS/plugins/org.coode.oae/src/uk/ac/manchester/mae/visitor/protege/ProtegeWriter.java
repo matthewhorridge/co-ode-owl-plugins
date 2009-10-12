@@ -32,9 +32,9 @@ import uk.ac.manchester.mae.visitor.Writer;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 22, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 22, 2008
  */
 public class ProtegeWriter extends Writer {
 	public ProtegeWriter(OWLIndividual individual,
@@ -42,7 +42,6 @@ public class ProtegeWriter extends Writer {
 			OWLModelManager modelManager, EvaluationReport evaluationReport) {
 		super(individual, dataProperty, results, modelManager
 				.getActiveOntology(), modelManager.getReasoner(), modelManager
-				.getOWLOntologyManager(), evaluationReport,
-				new ProtegeDescriptionFacetExtractor(modelManager));
+				.getOWLOntologyManager(), evaluationReport);
 	}
 }

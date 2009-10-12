@@ -29,9 +29,9 @@ import uk.ac.manchester.mae.visitor.DescriptionFacetExtractor;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 24, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 24, 2008
  */
 public class ProtegeDescriptionFacetExtractor extends DescriptionFacetExtractor {
 	public ProtegeDescriptionFacetExtractor(OWLModelManager modelManager) {
@@ -41,7 +41,6 @@ public class ProtegeDescriptionFacetExtractor extends DescriptionFacetExtractor 
 	// extends FacetExtractor {
 	// private OWLModelManager modelManager;
 	// private OWLDescription classDescription;
-	//
 	//
 	// /**
 	// * @see
@@ -87,11 +86,13 @@ public class ProtegeDescriptionFacetExtractor extends DescriptionFacetExtractor 
 	// */
 	// public Object visit(MAEmanSyntaxClassExpression node, Object data) {
 	// try {
-	// this.classDescription = this.modelManager.getOWLDescriptionParser()
-	// .createOWLDescription(node.getContent());
+	// this.classDescription = MAEAdapter.getParser(
+	// this.modelManager.getOntologies(),
+	// this.modelManager.getOWLDataFactory()).parse(
+	// node.getContent());
 	// data = this.classDescription;
 	// return data;
-	// } catch (OWLExpressionParserException e) {
+	// } catch (ParserException e) {
 	// e.printStackTrace();
 	// return null;
 	// }
@@ -111,28 +112,14 @@ public class ProtegeDescriptionFacetExtractor extends DescriptionFacetExtractor 
 	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyChain,
 	// * java.lang.Object)
 	// */
-	// public Object visit(MAEPropertyChain node, Object data) {
-	// for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-	// Node child = node.jjtGetChild(i);
-	// if (child instanceof MAEPropertyFacet) {
-	// child.jjtAccept(this, data);
-	// }
-	// }
-	// return null;
-	// }
-	//
-	// /**
-	// * @see
-	// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
-	// * java.lang.Object)
-	// */
-	// public Object visit(MAEPropertyFacet node, Object data) {
-	// for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-	// Node child = node.jjtGetChild(i);
-	// if (child instanceof MAEmanSyntaxClassExpression) {
-	// child.jjtAccept(this, data);
-	// }
-	// }
+	// public Object visit(MAEpropertyChainExpression node, Object data) {
+	// // XXX bogus implementation
+	// // for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+	// // Node child = node.jjtGetChild(i);
+	// // if (child instanceof MAEPropertyFacet) {
+	// // child.jjtAccept(this, data);
+	// // }
+	// // }
 	// return null;
 	// }
 	//
