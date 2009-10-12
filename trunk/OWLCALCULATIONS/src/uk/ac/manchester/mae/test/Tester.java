@@ -15,8 +15,8 @@ import junit.framework.TestCase;
 import org.coode.oae.utils.ParserFactory;
 import org.semanticweb.owl.apibinding.OWLManager;
 
-import uk.ac.manchester.mae.ArithmeticsParser;
-import uk.ac.manchester.mae.ParseException;
+import uk.ac.manchester.mae.parser.ArithmeticsParser;
+import uk.ac.manchester.mae.parser.ParseException;
 
 /**
  * @author Luigi Iannone

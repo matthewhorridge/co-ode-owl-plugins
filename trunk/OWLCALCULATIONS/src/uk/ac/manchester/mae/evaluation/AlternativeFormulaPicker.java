@@ -36,9 +36,9 @@ import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.model.OWLPropertyExpressionVisitor;
 
-import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.MoreThanOneFormulaPerIndividualException;
 import uk.ac.manchester.mae.PropertyVisitor;
+import uk.ac.manchester.mae.parser.MAEStart;
 import uk.ac.manchester.mae.visitor.ClassExtractor;
 
 /**

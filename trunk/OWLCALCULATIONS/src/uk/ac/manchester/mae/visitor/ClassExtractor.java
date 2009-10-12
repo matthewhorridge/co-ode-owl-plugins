@@ -36,20 +36,19 @@ import org.semanticweb.owl.util.OWLEntitySetProvider;
 import org.semanticweb.owl.util.ReferencedEntitySetProvider;
 import org.semanticweb.owl.util.SimpleShortFormProvider;
 
-import uk.ac.manchester.mae.MAEBinding;
-import uk.ac.manchester.mae.MAEConflictStrategy;
-import uk.ac.manchester.mae.MAEPropertyChain;
-import uk.ac.manchester.mae.MAEPropertyFacet;
-import uk.ac.manchester.mae.MAEStoreTo;
-import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
-import uk.ac.manchester.mae.SimpleNode;
+import uk.ac.manchester.mae.parser.MAEBinding;
+import uk.ac.manchester.mae.parser.MAEConflictStrategy;
+import uk.ac.manchester.mae.parser.MAEStoreTo;
+import uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression;
+import uk.ac.manchester.mae.parser.MAEpropertyChainExpression;
+import uk.ac.manchester.mae.parser.SimpleNode;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Mar 12, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Mar 12, 2008
  */
 public class ClassExtractor extends FormulaSetupVisitor {
 	private OWLOntologyManager manager;
@@ -99,7 +98,7 @@ public class ClassExtractor extends FormulaSetupVisitor {
 		return toReturn;
 	}
 
-	public Object visit(MAEPropertyChain node, Object data) {
+	public Object visit(MAEpropertyChainExpression node, Object data) {
 		Object toReturn = data;
 		if (data == null) {
 			data = this.manager.getOWLDataFactory().getOWLThing();
@@ -118,18 +117,10 @@ public class ClassExtractor extends FormulaSetupVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStoreTo,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStoreTo node, Object data) {
-		return null;
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEPropertyFacet node, Object data) {
 		return null;
 	}
 

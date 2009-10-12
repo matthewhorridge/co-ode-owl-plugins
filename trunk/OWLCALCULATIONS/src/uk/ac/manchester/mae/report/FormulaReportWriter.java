@@ -26,7 +26,7 @@ import java.util.Set;
 
 import org.semanticweb.owl.model.OWLDataProperty;
 
-import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.parser.MAEStart;
 
 /**
  * @author Luigi Iannone

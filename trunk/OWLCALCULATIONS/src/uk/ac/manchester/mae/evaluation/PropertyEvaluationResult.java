@@ -34,10 +34,11 @@ public class PropertyEvaluationResult {
 
 	@Override
 	public String toString() {
-		String toReturn = this.dataProperty.toString();
-		for (FormulaEvaluationResult formulaEvaluationResult : this.formulaEvaluationResults) {
-			toReturn += "\n" + formulaEvaluationResult;
+		StringBuilder toReturn = new StringBuilder(this.dataProperty.toString());
+		for (FormulaEvaluationResult formula : this.formulaEvaluationResults) {
+			toReturn.append("\n");
+			toReturn.append(formula);
 		}
-		return toReturn;
+		return toReturn.toString();
 	}
 }

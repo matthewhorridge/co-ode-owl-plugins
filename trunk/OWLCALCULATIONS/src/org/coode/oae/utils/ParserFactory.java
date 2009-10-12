@@ -30,7 +30,7 @@ import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcherImpl;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
-import uk.ac.manchester.mae.ArithmeticsParser;
+import uk.ac.manchester.mae.parser.ArithmeticsParser;
 
 /**
  * @author Luigi Iannone

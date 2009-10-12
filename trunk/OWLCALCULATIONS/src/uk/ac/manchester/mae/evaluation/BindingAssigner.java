@@ -27,41 +27,46 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxDescriptionParser;
+import org.semanticweb.owl.expression.ParserException;
+import org.semanticweb.owl.expression.ShortFormEntityChecker;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLConstant;
 import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLDataType;
 import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLIndividual;
 import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.model.OWLTypedConstant;
+import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
+import org.semanticweb.owl.util.OWLEntitySetProvider;
+import org.semanticweb.owl.util.ReferencedEntitySetProvider;
+import org.semanticweb.owl.util.SimpleShortFormProvider;
 import org.semanticweb.owl.vocab.XSDVocabulary;
 
-import uk.ac.manchester.mae.MAEBinding;
-import uk.ac.manchester.mae.MAEConflictStrategy;
-import uk.ac.manchester.mae.MAEPropertyChain;
-import uk.ac.manchester.mae.MAEPropertyFacet;
-import uk.ac.manchester.mae.MAEStoreTo;
-import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
-import uk.ac.manchester.mae.Node;
 import uk.ac.manchester.mae.UnsupportedDataTypeException;
+import uk.ac.manchester.mae.parser.MAEBinding;
+import uk.ac.manchester.mae.parser.MAEConflictStrategy;
+import uk.ac.manchester.mae.parser.MAEStoreTo;
+import uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression;
+import uk.ac.manchester.mae.parser.MAEpropertyChainCell;
+import uk.ac.manchester.mae.parser.MAEpropertyChainExpression;
+import uk.ac.manchester.mae.parser.Node;
 import uk.ac.manchester.mae.visitor.BindingExtractor;
-import uk.ac.manchester.mae.visitor.DescriptionFacetExtractor;
 import uk.ac.manchester.mae.visitor.FormulaSetupVisitor;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 29, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 29, 2008
  */
 public class BindingAssigner extends FormulaSetupVisitor {
 	protected OWLIndividual startingIndividual;
@@ -87,7 +92,7 @@ public class BindingAssigner extends FormulaSetupVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEConflictStrategy,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEConflictStrategy,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEConflictStrategy node, Object data) {
@@ -95,7 +100,7 @@ public class BindingAssigner extends FormulaSetupVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStoreTo,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStoreTo node, Object data) {
@@ -103,7 +108,7 @@ public class BindingAssigner extends FormulaSetupVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEmanSyntaxClassExpression,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
@@ -111,7 +116,7 @@ public class BindingAssigner extends FormulaSetupVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBinding,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEBinding,
 	 *      java.lang.Object)
 	 */
 	@SuppressWarnings("unchecked")
@@ -135,106 +140,94 @@ public class BindingAssigner extends FormulaSetupVisitor {
 		return null;
 	}
 
+	private OWLDescription parseFacet(String facet) {
+		if (facet == null) {
+			return null;
+		}
+		BidirectionalShortFormProviderAdapter adapter = new BidirectionalShortFormProviderAdapter(
+				new SimpleShortFormProvider());
+		OWLEntitySetProvider<OWLEntity> owlEntitySetProvider = new ReferencedEntitySetProvider(
+				this.ontologies);
+		adapter.rebuild(owlEntitySetProvider);
+		ManchesterOWLSyntaxDescriptionParser parser = new ManchesterOWLSyntaxDescriptionParser(
+				this.ontologyManager.getOWLDataFactory(),
+				new ShortFormEntityChecker(adapter));
+		try {
+			return parser.parse(facet);
+		} catch (ParserException e) {
+			return null;
+		}
+	}
+
 	/**
 	 * 
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyChain,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPropertyChain,
 	 *      java.lang.Object)
 	 */
 	@SuppressWarnings("unchecked")
-	public Object visit(MAEPropertyChain node, Object data) {
-		List<Object> toReturn = null;
-		Set<OWLIndividual> individuals = (Set<OWLIndividual>) data;
-		String propertyName = node.getPropertyName();
-		DescriptionFacetExtractor descriptionExtractor = new DescriptionFacetExtractor(
-				this.ontologyManager, this.ontologies);
-		node.jjtAccept(descriptionExtractor, data);
-		OWLDescription facetDescription = descriptionExtractor
-				.getExtractedDescription() == null ? this.ontologyManager
-				.getOWLDataFactory().getOWLThing() : descriptionExtractor
-				.getExtractedDescription();
-		toReturn = new ArrayList<Object>();
-		if (node.isEnd()) {
-			for (OWLIndividual individual : individuals) {
-				try {
-					toReturn.addAll(this.fetch(individual, propertyName, true,
-							facetDescription));
-				} catch (UnsupportedDataTypeException e) {
-					e.printStackTrace();
-				} catch (URISyntaxException e) {
-					e.printStackTrace();
-				} catch (OWLReasonerException e) {
-					e.printStackTrace();
-				}
+	public Object visit(MAEpropertyChainExpression node, Object data) {
+		// XXX I have my doubts this method actually gets called
+		// XXX bogus behaviour: only the first property and first facet get used
+		List<Object> toReturn = new ArrayList<Object>();
+		Set<OWLIndividual> currentIndividuals = (Set<OWLIndividual>) data;
+		for (int index = 0; index < node.getCells().size() - 1; index++) {
+			// all the cells explored here contain objectproperties
+			MAEpropertyChainCell cell = node.getCells().get(index);
+			Set<OWLIndividual> newIndividuals = new HashSet<OWLIndividual>();
+			String facet = cell.getFacet();
+			OWLDescription facetDescription = parseFacet(facet);
+			if (facetDescription == null) {
+				facetDescription = this.ontologyManager.getOWLDataFactory()
+						.getOWLThing();
 			}
-		} else {
-			for (OWLIndividual individual : individuals) {
-				for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-					Node child = node.jjtGetChild(i);
-					Set<Object> fillers;
+			URI propertyURI;
+			try {
+				propertyURI = new URI(cell.getPropertyName());
+				for (OWLIndividual individual : currentIndividuals) {
 					try {
-						if (child instanceof MAEPropertyChain) {
-							fillers = (Set<Object>) this.fetch(individual,
-									propertyName, false, facetDescription);
-							toReturn.addAll((List<Object>) child.jjtAccept(
-									this, fillers));
-						}
-					} catch (UnsupportedDataTypeException e) {
-						e.printStackTrace();
-					} catch (URISyntaxException e) {
-						e.printStackTrace();
+						newIndividuals.addAll(fetch(individual, propertyURI,
+								facetDescription));
 					} catch (OWLReasonerException e) {
 						e.printStackTrace();
 					}
 				}
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
 			}
+			currentIndividuals = newIndividuals;
+		}
+		MAEpropertyChainCell cell = node.getCells().get(
+				node.getCells().size() - 1);
+		try {
+			OWLDataProperty dataProperty = this.ontologyManager
+					.getOWLDataFactory().getOWLDataProperty(
+							new URI(cell.getPropertyName()));
+			for (OWLIndividual individual : currentIndividuals) {
+				try {
+					toReturn.addAll(fetchValues(individual, dataProperty));
+				} catch (UnsupportedDataTypeException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
 		}
 		return toReturn;
 	}
 
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEPropertyFacet node, Object data) {
-		return null;
-	}
-
-	private Collection<Object> fetch(OWLIndividual currentIndividual,
-			String propertyName, boolean isDatatype,
-			OWLDescription facetDescription) throws URISyntaxException,
-			UnsupportedDataTypeException, OWLReasonerException {
-		Collection<Object> toReturn = null;
-		Iterator<OWLOntology> it = this.ontologies.iterator();
-		boolean found = false;
-		OWLOntology ontology;
-		while (!found && it.hasNext()) {
-			ontology = it.next();
-			if (isDatatype) {
-				OWLDataProperty dataProperty = this.ontologyManager
-						.getOWLDataFactory().getOWLDataProperty(
-								new URI(propertyName));
-				Set<OWLConstant> values = currentIndividual
-						.getDataPropertyValues(ontology).get(dataProperty);
-				toReturn = new ArrayList<Object>();
-				if (!(values == null || values.isEmpty())) {
-					for (OWLConstant value : values) {
-						toReturn.add(this.convertValue(value
-								.asOWLTypedConstant()));
-					}
-				}
-			} else {
-				OWLObjectProperty objectProperty = this.ontologyManager
-						.getOWLDataFactory().getOWLObjectProperty(
-								new URI(propertyName));
-				Set<OWLIndividual> fillers = currentIndividual
-						.getObjectPropertyValues(ontology).get(objectProperty);
-				toReturn = new HashSet<Object>();
-				if (!(fillers == null || fillers.isEmpty())) {
-					for (OWLIndividual filler : fillers) {
-						if (this.reasoner.hasType(filler, facetDescription,
-								false)) {
-							toReturn.add(filler);
-						}
+	private Collection<OWLIndividual> fetch(OWLIndividual currentIndividual,
+			URI propertyName, OWLDescription facetDescription)
+			throws OWLReasonerException {
+		Collection<OWLIndividual> toReturn = new HashSet<OWLIndividual>();
+		for (OWLOntology ontology : this.ontologies) {
+			OWLObjectProperty objectProperty = this.ontologyManager
+					.getOWLDataFactory().getOWLObjectProperty(propertyName);
+			Set<OWLIndividual> fillers = currentIndividual
+					.getObjectPropertyValues(ontology).get(objectProperty);
+			if (!(fillers == null || fillers.isEmpty())) {
+				for (OWLIndividual filler : fillers) {
+					if (this.reasoner.hasType(filler, facetDescription, false)) {
+						toReturn.add(filler);
 					}
 				}
 			}
@@ -242,24 +235,39 @@ public class BindingAssigner extends FormulaSetupVisitor {
 		return toReturn;
 	}
 
-	private Object convertValue(OWLTypedConstant typedConstant)
+	private Collection<Double> fetchValues(OWLIndividual ind,
+			OWLDataProperty dataProperty) throws UnsupportedDataTypeException {
+		Collection<Double> toReturn = new ArrayList<Double>();
+		for (OWLOntology ontology : this.ontologies) {
+			Set<OWLConstant> values = ind.getDataPropertyValues(ontology).get(
+					dataProperty);
+			if (values != null) {
+				for (OWLConstant value : values) {
+					toReturn.add(convertValue(value.asOWLTypedConstant()));
+				}
+			}
+		}
+		return toReturn;
+	}
+
+	private static final Set<URI> supportedTypes = new HashSet<URI>();
+	static {
+		supportedTypes.add(XSDVocabulary.INT.getURI());
+		supportedTypes.add(XSDVocabulary.INTEGER.getURI());
+		supportedTypes.add(XSDVocabulary.DOUBLE.getURI());
+		supportedTypes.add(XSDVocabulary.DECIMAL.getURI());
+		supportedTypes.add(XSDVocabulary.SHORT.getURI());
+	}
+
+	private double convertValue(OWLTypedConstant typedConstant)
 			throws UnsupportedDataTypeException {
-		OWLDataType type = typedConstant.getDataType();
-		Object toReturn = null;
 		// Rough conversion big if
-		if (type.getURI().equals(XSDVocabulary.INT.getURI())
-				|| type.getURI().equals(XSDVocabulary.INTEGER.getURI())
-				|| type.getURI().equals(XSDVocabulary.DOUBLE.getURI())
-				|| type.getURI().equals(XSDVocabulary.DECIMAL.getURI())
-				|| type.getURI().equals(XSDVocabulary.SHORT.getURI())) {
-			toReturn = new Double(Double
-					.parseDouble(typedConstant.getLiteral()));
-		} else {
+		if (!supportedTypes.contains(typedConstant.getDataType().getURI())) {
 			throw new UnsupportedDataTypeException(
 					"Currently unsuported data type - "
-							+ type.getURI().toString());
+							+ typedConstant.getDataType().getURI().toString());
 		}
-		return toReturn;
+		return Double.parseDouble(typedConstant.getLiteral());
 	}
 
 	public Set<BindingAssignment> getBindingAssignments() {
