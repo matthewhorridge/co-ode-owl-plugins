@@ -23,25 +23,18 @@
 package org.coode.oae.ui;
 
 import java.awt.BorderLayout;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
-import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRowObjectEditor;
 
-import uk.ac.manchester.mae.Constants;
 import uk.ac.manchester.mae.evaluation.FormulaModel;
 
 /**
@@ -56,9 +49,7 @@ public class OWLCalculationsFormulaEditor extends
 		VerifiedInputEditor, InputVerificationStatusChangedListener {
 	private OWLEditorKit owlEditorKit;
 	protected FormulaModel formulaModel;
-	// private ExpressionEditor<FormulaModel> editor;
-	private final GraphicalFormulaEditor grapheditor;
-	protected JTextField nameTextField = new JTextField();
+	private final GraphicalEditor grapheditor;
 	private JPanel mainPanel = new JPanel(new BorderLayout());
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 
@@ -68,72 +59,12 @@ public class OWLCalculationsFormulaEditor extends
 	 */
 	public OWLCalculationsFormulaEditor(OWLEditorKit owlEditorKit) {
 		this.owlEditorKit = owlEditorKit;
-		this.grapheditor = new GraphicalFormulaEditor(this.owlEditorKit);
-		init();
-	}
-
-	private void init() {
-		// this.editor = new ExpressionEditor<FormulaModel>(this.owlEditorKit,
-		// new OWLCalculationsExpressionChecker(this.owlEditorKit));
-		JPanel namePanel = new JPanel(new BorderLayout());
-		namePanel.setBorder(ComponentFactory.createTitledBorder("Name"));
-		namePanel.add(this.nameTextField);
-		// will go away when the completer will be removed from the expression
-		// editor
-		removeKeyListeners();
-		// Now add the appropriate auto-completer
-		// new FormulaCompleter(this.owlEditorKit, this.editor, this.editor
-		// .getExpressionChecker());
-		// this.editor.setPreferredSize(PREFERRED_EDITOR_SIZE);
-		// this.editor.addStatusChangedListener(this);
+		this.grapheditor = new GraphicalEditor(this.owlEditorKit);
 		this.grapheditor.addStatusChangedListener(this);
-		// JTabbedPane editorPanel = new JTabbedPane(JTabbedPane.TOP);
-		// JScrollPane editorPane = new JScrollPane(this.editor);
-		// JScrollPane grapheditorPane = new JScrollPane(this.grapheditor);
-		// editorPanel.setBorder(ComponentFactory.createTitledBorder("Formula: "));
-		// editorPanel.addTab("Graphical Editor", grapheditorPane);
-		// editorPanel.addTab("Text Editor", editorPane);
-		this.nameTextField.getDocument().addDocumentListener(
-				new DocumentListener() {
-					public void changedUpdate(DocumentEvent e) {
-						updateURI();
-					}
-
-					/**
-					 * 
-					 */
-					private void updateURI() {
-						URI anUri = null;
-						try {
-							anUri = new URI(
-									Constants.FORMULA_NAMESPACE_URI_STRING
-											+ OWLCalculationsFormulaEditor.this.nameTextField
-													.getText());
-						} catch (URISyntaxException e1) {
-							// anUri = null;
-						} finally {
-							if (OWLCalculationsFormulaEditor.this.formulaModel != null) {
-								OWLCalculationsFormulaEditor.this.formulaModel
-										.setFormulaURI(anUri);
-							}
-							OWLCalculationsFormulaEditor.this.handleChange();
-						}
-					}
-
-					public void insertUpdate(DocumentEvent e) {
-						updateURI();
-					}
-
-					public void removeUpdate(DocumentEvent e) {
-						updateURI();
-					}
-				});
-		this.mainPanel.add(namePanel, BorderLayout.NORTH);
-		this.mainPanel.add(this.grapheditor, BorderLayout.CENTER);
+		this.mainPanel.add(this.grapheditor);
 	}
 
 	public void clear() {
-		this.nameTextField.setText("");
 		this.formulaModel = null;
 		this.grapheditor.clear();
 	}
@@ -152,20 +83,13 @@ public class OWLCalculationsFormulaEditor extends
 	}
 
 	public void setFormula(FormulaModel formulaModel) {
-		String localName = formulaModel.getFormulaURI().getFragment();
-		if (localName == null) {
-			localName = "";
-		}
-		this.nameTextField.setText(localName);
 		this.grapheditor.initFormula(formulaModel);
-		// this.editor.setText(this.grapheditor.getFormulaModel().render(
-		// this.owlEditorKit.getModelManager()));
 	}
 
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		notifyListener(listener);
+		listener.verifiedStatusChanged(isValid());
 	}
 
 	public void removeStatusChangedListener(
@@ -177,74 +101,20 @@ public class OWLCalculationsFormulaEditor extends
 		return this.mainPanel;
 	}
 
-	private void removeKeyListeners() {
-		// KeyListener[] keyListeners = this.editor.getKeyListeners();
-		// for (KeyListener keyListener : keyListeners) {
-		// this.editor.removeKeyListener(keyListener);
-		// }
-	}
-
-	/**
-	 * @param listener
-	 */
-	private void notifyListener(InputVerificationStatusChangedListener listener) {
-		try {
-			boolean valid = this.formulaModel != null ? this.formulaModel
-					.getFormulaURI() != null : false;
-			listener.verifiedStatusChanged(valid);
-		} catch (RuntimeException e) {
-			listener.verifiedStatusChanged(false);
-		}
-	}
-
-	public void handleChange() {
+	public void handleChange(boolean state) {
+		boolean valid = isValid() && state;
 		for (InputVerificationStatusChangedListener listener : this.listeners) {
-			notifyListener(listener);
+			listener.verifiedStatusChanged(valid);
 		}
+	}
+
+	private boolean isValid() {
+		return this.formulaModel != null ? this.formulaModel.getFormulaURI() != null
+				: false;
 	}
 
 	public void verifiedStatusChanged(boolean newState) {
-		// this.formulaModel = null;
-		if (newState) {
-			// FormulaModel fm1 = null;
-			// try {
-			// fm1 = this.editor.createObject();
-			// URI anUri = new URI(Constants.FORMULA_NAMESPACE_URI_STRING
-			// + OWLCalculationsFormulaEditor.this.nameTextField
-			// .getText());
-			// if (fm1 != null) {
-			// fm1.setFormulaURI(anUri);
-			// }
-			// } catch (OWLExpressionParserException e) {
-			// e.printStackTrace();
-			// } catch (OWLException e) {
-			// e.printStackTrace();
-			// } catch (URISyntaxException e) {
-			// e.printStackTrace();
-			// if (fm1 != null) {
-			// fm1.setFormulaURI(null);
-			// }
-			// }
-			FormulaModel fm2 = null;
-			try {
-				fm2 = this.grapheditor.getFormulaModel();
-				this.formulaModel = fm2;
-				URI anUri = new URI(Constants.FORMULA_NAMESPACE_URI_STRING
-						+ OWLCalculationsFormulaEditor.this.nameTextField
-								.getText());
-				fm2.setFormulaURI(anUri);
-			} catch (URISyntaxException e) {
-				e.printStackTrace();
-				if (fm2 != null) {
-					fm2.setFormulaURI(null);
-				}
-			}
-			// if (fm2 != null) {
-			// // synchronize with the other editor
-			// this.editor.setText(fm2.render(this.owlEditorKit
-			// .getModelManager()));
-			// }
-		}
-		handleChange();
+		this.formulaModel = this.grapheditor.getFormulaModel();
+		handleChange(newState);
 	}
 }

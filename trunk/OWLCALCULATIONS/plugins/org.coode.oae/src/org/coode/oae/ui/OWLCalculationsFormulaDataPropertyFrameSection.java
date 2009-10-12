@@ -16,8 +16,8 @@ import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLEntityAnnotationAxiom;
 import org.semanticweb.owl.model.OWLOntology;
 
-import uk.ac.manchester.mae.ParseException;
 import uk.ac.manchester.mae.evaluation.FormulaModel;
+import uk.ac.manchester.mae.parser.ParseException;
 
 @SuppressWarnings("unchecked")
 public class OWLCalculationsFormulaDataPropertyFrameSection
@@ -29,12 +29,11 @@ public class OWLCalculationsFormulaDataPropertyFrameSection
 	protected OWLCalculationsFormulaDataPropertyFrameSection(
 			OWLEditorKit editorKit, OWLFrame<? extends OWLDataProperty> frame) {
 		super(editorKit, LABEL, frame);
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	protected void clear() {
-		// TODO Auto-generated method stub
+		// TODO cleaning to be implemented
 	}
 
 	@Override

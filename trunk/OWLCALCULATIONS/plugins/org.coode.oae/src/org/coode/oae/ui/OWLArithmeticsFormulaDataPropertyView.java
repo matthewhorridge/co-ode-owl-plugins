@@ -27,6 +27,7 @@ import java.awt.BorderLayout;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.ui.framelist.OWLFrameList2;
 import org.protege.editor.owl.ui.view.AbstractOWLDataPropertyViewComponent;
 import org.semanticweb.owl.model.OWLDataProperty;
@@ -64,7 +65,7 @@ public class OWLArithmeticsFormulaDataPropertyView extends
 		this.list = new OWLFrameList2<OWLDataProperty>(getOWLEditorKit(),
 				new OWLCalculationsFormulaDataPropertyFrame(getOWLEditorKit()));
 		setLayout(new BorderLayout());
-		JScrollPane sp = new JScrollPane(this.list);
+		JScrollPane sp = ComponentFactory.createScrollPane(this.list);
 		sp
 				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		this.add(sp);

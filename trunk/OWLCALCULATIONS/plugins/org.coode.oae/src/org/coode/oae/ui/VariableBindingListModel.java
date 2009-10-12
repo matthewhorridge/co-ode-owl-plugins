@@ -14,7 +14,7 @@ import org.coode.oae.ui.utils.ExceptionUtils;
 import org.protege.editor.core.ui.list.MListItem;
 import org.protege.editor.core.ui.list.MListSectionHeader;
 
-public class VariableListModel<I> implements ListModel {
+public class VariableBindingListModel<I> implements ListModel {
 	protected final static class MySectionHeader implements MListSectionHeader {
 		String header;
 		boolean add = true;
@@ -66,13 +66,13 @@ public class VariableListModel<I> implements ListModel {
 	private final Set<ListDataListener> listeners = new HashSet<ListDataListener>();
 	private final Collection<I> modelElements;
 
-	public VariableListModel(Collection<I> elements, String sectionHeader) {
+	public VariableBindingListModel(Collection<I> elements, String sectionHeader) {
 		this.modelElements = elements;
 		this.myHeader.header = sectionHeader;
 	}
 
-	public VariableListModel(Collection<I> elements, String sectionHeader,
-			boolean canAdd) {
+	public VariableBindingListModel(Collection<I> elements,
+			String sectionHeader, boolean canAdd) {
 		this.modelElements = elements;
 		this.myHeader.header = sectionHeader;
 		this.myHeader.add = canAdd;

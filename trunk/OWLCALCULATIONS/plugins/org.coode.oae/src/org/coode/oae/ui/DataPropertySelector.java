@@ -8,12 +8,12 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.coode.oae.ui.StaticListModel.StaticListItem;
 import org.protege.editor.core.ui.list.MList;
+import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.OWLEditorKit;
@@ -72,8 +72,10 @@ public class DataPropertySelector extends JPanel implements VerifiedInputEditor 
 						}
 					}
 				});
-		JScrollPane spd = new JScrollPane(this.dataPropertiesView);
-		spd.setBorder(new TitledBorder("Data property selection"));
+		JScrollPane spd = ComponentFactory
+				.createScrollPane(this.dataPropertiesView);
+		spd.setBorder(ComponentFactory
+				.createTitledBorder("Data property selection"));
 		this.add(spd, BorderLayout.CENTER);
 	}
 

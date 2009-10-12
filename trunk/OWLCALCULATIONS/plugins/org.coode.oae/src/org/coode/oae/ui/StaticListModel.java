@@ -46,7 +46,6 @@ public class StaticListModel<I> implements ListModel {
 		}
 
 		public boolean handleDelete() {
-			// TODO figure out how to configure this stuff for general use
 			return false;
 		}
 
@@ -77,7 +76,6 @@ public class StaticListModel<I> implements ListModel {
 
 	protected void init() {
 		this.delegate.clear();
-		// XXX this use of the list is actually not too nice...
 		if (this.myHeader != null) {
 			this.delegate.add(this.myHeader);
 		}

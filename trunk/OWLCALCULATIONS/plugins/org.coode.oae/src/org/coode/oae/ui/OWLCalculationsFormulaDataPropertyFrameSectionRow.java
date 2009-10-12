@@ -36,9 +36,9 @@ import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.ParseException;
 import uk.ac.manchester.mae.evaluation.FormulaModel;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.ParseException;
 
 /**
  * @author Luigi Iannone

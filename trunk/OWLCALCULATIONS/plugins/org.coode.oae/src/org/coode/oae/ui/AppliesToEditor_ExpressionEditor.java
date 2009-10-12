@@ -3,13 +3,15 @@ package org.coode.oae.ui;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.clsdescriptioneditor.ExpressionEditor;
+import org.protege.editor.owl.ui.clsdescriptioneditor.OWLDescriptionChecker;
+import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLException;
 
 import uk.ac.manchester.mae.evaluation.BindingModel;
-import uk.ac.manchester.mae.evaluation.PropertyChainModel;
 
-public class StoreToEditor extends ExpressionEditor<PropertyChainModel> {
-	private static final long serialVersionUID = 3420300348376487738L;
+public class AppliesToEditor_ExpressionEditor extends
+		ExpressionEditor<OWLDescription> {
+	private static final long serialVersionUID = -339908555692710213L;
 
 	/**
 	 * @param k
@@ -18,21 +20,16 @@ public class StoreToEditor extends ExpressionEditor<PropertyChainModel> {
 	 *            the {@link BindingModel} to use; must not be null but can be
 	 *            empty
 	 */
-	public StoreToEditor(OWLEditorKit k) {
-		super(k, new PropertyChainExpressionChecker(k, true, true));
-		setBorder(ComponentFactory.createTitledBorder("Store to"));
-		// setPreferredSize(new Dimension(400, 20));
+	public AppliesToEditor_ExpressionEditor(OWLEditorKit k) {
+		super(k, new OWLDescriptionChecker(k.getOWLModelManager()));
+		setBorder(ComponentFactory.createTitledBorder("Applies to"));
 	}
 
-	public void setStoreTo(PropertyChainModel _pcm) {
-		if (_pcm != null) {
-			setText(_pcm.render(getOWLEditorKit().getModelManager()));
-		} else {
-			setText("");
-		}
+	public void setAppliesTo(OWLDescription f) {
+		setExpressionObject(f);
 	}
 
-	public PropertyChainModel getPropertyChainModel() {
+	public OWLDescription getAppliesTo() {
 		if (getText().trim().isEmpty()) {
 			return null;
 		}
@@ -44,6 +41,6 @@ public class StoreToEditor extends ExpressionEditor<PropertyChainModel> {
 	}
 
 	public void clear() {
-		setStoreTo(null);
+		setExpressionObject(null);
 	}
 }

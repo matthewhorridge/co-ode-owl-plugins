@@ -8,12 +8,12 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.coode.oae.ui.StaticListModel.StaticListItem;
 import org.protege.editor.core.ui.list.MList;
+import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.OWLEditorKit;
@@ -52,9 +52,9 @@ public class ObjectPropertySelector extends JPanel implements
 		super(new BorderLayout());
 		this.kit = k;
 		this.objectPropertiesView
-				.setPreferredSize(GraphicalFormulaEditor.LIST_PREFERRED_SIZE);
+				.setPreferredSize(GraphicalEditorConstants.LIST_PREFERRED_SIZE);
 		this.facetClassView
-				.setPreferredSize(GraphicalFormulaEditor.LIST_PREFERRED_SIZE);
+				.setPreferredSize(GraphicalEditorConstants.LIST_PREFERRED_SIZE);
 		this.objectPropertiesView
 				.setCellRenderer(new RenderableObjectCellRenderer(this.kit));
 		this.facetClassView.setCellRenderer(new RenderableObjectCellRenderer(
@@ -72,10 +72,15 @@ public class ObjectPropertySelector extends JPanel implements
 		}
 		this.objectPropertiesModel.init();
 		this.facetClassesModel.init();
-		JScrollPane spobj = new JScrollPane(this.objectPropertiesView);
-		spobj.setBorder(new TitledBorder("Object property selection"));
-		JScrollPane spobjf = new JScrollPane(this.facetClassView);
-		spobjf.setBorder(new TitledBorder("Facet selection"));
+		JScrollPane spobj = ComponentFactory
+				.createScrollPane(this.objectPropertiesView);
+		spobj.setBorder(ComponentFactory
+				.createTitledBorder("Object property selection"));
+		JScrollPane spobjf = ComponentFactory
+				.createScrollPane(this.facetClassView);
+		spobjf
+				.setBorder(ComponentFactory
+						.createTitledBorder("Facet selection"));
 		this.add(spobj, BorderLayout.WEST);
 		this.add(spobjf, BorderLayout.EAST);
 		this.objectPropertiesView

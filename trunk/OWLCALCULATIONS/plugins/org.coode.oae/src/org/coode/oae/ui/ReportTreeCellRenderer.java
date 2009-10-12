@@ -14,7 +14,7 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.model.OWLObject;
 
-import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.parser.MAEStart;
 
 /**
  * Copyright (C) 2008, University of Manchester

@@ -27,13 +27,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
+import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 import org.semanticweb.owl.model.OWLIndividual;
 
@@ -78,7 +78,7 @@ public class EvaluationResultsView extends AbstractOWLViewComponent implements
 			this.tree.setCellRenderer(new ReportTreeCellRenderer(
 					getOWLEditorKit()));
 			report.accept(this, this.root);
-			this.add(new JScrollPane(this.tree));
+			this.add(ComponentFactory.createScrollPane(this.tree));
 		}
 	}
 

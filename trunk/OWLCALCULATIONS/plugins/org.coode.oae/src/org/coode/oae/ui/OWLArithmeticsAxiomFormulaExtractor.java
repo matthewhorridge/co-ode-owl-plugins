@@ -63,7 +63,7 @@ import org.semanticweb.owl.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLTransitiveObjectPropertyAxiom;
 import org.semanticweb.owl.model.SWRLRule;
 
-import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.parser.MAEStart;
 
 /**
  * @author Luigi Iannone

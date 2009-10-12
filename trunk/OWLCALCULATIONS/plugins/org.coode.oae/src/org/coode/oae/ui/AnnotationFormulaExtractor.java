@@ -30,18 +30,17 @@ import org.semanticweb.owl.model.OWLConstantAnnotation;
 import org.semanticweb.owl.model.OWLObjectAnnotation;
 import org.semanticweb.owl.util.NamespaceUtil;
 
-import uk.ac.manchester.mae.ArithmeticsParser;
 import uk.ac.manchester.mae.Constants;
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.ParseException;
+import uk.ac.manchester.mae.parser.ArithmeticsParser;
+import uk.ac.manchester.mae.parser.MAEStart;
 import uk.ac.manchester.mae.visitor.protege.ProtegeClassExtractor;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 4, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 4, 2008
  */
 public class AnnotationFormulaExtractor implements OWLAnnotationVisitor {
 	protected OWLClass owlClass = null;
@@ -79,24 +78,25 @@ public class AnnotationFormulaExtractor implements OWLAnnotationVisitor {
 			String namespace = namespaceSplitURString[0];
 			if (namespace != null
 					&& namespace
-					.compareTo(Constants.FORMULA_NAMESPACE_URI_STRING) == 0) {
+							.compareTo(Constants.FORMULA_NAMESPACE_URI_STRING) == 0) {
 				String formulaString = annotation.getAnnotationValue()
-				.getLiteral().toString();
+						.getLiteral().toString();
 				ParserFactory.initParser(formulaString, this.modelManager);
 				try {
-					MAEStart extractedF = (MAEStart) ArithmeticsParser
-					.Start();
+					MAEStart extractedF = (MAEStart) ArithmeticsParser.Start();
 					ProtegeClassExtractor classExtractor = new ProtegeClassExtractor(
 							this.modelManager);
 					extractedF.jjtAccept(classExtractor, null);
 					Object extractedClass = classExtractor
-					.getClassDescription();
+							.getClassDescription();
 					this.extractedFormula = this.owlClass == null
-					|| this.owlClass.equals(extractedClass) ? extractedF
+							|| this.owlClass.equals(extractedClass) ? extractedF
 							: null;
-				} catch (ParseException e) {
-
-					e.printStackTrace();
+				} catch (Throwable e) {
+					System.out.println("Caught at:");
+					new Exception().printStackTrace(System.out);
+					System.out.println(formulaString);
+					e.printStackTrace(System.out);
 				}
 			}
 		}

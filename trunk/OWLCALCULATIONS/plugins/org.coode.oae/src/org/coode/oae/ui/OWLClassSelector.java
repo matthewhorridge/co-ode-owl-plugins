@@ -8,12 +8,12 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.coode.oae.ui.StaticListModel.StaticListItem;
 import org.protege.editor.core.ui.list.MList;
+import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.OWLEditorKit;
@@ -43,7 +43,7 @@ public class OWLClassSelector extends JPanel implements VerifiedInputEditor {
 		super(new BorderLayout());
 		this.kit = k;
 		this.facetClassView
-				.setPreferredSize(GraphicalFormulaEditor.LIST_PREFERRED_SIZE);
+				.setPreferredSize(GraphicalEditorConstants.LIST_PREFERRED_SIZE);
 		this.facetClassView.setCellRenderer(new RenderableObjectCellRenderer(
 				this.kit));
 		this.facetClassView.setModel(this.facetClassesModel);
@@ -56,8 +56,11 @@ public class OWLClassSelector extends JPanel implements VerifiedInputEditor {
 		}
 		setOK(false);
 		this.facetClassesModel.init();
-		JScrollPane spobjf = new JScrollPane(this.facetClassView);
-		spobjf.setBorder(new TitledBorder("Facet selection"));
+		JScrollPane spobjf = ComponentFactory
+				.createScrollPane(this.facetClassView);
+		spobjf
+				.setBorder(ComponentFactory
+						.createTitledBorder("Facet selection"));
 		this.add(spobjf);
 		this.facetClassView
 				.addListSelectionListener(new ListSelectionListener() {

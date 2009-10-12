@@ -48,7 +48,6 @@ import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
 import javax.swing.border.LineBorder;
-import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.TreeModelEvent;
@@ -60,6 +59,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 
 import org.coode.oae.utils.ParserFactory;
+import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.core.ui.util.VerifyingOptionPane;
@@ -74,19 +74,19 @@ import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLProperty;
 import org.semanticweb.owl.util.NamespaceUtil;
 
-import uk.ac.manchester.mae.ArithmeticsParser;
 import uk.ac.manchester.mae.ConflictStrategy;
 import uk.ac.manchester.mae.Constants;
 import uk.ac.manchester.mae.ExceptionStrategy;
-import uk.ac.manchester.mae.MAEPropertyChain;
-import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.OverriddenStrategy;
 import uk.ac.manchester.mae.OverridingStrategy;
-import uk.ac.manchester.mae.ParseException;
 import uk.ac.manchester.mae.evaluation.BindingModel;
 import uk.ac.manchester.mae.evaluation.FormulaModel;
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;
 import uk.ac.manchester.mae.evaluation.StorageModel;
+import uk.ac.manchester.mae.parser.ArithmeticsParser;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.MAEpropertyChainExpression;
+import uk.ac.manchester.mae.parser.ParseException;
 import uk.ac.manchester.mae.visitor.ConflictStrategyExtractor;
 import uk.ac.manchester.mae.visitor.StorageExtractor;
 import uk.ac.manchester.mae.visitor.protege.ProtegeBindingExtractor;
@@ -115,7 +115,8 @@ public class OWLArithmeticFormulaEditor extends
 	protected JButton editAppliesToButton = new JButton(new ImageIcon(
 			OWLArithmeticFormulaEditor.class.getClassLoader().getResource(
 					"edit.png")));
-	protected JTextField formulaURITextField = new JTextField();
+	protected JTextField formulaURITextField = ComponentFactory
+			.createTextField();
 	protected JPanel mainPanel = new JPanel();
 	private MAEStart formula = null;
 	protected FormulaModel formulaModel;
@@ -126,7 +127,8 @@ public class OWLArithmeticFormulaEditor extends
 	protected Map<JRadioButton, ConflictStrategy> radioButtonConflictStrategyMap = new HashMap<JRadioButton, ConflictStrategy>();
 	private JLabel arithmeticFormulaLabel = new JLabel(
 			OWLArithmeticFormulaEditor.FORMULA_BODY_LABEL);
-	protected JTextField arithmeticFormulaTextArea = new JTextField();
+	protected JTextField arithmeticFormulaTextArea = ComponentFactory
+			.createTextField();
 	private ButtonGroup conflictButtnGroup;
 	private JRadioButton overridingButton;
 	private JRadioButton overriddenButton;
@@ -198,7 +200,8 @@ public class OWLArithmeticFormulaEditor extends
 
 	private void drawFormulaURISection() {
 		JPanel formulaURIPanel = new JPanel(new BorderLayout());
-		formulaURIPanel.setBorder(new TitledBorder("Formula URI:"));
+		formulaURIPanel.setBorder(ComponentFactory
+				.createTitledBorder("Formula URI:"));
 		formulaURIPanel.add(this.formulaURITextField);
 		this.formulaURITextField.getDocument().addDocumentListener(
 				new DocumentListener() {
@@ -256,7 +259,8 @@ public class OWLArithmeticFormulaEditor extends
 	 */
 	private void drawConflictSection() {
 		JPanel conflictSection = new JPanel(new GridLayout(1, 3));
-		conflictSection.setBorder(new TitledBorder("conflict Strategy"));
+		conflictSection.setBorder(ComponentFactory
+				.createTitledBorder("conflict Strategy"));
 		this.conflictButtnGroup = new ButtonGroup();
 		this.overridingButton = new JRadioButton(OVERRIDING_BUTTON_TEXT);
 		this.overriddenButton = new JRadioButton(OVERRIDDEN_BUTTON_TEXT);
@@ -342,7 +346,7 @@ public class OWLArithmeticFormulaEditor extends
 		if (this.formula != null) {
 			StorageExtractor bindingExtractor = new StorageExtractor();
 			this.formula.jjtAccept(bindingExtractor, null);
-			MAEPropertyChain storeToNode = bindingExtractor
+			MAEpropertyChainExpression storeToNode = bindingExtractor
 					.getExtractedStorage();
 			if (storeToNode != null) {
 				MutableTreeNode storageNode = MAENodeAdapter.toTreeNode(
@@ -517,7 +521,8 @@ public class OWLArithmeticFormulaEditor extends
 		toolBar.setBorderPainted(false);
 		bindingPanel.add(toolBar, BorderLayout.NORTH);
 		this.bindingTree = new JTree(this.bindingTreeModel);
-		JScrollPane bindingTreePane = new JScrollPane(this.bindingTree);
+		JScrollPane bindingTreePane = ComponentFactory
+				.createScrollPane(this.bindingTree);
 		bindingPanel.add(bindingTreePane, BorderLayout.CENTER);
 		this.mainPanel.add(bindingPanel);
 	}
@@ -539,7 +544,8 @@ public class OWLArithmeticFormulaEditor extends
 		storeToolBar.setBorderPainted(false);
 		storePanel.add(storeToolBar, BorderLayout.NORTH);
 		this.storeTree = new JTree(this.storeTreeModel);
-		JScrollPane storeTreePane = new JScrollPane(this.storeTree);
+		JScrollPane storeTreePane = ComponentFactory
+				.createScrollPane(this.storeTree);
 		storePanel.add(storeTreePane, BorderLayout.CENTER);
 		this.mainPanel.add(storePanel);
 	}
@@ -635,7 +641,8 @@ public class OWLArithmeticFormulaEditor extends
 										.getModelManager()
 										.getOWLHierarchyManager()
 										.getOWLDataPropertyHierarchyProvider());
-						JScrollPane panel = new JScrollPane(dataPropertyTree);
+						JScrollPane panel = ComponentFactory
+								.createScrollPane(dataPropertyTree);
 						panel.setBorder(LineBorder.createBlackLineBorder());
 						JOptionPane jOptionPane = new JOptionPane(panel,
 								JOptionPane.QUESTION_MESSAGE,
@@ -680,7 +687,8 @@ public class OWLArithmeticFormulaEditor extends
 										.getModelManager()
 										.getOWLHierarchyManager()
 										.getOWLObjectPropertyHierarchyProvider());
-						JScrollPane panel = new JScrollPane(objectPropertyTree);
+						JScrollPane panel = ComponentFactory
+								.createScrollPane(objectPropertyTree);
 						panel.setBorder(LineBorder.createBlackLineBorder());
 						JOptionPane jOptionPane = new JOptionPane(panel,
 								JOptionPane.QUESTION_MESSAGE,
@@ -789,7 +797,8 @@ public class OWLArithmeticFormulaEditor extends
 										.getModelManager()
 										.getOWLHierarchyManager()
 										.getOWLObjectPropertyHierarchyProvider());
-						JScrollPane panel = new JScrollPane(objectPropertyTree);
+						JScrollPane panel = ComponentFactory
+								.createScrollPane(objectPropertyTree);
 						panel.setBorder(LineBorder.createBlackLineBorder());
 						JOptionPane jOptionPane = new JOptionPane(panel,
 								JOptionPane.QUESTION_MESSAGE,
@@ -890,7 +899,8 @@ public class OWLArithmeticFormulaEditor extends
 	 */
 	private void drawAppliesToSection() {
 		JPanel appliesToSection = new JPanel();
-		appliesToSection.setBorder(new TitledBorder(APPLIES_TO_LABEL_NAME));
+		appliesToSection.setBorder(ComponentFactory
+				.createTitledBorder(APPLIES_TO_LABEL_NAME));
 		this.editAppliesToButton.setSize(20, 20);
 		appliesToSection.add(this.appliesToLabel);
 		this.editAppliesToButton.addActionListener(new ActionListener() {
