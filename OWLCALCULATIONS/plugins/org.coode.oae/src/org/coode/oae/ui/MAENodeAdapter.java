@@ -23,6 +23,8 @@
 package org.coode.oae.ui;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
@@ -31,15 +33,16 @@ import org.coode.oae.utils.ParserFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
 
-import uk.ac.manchester.mae.ArithmeticsParser;
-import uk.ac.manchester.mae.MAEBinding;
-import uk.ac.manchester.mae.MAEPropertyChain;
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.ParseException;
 import uk.ac.manchester.mae.evaluation.BindingModel;
 import uk.ac.manchester.mae.evaluation.FormulaModel;
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;
 import uk.ac.manchester.mae.evaluation.StorageModel;
+import uk.ac.manchester.mae.parser.ArithmeticsParser;
+import uk.ac.manchester.mae.parser.MAEBinding;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.MAEpropertyChainCell;
+import uk.ac.manchester.mae.parser.MAEpropertyChainExpression;
+import uk.ac.manchester.mae.parser.ParseException;
 import uk.ac.manchester.mae.visitor.BindingPropertyChainExtractor;
 import uk.ac.manchester.mae.visitor.protege.ProtegeFormulaModelExtractor;
 
@@ -57,8 +60,8 @@ public class MAENodeAdapter {
 				.getIdentifier());
 		BindingPropertyChainExtractor propertyExtractor = new BindingPropertyChainExtractor(
 				binding);
-		MAEPropertyChain propertyChain = (MAEPropertyChain) binding.jjtAccept(
-				propertyExtractor, null);
+		MAEpropertyChainExpression propertyChain = (MAEpropertyChainExpression) binding
+				.jjtAccept(propertyExtractor, null);
 		if (propertyChain != null) {
 			DefaultMutableTreeNode propertyChainNode = toTreeNode(
 					propertyChain, manager);
@@ -68,18 +71,17 @@ public class MAENodeAdapter {
 	}
 
 	public static DefaultMutableTreeNode toTreeNode(
-			MAEPropertyChain propertyChain, OWLModelManager modelManager) {
+			MAEpropertyChainExpression propertyChain,
+			OWLModelManager modelManager) {
+		List<DefaultMutableTreeNode> list = new ArrayList<DefaultMutableTreeNode>();
 		DefaultMutableTreeNode toReturn;
-		if (!propertyChain.isEnd()) {
-			toReturn = new DefaultMutableTreeNode(propertyChain);
-			MAEPropertyChain innerPropertyChain = (MAEPropertyChain) propertyChain
-					.jjtGetChild(0);
-			DefaultMutableTreeNode innerPropertyChainNode = toTreeNode(
-					innerPropertyChain, modelManager);
-			toReturn.insert(innerPropertyChainNode, 0);
-		} else {
-			toReturn = new DefaultMutableTreeNode(propertyChain);
+		for (MAEpropertyChainCell cell : propertyChain.getCells()) {
+			list.add(new DefaultMutableTreeNode(cell));
 		}
+		for (int i = list.size() - 1; i > 0; i--) {
+			list.get(i - 1).insert(list.get(i), 0);
+		}
+		toReturn = list.get(0);
 		return toReturn;
 	}
 
@@ -109,6 +111,7 @@ public class MAENodeAdapter {
 
 	public static MAEStart toFormula(FormulaModel formulaModel,
 			OWLModelManager modelManager) throws ParseException {
+		// TODO full uris needed
 		ParserFactory.initParser(formulaModel.render(modelManager),
 				modelManager);
 		return (MAEStart) ArithmeticsParser.Start();

@@ -20,7 +20,7 @@ import org.semanticweb.owl.model.OWLClass;
 
 import uk.ac.manchester.mae.evaluation.BindingModel;
 
-public class AppliesToEditor extends JPanel implements ActionListener,
+public class AppliesToEditor_Combobox extends JPanel implements ActionListener,
 		VerifiedInputEditor {
 	private static final String NONE = "none";
 	private static final long serialVersionUID = -339908555692710213L;
@@ -38,7 +38,7 @@ public class AppliesToEditor extends JPanel implements ActionListener,
 	 *            the {@link BindingModel} to use; must not be null but can be
 	 *            empty
 	 */
-	public AppliesToEditor(OWLEditorKit k) {
+	public AppliesToEditor_Combobox(OWLEditorKit k) {
 		super(new BorderLayout());
 		this.kit = k;
 		OWLObjectHierarchyProvider<OWLClass> provider = this.kit
@@ -54,7 +54,7 @@ public class AppliesToEditor extends JPanel implements ActionListener,
 			this.myComboBoxModel.addElement(c);
 		}
 		this.selectedFacet
-				.setPreferredSize(GraphicalFormulaEditor.LONG_FIELD_DIMENSION);
+				.setPreferredSize(GraphicalEditorConstants.LONG_FIELD_DIMENSION);
 		this.selectedFacet.setEditable(false);
 		this.selectedFacet.setSelectedItem(NONE);
 		// this.selectedFacet.setRenderer(new RenderableObjectCellRenderer(

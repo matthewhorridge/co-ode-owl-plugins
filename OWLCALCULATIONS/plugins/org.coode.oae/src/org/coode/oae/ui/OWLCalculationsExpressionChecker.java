@@ -27,22 +27,20 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.description.OWLExpressionParserException;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
 
-import uk.ac.manchester.mae.ArithmeticsParser;
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.ParseException;
-import uk.ac.manchester.mae.SimpleNode;
 import uk.ac.manchester.mae.evaluation.FormulaModel;
+import uk.ac.manchester.mae.parser.ArithmeticsParser;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.ParseException;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Aug 11, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Aug 11, 2008
  */
 public class OWLCalculationsExpressionChecker implements
 		OWLExpressionChecker<FormulaModel> {
-	private FormulaModel lastCreatedObject;
 	private OWLEditorKit owlEditorKit;
 
 	/**
@@ -57,15 +55,7 @@ public class OWLCalculationsExpressionChecker implements
 	 * @see org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker#check(java.lang.String)
 	 */
 	public void check(String text) throws OWLExpressionParserException {
-		this.lastCreatedObject = null;
-		ParserFactory.initParser(text, this.owlEditorKit.getModelManager());
-		try {
-			SimpleNode formulaNode = ArithmeticsParser.Start();
-			this.lastCreatedObject = MAENodeAdapter.toFormulaModel(
-					(MAEStart) formulaNode, null, this.owlEditorKit);
-		} catch (ParseException e) {
-			throw new OWLExpressionParserException(e);
-		}
+		createObject(text);
 	}
 
 	/**
@@ -73,6 +63,13 @@ public class OWLCalculationsExpressionChecker implements
 	 */
 	public FormulaModel createObject(String text)
 			throws OWLExpressionParserException {
-		return this.lastCreatedObject;
+		ParserFactory.initParser(text, this.owlEditorKit.getModelManager());
+		try {
+			MAEStart formulaNode = (MAEStart) ArithmeticsParser.Start();
+			return MAENodeAdapter.toFormulaModel(formulaNode, null,
+					this.owlEditorKit);
+		} catch (ParseException e) {
+			throw new OWLExpressionParserException(e);
+		}
 	}
 }

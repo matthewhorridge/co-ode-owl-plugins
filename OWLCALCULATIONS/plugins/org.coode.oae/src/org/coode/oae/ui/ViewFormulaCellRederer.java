@@ -26,7 +26,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.net.URI;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListCellRenderer;
@@ -43,28 +42,24 @@ import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRow;
 import org.semanticweb.owl.model.OWLAnnotation;
 import org.semanticweb.owl.model.OWLAnnotationAxiom;
 import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLProperty;
 import org.semanticweb.owl.util.NamespaceUtil;
 
-import uk.ac.manchester.mae.ArithmeticsParser;
-import uk.ac.manchester.mae.ArithmeticsParserVisitor;
-import uk.ac.manchester.mae.MAEAdd;
-import uk.ac.manchester.mae.MAEBigSum;
-import uk.ac.manchester.mae.MAEBinding;
-import uk.ac.manchester.mae.MAEConflictStrategy;
-import uk.ac.manchester.mae.MAEIdentifier;
-import uk.ac.manchester.mae.MAEIntNode;
-import uk.ac.manchester.mae.MAEMult;
-import uk.ac.manchester.mae.MAEPower;
-import uk.ac.manchester.mae.MAEPropertyChain;
-import uk.ac.manchester.mae.MAEPropertyFacet;
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.MAEStoreTo;
-import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
-import uk.ac.manchester.mae.Node;
-import uk.ac.manchester.mae.ParseException;
-import uk.ac.manchester.mae.SimpleNode;
-import uk.ac.manchester.mae.visitor.protege.ProtegeDescriptionFacetExtractor;
+import uk.ac.manchester.mae.parser.ArithmeticsParser;
+import uk.ac.manchester.mae.parser.ArithmeticsParserVisitor;
+import uk.ac.manchester.mae.parser.MAEAdd;
+import uk.ac.manchester.mae.parser.MAEBigSum;
+import uk.ac.manchester.mae.parser.MAEBinding;
+import uk.ac.manchester.mae.parser.MAEConflictStrategy;
+import uk.ac.manchester.mae.parser.MAEIdentifier;
+import uk.ac.manchester.mae.parser.MAEIntNode;
+import uk.ac.manchester.mae.parser.MAEMult;
+import uk.ac.manchester.mae.parser.MAEPower;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.MAEStoreTo;
+import uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression;
+import uk.ac.manchester.mae.parser.MAEpropertyChainExpression;
+import uk.ac.manchester.mae.parser.ParseException;
+import uk.ac.manchester.mae.parser.SimpleNode;
 
 /**
  * @author Luigi Iannone
@@ -164,34 +159,31 @@ public class ViewFormulaCellRederer extends JPanel implements ListCellRenderer,
 		return toReturn;
 	}
 
-	public Object visit(SimpleNode node, Object data) {
-		return null;
-	}
-
 	public Object visit(MAEStart node, Object data) {
-		this.formulaString = "";
-		String toReturn = "";
-		Node child, previousChild = null;
-		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
-			child = node.jjtGetChild(i);
-			if (previousChild != null && !(previousChild instanceof MAEBinding)
-					&& child instanceof MAEBinding) {
-				toReturn += "{";
-				this.formulaString += "{";
-			} else if (previousChild != null
-					&& previousChild instanceof MAEBinding
-					&& child instanceof MAEBinding) {
-				toReturn += ",";
-				this.formulaString += ",";
-			} else if (!(child instanceof MAEBinding)
-					&& previousChild instanceof MAEBinding) {
-				toReturn += "}->";
-				this.formulaString += "}->";
-			}
-			toReturn += child.jjtAccept(this, data);
-			previousChild = child;
-		}
-		return toReturn;
+		this.formulaString = node.toString();
+		return this.formulaString;
+		// String toReturn = "";
+		// Node child, previousChild = null;
+		// for (int i = 0; i < node.jjtGetNumChildren(); i++) {
+		// child = node.jjtGetChild(i);
+		// if (previousChild != null && !(previousChild instanceof MAEBinding)
+		// && child instanceof MAEBinding) {
+		// toReturn += "{";
+		// this.formulaString += "{";
+		// } else if (previousChild != null
+		// && previousChild instanceof MAEBinding
+		// && child instanceof MAEBinding) {
+		// toReturn += ",";
+		// this.formulaString += ",";
+		// } else if (!(child instanceof MAEBinding)
+		// && previousChild instanceof MAEBinding) {
+		// toReturn += "}->";
+		// this.formulaString += "}->";
+		// }
+		// toReturn += child.jjtAccept(this, data);
+		// previousChild = child;
+		// }
+		// return toReturn;
 	}
 
 	public Object visit(MAEConflictStrategy node, Object data) {
@@ -208,6 +200,7 @@ public class ViewFormulaCellRederer extends JPanel implements ListCellRenderer,
 	}
 
 	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
+		// XXX
 		String toReturn = " APPLESTO <" + node.getContent() + ">";
 		this.formulaString += toReturn;
 		return toReturn;
@@ -218,46 +211,6 @@ public class ViewFormulaCellRederer extends JPanel implements ListCellRenderer,
 		this.formulaString += node.getIdentifier() + "=";
 		toReturn += node.childrenAccept(this, data);
 		return toReturn;
-	}
-
-	@SuppressWarnings("unchecked")
-	public Object visit(MAEPropertyChain node, Object data) {
-		String toReturn = "";
-		String propertyName = node.getPropertyName();
-		OWLProperty property = node.isEnd() && !hasStoreToAncestor(node) ? this.owlEditorKit
-				.getModelManager().getOWLDataFactory().getOWLDataProperty(
-						URI.create(propertyName))
-				: this.owlEditorKit.getModelManager().getOWLDataFactory()
-						.getOWLObjectProperty(URI.create(propertyName));
-		toReturn += this.owlEditorKit.getModelManager().getRendering(property);
-		this.formulaString += toReturn;
-		ProtegeDescriptionFacetExtractor facetExtractor = new ProtegeDescriptionFacetExtractor(
-				this.owlEditorKit.getModelManager());
-		node.jjtAccept(facetExtractor, data);
-		String facetDescriptionString = facetExtractor
-				.getExtractedDescription() == null ? "" : "["
-				+ this.owlEditorKit.getModelManager().getRendering(
-						facetExtractor.getExtractedDescription()) + "]";
-		toReturn += facetDescriptionString;
-		this.formulaString += facetDescriptionString;
-		if (!node.isEnd()) {
-			this.formulaString += "!";
-			toReturn += node.childrenAccept(this, data);
-		}
-		return toReturn;
-	}
-
-	private boolean hasStoreToAncestor(MAEPropertyChain node) {
-		if (node.jjtGetParent() != null
-				&& node.jjtGetParent() instanceof MAEPropertyChain) {
-			return hasStoreToAncestor((MAEPropertyChain) node.jjtGetParent());
-		} else {
-			return node.jjtGetParent() instanceof MAEStoreTo;
-		}
-	}
-
-	public Object visit(MAEPropertyFacet node, Object data) {
-		return "";
 	}
 
 	public Object visit(MAEAdd node, Object data) {
@@ -292,5 +245,10 @@ public class ViewFormulaCellRederer extends JPanel implements ListCellRenderer,
 
 	public String getFormulaString() {
 		return this.formulaString;
+	}
+
+	public Object visit(MAEpropertyChainExpression node, Object data) {
+		this.formulaString += node.toString();
+		return node.toString();
 	}
 }

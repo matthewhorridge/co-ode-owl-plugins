@@ -53,8 +53,8 @@ import org.protege.editor.owl.ui.clsdescriptioneditor.OWLDescriptionAutoComplete
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
 import org.semanticweb.owl.model.OWLObject;
 
-import uk.ac.manchester.mae.ArithmeticsParser;
-import uk.ac.manchester.mae.ParseException;
+import uk.ac.manchester.mae.parser.ArithmeticsParser;
+import uk.ac.manchester.mae.parser.ParseException;
 
 /**
  * @author Luigi Iannone
@@ -63,6 +63,28 @@ import uk.ac.manchester.mae.ParseException;
  */
 @SuppressWarnings("unchecked")
 public class FormulaCompleter {
+	protected final class SpecializedKeyAdapter extends KeyAdapter {
+		@Override
+		public void keyPressed(KeyEvent e) {
+			processKeyPressed(e);
+		}
+
+		@Override
+		public void keyReleased(KeyEvent e) {
+			if (e.getKeyCode() != KeyEvent.VK_UP
+					&& e.getKeyCode() != KeyEvent.VK_DOWN) {
+				if (FormulaCompleter.this.popupWindow.isVisible()
+						&& !FormulaCompleter.this.lastTextUpdate
+								.equals(FormulaCompleter.this.textComponent
+										.getText())) {
+					FormulaCompleter.this.lastTextUpdate = FormulaCompleter.this.textComponent
+							.getText();
+					updatePopup(getMatches());
+				}
+			}
+		}
+	}
+
 	private static Logger logger = Logger
 			.getLogger(OWLDescriptionAutoCompleter.class);
 	public static final int DEFAULT_MAX_ENTRIES = 100;
@@ -82,28 +104,7 @@ public class FormulaCompleter {
 			OWLExpressionChecker checker) {
 		this.owlEditorKit = owlEditorKit;
 		this.textComponent = tc;
-		this.keyListener = new KeyAdapter() {
-			@Override
-			public void keyPressed(KeyEvent e) {
-				FormulaCompleter.this.processKeyPressed(e);
-			}
-
-			@Override
-			public void keyReleased(KeyEvent e) {
-				if (e.getKeyCode() != KeyEvent.VK_UP
-						&& e.getKeyCode() != KeyEvent.VK_DOWN) {
-					if (FormulaCompleter.this.popupWindow.isVisible()
-							&& !FormulaCompleter.this.lastTextUpdate
-									.equals(FormulaCompleter.this.textComponent
-											.getText())) {
-						FormulaCompleter.this.lastTextUpdate = FormulaCompleter.this.textComponent
-								.getText();
-						FormulaCompleter.this.updatePopup(FormulaCompleter.this
-								.getMatches());
-					}
-				}
-			}
-		};
+		this.keyListener = new SpecializedKeyAdapter();
 		this.textComponent.addKeyListener(this.keyListener);
 		this.wordDelimeters = new HashSet<String>();
 		this.wordDelimeters.add(" ");

@@ -18,8 +18,8 @@ import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLEntityAnnotationAxiom;
 import org.semanticweb.owl.model.OWLOntology;
 
-import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.evaluation.FormulaModel;
+import uk.ac.manchester.mae.parser.MAEStart;
 
 public class OWLCalculationsFormulaClassFrameSection
 		extends
