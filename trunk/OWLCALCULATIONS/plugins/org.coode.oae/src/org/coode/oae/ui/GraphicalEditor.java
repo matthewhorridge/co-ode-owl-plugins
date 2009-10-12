@@ -18,6 +18,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.coode.oae.ui.utils.StretchingPanelsFactory;
 import org.protege.editor.core.ui.RefreshableComponent;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
@@ -47,6 +48,13 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 	private transient OWLExpressionChecker<FormulaModel> checker;
 	private OWLEditorKit edKit;
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
+	boolean initializing = false;
+	private JPanel mainPanel = new JPanel(new BorderLayout());
+	private final JPanel extendedArea = new JPanel(new GridLayout(3, 1));
+	private JPanel lowerPanel = StretchingPanelsFactory
+			.getStretchyPanelWithBorder(null, null);
+	private final JButton more = new JButton("More...");
+	private final JButton less = new JButton("Less...");
 
 	public GraphicalEditor(OWLEditorKit kit) {
 		super(new BorderLayout());
@@ -69,31 +77,48 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		namePanel.add(this.nameTextField, BorderLayout.NORTH);
 		this.add(namePanel, BorderLayout.NORTH);
 		// expression
-		this.expression.setBorder(ComponentFactory
-				.createTitledBorder("Expression"));
-		this.mainPanel.add(this.expression, BorderLayout.NORTH);
+		this.mainPanel.add(StretchingPanelsFactory.getStretchyPanelWithBorder(
+				this.expression, "Expression"), BorderLayout.NORTH);
 		// bindings
 		this.mainPanel.add(this.bindingviewer, BorderLayout.CENTER);
-		this.showExtendedPanel = new JButton("Extended view");
-		this.showExtendedPanel.addActionListener(new ActionListener() {
+		this.more.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				showExtendedView();
 			}
 		});
-		this.mainPanel.add(this.showExtendedPanel, BorderLayout.SOUTH);
+		this.less.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				hideExtendedView();
+			}
+		});
+		this.lowerPanel.add(this.more, BorderLayout.NORTH);
+		this.extendedArea.add(StretchingPanelsFactory
+				.getStretchyPanelWithBorder(this.conflictStrategyEditor,
+						"Conflict Strategy"));
+		this.extendedArea
+				.add(StretchingPanelsFactory.getStretchyPanelWithBorder(
+						this.appliesToEditor, "Applies to"));
+		this.extendedArea.add(StretchingPanelsFactory
+				.getStretchyPanelWithBorder(this.storeToEditor, "Copy to"));
+		this.mainPanel.add(this.lowerPanel, BorderLayout.SOUTH);
 		// optional bits
 		this.add(this.mainPanel, BorderLayout.CENTER);
-		this.add(this.report, BorderLayout.SOUTH);
+		this.add(StretchingPanelsFactory.getStretchyPanelWithBorder(
+				this.report, "Error report"), BorderLayout.SOUTH);
 		// handleVerification();
 	}
 
 	protected void showExtendedView() {
-		JPanel extendedArea = new JPanel(new GridLayout(3, 1));
-		extendedArea.add(this.conflictStrategyEditor);
-		extendedArea.add(this.appliesToEditor);
-		extendedArea.add(this.storeToEditor);
-		this.mainPanel.remove(this.showExtendedPanel);
-		this.mainPanel.add(extendedArea, BorderLayout.SOUTH);
+		this.lowerPanel.remove(this.more);
+		this.lowerPanel.add(this.less, BorderLayout.NORTH);
+		this.lowerPanel.add(this.extendedArea, BorderLayout.CENTER);
+		validate();
+	}
+
+	protected void hideExtendedView() {
+		this.lowerPanel.remove(this.less);
+		this.lowerPanel.remove(this.extendedArea);
+		this.lowerPanel.add(this.more, BorderLayout.NORTH);
 		validate();
 	}
 
@@ -172,10 +197,6 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		return getFormulaModel().render(this.edKit.getOWLModelManager());
 	}
 
-	boolean initializing = false;
-	private JPanel mainPanel = new JPanel(new BorderLayout());
-	private JButton showExtendedPanel;
-
 	public void initFormula(FormulaModel fm) {
 		this.initializing = true;
 		String localName = fm.getFormulaURI().getFragment();
@@ -215,7 +236,8 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 				this.checker.check(currentFormula);
 			} catch (Throwable e) {
 				// e.printStackTrace(System.out);
-				this.report.addReport(e.getMessage());
+				this.report.addReport(e.getMessage().replace(
+						"uk.ac.manchester.mae.parser.ParseException: ", ""));
 				status = false;
 			}
 			for (InputVerificationStatusChangedListener v : this.listeners) {

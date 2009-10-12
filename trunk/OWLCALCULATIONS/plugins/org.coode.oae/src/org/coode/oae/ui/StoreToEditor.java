@@ -1,6 +1,5 @@
 package org.coode.oae.ui;
 
-import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.clsdescriptioneditor.ExpressionEditor;
 import org.semanticweb.owl.model.OWLException;
@@ -20,8 +19,6 @@ public class StoreToEditor extends ExpressionEditor<PropertyChainModel> {
 	 */
 	public StoreToEditor(OWLEditorKit k) {
 		super(k, new PropertyChainExpressionChecker(k, true, true));
-		setBorder(ComponentFactory.createTitledBorder("Store to"));
-		// setPreferredSize(new Dimension(400, 20));
 	}
 
 	public void setStoreTo(PropertyChainModel _pcm) {

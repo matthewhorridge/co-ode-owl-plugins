@@ -19,6 +19,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import org.coode.oae.ui.VariableListModel.VariableListItem;
+import org.coode.oae.ui.utils.StretchingPanelsFactory;
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.core.ui.list.MListButton;
 import org.protege.editor.core.ui.list.MListSectionHeader;
@@ -184,7 +185,8 @@ public class BindingEditor_modalwindows extends JPanel implements
 	public void init() {
 		this.add(this.identifier, BorderLayout.NORTH);
 		this.add(this.propertychainsView, BorderLayout.CENTER);
-		this.add(this.errorsLabel, BorderLayout.SOUTH);
+		this.add(StretchingPanelsFactory.getStretchyPanelWithBorder(
+				this.errorsLabel, "Error report"), BorderLayout.SOUTH);
 	}
 
 	public void actionPerformed(ActionEvent e) {
