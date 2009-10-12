@@ -22,7 +22,6 @@
  */
 package uk.ac.manchester.mae.visitor;
 
-import java.net.URI;
 import java.util.Set;
 
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxDescriptionParser;
@@ -32,40 +31,38 @@ import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.model.OWLProperty;
 import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
 import org.semanticweb.owl.util.OWLEntitySetProvider;
 import org.semanticweb.owl.util.ReferencedEntitySetProvider;
 import org.semanticweb.owl.util.SimpleShortFormProvider;
 
-import uk.ac.manchester.mae.ArithmeticsParserVisitor;
 import uk.ac.manchester.mae.ConflictStrategyFactory;
-import uk.ac.manchester.mae.MAEAdd;
-import uk.ac.manchester.mae.MAEBigSum;
-import uk.ac.manchester.mae.MAEBinding;
-import uk.ac.manchester.mae.MAEConflictStrategy;
-import uk.ac.manchester.mae.MAEIdentifier;
-import uk.ac.manchester.mae.MAEIntNode;
-import uk.ac.manchester.mae.MAEMult;
-import uk.ac.manchester.mae.MAEPower;
-import uk.ac.manchester.mae.MAEPropertyChain;
-import uk.ac.manchester.mae.MAEPropertyFacet;
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.MAEStoreTo;
-import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
-import uk.ac.manchester.mae.Node;
-import uk.ac.manchester.mae.SimpleNode;
 import uk.ac.manchester.mae.evaluation.BindingModel;
 import uk.ac.manchester.mae.evaluation.FormulaModel;
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;
 import uk.ac.manchester.mae.evaluation.StorageModel;
+import uk.ac.manchester.mae.parser.ArithmeticsParserVisitor;
+import uk.ac.manchester.mae.parser.MAEAdd;
+import uk.ac.manchester.mae.parser.MAEBigSum;
+import uk.ac.manchester.mae.parser.MAEBinding;
+import uk.ac.manchester.mae.parser.MAEConflictStrategy;
+import uk.ac.manchester.mae.parser.MAEIdentifier;
+import uk.ac.manchester.mae.parser.MAEIntNode;
+import uk.ac.manchester.mae.parser.MAEMult;
+import uk.ac.manchester.mae.parser.MAEPower;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.MAEStoreTo;
+import uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression;
+import uk.ac.manchester.mae.parser.MAEpropertyChainExpression;
+import uk.ac.manchester.mae.parser.Node;
+import uk.ac.manchester.mae.parser.SimpleNode;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 10, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 10, 2008
  */
 public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	protected FormulaModel formulaModel;
@@ -80,7 +77,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.SimpleNode,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.SimpleNode,
 	 *      java.lang.Object)
 	 */
 	public Object visit(SimpleNode node, Object data) {
@@ -88,7 +85,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStart,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStart,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStart node, Object data) {
@@ -101,7 +98,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEConflictStrategy,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEConflictStrategy,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEConflictStrategy node, Object data) {
@@ -111,7 +108,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEmanSyntaxClassExpression,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
@@ -136,8 +133,9 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBinding,
-	 *      java.lang.Object)
+	 * @see
+	 * uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.
+	 * mae.MAEBinding, java.lang.Object)
 	 */
 	public Object visit(MAEBinding node, Object data) {
 		BindingModel bindingModel = new BindingModel(node.getIdentifier(),
@@ -147,37 +145,16 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyChain,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPropertyChain,
 	 *      java.lang.Object)
 	 */
-	@SuppressWarnings("unchecked")
-	public Object visit(MAEPropertyChain node, Object data) {
-		URI propertyURI = URI.create(node.getPropertyName());
-		OWLProperty property = node.isEnd() ? this.manager.getOWLDataFactory()
-				.getOWLDataProperty(propertyURI) : this.manager
-				.getOWLDataFactory().getOWLObjectProperty(propertyURI);
-		DescriptionFacetExtractor pdfExtractor = new DescriptionFacetExtractor(
-				this.manager, this.ontologies);
-		node.jjtAccept(pdfExtractor, data);
-		OWLDescription facet = pdfExtractor.getExtractedDescription();
-		PropertyChainModel toReturn = new PropertyChainModel(property, facet);
-		if (!node.isEnd() && node.jjtGetNumChildren() > 0) {
-			boolean found = false;
-			for (int i = 0; !found && i < node.jjtGetNumChildren(); i++) {
-				Node child = node.jjtGetChild(i);
-				if (child instanceof MAEPropertyChain) {
-					found = true;
-					PropertyChainModel childPropertyChain = (PropertyChainModel) node.jjtGetChild(i)
-							.jjtAccept(this, data);
-					toReturn.setChild(childPropertyChain);
-				}
-			}
-		}
-		return toReturn;
+	public Object visit(MAEpropertyChainExpression node, Object data) {
+		return MAEAdapter.toPropertyChainModel(node, this.ontologies,
+				this.manager);
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEAdd,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEAdd,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEAdd node, Object data) {
@@ -186,7 +163,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEMult,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEMult,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEMult node, Object data) {
@@ -195,7 +172,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPower,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPower,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEPower node, Object data) {
@@ -204,7 +181,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEIntNode,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEIntNode,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEIntNode node, Object data) {
@@ -213,7 +190,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEIdentifier,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEIdentifier,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEIdentifier node, Object data) {
@@ -222,7 +199,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBigSum,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEBigSum,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEBigSum node, Object data) {
@@ -235,41 +212,21 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStoreTo,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStoreTo node, Object data) {
 		// PropertyChainModel propertyChainModel = (PropertyChainModel) node
 		// .jjtGetChild(0).jjtAccept(this, data);
-		MAEPropertyChain propertyChain = (MAEPropertyChain) node.jjtGetChild(0);
+		MAEpropertyChainExpression propertyChain = (MAEpropertyChainExpression) node
+				.jjtGetChild(0);
 		if (propertyChain != null) {
-			PropertyChainModel propertyChainModel = this
-					.toPropertyChainModel(propertyChain);
+			PropertyChainModel propertyChainModel = MAEAdapter
+					.toPropertyChainModel(propertyChain, this.ontologies,
+							this.manager);
 			StorageModel storageModel = new StorageModel(propertyChainModel);
 			this.formulaModel.setStorageModel(storageModel);
 		}
-		return null;
-	}
-
-	private PropertyChainModel toPropertyChainModel(
-			MAEPropertyChain propertyChain) {
-		String propertyName = propertyChain.getPropertyName();
-		DescriptionFacetExtractor descriptionFacetExatrctor = new DescriptionFacetExtractor(
-				this.manager, this.ontologies);
-		propertyChain.jjtAccept(descriptionFacetExatrctor, null);
-		PropertyChainModel toReturn = new PropertyChainModel(this.manager
-				.getOWLDataFactory().getOWLObjectProperty(
-						URI.create(propertyName)), descriptionFacetExatrctor
-				.getExtractedDescription());
-		if (!propertyChain.isEnd()) {
-			toReturn.setChild(this
-					.toPropertyChainModel((MAEPropertyChain) propertyChain
-							.jjtGetChild(0)));
-		}
-		return toReturn;
-	}
-
-	public Object visit(MAEPropertyFacet node, Object data) {
 		return null;
 	}
 }

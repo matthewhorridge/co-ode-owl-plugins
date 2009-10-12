@@ -30,9 +30,9 @@ import java.util.Set;
 
 import org.semanticweb.owl.model.OWLIndividual;
 
-import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.evaluation.EvaluationResult;
 import uk.ac.manchester.mae.evaluation.IndividualEvaluationResult;
+import uk.ac.manchester.mae.parser.MAEStart;
 
 /**
  * @author Luigi Iannone

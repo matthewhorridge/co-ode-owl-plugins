@@ -89,7 +89,7 @@ public class PropertyChainModel {
 	public String toString() {
 		String toReturn = this.cell.toString();
 		if (this.child != null) {
-			toReturn += "!" + this.child.toString();
+			toReturn += " o " + this.child.toString();
 		}
 		return toReturn;
 	}
@@ -101,7 +101,7 @@ public class PropertyChainModel {
 	public String render(OWLModelManager manager) {
 		String toReturn = this.cell.render(manager);
 		if (this.child != null) {
-			toReturn += "!" + this.child.render(manager);
+			toReturn += " o " + this.child.render(manager);
 		}
 		return toReturn;
 	}

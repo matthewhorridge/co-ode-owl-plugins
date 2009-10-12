@@ -36,6 +36,10 @@ import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLPropertyExpressionVisitor;
 import org.semanticweb.owl.util.NamespaceUtil;
 
+import uk.ac.manchester.mae.parser.ArithmeticsParser;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.ParseException;
+
 /**
  * @author Luigi Iannone
  * 

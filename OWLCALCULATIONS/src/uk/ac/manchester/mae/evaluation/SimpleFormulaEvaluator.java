@@ -28,22 +28,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import uk.ac.manchester.mae.MAEAdd;
-import uk.ac.manchester.mae.MAEBigSum;
-import uk.ac.manchester.mae.MAEIdentifier;
-import uk.ac.manchester.mae.MAEIntNode;
-import uk.ac.manchester.mae.MAEMult;
-import uk.ac.manchester.mae.MAEPower;
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.Node;
+import uk.ac.manchester.mae.parser.MAEAdd;
+import uk.ac.manchester.mae.parser.MAEBigSum;
+import uk.ac.manchester.mae.parser.MAEIdentifier;
+import uk.ac.manchester.mae.parser.MAEIntNode;
+import uk.ac.manchester.mae.parser.MAEMult;
+import uk.ac.manchester.mae.parser.MAEPower;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.MAEpropertyChainExpression;
+import uk.ac.manchester.mae.parser.Node;
 import uk.ac.manchester.mae.visitor.FormulaBodyVisitor;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 29, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 29, 2008
  */
 public class SimpleFormulaEvaluator extends FormulaBodyVisitor {
 	protected Set<BindingAssignment> bindingAssignments;
@@ -78,7 +79,7 @@ public class SimpleFormulaEvaluator extends FormulaBodyVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEAdd,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEAdd,
 	 *      java.lang.Object)
 	 */
 	@SuppressWarnings("unchecked")
@@ -103,7 +104,7 @@ public class SimpleFormulaEvaluator extends FormulaBodyVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEMult,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEMult,
 	 *      java.lang.Object)
 	 */
 	@SuppressWarnings("unchecked")
@@ -135,13 +136,13 @@ public class SimpleFormulaEvaluator extends FormulaBodyVisitor {
 	/**
 	 * (non-Javadoc)
 	 * 
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPower,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPower,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEPower node, Object data) {
 		List<Double> result = null;
 		if (node.getBaseIdentifier() != null) {
-			Collection<? extends Object> values = this.findAssignement(
+			Collection<? extends Object> values = findAssignement(
 					node.getBaseIdentifier()).getValues();
 			if (!values.isEmpty()) {
 				result = new ArrayList<Double>();
@@ -160,7 +161,7 @@ public class SimpleFormulaEvaluator extends FormulaBodyVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEInteger,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEInteger,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEIntNode node, Object data) {
@@ -190,7 +191,7 @@ public class SimpleFormulaEvaluator extends FormulaBodyVisitor {
 
 	public Object visit(MAEIdentifier node, Object data) {
 		Object toReturn = null;
-		BindingAssignment bindingAssignment = this.findAssignement(node
+		BindingAssignment bindingAssignment = findAssignement(node
 				.getIdentifierName());
 		if (bindingAssignment != null) {
 			toReturn = bindingAssignment.getValues();
@@ -215,5 +216,11 @@ public class SimpleFormulaEvaluator extends FormulaBodyVisitor {
 
 	public EvaluationResult getEvaluationResults() {
 		return this.evaluationResults;
+	}
+
+	@Override
+	public Object visit(MAEpropertyChainExpression node, Object data) {
+		// FIXME needs implementation
+		return null;
 	}
 }

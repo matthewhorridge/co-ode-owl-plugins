@@ -22,22 +22,21 @@
  */
 package uk.ac.manchester.mae.visitor;
 
-import uk.ac.manchester.mae.ArithmeticsParserVisitor;
-import uk.ac.manchester.mae.MAEBinding;
-import uk.ac.manchester.mae.MAEConflictStrategy;
-import uk.ac.manchester.mae.MAEPropertyChain;
-import uk.ac.manchester.mae.MAEPropertyFacet;
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.MAEStoreTo;
-import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
-import uk.ac.manchester.mae.SimpleNode;
+import uk.ac.manchester.mae.parser.ArithmeticsParserVisitor;
+import uk.ac.manchester.mae.parser.MAEBinding;
+import uk.ac.manchester.mae.parser.MAEConflictStrategy;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.MAEStoreTo;
+import uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression;
+import uk.ac.manchester.mae.parser.MAEpropertyChainExpression;
+import uk.ac.manchester.mae.parser.SimpleNode;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 29, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 29, 2008
  */
 public abstract class FormulaBodyVisitor implements ArithmeticsParserVisitor {
 	protected Object emptyVisit() {
@@ -45,18 +44,18 @@ public abstract class FormulaBodyVisitor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.SimpleNode,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.SimpleNode,
 	 *      java.lang.Object)
 	 */
 	public Object visit(SimpleNode node, Object data) {
-		return this.emptyVisit();
+		return emptyVisit();
 	}
 
 	/**
 	 * This method will visit each child. For context-based visits please
 	 * ovverride this method
 	 * 
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStart,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStart,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStart node, Object data) {
@@ -64,50 +63,42 @@ public abstract class FormulaBodyVisitor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEConflictStrategy,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEConflictStrategy,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEConflictStrategy node, Object data) {
-		return this.emptyVisit();
+		return emptyVisit();
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStoreTo,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStoreTo node, Object data) {
-		return this.emptyVisit();
+		return emptyVisit();
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEmanSyntaxClassExpression,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
-		return this.emptyVisit();
+		return emptyVisit();
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBinding,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEBinding,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEBinding node, Object data) {
-		return this.emptyVisit();
+		return emptyVisit();
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyChain,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPropertyChain,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEPropertyChain node, Object data) {
-		return this.emptyVisit();
-	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEPropertyFacet node, Object data) {
-		return this.emptyVisit();
+	public Object visit(MAEpropertyChainExpression node, Object data) {
+		return emptyVisit();
 	}
 }

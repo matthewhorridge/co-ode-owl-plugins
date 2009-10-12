@@ -24,7 +24,7 @@ package uk.ac.manchester.mae.visitor;
 
 import org.semanticweb.owl.model.OWLDescription;
 
-import uk.ac.manchester.mae.ArithmeticsParserVisitor;
+import uk.ac.manchester.mae.parser.ArithmeticsParserVisitor;
 
 /**
  * @author Luigi Iannone

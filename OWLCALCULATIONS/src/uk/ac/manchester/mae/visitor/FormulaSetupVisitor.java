@@ -22,15 +22,15 @@
  */
 package uk.ac.manchester.mae.visitor;
 
-import uk.ac.manchester.mae.ArithmeticsParserVisitor;
-import uk.ac.manchester.mae.MAEAdd;
-import uk.ac.manchester.mae.MAEBigSum;
-import uk.ac.manchester.mae.MAEIdentifier;
-import uk.ac.manchester.mae.MAEIntNode;
-import uk.ac.manchester.mae.MAEMult;
-import uk.ac.manchester.mae.MAEPower;
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.SimpleNode;
+import uk.ac.manchester.mae.parser.ArithmeticsParserVisitor;
+import uk.ac.manchester.mae.parser.MAEAdd;
+import uk.ac.manchester.mae.parser.MAEBigSum;
+import uk.ac.manchester.mae.parser.MAEIdentifier;
+import uk.ac.manchester.mae.parser.MAEIntNode;
+import uk.ac.manchester.mae.parser.MAEMult;
+import uk.ac.manchester.mae.parser.MAEPower;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.SimpleNode;
 
 /**
  * This abstract class is the basis for implementing visitors that do not take
@@ -45,7 +45,7 @@ import uk.ac.manchester.mae.SimpleNode;
  */
 public abstract class FormulaSetupVisitor implements ArithmeticsParserVisitor {
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.SimpleNode,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.SimpleNode,
 	 *      java.lang.Object)
 	 */
 	public Object visit(SimpleNode node, Object data) {
@@ -56,7 +56,7 @@ public abstract class FormulaSetupVisitor implements ArithmeticsParserVisitor {
 	 * This method will visit each child. For context-based visits please
 	 * ovverride this method
 	 * 
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStart,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStart,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStart node, Object data) {
@@ -64,7 +64,7 @@ public abstract class FormulaSetupVisitor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEAdd,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEAdd,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEAdd node, Object data) {
@@ -72,7 +72,7 @@ public abstract class FormulaSetupVisitor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEMult,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEMult,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEMult node, Object data) {
@@ -80,7 +80,7 @@ public abstract class FormulaSetupVisitor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPower,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPower,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEPower node, Object data) {
@@ -88,7 +88,7 @@ public abstract class FormulaSetupVisitor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEIntNode,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEIntNode,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEIntNode node, Object data) {
@@ -96,7 +96,7 @@ public abstract class FormulaSetupVisitor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEIdentifier,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEIdentifier,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEIdentifier node, Object data) {
@@ -104,7 +104,7 @@ public abstract class FormulaSetupVisitor implements ArithmeticsParserVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBigSum,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEBigSum,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEBigSum node, Object data) {

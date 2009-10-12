@@ -24,14 +24,14 @@ package uk.ac.manchester.mae.evaluation;
 
 import java.util.Set;
 
-import uk.ac.manchester.mae.MAEStart;
+import uk.ac.manchester.mae.parser.MAEStart;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Apr 30, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Apr 30, 2008
  */
 public class FormulaEvaluationResult {
 	MAEStart formula;
@@ -63,10 +63,11 @@ public class FormulaEvaluationResult {
 
 	@Override
 	public String toString() {
-		String toReturn = this.formula.toString();
-		for (IndividualEvaluationResult individualEvaluationResult : this.individualEvaluationResults) {
-			toReturn += "\n" + individualEvaluationResult;
+		StringBuilder toReturn = new StringBuilder(this.formula.toString());
+		for (IndividualEvaluationResult i : this.individualEvaluationResults) {
+			toReturn.append("\n");
+			toReturn.append(i);
 		}
-		return toReturn;
+		return toReturn.toString();
 	}
 }

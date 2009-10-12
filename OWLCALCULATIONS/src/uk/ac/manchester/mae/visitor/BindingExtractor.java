@@ -22,25 +22,21 @@
  */
 package uk.ac.manchester.mae.visitor;
 
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.model.OWLProperty;
 
-import uk.ac.manchester.mae.MAEBinding;
-import uk.ac.manchester.mae.MAEConflictStrategy;
-import uk.ac.manchester.mae.MAEPropertyChain;
-import uk.ac.manchester.mae.MAEPropertyFacet;
-import uk.ac.manchester.mae.MAEStart;
-import uk.ac.manchester.mae.MAEStoreTo;
-import uk.ac.manchester.mae.MAEmanSyntaxClassExpression;
-import uk.ac.manchester.mae.Node;
 import uk.ac.manchester.mae.evaluation.BindingModel;
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;
+import uk.ac.manchester.mae.parser.MAEBinding;
+import uk.ac.manchester.mae.parser.MAEConflictStrategy;
+import uk.ac.manchester.mae.parser.MAEStart;
+import uk.ac.manchester.mae.parser.MAEStoreTo;
+import uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression;
+import uk.ac.manchester.mae.parser.MAEpropertyChainExpression;
+import uk.ac.manchester.mae.parser.Node;
 
 /**
  * @author Luigi Iannone
@@ -65,7 +61,7 @@ public class BindingExtractor extends FormulaSetupVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStart,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStart,
 	 *      java.lang.Object)
 	 */
 	@Override
@@ -81,7 +77,7 @@ public class BindingExtractor extends FormulaSetupVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEConflictStrategy,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEConflictStrategy,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEConflictStrategy node, Object data) {
@@ -89,7 +85,7 @@ public class BindingExtractor extends FormulaSetupVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEmanSyntaxClassExpression,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
@@ -97,14 +93,14 @@ public class BindingExtractor extends FormulaSetupVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBinding,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEBinding,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEBinding node, Object data) {
 		PropertyChainModel propertyChainModel = null;
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 			Node child = node.jjtGetChild(i);
-			if (child instanceof MAEPropertyChain) {
+			if (child instanceof MAEpropertyChainExpression) {
 				propertyChainModel = (PropertyChainModel) child.jjtAccept(this,
 						data);
 			}
@@ -113,184 +109,19 @@ public class BindingExtractor extends FormulaSetupVisitor {
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyChain,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPropertyChain,
 	 *      java.lang.Object)
 	 */
-	@SuppressWarnings("unchecked")
-	public Object visit(MAEPropertyChain node, Object data) {
-		URI propertyURI = URI.create(node.getPropertyName());
-		OWLProperty property = node.isEnd() ? this.owlOntologyManager
-				.getOWLDataFactory().getOWLDataProperty(propertyURI)
-				: this.owlOntologyManager.getOWLDataFactory()
-						.getOWLObjectProperty(propertyURI);
-		DescriptionFacetExtractor pdfExtractor = new DescriptionFacetExtractor(
-				this.owlOntologyManager, this.ontologies);
-		node.jjtAccept(pdfExtractor, data);
-		OWLDescription facet = pdfExtractor.getExtractedDescription();
-		PropertyChainModel toReturn = new PropertyChainModel(property, facet);
-		if (!node.isEnd() && node.jjtGetNumChildren() > 0) {
-			boolean found = false;
-			for (int i = 0; !found && i < node.jjtGetNumChildren(); i++) {
-				Node child = node.jjtGetChild(i);
-				if (child instanceof MAEPropertyChain) {
-					found = true;
-					toReturn.setChild((PropertyChainModel) node.jjtGetChild(i)
-							.jjtAccept(this, data));
-				}
-			}
-		}
-		return toReturn;
+	public Object visit(MAEpropertyChainExpression node, Object data) {
+		return MAEAdapter.toPropertyChainModel(node, this.ontologies,
+				this.owlOntologyManager);
 	}
 
 	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
+	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStoreTo,
 	 *      java.lang.Object)
 	 */
 	public Object visit(MAEStoreTo node, Object data) {
 		return null;
 	}
-
-	/**
-	 * @see uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
-	 *      java.lang.Object)
-	 */
-	public Object visit(MAEPropertyFacet node, Object data) {
-		return null;
-	}
 }
-// public class BindingExtractor implements ArithmeticsParserVisitor {
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.SimpleNode,
-// * java.lang.Object)
-// */
-// public Object visit(SimpleNode node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStart,
-// * java.lang.Object)
-// */
-// public Object visit(MAEStart node, Object data) {
-// Set<MAEBinding> toReturn = new HashSet<MAEBinding>();
-// int childrenCount = node.jjtGetNumChildren();
-// for (int i = 0; i < childrenCount; i++) {
-// Node element = node.jjtGetChild(i);
-// MAEBinding visitResult = (MAEBinding) element.jjtAccept(this, null);
-// if (visitResult != null) {
-// toReturn.add(visitResult);
-// }
-// }
-// return toReturn;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEConflictStrategy,
-// * java.lang.Object)
-// */
-// public Object visit(MAEConflictStrategy node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEmanSyntaxClassExpression,
-// * java.lang.Object)
-// */
-// public Object visit(MAEmanSyntaxClassExpression node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBinding,
-// * java.lang.Object)
-// */
-// public Object visit(MAEBinding node, Object data) {
-// return node;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyChain,
-// * java.lang.Object)
-// */
-// public Object visit(MAEPropertyChain node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEAdd,
-// * java.lang.Object)
-// */
-// public Object visit(MAEAdd node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEMult,
-// * java.lang.Object)
-// */
-// public Object visit(MAEMult node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPower,
-// * java.lang.Object)
-// */
-// public Object visit(MAEPower node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEIntNode,
-// * java.lang.Object)
-// */
-// public Object visit(MAEIntNode node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEIdentifier,
-// * java.lang.Object)
-// */
-// public Object visit(MAEIdentifier node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEBigSum,
-// * java.lang.Object)
-// */
-// public Object visit(MAEBigSum node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEStoreTo,
-// * java.lang.Object)
-// */
-// public Object visit(MAEStoreTo node, Object data) {
-// return null;
-// }
-//
-// /**
-// * @see
-// uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.MAEPropertyFacet,
-// * java.lang.Object)
-// */
-// public Object visit(MAEPropertyFacet node, Object data) {
-// return null;
-// }
-// }

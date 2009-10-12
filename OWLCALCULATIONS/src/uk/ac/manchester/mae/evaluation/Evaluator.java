@@ -23,7 +23,6 @@
 package uk.ac.manchester.mae.evaluation;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
@@ -38,14 +37,13 @@ import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyCreationException;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
-import uk.ac.manchester.mae.MAEStart;
 import uk.ac.manchester.mae.PropertyVisitor;
 import uk.ac.manchester.mae.UnresolvedSymbolsException;
+import uk.ac.manchester.mae.parser.MAEStart;
 import uk.ac.manchester.mae.report.EvaluationReport;
 import uk.ac.manchester.mae.report.ExceptionReportWriter;
 import uk.ac.manchester.mae.report.ResultReportWriter;
 import uk.ac.manchester.mae.visitor.ClassExtractor;
-import uk.ac.manchester.mae.visitor.DescriptionFacetExtractor;
 import uk.ac.manchester.mae.visitor.Writer;
 
 /**
@@ -118,10 +116,7 @@ public class Evaluator {
 									dataProperty,
 									evaluationResults.getValues(),
 									this.ontology, this.reasoner,
-									this.ontologyManager, this.report,
-									new DescriptionFacetExtractor(
-											this.ontologyManager,
-											this.ontologies));
+									this.ontologyManager, this.report);
 							formula.jjtAccept(writer, null);
 						}
 					} else {
@@ -214,15 +209,7 @@ public class Evaluator {
 			Constructor<OWLReasoner> con = reasonerClass
 					.getConstructor(OWLOntologyManager.class);
 			return con.newInstance(ontologyManager);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (InstantiationException e) {
+		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
 	}
