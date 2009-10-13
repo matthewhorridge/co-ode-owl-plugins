@@ -26,7 +26,6 @@ public class RenderableObjectCellRenderer extends OWLCellRenderer {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	protected String getRendering(Object object) {
 		// if the item is an OWLObject, use the default OWLCellRenderer
 		// implementation
@@ -38,10 +37,10 @@ public class RenderableObjectCellRenderer extends OWLCellRenderer {
 		}
 		// otherwise, instead of a simple toString...
 		Object item = null;
-		if (object instanceof VariableListItem) {
-			item = ((VariableListItem) object).getItem();
-		} else if (object instanceof StaticListItem) {
-			item = ((StaticListItem) object).getItem();
+		if (object instanceof VariableListItem<?>) {
+			item = ((VariableListItem<?>) object).getItem();
+		} else if (object instanceof StaticListItem<?>) {
+			item = ((StaticListItem<?>) object).getItem();
 		}
 		// item contains now the actual element
 		if (item != null) {

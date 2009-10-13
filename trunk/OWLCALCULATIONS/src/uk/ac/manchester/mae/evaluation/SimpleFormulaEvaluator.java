@@ -57,7 +57,6 @@ public class SimpleFormulaEvaluator extends FormulaBodyVisitor {
 		this.bindingAssignments = bindingAssignments;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Object visit(MAEStart node, Object data) {
 		Object results = null;
@@ -67,9 +66,9 @@ public class SimpleFormulaEvaluator extends FormulaBodyVisitor {
 				results = child.jjtAccept(this, data);
 			}
 		}
-		if (results != null && results instanceof Collection) {
+		if (results != null && results instanceof Collection<?>) {
 			this.evaluationResults = new EvaluationResult(
-					(Collection<? extends Object>) results);
+					(Collection<?>) results);
 		} else if (results != null) {
 			List<Object> resultList = new ArrayList<Object>();
 			resultList.add(results);
