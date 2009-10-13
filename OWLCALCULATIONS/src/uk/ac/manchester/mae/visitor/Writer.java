@@ -321,7 +321,6 @@ public class Writer implements ArithmeticsParserVisitor {
 		return null;
 	}
 
-	@SuppressWarnings("unchecked")
 	private void write(OWLIndividual individual, OWLDataProperty dataProp,
 			Object object) throws EvaluationException,
 			OWLOntologyChangeException, UnsupportedDataTypeException {
@@ -329,16 +328,16 @@ public class Writer implements ArithmeticsParserVisitor {
 				this.startingOntology).get(dataProp);
 		if (!dataProp.isFunctional(this.ontologies) || oldValues == null
 				|| oldValues.isEmpty()) {
-			if (object instanceof Collection) {
-				for (Object newValue : (Collection<Object>) object) {
+			if (object instanceof Collection<?>) {
+				for (Object newValue : (Collection<?>) object) {
 					writeSingleValue(individual, dataProp, newValue);
 				}
 			} else {
 				writeSingleValue(individual, dataProp, object);
 			}
 		} else if (dataProp.isFunctional(this.ontologies)) {
-			if (object instanceof Collection
-					&& ((Collection<Object>) object).size() > 1) {
+			if (object instanceof Collection<?>
+					&& ((Collection<?>) object).size() > 1) {
 				throw new MoreThanOneValueForFunctionalPropertyException(
 						"More than one value for the functional property "
 								+ dataProp + " for the individual "
@@ -354,7 +353,7 @@ public class Writer implements ArithmeticsParserVisitor {
 							.solve(
 									individual,
 									oldAssertion,
-									convert2OWLConstant(object instanceof Collection ? ((Collection) object)
+									convert2OWLConstant(object instanceof Collection<?> ? ((Collection<?>) object)
 											.iterator().next()
 											: object), this.ontologies,
 									this.ontologyManager);
@@ -362,7 +361,7 @@ public class Writer implements ArithmeticsParserVisitor {
 					writeSingleValue(
 							individual,
 							dataProp,
-							object instanceof Collection ? ((Collection) object)
+							object instanceof Collection<?> ? ((Collection<?>) object)
 									.iterator().next()
 									: object);
 				}

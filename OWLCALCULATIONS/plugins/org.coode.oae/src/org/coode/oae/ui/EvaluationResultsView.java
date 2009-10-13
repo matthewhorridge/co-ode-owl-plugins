@@ -101,7 +101,6 @@ public class EvaluationResultsView extends AbstractOWLViewComponent implements
 	 * @see uk.ac.manchester.mae.report.ReportVisitor#visitFormulaEvaluationReport(uk.ac.manchester.mae.report.FormulaEvaluationReport,
 	 *      java.lang.Object)
 	 */
-	@SuppressWarnings("unchecked")
 	public Object visitFormulaEvaluationReport(
 			FormulaEvaluationReport formulaEvaluationReport, Object data) {
 		MutableTreeNode formulaNode = new DefaultMutableTreeNode(
@@ -115,8 +114,8 @@ public class EvaluationResultsView extends AbstractOWLViewComponent implements
 			formulaNode.insert(individualNode, 0);
 			Object value = formulaEvaluationReport.getResult(individual)
 					.getValues();
-			if (value instanceof Collection) {
-				for (Object singleValue : (Collection<Object>) value) {
+			if (value instanceof Collection<?>) {
+				for (Object singleValue : (Collection<?>) value) {
 					MutableTreeNode singleValueNode = new DefaultMutableTreeNode(
 							singleValue);
 					individualNode.insert(singleValueNode, 0);
