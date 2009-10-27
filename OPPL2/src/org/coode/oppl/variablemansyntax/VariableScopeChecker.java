@@ -22,7 +22,8 @@
  */
 package org.coode.oppl.variablemansyntax;
 
-import org.coode.oppl.OPPLException;
+import org.coode.oppl.exceptions.NullReasonerException;
+import org.coode.oppl.exceptions.OPPLException;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLClass;
@@ -41,7 +42,7 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  */
 public class VariableScopeChecker {
 	protected OWLOntologyManager ontologyManager;
-	protected OWLReasoner reasoner;
+	private OWLReasoner reasoner;
 
 	/**
 	 * @param ontologyManager
@@ -63,7 +64,7 @@ public class VariableScopeChecker {
 	 * @return true is the input owlClass is in the input scope, false otherwise
 	 * @throws OWLReasonerException
 	 */
-	public boolean check(OWLClass owlCass, SubClassVariableScope scope)
+	protected boolean check(OWLClass owlCass, SubClassVariableScope scope)
 			throws OWLReasonerException {
 		OWLDescription description = scope.getDescription();
 		return this.reasoner.isSubClassOf(owlCass, description);
@@ -75,7 +76,7 @@ public class VariableScopeChecker {
 	 * @return true is the input owlClass is in the input scope, false otherwise
 	 * @throws OWLReasonerException
 	 */
-	public boolean check(OWLClass owlCass, SuperClassVariableScope scope)
+	protected boolean check(OWLClass owlCass, SuperClassVariableScope scope)
 			throws OWLReasonerException {
 		OWLDescription description = scope.getDescription();
 		return this.reasoner.isSubClassOf(description, owlCass);
@@ -88,8 +89,8 @@ public class VariableScopeChecker {
 	 *         otherwise
 	 * @throws OWLReasonerException
 	 */
-	public boolean check(OWLIndividual individual, IndividualVariableScope scope)
-			throws OWLReasonerException {
+	protected boolean check(OWLIndividual individual,
+			IndividualVariableScope scope) throws OWLReasonerException {
 		OWLDescription description = scope.getDescription();
 		return this.reasoner.hasType(individual, description, false);
 	}

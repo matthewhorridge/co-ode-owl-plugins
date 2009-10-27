@@ -27,6 +27,7 @@ package org.coode.oppl;
  * 
  */
 public enum ActionType {
+	// TODO equivalent to a defalut enum without fields and parameters
 	ADD("ADD"), REMOVE("REMOVE");
 	private String actionName;
 

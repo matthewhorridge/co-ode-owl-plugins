@@ -60,6 +60,8 @@ public class ExpressionParser implements VariableTypeVisitorEx<OWLObject> {
 				toReturn = this.parser.parseConstant();
 			}
 		} catch (ParserException e) {
+			// TODO figure out why no exception was being printed
+			e.printStackTrace();
 		}
 		return toReturn;
 	}

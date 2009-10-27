@@ -20,22 +20,39 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oppl.variablemansyntax;
-
-import org.coode.oppl.OPPLException;
-import org.semanticweb.owl.model.OWLObject;
+package org.coode.oppl.exceptions;
 
 /**
+ * Generic OPPL Exception
+ * 
  * @author Luigi Iannone
  * 
  */
-public class IncompatibleValueException extends OPPLException {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -5527774913248172855L;
+public class OPPLException extends Exception {
+	private static final long serialVersionUID = 567886696227544902L;
 
-	public IncompatibleValueException(OWLObject value, VariableType type) {
-		super("Incompatible value: " + value.toString() + " for type: " + type);
+	/**
+	 * @param message
+	 * @see Exception#Exception(String)
+	 */
+	public OPPLException(String message) {
+		super(message);
+	}
+
+	/**
+	 * @see Exception#Exception(Throwable)
+	 * @param t
+	 */
+	public OPPLException(Throwable t) {
+		super(t);
+	}
+
+	/**
+	 * @param message
+	 * @param t
+	 * @see Exception#Exception(String, Throwable)
+	 */
+	public OPPLException(String message, Throwable t) {
+		super(message, t);
 	}
 }

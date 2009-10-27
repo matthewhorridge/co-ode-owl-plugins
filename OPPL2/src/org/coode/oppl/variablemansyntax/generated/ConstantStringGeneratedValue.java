@@ -22,8 +22,7 @@
  */
 package org.coode.oppl.variablemansyntax.generated;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
@@ -36,7 +35,8 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
  * @author Luigi Iannone
  * 
  */
-public class ConstantStringGeneratedValue implements GeneratedValue<String> {
+public class ConstantStringGeneratedValue implements GeneratedValue<String>,
+		GeneratedValues<String> {
 	private final String constant;
 
 	public ConstantStringGeneratedValue(String constant) {
@@ -47,8 +47,10 @@ public class ConstantStringGeneratedValue implements GeneratedValue<String> {
 	 * @see org.coode.oppl.variablemansyntax.generated.GeneratedValue#getGeneratedValues()
 	 */
 	public List<String> getGeneratedValues() {
-		return Collections.unmodifiableList(new ArrayList<String>(Collections
-				.singleton(this.constant)));
+		// no need to return an unmodifiable list: the only element in the list
+		// is the string representing this constant, and that is immutable per
+		// se
+		return Arrays.asList(this.constant);
 	}
 
 	@Override

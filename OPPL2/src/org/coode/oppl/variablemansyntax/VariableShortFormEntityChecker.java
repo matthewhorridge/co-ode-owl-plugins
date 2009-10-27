@@ -371,20 +371,20 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 			VariableType type) throws OWLEntityCreationException {
 		Class<? extends OWLEntity> clazz = null;
 		switch (type) {
-		case CLASS:
-			clazz = OWLClass.class;
-			break;
-		case OBJECTPROPERTY:
-			clazz = OWLObjectProperty.class;
-			break;
-		case DATAPROPERTY:
-			clazz = OWLDataProperty.class;
-			break;
-		case INDIVIDUAL:
-			clazz = OWLIndividual.class;
-			break;
-		default:
-			break;
+			case CLASS:
+				clazz = OWLClass.class;
+				break;
+			case OBJECTPROPERTY:
+				clazz = OWLObjectProperty.class;
+				break;
+			case DATAPROPERTY:
+				clazz = OWLDataProperty.class;
+				break;
+			case INDIVIDUAL:
+				clazz = OWLIndividual.class;
+				break;
+			default:
+				break;
 		}
 		OWLEntityCreationSet<? extends OWLEntity> toReturn = null;
 		org.coode.oppl.entity.OWLEntityFactory owlEntityFactory = OPPLParser

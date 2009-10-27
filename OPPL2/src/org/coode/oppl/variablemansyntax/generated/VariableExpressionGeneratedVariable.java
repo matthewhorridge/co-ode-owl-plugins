@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.coode.oppl.variablemansyntax.generated;
 
@@ -29,7 +29,7 @@ public class VariableExpressionGeneratedVariable extends
 		/**
 		 * @param owlObject
 		 */
-		private VariableExpressionGeneratedValue(OWLObject owlObject,
+		protected VariableExpressionGeneratedValue(OWLObject owlObject,
 				ConstraintSystem constraintSystem) {
 			assert owlObject != null;
 			assert constraintSystem != null;
@@ -48,7 +48,7 @@ public class VariableExpressionGeneratedVariable extends
 			Set<BindingNode> leaves = this.constraintSystem.getLeaves();
 			List<OWLObject> toReturn = new ArrayList<OWLObject>(leaves.size());
 			for (BindingNode bindingNode : leaves) {
-				toReturn.add(this.getGeneratedValue(bindingNode));
+				toReturn.add(getGeneratedValue(bindingNode));
 			}
 			return toReturn;
 		}
@@ -78,11 +78,11 @@ public class VariableExpressionGeneratedVariable extends
 				new VariableExpressionGeneratedValue(owlObject,
 						constraintSystem));
 		if (constraintSystem == null) {
-			throw new NullPointerException(
+			throw new IllegalArgumentException(
 					"The constraint system cannot be null");
 		}
 		if (owlObject == null) {
-			throw new NullPointerException("The OWL Object cannot be null");
+			throw new IllegalArgumentException("The OWL Object cannot be null");
 		}
 		this.owlObject = owlObject;
 		this.constraintSystem = constraintSystem;

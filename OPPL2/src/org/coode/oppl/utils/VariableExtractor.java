@@ -119,6 +119,7 @@ import org.semanticweb.owl.model.SWRLSameAsAtom;
  * @author Luigi Iannone
  * 
  */
+@SuppressWarnings("unused")
 public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 	protected ConstraintSystem constraintSystem;
 

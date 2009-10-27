@@ -31,9 +31,9 @@ import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.InputVariable;
+import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.Variable.PlainVariableVisitor;
-import org.coode.oppl.variablemansyntax.Variable.VariableVisitor;
+import org.coode.oppl.variablemansyntax.VariableVisitor;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
@@ -44,6 +44,9 @@ import org.semanticweb.owl.model.OWLObject;
  */
 public class BindingNode implements VariableVisitor<OWLObject> {
 	private class VariableInspector implements PlainVariableVisitor {
+		public VariableInspector() {
+		}
+
 		public void visit(InputVariable v) {
 			BindingNode.this.unassignedVariables.add(v);
 		}
@@ -53,7 +56,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	}
 
 	private final Set<Assignment> assignments;
-	private final Set<Variable> unassignedVariables;
+	protected final Set<Variable> unassignedVariables;
 
 	/**
 	 * @param assignments
@@ -154,12 +157,9 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 		boolean toReturn = obj instanceof BindingNode;
 		if (toReturn) {
 			BindingNode toCompare = (BindingNode) obj;
-			toReturn = toCompare.assignments.containsAll(this.assignments)
-					&& this.assignments.containsAll(toCompare.assignments)
-					&& toCompare.unassignedVariables
-							.containsAll(this.unassignedVariables)
-					&& this.assignments
-							.containsAll(toCompare.unassignedVariables);
+			toReturn = this.assignments.equals(toCompare.assignments)
+					&& this.unassignedVariables
+							.equals(toCompare.unassignedVariables);
 		}
 		return toReturn;
 	}
@@ -178,15 +178,12 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	}
 
 	public OWLObject visit(InputVariable v) {
-		Iterator<Assignment> it = this.assignments.iterator();
-		boolean found = false;
-		OWLObject toReturn = null;
-		while (!found && it.hasNext()) {
-			Assignment assignment = it.next();
-			found = assignment.getAssignedVariable().equals(v);
-			toReturn = found ? assignment.getAssignment() : toReturn;
+		for (Assignment assignment : this.assignments) {
+			if (assignment.getAssignedVariable().equals(v)) {
+				return assignment.getAssignment();
+			}
 		}
-		return toReturn;
+		return null;
 	}
 
 	public OWLObject visit(GeneratedVariable<?> v) {

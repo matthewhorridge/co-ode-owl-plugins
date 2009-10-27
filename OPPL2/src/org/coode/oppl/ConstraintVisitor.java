@@ -43,5 +43,6 @@ public interface ConstraintVisitor {
 	 * @param c
 	 * 
 	 */
-	void visitInCollectionConstraint(InCollectionConstraint<? extends OWLObject> c);
+	void visitInCollectionConstraint(
+			InCollectionConstraint<? extends OWLObject> c);
 }

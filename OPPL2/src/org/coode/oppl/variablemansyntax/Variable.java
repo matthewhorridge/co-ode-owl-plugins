@@ -39,33 +39,21 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public interface Variable {
-	public interface VariableVisitor<P extends Object> {
-		P visit(InputVariable v);
-
-		P visit(GeneratedVariable<?> v);
-	}
-
-	public interface PlainVariableVisitor {
-		void visit(InputVariable v);
-
-		void visit(GeneratedVariable<?> v);
-	}
-
 	/**
 	 * @return the name of the Variable
 	 */
-	String getName();
+	public String getName();
 
 	/**
 	 * @return an URI for the Variable
 	 */
-	URI getURI();
+	public URI getURI();
 
 	/**
 	 * @return the type of the Variable
 	 * @see VariableType
 	 */
-	VariableType getType();
+	public VariableType getType();
 
 	/**
 	 * Adds a possible value (the input OWLObject) the Variable can assume
@@ -73,12 +61,13 @@ public interface Variable {
 	 * @param object
 	 * @throws OWLReasonerException
 	 */
-	boolean addPossibleBinding(OWLObject object) throws OWLReasonerException;
+	public boolean addPossibleBinding(OWLObject object)
+			throws OWLReasonerException;
 
 	/**
 	 * @return the currently possible values that a Variable can assume
 	 */
-	Set<OWLObject> getPossibleBindings();
+	public Set<OWLObject> getPossibleBindings();
 
 	/**
 	 * Removes the input OWLObject from the set of current possible values the
@@ -86,12 +75,12 @@ public interface Variable {
 	 * 
 	 * @param object
 	 */
-	boolean removePossibleBinding(OWLObject object);
+	public boolean removePossibleBinding(OWLObject object);
 
 	/**
 	 * Empties the set of current possible values for the Variable
 	 */
-	void clearBindings();
+	public void clearBindings();
 
 	/**
 	 * Sets the scope for the Variable that will be checked by means of the
@@ -100,20 +89,19 @@ public interface Variable {
 	 * @param variableScope
 	 * @param variableScopeChecker
 	 */
-	void setVariableScope(VariableScope variableScope,
+	public void setVariableScope(VariableScope variableScope,
 			VariableScopeChecker variableScopeChecker);
 
 	/**
 	 * @return the scope for the Variable (can be null if not previously
 	 *         assigned)
 	 */
-	VariableScope getVariableScope();
+	public VariableScope getVariableScope();
 
 	/**
 	 * Visitor pattern interface method for visitors with return type
 	 * 
-	 * @param
-	 * <P>
+	 * @param <P>
 	 * @param visitor
 	 * @return
 	 */
@@ -124,5 +112,5 @@ public interface Variable {
 	 * 
 	 * @param visitor
 	 */
-	void accept(PlainVariableVisitor visitor);
+	public void accept(PlainVariableVisitor visitor);
 }

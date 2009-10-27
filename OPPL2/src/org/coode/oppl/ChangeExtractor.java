@@ -22,13 +22,11 @@
  */
 package org.coode.oppl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.AddAxiom;
-import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -43,7 +41,6 @@ public class ChangeExtractor implements
 		OPPLScriptVisitorEx<List<OWLAxiomChange>> {
 	private final OWLOntologyManager ontologyManager;
 	private final OWLOntology ontology;
-	// private List<OWLAxiomChange> changes = new ArrayList<OWLAxiomChange>();
 	private final boolean considerImportClosure;
 	private final ConstraintSystem constraintSystem;
 
@@ -60,73 +57,43 @@ public class ChangeExtractor implements
 	}
 
 	public List<OWLAxiomChange> visit(OPPLQuery q, List<OWLAxiomChange> p) {
-		if (q != null) {
-			q.getConstraintSystem().reset();
-			List<OWLAxiom> axioms = q.getAssertedAxioms();
-			for (OWLAxiom axiom : axioms) {
-				q.getConstraintSystem().addAssertedAxiom(axiom);
-			}
-			axioms = q.getAxioms();
-			for (OWLAxiom axiom : axioms) {
-				q.getConstraintSystem().addAxiom(axiom);
-			}
-			for (AbstractConstraint c : q.getConstraints()) {
-				q.getConstraintSystem().addConstraint(c);
-			}
-		}
-		return null;
+		// if (q != null) {
+		// q.getConstraintSystem().reset();
+		// List<OWLAxiom> axioms = q.getAssertedAxioms();
+		// for (OWLAxiom axiom : axioms) {
+		// q.getConstraintSystem().addAssertedAxiom(axiom);
+		// }
+		// axioms = q.getAxioms();
+		// for (OWLAxiom axiom : axioms) {
+		// q.getConstraintSystem().addAxiom(axiom);
+		// }
+		// for (AbstractConstraint c : q.getConstraints()) {
+		// q.getConstraintSystem().addConstraint(c);
+		// }
+		// }
+		// return null;
+		return p;
 	}
 
 	public List<OWLAxiomChange> visit(Variable v, List<OWLAxiomChange> p) {
-		return null;
+		// return null;
+		return p;
 	}
 
 	public List<OWLAxiomChange> visitActions(List<OWLAxiomChange> changes,
 			List<OWLAxiomChange> p) {
-		p = new ArrayList<OWLAxiomChange>();
 		for (OWLAxiomChange change : changes) {
 			boolean isAdd = change instanceof AddAxiom;
-			String action = isAdd ? "ADD" : "REMOVE";
-			List<OWLAxiomChange> actionChanges = this.considerImportClosure
-					&& !isAdd ? ActionFactory.createChanges(ActionType
-					.valueOf(action), change.getAxiom(), this
-					.getConstraintSystem(), this.ontologyManager
-					.getOWLDataFactory(), this.ontologyManager
-					.getImportsClosure(this.ontology)) : ActionFactory
-					.createChanges(ActionType.valueOf(action), change
-							.getAxiom(), this.getConstraintSystem(),
-							this.ontologyManager.getOWLDataFactory(),
-							this.ontology);
-			p.addAll(actionChanges);
+			ActionType action = isAdd ? ActionType.ADD : ActionType.REMOVE;
+			if (this.considerImportClosure && !isAdd) {
+				p.addAll(ActionFactory.createChanges(action, change.getAxiom(),
+						this.constraintSystem, this.ontologyManager
+								.getImportsClosure(this.ontology)));
+			} else {
+				p.addAll(ActionFactory.createChanges(action, change.getAxiom(),
+						this.constraintSystem, this.ontology));
+			}
 		}
 		return p;
-	}
-
-	/**
-	 * @return the ontologyManager
-	 */
-	public OWLOntologyManager getOntologyManager() {
-		return this.ontologyManager;
-	}
-
-	/**
-	 * @return the ontology
-	 */
-	public OWLOntology getOntology() {
-		return this.ontology;
-	}
-
-	/**
-	 * @return the considerImportClosure
-	 */
-	public boolean isConsiderImportClosure() {
-		return this.considerImportClosure;
-	}
-
-	/**
-	 * @return the constraintSystem
-	 */
-	public ConstraintSystem getConstraintSystem() {
-		return this.constraintSystem;
 	}
 }
