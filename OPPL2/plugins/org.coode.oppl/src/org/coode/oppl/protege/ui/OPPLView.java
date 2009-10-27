@@ -87,9 +87,12 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		OWLModelManagerListener {
 	private final class ReasonerOPPLScriptValiator implements
 			OPPLScriptValidator {
+		public ReasonerOPPLScriptValiator() {
+		}
+
 		public boolean accept(OPPLScript script) {
-			OWLReasoner reasoner = OPPLView.this.getOWLEditorKit()
-					.getModelManager().getReasoner();
+			OWLReasoner reasoner = getOWLEditorKit().getModelManager()
+					.getReasoner();
 			return !(reasoner instanceof NoOpReasoner)
 					|| script.accept(new OPPLScriptVisitorEx<Boolean>() {
 						public Boolean visitActions(
@@ -120,14 +123,13 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		/**
 		 * @param changes
 		 */
-		public OPPLExecutorSwingWorker(List<OWLAxiomChange> changes) {
+		protected OPPLExecutorSwingWorker(List<OWLAxiomChange> changes) {
 			this.changes = changes;
 		}
 
 		@Override
-		protected List<OWLAxiomChange> doInBackground() throws Exception {
-			OPPLView.this.getOWLEditorKit().getModelManager().applyChanges(
-					this.changes);
+		protected List<OWLAxiomChange> doInBackground() {
+			getOWLEditorKit().getModelManager().applyChanges(this.changes);
 			return this.changes;
 		}
 
@@ -155,9 +157,8 @@ public class OPPLView extends AbstractOWLViewComponent implements
 				for (OWLAxiomChange axiomChange : changes) {
 					model.addAction(axiomChange, false, true);
 				}
-				OPPLView.this.revalidate();
-				OPPLView.this
-						.updateInstantiatedAxioms(OPPLView.this.statementModel);
+				revalidate();
+				updateInstantiatedAxioms(OPPLView.this.statementModel);
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
 						OPPLView.this.instantiatedScrollPane
@@ -182,11 +183,10 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		}
 
 		@Override
-		protected List<OWLAxiomChange> doInBackground() throws Exception {
-			ChangeExtractor changeExtractor = new ChangeExtractor(OPPLView.this
-					.getOWLEditorKit().getModelManager().getActiveOntology(),
-					OPPLView.this.getOWLEditorKit().getModelManager()
-							.getOWLOntologyManager(),
+		protected List<OWLAxiomChange> doInBackground() {
+			ChangeExtractor changeExtractor = new ChangeExtractor(
+					getOWLEditorKit().getModelManager().getActiveOntology(),
+					getOWLEditorKit().getModelManager().getOWLOntologyManager(),
 					OPPLView.this.statementModel.getConstraintSystem(),
 					OPPLView.this.considerImportClosureCheckBox.isSelected());
 			System.out.println(OPPLView.this.statementModel.toString());
@@ -197,21 +197,21 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1897093057453176659L;
 	private static final String OPPL_COMPUTATION_IN_PROGRESS_PLEASE_WAIT = "OPPL Computation in progress...please wait";
-	private OPPLEditor editor;
+	protected OPPLEditor editor;
 	private final ReasonerOPPLScriptValiator validator = new ReasonerOPPLScriptValiator();
-	private JButton evaluate = new JButton("Evaluate");
-	private JButton execute = new JButton("Execute");
-	private ActionList affectedAxioms;
-	private OWLLinkedObjectList instantiatedAxiomsList;
-	private OPPLScript statementModel;
-	private JDialog window;
-	private JScrollPane affectedScrollPane;
-	private JScrollPane instantiatedScrollPane;
-	private JCheckBox considerImportClosureCheckBox = new JCheckBox(
+	protected JButton evaluate = new JButton("Evaluate");
+	protected JButton execute = new JButton("Execute");
+	protected ActionList affectedAxioms;
+	protected OWLLinkedObjectList instantiatedAxiomsList;
+	protected OPPLScript statementModel;
+	protected JDialog window;
+	protected JScrollPane affectedScrollPane;
+	protected JScrollPane instantiatedScrollPane;
+	protected JCheckBox considerImportClosureCheckBox = new JCheckBox(
 			"When removing consider Active Ontology Imported Closure", false);
 	private DefaultTreeModel bindingTreeNodeModel = new DefaultTreeModel(
 			new DefaultMutableTreeNode("Bindings"));
@@ -219,24 +219,22 @@ public class OPPLView extends AbstractOWLViewComponent implements
 
 	@Override
 	protected void disposeOWLView() {
-		this.getOWLEditorKit().getModelManager().removeListener(this);
+		getOWLEditorKit().getModelManager().removeListener(this);
 		this.editor.removeStatusChangedListener(this);
 	}
 
 	@Override
-	protected void initialiseOWLView() throws Exception {
-		this.setLayout(new BorderLayout());
+	protected void initialiseOWLView() {
+		setLayout(new BorderLayout());
 		JPanel statementPanel = new JPanel(new BorderLayout());
-		ProtegeParserFactory.initParser("", this.getOWLModelManager());
-		this.affectedAxioms = new ActionList(this.getOWLEditorKit(),
-				new ConstraintSystem(this.getOWLEditorKit().getModelManager()
-						.getActiveOntology(), this.getOWLEditorKit()
+		ProtegeParserFactory.initParser("", getOWLModelManager());
+		this.affectedAxioms = new ActionList(getOWLEditorKit(),
+				new ConstraintSystem(getOWLEditorKit().getModelManager()
+						.getActiveOntology(), getOWLEditorKit()
 						.getModelManager().getOWLOntologyManager()), false);
-		this.instantiatedAxiomsList = new OWLLinkedObjectList(this
-				.getOWLEditorKit());
+		this.instantiatedAxiomsList = new OWLLinkedObjectList(getOWLEditorKit());
 		this.instantiatedAxiomsList.setModel(new DefaultListModel());
-		OWLCellRenderer cellRenderer = new OWLCellRenderer(this
-				.getOWLEditorKit());
+		OWLCellRenderer cellRenderer = new OWLCellRenderer(getOWLEditorKit());
 		cellRenderer.setWrap(true);
 		cellRenderer.setHighlightKeywords(true);
 		this.considerImportClosureCheckBox
@@ -260,10 +258,10 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		statementPanel.add(this.considerImportClosureCheckBox,
 				BorderLayout.EAST);
 		this.instantiatedAxiomsList.setCellRenderer(cellRenderer);
-		this.getOWLEditorKit().getModelManager().addListener(this);
-		this.getOWLModelManager().getOWLOntologyManager()
-				.addOntologyChangeListener(this);
-		this.editor = new OPPLEditor(this.getOWLEditorKit(), this.validator);
+		getOWLEditorKit().getModelManager().addListener(this);
+		getOWLModelManager().getOWLOntologyManager().addOntologyChangeListener(
+				this);
+		this.editor = new OPPLEditor(getOWLEditorKit(), this.validator);
 		this.editor.setPreferredSize(new Dimension(200, 300));
 		statementPanel.add(ComponentFactory.createScrollPane(this.editor),
 				BorderLayout.NORTH);
@@ -295,33 +293,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.evaluate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				OPPLView.this.evaluate.setEnabled(false);
-				JPanel panel = new JPanel(new BorderLayout(7, 7));
-				JProgressBar progressBar = new JProgressBar();
-				panel.add(progressBar, BorderLayout.SOUTH);
-				panel
-						.setBorder(BorderFactory.createEmptyBorder(10, 10, 10,
-								10));
-				progressBar.setIndeterminate(true);
-				JLabel label = new JLabel(
-						OPPL_COMPUTATION_IN_PROGRESS_PLEASE_WAIT);
-				panel.add(label, BorderLayout.NORTH);
-				OPPLView.this.window = new JDialog((Frame) SwingUtilities
-						.getAncestorOfClass(Frame.class, OPPLView.this
-								.getOWLEditorKit().getWorkspace()),
-						"OPPL Engine progress", true);
-				OPPLView.this.window.setLocation(400, 400);
-				JPanel holderPanel = new JPanel(new BorderLayout(7, 7));
-				holderPanel.add(panel, BorderLayout.NORTH);
-				holderPanel.setBorder(BorderFactory.createEmptyBorder(5, 10,
-						10, 10));
-				OPPLView.this.window.getContentPane().setLayout(
-						new BorderLayout());
-				OPPLView.this.window.getContentPane().add(holderPanel,
-						BorderLayout.NORTH);
-				OPPLView.this.window.pack();
-				Dimension windowSize = OPPLView.this.window.getSize();
-				OPPLView.this.window.setSize(400, windowSize.height);
-				OPPLView.this.window.setResizable(false);
+				test();
 				OPPLChangeDetectorSwingWorker opplSwingWorker = new OPPLChangeDetectorSwingWorker();
 				OPPLView.this.window.pack();
 				SwingUtilities.invokeLater(new Runnable() {
@@ -356,33 +328,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 			public void actionPerformed(ActionEvent e) {
 				ActionListModel model = (ActionListModel) OPPLView.this.affectedAxioms
 						.getModel();
-				JPanel panel = new JPanel(new BorderLayout(7, 7));
-				JProgressBar progressBar = new JProgressBar();
-				panel.add(progressBar, BorderLayout.SOUTH);
-				panel
-						.setBorder(BorderFactory.createEmptyBorder(10, 10, 10,
-								10));
-				progressBar.setIndeterminate(true);
-				JLabel label = new JLabel(
-						OPPL_COMPUTATION_IN_PROGRESS_PLEASE_WAIT);
-				panel.add(label, BorderLayout.NORTH);
-				OPPLView.this.window = new JDialog((Frame) SwingUtilities
-						.getAncestorOfClass(Frame.class, OPPLView.this
-								.getOWLEditorKit().getWorkspace()),
-						"OPPL Engine progress", true);
-				OPPLView.this.window.setLocation(400, 400);
-				JPanel holderPanel = new JPanel(new BorderLayout(7, 7));
-				holderPanel.add(panel, BorderLayout.NORTH);
-				holderPanel.setBorder(BorderFactory.createEmptyBorder(5, 10,
-						10, 10));
-				OPPLView.this.window.getContentPane().setLayout(
-						new BorderLayout());
-				OPPLView.this.window.getContentPane().add(holderPanel,
-						BorderLayout.NORTH);
-				OPPLView.this.window.pack();
-				Dimension windowSize = OPPLView.this.window.getSize();
-				OPPLView.this.window.setSize(400, windowSize.height);
-				OPPLView.this.window.setResizable(false);
+				test();
 				OPPLView.this.window.pack();
 				List<OWLAxiomChange> changes = model.getOWLAxiomChanges();
 				OPPLExecutorSwingWorker executorSwingWorker = new OPPLExecutorSwingWorker(
@@ -406,6 +352,29 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.editor.addStatusChangedListener(this);
 	}
 
+	protected final void test() {
+		JPanel panel = new JPanel(new BorderLayout(7, 7));
+		JProgressBar progressBar = new JProgressBar();
+		panel.add(progressBar, BorderLayout.SOUTH);
+		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		progressBar.setIndeterminate(true);
+		JLabel label = new JLabel(OPPL_COMPUTATION_IN_PROGRESS_PLEASE_WAIT);
+		panel.add(label, BorderLayout.NORTH);
+		this.window = new JDialog((Frame) SwingUtilities.getAncestorOfClass(
+				Frame.class, getOWLEditorKit().getWorkspace()),
+				"OPPL Engine progress", true);
+		this.window.setLocation(400, 400);
+		JPanel holderPanel = new JPanel(new BorderLayout(7, 7));
+		holderPanel.add(panel, BorderLayout.NORTH);
+		holderPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
+		this.window.getContentPane().setLayout(new BorderLayout());
+		this.window.getContentPane().add(holderPanel, BorderLayout.NORTH);
+		this.window.pack();
+		Dimension windowSize = this.window.getSize();
+		this.window.setSize(400, windowSize.height);
+		this.window.setResizable(false);
+	}
+
 	public void verifiedStatusChanged(boolean newState) {
 		this.bindingTreeNodeModel = new DefaultTreeModel(
 				new DefaultMutableTreeNode("Bindings"));
@@ -420,9 +389,9 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.instantiatedAxiomsList.setModel(new DefaultListModel());
 		if (newState) {
 			this.statementModel = this.editor.getOPPLScript();
-			this.bindingNodeTree.setCellRenderer(new BindingTreeRenderer(this
-					.getOWLEditorKit(), this.statementModel
-					.getConstraintSystem()));
+			this.bindingNodeTree.setCellRenderer(new BindingTreeRenderer(
+					getOWLEditorKit(), this.statementModel
+							.getConstraintSystem()));
 		}
 	}
 
@@ -439,10 +408,10 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	private void updateInstantiatedAxioms(OPPLScript statementModel) {
-		Map<BindingNode, Set<OWLAxiom>> instantiationMap = statementModel
+	protected void updateInstantiatedAxioms(OPPLScript statementModel1) {
+		Map<BindingNode, Set<OWLAxiom>> instantiationMap = statementModel1
 				.getConstraintSystem().getInstantiatedAxioms();
 		DefaultListModel model = new DefaultListModel();
 		DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.bindingNodeTree
@@ -460,12 +429,12 @@ public class OPPLView extends AbstractOWLViewComponent implements
 			}
 		}
 		this.instantiatedAxiomsList.setModel(model);
-		this.revalidate();
+		revalidate();
 	}
 
 	public void handleChange(OWLModelManagerChangeEvent event) {
 		if (event.getType().equals(EventType.REASONER_CHANGED)) {
-			OPPLParser.setReasoner(this.getOWLEditorKit().getModelManager()
+			OPPLParser.setReasoner(getOWLEditorKit().getModelManager()
 					.getReasoner());
 			// try {
 			// this.statementModel = this.opplStatementExpressionEditor

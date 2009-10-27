@@ -20,8 +20,8 @@ public class OPPLConstraintList extends MList {
 	 * 
 	 */
 	private static final long serialVersionUID = 4366866288573896156L;
-	private final OWLEditorKit owlEditorKit;
-	private ConstraintSystem constraintSystem;
+	protected final OWLEditorKit owlEditorKit;
+	protected ConstraintSystem constraintSystem;
 
 	/**
 	 * @param owlEditorKit
@@ -31,8 +31,8 @@ public class OPPLConstraintList extends MList {
 			ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
-		DefaultListModel model = this.clearModel();
-		this.setModel(model);
+		DefaultListModel model = clearModel();
+		setModel(model);
 	}
 
 	/**
@@ -54,21 +54,19 @@ public class OPPLConstraintList extends MList {
 
 	@Override
 	protected void handleEdit() {
-		if (this.getSelectedValue() instanceof OPPLConstraintListItem) {
-			OPPLConstraintListItem item = (OPPLConstraintListItem) this
-					.getSelectedValue();
-			((DefaultListModel) this.getModel()).removeElement(item);
+		if (getSelectedValue() instanceof OPPLConstraintListItem) {
+			OPPLConstraintListItem item = (OPPLConstraintListItem) getSelectedValue();
+			((DefaultListModel) getModel()).removeElement(item);
 			item.handleEdit();
-			((DefaultListModel) this.getModel()).addElement(item);
+			((DefaultListModel) getModel()).addElement(item);
 		}
 	}
 
 	@Override
 	protected void handleDelete() {
-		if (this.getSelectedValue() instanceof OPPLConstraintListItem) {
-			OPPLConstraintListItem item = (OPPLConstraintListItem) this
-					.getSelectedValue();
-			((DefaultListModel) this.getModel()).removeElement(item);
+		if (getSelectedValue() instanceof OPPLConstraintListItem) {
+			OPPLConstraintListItem item = (OPPLConstraintListItem) getSelectedValue();
+			((DefaultListModel) getModel()).removeElement(item);
 		}
 	}
 
@@ -126,6 +124,6 @@ public class OPPLConstraintList extends MList {
 	}
 
 	public void clear() {
-		this.setModel(this.clearModel());
+		setModel(clearModel());
 	}
 }

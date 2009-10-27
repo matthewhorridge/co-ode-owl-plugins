@@ -33,8 +33,8 @@ public class ProtegeSimpleVariableShortFormProvider implements
 	private final OWLModelManager modelManager;
 	private final ConstraintSystem constraintSystem;
 
-	public ProtegeSimpleVariableShortFormProvider(
-			OWLModelManager modelManager, ConstraintSystem constraintSystem) {
+	public ProtegeSimpleVariableShortFormProvider(OWLModelManager modelManager,
+			ConstraintSystem constraintSystem) {
 		this.modelManager = modelManager;
 		this.constraintSystem = constraintSystem;
 	}
@@ -45,8 +45,8 @@ public class ProtegeSimpleVariableShortFormProvider implements
 	public String getShortForm(OWLEntity entity) {
 		String toReturn = this.getModelManager().getRendering(entity);
 		if (this.constraintSystem != null) {
-			Variable v = this.getConstraintSystem().getVariable(
-					entity.getURI());
+			Variable v = this.getConstraintSystem()
+					.getVariable(entity.getURI());
 			if (v != null) {
 				toReturn = v.getName();
 			}

@@ -57,14 +57,14 @@ public class AxiomEditor extends JPanel implements VerifiedInputEditor {
 	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private final ExpressionEditor<OWLAxiom> editor;
 	private final OWLEditorKit owlEditorKit;
-	private final ConstraintSystem constraintSystem;
+	protected final ConstraintSystem constraintSystem;
 	private OWLAxiom axiom = null;
 
-	public AxiomEditor(OWLEditorKit owlEditorKit,
+	protected AxiomEditor(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
-		this.setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 		this.editor = new ExpressionEditor<OWLAxiom>(this.owlEditorKit,
 				new OWLExpressionChecker<OWLAxiom>() {
 					private OWLAxiom lastEditedObject = null;
@@ -112,11 +112,11 @@ public class AxiomEditor extends JPanel implements VerifiedInputEditor {
 	 */
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		listener.verifiedStatusChanged(this.check());
+		listener.verifiedStatusChanged(check());
 		this.listeners.add(listener);
 	}
 
-	private boolean check() {
+	protected boolean check() {
 		try {
 			this.axiom = this.editor.createObject();
 			return true;
@@ -137,7 +137,7 @@ public class AxiomEditor extends JPanel implements VerifiedInputEditor {
 		this.listeners.remove(listener);
 	}
 
-	public void notifyListeners(boolean newStatus) {
+	protected void notifyListeners(boolean newStatus) {
 		for (InputVerificationStatusChangedListener listener : this.listeners) {
 			listener.verifiedStatusChanged(newStatus);
 		}
@@ -147,7 +147,7 @@ public class AxiomEditor extends JPanel implements VerifiedInputEditor {
 		return this.axiom;
 	}
 
-	public void clear() {
+	protected void clear() {
 		this.editor.setText("");
 	}
 

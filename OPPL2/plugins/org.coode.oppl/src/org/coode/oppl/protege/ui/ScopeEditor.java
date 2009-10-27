@@ -81,7 +81,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 
 		public ClassScopeEditor(OWLEditorKit owlEditorKit) {
 			super(CLASS_TITLE, owlEditorKit);
-			this.setLayout(new BorderLayout());
+			setLayout(new BorderLayout());
 			JRadioButton superClassRadioButton = new JRadioButton(
 					Direction.SUPERCLASSOF.toString());
 			this.radioButtonDirectionMap.put(superClassRadioButton,
@@ -131,25 +131,26 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 		}
 
 		public void verifiedStatusChanged(boolean newState) {
-			this.setVariableScope(null);
+			setVariableScope(null);
 			if (newState) {
-				JRadioButton button = this.findSelectedButton();
+				JRadioButton button = findSelectedButton();
 				if (button != null) {
 					Direction direction = this.radioButtonDirectionMap
 							.get(button);
 					try {
 						switch (direction) {
-						case SUPERCLASSOF:
-							this.setVariableScope(VariableScopes
-									.buildSuperClassVariableScope(this.editor
-											.createObject()));
-							break;
-						case SUBCLASSOF:
-							this.setVariableScope(VariableScopes
-									.buildSubClassVariableScope(this.editor
-											.createObject()));
-						default:
-							break;
+							case SUPERCLASSOF:
+								setVariableScope(VariableScopes
+										.buildSuperClassVariableScope(this.editor
+												.createObject()));
+								break;
+							case SUBCLASSOF:
+								setVariableScope(VariableScopes
+										.buildSubClassVariableScope(this.editor
+												.createObject()));
+								//$FALL-THROUGH$
+							default:
+								break;
 						}
 					} catch (OWLException e) {
 						throw new RuntimeException(e);
@@ -159,25 +160,26 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 		}
 
 		public void stateChanged(ChangeEvent e) {
-			JRadioButton selectedButton = this.findSelectedButton();
+			JRadioButton selectedButton = findSelectedButton();
 			if (selectedButton != null) {
 				Direction direction = this.radioButtonDirectionMap
 						.get(selectedButton);
 				try {
 					OWLDescription description = this.editor.createObject();
 					switch (direction) {
-					case SUPERCLASSOF:
-						this.setVariableScope(VariableScopes
-								.buildSuperClassVariableScope(description));
-						break;
-					case SUBCLASSOF:
-						this.setVariableScope(VariableScopes
-								.buildSubClassVariableScope(description));
-					default:
-						break;
+						case SUPERCLASSOF:
+							setVariableScope(VariableScopes
+									.buildSuperClassVariableScope(description));
+							break;
+						case SUBCLASSOF:
+							setVariableScope(VariableScopes
+									.buildSubClassVariableScope(description));
+							//$FALL-THROUGH$
+						default:
+							break;
 					}
 				} catch (OWLException owlException) {
-					this.setVariableScope(null);
+					setVariableScope(null);
 				}
 			}
 		}
@@ -212,7 +214,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 
 		public IndividualScopeEditor(OWLEditorKit owlEditorKit) {
 			super(INDIVIDUAL_TITLE, owlEditorKit);
-			this.setLayout(new BorderLayout());
+			setLayout(new BorderLayout());
 			// De-activate OWL default auto-completer
 			for (KeyListener l : this.editor.getKeyListeners()) {
 				this.editor.removeKeyListener(l);
@@ -229,10 +231,10 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 		}
 
 		public void verifiedStatusChanged(boolean newState) {
-			this.setVariableScope(null);
+			setVariableScope(null);
 			if (newState) {
 				try {
-					this.setVariableScope(VariableScopes
+					setVariableScope(VariableScopes
 							.buildIndividualVariableScope(this.editor
 									.createObject()));
 				} catch (OWLException e) {
@@ -273,7 +275,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 				boolean isDataProperty) {
 			super(PROPERTY_TITLE, owlEditorKit);
 			this.isDataProperty = isDataProperty;
-			this.setLayout(new BorderLayout());
+			setLayout(new BorderLayout());
 			JRadioButton superClassRadioButton = new JRadioButton(
 					Direction.SUBPROPERTYOF.toString());
 			this.radioButtonDirectionMap.put(superClassRadioButton,
@@ -348,37 +350,33 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 
 		public void stateChanged(ChangeEvent e) {
 			Object lastPathComponent = this.propertyTree.getSelectedObject();
-			JRadioButton selectedButton = this.findSelectedButton();
+			JRadioButton selectedButton = findSelectedButton();
 			if (selectedButton != null) {
 				Direction direction = this.radioButtonDirectionMap
 						.get(selectedButton);
-				this.setVariableScope(null);
+				setVariableScope(null);
 				if (lastPathComponent != null && direction != null) {
 					switch (direction) {
-					case SUBPROPERTYOF:
-						if (lastPathComponent instanceof OWLDataProperty) {
-							this
-									.setVariableScope(VariableScopes
-											.buildSubPropertyVariableScope((OWLDataProperty) lastPathComponent));
-						} else if (lastPathComponent instanceof OWLObjectProperty) {
-							this
-									.setVariableScope(VariableScopes
-											.buildSubPropertyVariableScope((OWLObjectProperty) lastPathComponent));
-						}
-						break;
-					case SUPERPROPERTYOF:
-						if (lastPathComponent instanceof OWLDataProperty) {
-							this
-									.setVariableScope(VariableScopes
-											.buildSuperPropertyVariableScope((OWLDataProperty) lastPathComponent));
-						} else if (lastPathComponent instanceof OWLObjectProperty) {
-							this
-									.setVariableScope(VariableScopes
-											.buildSuperPropertyVariableScope((OWLObjectProperty) lastPathComponent));
-						}
-						break;
-					default:
-						break;
+						case SUBPROPERTYOF:
+							if (lastPathComponent instanceof OWLDataProperty) {
+								setVariableScope(VariableScopes
+										.buildSubPropertyVariableScope((OWLDataProperty) lastPathComponent));
+							} else if (lastPathComponent instanceof OWLObjectProperty) {
+								setVariableScope(VariableScopes
+										.buildSubPropertyVariableScope((OWLObjectProperty) lastPathComponent));
+							}
+							break;
+						case SUPERPROPERTYOF:
+							if (lastPathComponent instanceof OWLDataProperty) {
+								setVariableScope(VariableScopes
+										.buildSuperPropertyVariableScope((OWLDataProperty) lastPathComponent));
+							} else if (lastPathComponent instanceof OWLObjectProperty) {
+								setVariableScope(VariableScopes
+										.buildSuperPropertyVariableScope((OWLObjectProperty) lastPathComponent));
+							}
+							break;
+						default:
+							break;
 					}
 				}
 			}
@@ -394,7 +392,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 	private VariableScope variableScope = null;
 	private final String title;
 
-	private ScopeEditor(String title, OWLEditorKit owlEditorKit) {
+	protected ScopeEditor(String title, OWLEditorKit owlEditorKit) {
 		this.owlEditorKit = owlEditorKit;
 		this.title = title;
 	}
@@ -409,7 +407,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 
 	protected final void setVariableScope(VariableScope variableScope) {
 		this.variableScope = variableScope;
-		this.notifyListeners();
+		notifyListeners();
 	}
 
 	private void notifyListeners() {
@@ -422,20 +420,20 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 			OWLEditorKit owlEditorKit) {
 		ScopeEditor toReturn = null;
 		switch (variableType) {
-		case CLASS:
-			toReturn = new ClassScopeEditor(owlEditorKit);
-			break;
-		case DATAPROPERTY:
-			toReturn = new PropertyScopeEditor(owlEditorKit, true);
-			break;
-		case OBJECTPROPERTY:
-			toReturn = new PropertyScopeEditor(owlEditorKit, false);
-			break;
-		case INDIVIDUAL:
-			toReturn = new IndividualScopeEditor(owlEditorKit);
-			break;
-		default:
-			break;
+			case CLASS:
+				toReturn = new ClassScopeEditor(owlEditorKit);
+				break;
+			case DATAPROPERTY:
+				toReturn = new PropertyScopeEditor(owlEditorKit, true);
+				break;
+			case OBJECTPROPERTY:
+				toReturn = new PropertyScopeEditor(owlEditorKit, false);
+				break;
+			case INDIVIDUAL:
+				toReturn = new IndividualScopeEditor(owlEditorKit);
+				break;
+			default:
+				break;
 		}
 		return toReturn;
 	}
@@ -443,7 +441,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		this.notifyListeners();
+		notifyListeners();
 	}
 
 	public void removeStatusChangedListener(

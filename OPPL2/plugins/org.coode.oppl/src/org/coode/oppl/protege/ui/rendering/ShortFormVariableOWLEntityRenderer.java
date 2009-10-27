@@ -30,12 +30,12 @@ import org.semanticweb.owl.util.SimpleShortFormProvider;
 
 public class ShortFormVariableOWLEntityRenderer implements OWLEntityRenderer {
 	private final ConstraintSystem constraintSystem;
-	private static final SimpleShortFormProvider shortFormProvider = new SimpleShortFormProvider();
+	private static final SimpleShortFormProvider SHORT_FORM_PROVIDER = new SimpleShortFormProvider();
 
 	public String render(OWLEntity entity) {
 		Variable variable = this.getConstraintSystem().getVariable(
 				entity.getURI());
-		return variable != null ? variable.getName() : shortFormProvider
+		return variable != null ? variable.getName() : SHORT_FORM_PROVIDER
 				.getShortForm(entity);
 	}
 

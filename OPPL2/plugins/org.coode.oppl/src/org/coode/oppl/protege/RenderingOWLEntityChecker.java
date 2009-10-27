@@ -37,9 +37,9 @@ import org.semanticweb.owl.util.SimpleShortFormProvider;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Aug 12, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Aug 12, 2008
  */
 public class RenderingOWLEntityChecker implements OWLEntityChecker {
 	protected OWLModelManager owlModelManager = null;

@@ -60,27 +60,28 @@ public class VariableOWLCellRenderer extends OWLCellRenderer implements
 	 * @param defaultRenderer
 	 *            the fall-back renderer for non variable OWLObjects. Cannot be
 	 *            {@code null}.
-	 * @throws NullPointerException
+	 * @throws IllegalArgumentException
 	 *             when either of the inputs is {@code null}.
 	 */
 	public VariableOWLCellRenderer(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem, OWLCellRenderer defaultRenderer) {
 		super(owlEditorKit);
 		if (owlEditorKit == null) {
-			throw new NullPointerException("The OWL editor kit cannot be null");
+			throw new IllegalArgumentException(
+					"The OWL editor kit cannot be null");
 		}
 		if (constraintSystem == null) {
-			throw new NullPointerException(
+			throw new IllegalArgumentException(
 					"The constraint system cannot be null");
 		}
 		if (defaultRenderer == null) {
-			throw new NullPointerException(
+			throw new IllegalArgumentException(
 					"The default cell renderer cannot be null");
 		}
 		this.constraintSystem = constraintSystem;
 		this.defaultRenderer = defaultRenderer;
-		this.setHighlightKeywords(true);
-		this.setWrap(true);
+		setHighlightKeywords(true);
+		setWrap(true);
 	}
 
 	/**

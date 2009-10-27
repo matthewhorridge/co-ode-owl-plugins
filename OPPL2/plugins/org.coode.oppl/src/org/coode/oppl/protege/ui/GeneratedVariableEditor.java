@@ -27,23 +27,19 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EnumSet;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-import javax.swing.AbstractButton;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import org.coode.oppl.exceptions.InvalidVariableNameException;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.syntax.TokenMgrError;
 import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.InvalidVariableNameException;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
@@ -60,25 +56,67 @@ import org.semanticweb.owl.model.OWLException;
  * 
  */
 public class GeneratedVariableEditor extends AbstractVariableEditor {
-	private class ChangeTypeActionListener implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			GeneratedVariableEditor.this.handleChange();
+	private final class VariableOWLExpressionChecker implements
+			OWLExpressionChecker<Variable> {
+		public VariableOWLExpressionChecker() {
+		}
+
+		private Variable lastEditedObject = null;
+
+		public void check(String text) throws OWLExpressionParserException {
+			this.lastEditedObject = null;
+			ProtegeParserFactory
+					.initParser(text, GeneratedVariableEditor.this.owlEditorKit
+							.getModelManager());
+			try {
+				String variableName = GeneratedVariableEditor.this.variableNameExpressionEditor
+						.createObject();
+				Object selectedValue = GeneratedVariableEditor.this.jRadioButtonTypeMap
+						.get(findSelectedButton());
+				if (selectedValue instanceof VariableType) {
+					Variable variableDefinition = OPPLParser.opplFunction(
+							variableName, (VariableType) selectedValue,
+							GeneratedVariableEditor.this.constraintSystem);
+					this.lastEditedObject = variableDefinition;
+				} else {
+					this.lastEditedObject = null;
+					throw new OWLExpressionParserException(new Exception(
+							"Undefined variable type"));
+				}
+			} catch (ParseException e) {
+				this.lastEditedObject = null;
+				throw new OWLExpressionParserException(e);
+			} catch (TokenMgrError e) {
+				this.lastEditedObject = null;
+				throw new OWLExpressionParserException(e);
+			} catch (OWLException e) {
+				this.lastEditedObject = null;
+				throw new OWLExpressionParserException(e);
+			}
+		}
+
+		public Variable createObject(String text)
+				throws OWLExpressionParserException {
+			this.check(text);
+			return this.lastEditedObject;
 		}
 	}
 
-	/**
-	 * 
-	 */
+	private class ChangeTypeActionListener implements ActionListener {
+		public ChangeTypeActionListener() {
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			handleChange();
+		}
+	}
+
 	private static final long serialVersionUID = 8899160597858126563L;
 	private static Map<VariableType, String> typeLabelStringMap;
-	private ExpressionEditor<String> variableNameExpressionEditor;
-	private ButtonGroup variableTypeButtonGroup;
-	private Variable variable = null;
-	private final OWLEditorKit owlEditorKit;
-	private final ConstraintSystem constraintSystem;
-	private final Map<JRadioButton, VariableType> jRadioButtonTypeMap = new HashMap<JRadioButton, VariableType>();
+	protected final OWLEditorKit owlEditorKit;
+	protected final ConstraintSystem constraintSystem;
+	protected final Map<JRadioButton, VariableType> jRadioButtonTypeMap = new HashMap<JRadioButton, VariableType>();
 	private final Map<VariableType, JRadioButton> typeJRadioButonMap = new HashMap<VariableType, JRadioButton>();
-	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private ExpressionEditor<Variable> opplFunctionEditor;
 	static {
 		typeLabelStringMap = new HashMap<VariableType, String>();
@@ -88,9 +126,9 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 		}
 	}
 
-	public GeneratedVariableEditor(OWLEditorKit owlEditorKit,
+	protected GeneratedVariableEditor(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
-		this.setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
 		this.variableNameExpressionEditor = new ExpressionEditor<String>(
@@ -150,51 +188,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 				.createTitledBorder("Variable Type"));
 		this.add(variableTypeAndScopePanel, BorderLayout.CENTER);
 		this.opplFunctionEditor = new ExpressionEditor<Variable>(
-				this.owlEditorKit, new OWLExpressionChecker<Variable>() {
-					private Variable lastEditedObject = null;
-
-					public void check(String text)
-							throws OWLExpressionParserException {
-						this.lastEditedObject = null;
-						ProtegeParserFactory.initParser(text,
-								GeneratedVariableEditor.this.owlEditorKit
-										.getModelManager());
-						try {
-							String variableName = GeneratedVariableEditor.this.variableNameExpressionEditor
-									.createObject();
-							Object selectedValue = GeneratedVariableEditor.this.jRadioButtonTypeMap
-									.get(GeneratedVariableEditor.this
-											.findSelectedButton());
-							if (selectedValue instanceof VariableType) {
-								Variable variableDefinition = OPPLParser
-										.opplFunction(
-												variableName,
-												(VariableType) selectedValue,
-												GeneratedVariableEditor.this.constraintSystem);
-								this.lastEditedObject = variableDefinition;
-							} else {
-								this.lastEditedObject = null;
-								throw new OWLExpressionParserException(
-										new Exception("Undefined variable type"));
-							}
-						} catch (ParseException e) {
-							this.lastEditedObject = null;
-							throw new OWLExpressionParserException(e);
-						} catch (TokenMgrError e) {
-							this.lastEditedObject = null;
-							throw new OWLExpressionParserException(e);
-						} catch (OWLException e) {
-							this.lastEditedObject = null;
-							throw new OWLExpressionParserException(e);
-						}
-					}
-
-					public Variable createObject(String text)
-							throws OWLExpressionParserException {
-						this.check(text);
-						return this.lastEditedObject;
-					}
-				});
+				this.owlEditorKit, new VariableOWLExpressionChecker());
 		this.opplFunctionEditor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
 					public void verifiedStatusChanged(boolean newState) {
@@ -209,8 +203,8 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 		this.add(opplFunctionEditorPanel, BorderLayout.SOUTH);
 	}
 
-	public void handleChange() {
-		if (this.check()) {
+	protected void handleChange() {
+		if (check()) {
 			try {
 				this.variableNameExpressionEditor.createObject();
 				if (this.variable != null) {
@@ -218,30 +212,21 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 				}
 				this.variable = this.opplFunctionEditor.createObject();
 				this.constraintSystem.importVariable(this.variable);
-				this.notifyListeners();
+				notifyListeners();
 			} catch (OWLExpressionParserException e) {
-				this.notifyListeners();
+				notifyListeners();
 				throw new RuntimeException(e);
 			} catch (OWLException e) {
-				this.notifyListeners();
+				notifyListeners();
 				throw new RuntimeException(e);
 			}
 		} else {
-			this.notifyListeners();
+			notifyListeners();
 		}
 	}
 
-	private void notifyListeners() {
-		for (InputVerificationStatusChangedListener listener : this.listeners) {
-			this.notifyListener(listener);
-		}
-	}
-
-	private void notifyListener(InputVerificationStatusChangedListener listener) {
-		listener.verifiedStatusChanged(this.check());
-	}
-
-	private boolean check() {
+	@Override
+	protected boolean check() {
 		try {
 			this.variableNameExpressionEditor.createObject();
 			this.opplFunctionEditor.createObject();
@@ -254,55 +239,16 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 	}
 
 	@Override
-	public void addStatusChangedListener(
-			InputVerificationStatusChangedListener listener) {
-		listener.verifiedStatusChanged(this.check());
-		this.listeners.add(listener);
-	}
-
-	@Override
-	public void removeStatusChangedListener(
-			InputVerificationStatusChangedListener listener) {
-		this.listeners.remove(listener);
-	}
-
-	@Override
-	public Variable getVariable() {
-		return this.variable;
-	}
-
-	@Override
-	public void dispose() {
-	}
-
-	@Override
-	public void clear() {
-		this.variableNameExpressionEditor.setText("");
-		Enumeration<AbstractButton> elements = this.variableTypeButtonGroup
-				.getElements();
-		while (elements.hasMoreElements()) {
-			elements.nextElement().setSelected(false);
-		}
-	}
-
-	private JRadioButton findSelectedButton() {
-		JRadioButton button = null;
-		Enumeration<AbstractButton> directions = this.variableTypeButtonGroup
-				.getElements();
-		boolean found = false;
-		while (!found && directions.hasMoreElements()) {
-			button = (JRadioButton) directions.nextElement();
-			found = button.isSelected();
-		}
-		return found ? button : null;
-	}
-
-	@Override
 	public void setVariable(Variable v) {
-		this.clear();
+		clear();
 		this.variableNameExpressionEditor.setText(v.getName());
 		this.typeJRadioButonMap.get(v.getType()).setSelected(true);
 		this.opplFunctionEditor.setText(((GeneratedVariable<?>) v)
 				.getOPPLFunction());
+	}
+
+	@Override
+	public void dispose() {
+		// TODO Auto-generated method stub
 	}
 }

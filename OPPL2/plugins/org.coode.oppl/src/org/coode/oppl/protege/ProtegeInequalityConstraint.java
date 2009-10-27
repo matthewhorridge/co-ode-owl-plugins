@@ -47,11 +47,23 @@ public class ProtegeInequalityConstraint extends InequalityConstraint {
 
 	@Override
 	public String toString() {
-		this.entityRenderer = new ShortFormVariableOWLEntityRenderer(this
-				.getConstraintSystem());
+		this.entityRenderer = new ShortFormVariableOWLEntityRenderer(
+				getConstraintSystem());
 		return this.constraint.getVariable().getName()
 				+ " != "
-				+ this.variableOWLObjectRenderer.render(this.getExpression(),
+				+ this.variableOWLObjectRenderer.render(getExpression(),
 						this.entityRenderer);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		// the changes in this class are not relevant for hashcode and equals
+		return super.equals(obj);
+	}
+
+	@Override
+	public int hashCode() {
+		// the changes in this class are not relevant for hashcode and equals
+		return super.hashCode();
 	}
 }

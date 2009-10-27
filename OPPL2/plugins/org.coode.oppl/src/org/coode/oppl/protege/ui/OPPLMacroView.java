@@ -81,27 +81,26 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 	 * 
 	 */
 	private static final long serialVersionUID = -8368147957917061074L;
-	private ActionList recordedActions;
+	protected ActionList recordedActions;
 	private OWLObjectList entities;
-	private VariableList variableList;
-	private JButton recordButton;
-	private JButton stopButton;
+	protected VariableList variableList;
+	protected JButton recordButton;
+	protected JButton stopButton;
 	private JButton copy2ClipboardButton;
 	private JButton clearButton;
-	private ConstraintSystem constraintSystem;
+	protected ConstraintSystem constraintSystem;
 
 	/**
 	 * @see org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent#initialiseClassView()
 	 */
 	@Override
-	public void initialiseOWLView() throws Exception {
-		this.constraintSystem = new ConstraintSystem(this.getOWLModelManager()
-				.getActiveOntology(), this.getOWLModelManager()
+	public void initialiseOWLView() {
+		this.constraintSystem = new ConstraintSystem(getOWLModelManager()
+				.getActiveOntology(), getOWLModelManager()
 				.getOWLOntologyManager());
-		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(this
-				.getOWLModelManager()));
-		this.setLayout(new BorderLayout());
-		this.recordedActions = new ActionList(this.getOWLEditorKit(),
+		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(getOWLModelManager()));
+		setLayout(new BorderLayout());
+		this.recordedActions = new ActionList(getOWLEditorKit(),
 				this.constraintSystem, false);
 		JScrollPane recordedActionsScrollPane = ComponentFactory
 				.createScrollPane(this.recordedActions);
@@ -221,11 +220,11 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 		JPanel recorderPanel = new JPanel(new BorderLayout());
 		recorderPanel.add(recorderToolBar, BorderLayout.NORTH);
 		recorderPanel.add(recordedActionBorderPanel, BorderLayout.CENTER);
-		this.entities = new OWLObjectList(this.constraintSystem, this
-				.getOWLEditorKit());
+		this.entities = new OWLObjectList(this.constraintSystem,
+				getOWLEditorKit());
 		this.entities.addOPPLMacroListener(this);
 		this.entities.setModel(new DefaultListModel());
-		this.variableList = new VariableList(this.getOWLEditorKit(),
+		this.variableList = new VariableList(getOWLEditorKit(),
 				this.constraintSystem);
 		this.variableList.setModel(new DefaultListModel());
 		this.variableList.getModel().addListDataListener(this.entities);
@@ -252,10 +251,9 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 
 	@Override
 	protected void disposeOWLView() {
-		this.getOWLEditorKit().getModelManager().removeOntologyChangeListener(
-				this);
+		getOWLEditorKit().getModelManager().removeOntologyChangeListener(this);
 		this.recordedActions.getModel().removeListDataListener(this);
-		this.getOWLModelManager().removeOntologyChangeListener(this);
+		getOWLModelManager().removeOntologyChangeListener(this);
 		this.entities.removeOPPLMacroListener(this);
 		this.variableList.getModel().removeListDataListener(this.entities);
 	}
@@ -283,13 +281,13 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 						false, true);
 			}
 		}
-		this.revalidate();
+		revalidate();
 	}
 
 	public void contentsChanged(ListDataEvent e) {
 		this.clearButton
 				.setEnabled(this.recordedActions.getModel().getSize() > 0);
-		this.refreshEntities();
+		refreshEntities();
 	}
 
 	private void refreshEntities() {
@@ -329,22 +327,22 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 	public void intervalAdded(ListDataEvent e) {
 		this.clearButton
 				.setEnabled(this.recordedActions.getModel().getSize() > 0);
-		this.refreshEntities();
+		refreshEntities();
 	}
 
 	public void intervalRemoved(ListDataEvent e) {
 		this.clearButton
 				.setEnabled(this.recordedActions.getModel().getSize() > 0);
-		this.refreshEntities();
+		refreshEntities();
 	}
 
 	public void handleGeneralisedOWLObject(Variable variable) {
-		VariableListItem variableListItem = new VariableListItem(variable, this
-				.getOWLEditorKit(), true, true);
+		VariableListItem variableListItem = new VariableListItem(variable,
+				getOWLEditorKit(), true, true);
 		variableListItem.addOPPLMacroListener(this);
 		((DefaultListModel) this.variableList.getModel())
 				.addElement(variableListItem);
-		this.updateActions();
+		updateActions();
 	}
 
 	/**
@@ -356,17 +354,16 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 				.getModel();
 		int size = model.size();
 		OWLObjectAbstractor abstractor = new OWLObjectAbstractor(variables,
-				this.getOWLDataFactory());
+				getOWLDataFactory());
 		for (int i = 0; i < size; i++) {
 			ActionListItem anActionListItem = (ActionListItem) model.remove(i);
 			OWLAxiomChange axiomChange = anActionListItem.getAxiomChange();
 			OWLAxiom axiom = axiomChange.getAxiom();
 			OWLAxiom abstractedAxiom = (OWLAxiom) axiom.accept(abstractor);
 			OWLAxiomChange newChange = axiomChange instanceof AddAxiom ? new AddAxiom(
-					this.getOWLModelManager().getActiveOntology(),
-					abstractedAxiom)
-					: new RemoveAxiom(this.getOWLModelManager()
-							.getActiveOntology(), abstractedAxiom);
+					getOWLModelManager().getActiveOntology(), abstractedAxiom)
+					: new RemoveAxiom(getOWLModelManager().getActiveOntology(),
+							abstractedAxiom);
 			model.add(i, new ActionListItem(newChange, false, true));
 		}
 	}
@@ -404,6 +401,6 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 
 	public void handleGeneralisedOWLObject(Variable variable,
 			OWLObject owlObject) {
-		this.updateActions();
+		updateActions();
 	}
 }

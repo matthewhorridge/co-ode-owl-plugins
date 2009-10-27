@@ -27,7 +27,6 @@ import java.net.URI;
 import java.util.List;
 
 import org.coode.oppl.OPPLAbstractFactory;
-import org.coode.oppl.OPPLException;
 import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLQueryImpl;
 import org.coode.oppl.OPPLScript;
@@ -36,6 +35,7 @@ import org.coode.oppl.entity.OWLEntityCreationException;
 import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.entity.OWLEntityRenderer;
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.rendering.VariableOWLEntityRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
@@ -69,12 +69,18 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	 * 
 	 */
 	private final class ProtegeOWLEntityRenderer implements OWLEntityRenderer {
+		public ProtegeOWLEntityRenderer() {
+		}
+
 		public String render(OWLEntity entity) {
 			return ProtegeOPPLFactory.this.modelManager.getRendering(entity);
 		}
 	}
 
 	private final class ProtegeOWLEntityFactory implements OWLEntityFactory {
+		public ProtegeOWLEntityFactory() {
+		}
+
 		private final org.protege.editor.owl.model.entity.OWLEntityFactory protegeOWLEntityFactory = ProtegeOPPLFactory.this.modelManager
 				.getOWLEntityFactory();
 
@@ -85,7 +91,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 						.createOWLClass(shortName, baseURI);
 				return this.convert(protegeCreationSet);
 			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e.getMessage());
+				throw new OWLEntityCreationException(e);
 			}
 		}
 
@@ -107,7 +113,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 						.createOWLDataProperty(shortName, baseURI);
 				return this.convert(protegeCreationSet);
 			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e.getMessage());
+				throw new OWLEntityCreationException(e);
 			}
 		}
 
@@ -119,7 +125,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 						.createOWLEntity(type, shortName, baseURI);
 				return this.convert(protegeCreationSet);
 			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e.getMessage());
+				throw new OWLEntityCreationException(e);
 			}
 		}
 
@@ -131,7 +137,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 						.createOWLIndividual(shortName, baseURI);
 				return this.convert(protegeCreationSet);
 			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e.getMessage());
+				throw new OWLEntityCreationException(e);
 			}
 		}
 
@@ -143,7 +149,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 						.createOWLObjectProperty(shortName, baseURI);
 				return this.convert(protegeCreationSet);
 			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e.getMessage());
+				throw new OWLEntityCreationException(e);
 			}
 		}
 
@@ -166,7 +172,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 		}
 	}
 
-	private OWLModelManager modelManager;
+	protected OWLModelManager modelManager;
 	private ConstraintSystem constraintSystem;
 	private ProtegeScopeVariableChecker variableScopeVariableChecker = null;
 	private final ProtegeOWLEntityFactory entityFactory;
@@ -207,7 +213,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	public org.coode.oppl.entity.OWLEntityRenderer getOWLEntityRenderer(
 			ConstraintSystem cs) {
 		if (cs == null) {
-			throw new NullPointerException(
+			throw new IllegalArgumentException(
 					"The constraint system cannot be null");
 		}
 		return new VariableOWLEntityRenderer(cs, this.entityRenderer);
@@ -220,17 +226,17 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 		return this.entityFactory;
 	}
 
-	public OPPLScript buildOPPLScript(ConstraintSystem constraintSystem,
+	public OPPLScript buildOPPLScript(ConstraintSystem constraintSystem1,
 			List<Variable> variables, OPPLQuery opplQuery,
 			List<OWLAxiomChange> actions) {
 		ProtegeOPPLScript toReturn = new ProtegeOPPLScript(new OPPLScriptImpl(
-				constraintSystem, variables, opplQuery, actions),
+				constraintSystem1, variables, opplQuery, actions),
 				this.modelManager);
 		return toReturn;
 	}
 
-	public OPPLQuery buildNewQuery(ConstraintSystem constraintSystem) {
-		OPPLQuery opplQuery = new OPPLQueryImpl(constraintSystem);
+	public OPPLQuery buildNewQuery(ConstraintSystem constraintSystem1) {
+		OPPLQuery opplQuery = new OPPLQueryImpl(constraintSystem1);
 		return new ProtegeOPPLQuery(opplQuery, this.modelManager);
 	}
 
@@ -240,7 +246,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 				writer);
 		renderer
 				.setShortFormProvider(new ProtegeSimpleVariableShortFormProvider(
-						this.modelManager, this.getConstraintSystem()));
+						this.modelManager, getConstraintSystem()));
 		return renderer;
 	}
 
@@ -256,7 +262,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	 * @return the constraintSystem
 	 */
 	private ConstraintSystem getConstraintSystem() {
-		return this.constraintSystem == null ? this.createConstraintSystem()
+		return this.constraintSystem == null ? createConstraintSystem()
 				: this.constraintSystem;
 	}
 
@@ -275,11 +281,11 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer(
 			ConstraintSystem cs) {
 		if (cs == null) {
-			throw new NullPointerException(
+			throw new IllegalArgumentException(
 					"The constraint system cannot be null");
 		}
 		return new ManchesterSyntaxRenderer(this.modelManager
-				.getOWLOntologyManager(), this.getOWLEntityRenderer(cs), cs);
+				.getOWLOntologyManager(), getOWLEntityRenderer(cs), cs);
 	}
 
 	public OWLOntologyManager getOntologyManager() {

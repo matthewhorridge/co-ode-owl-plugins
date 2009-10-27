@@ -31,7 +31,7 @@ import java.util.List;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import org.coode.oppl.OPPLException;
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
@@ -48,7 +48,7 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public class VariableListItem implements MListItem, OPPLMacroStatusChange {
-	private final Variable variable;
+	protected final Variable variable;
 	private final OWLEditorKit owlEditorKit;
 	private final List<OPPLMacroListener> listeners = new ArrayList<OPPLMacroListener>();
 	private final boolean isEditable;
@@ -87,10 +87,10 @@ public class VariableListItem implements MListItem, OPPLMacroStatusChange {
 	 * @see org.protege.editor.core.ui.list.MListItem#handleDelete()
 	 */
 	public boolean handleDelete() {
-		this.notifyListeners(this.getVariable());
-		for (OPPLMacroListener l : new ArrayList<OPPLMacroListener>(this
-				.getListeners())) {
-			this.removeOPPLMacroListener(l);
+		notifyListeners(getVariable());
+		for (OPPLMacroListener l : new ArrayList<OPPLMacroListener>(
+				getListeners())) {
+			removeOPPLMacroListener(l);
 		}
 		return true;
 	}
@@ -189,9 +189,9 @@ public class VariableListItem implements MListItem, OPPLMacroStatusChange {
 		this.listeners.remove(listener);
 	}
 
-	private void notifyListeners(Variable variable) {
+	private void notifyListeners(Variable variable1) {
 		for (OPPLMacroListener listener : this.listeners) {
-			listener.handleDeletedVariable(variable);
+			listener.handleDeletedVariable(variable1);
 		}
 	}
 

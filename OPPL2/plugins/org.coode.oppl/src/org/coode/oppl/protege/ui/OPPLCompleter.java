@@ -67,19 +67,19 @@ import org.semanticweb.owl.model.OWLObject;
  */
 @SuppressWarnings("unchecked")
 public class OPPLCompleter {
-	private static Logger logger = Logger.getLogger(OPPLCompleter.class
+	private static final Logger LOGGER = Logger.getLogger(OPPLCompleter.class
 			.getName());
-	public static final int DEFAULT_MAX_ENTRIES = 100;
+	private static final int DEFAULT_MAX_ENTRIES = 100;
 	private OWLEditorKit owlEditorKit;
-	private JTextComponent textComponent;
+	protected JTextComponent textComponent;
 	private KeyListener keyListener;
 	private Set<String> wordDelimeters;
 	// private AutoCompleterMatcher matcher;
 	private JList popupList;
-	private JWindow popupWindow;
-	public static final int POPUP_WIDTH = 350;
-	public static final int POPUP_HEIGHT = 300;
-	private String lastTextUpdate = "*";
+	protected JWindow popupWindow;
+	private static final int POPUP_WIDTH = 350;
+	private static final int POPUP_HEIGHT = 300;
+	protected String lastTextUpdate = "*";
 	private int maxEntries = DEFAULT_MAX_ENTRIES;
 
 	public OPPLCompleter(OWLEditorKit owlEditorKit, JTextComponent tc,
@@ -142,7 +142,7 @@ public class OPPLCompleter {
 			}
 		});
 		this.popupList.setRequestFocusEnabled(false);
-		this.createPopupWindow();
+		createPopupWindow();
 		this.textComponent.addHierarchyListener(new HierarchyListener() {
 			/**
 			 * Called when the hierarchy has been changed. To discern the actual
@@ -159,53 +159,53 @@ public class OPPLCompleter {
 		});
 	}
 
-	private void processKeyPressed(KeyEvent e) {
+	protected void processKeyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE && e.isControlDown()) {
 			// Show popup
-			this.performAutoCompletion();
+			performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_TAB) {
 			e.consume();
-			this.performAutoCompletion();
+			performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			if (this.popupWindow.isVisible()) {
 				// Hide popup
 				e.consume();
-				this.hidePopup();
+				hidePopup();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if (this.popupWindow.isVisible()) {
 				// Complete
 				e.consume();
-				this.completeWithPopupSelection();
+				completeWithPopupSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			if (this.popupWindow.isVisible()) {
 				e.consume();
-				this.incrementSelection();
+				incrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 			if (this.popupWindow.isVisible()) {
 				e.consume();
-				this.decrementSelection();
+				decrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			this.hidePopup();
+			hidePopup();
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			this.hidePopup();
+			hidePopup();
 		}
 	}
 
-	private void completeWithPopupSelection() {
+	protected void completeWithPopupSelection() {
 		if (this.popupWindow.isVisible()) {
 			Object selObject = this.popupList.getSelectedValue();
 			if (selObject != null) {
-				this.insertWord(this.getInsertText(selObject));
-				this.hidePopup();
+				insertWord(getInsertText(selObject));
+				hidePopup();
 			}
 		}
 	}
 
-	private List getMatches() {
+	protected List getMatches() {
 		ProtegeParserFactory.initParser(this.textComponent.getText(),
 				this.owlEditorKit.getModelManager());
 		List completions;
@@ -217,7 +217,7 @@ public class OPPLCompleter {
 			completions = OPPLParser.getCompletions();
 		}
 		List toReturn = new ArrayList(completions);
-		String wordToComplete = this.getWordToComplete();
+		String wordToComplete = getWordToComplete();
 		if (wordToComplete.length() > 0) {
 			for (Object object : completions) {
 				if (!object.toString().trim().startsWith(wordToComplete)) {
@@ -228,7 +228,7 @@ public class OPPLCompleter {
 		return toReturn;
 	}
 
-	private void createPopupWindow() {
+	protected final void createPopupWindow() {
 		JScrollPane sp = ComponentFactory.createScrollPane(this.popupList);
 		this.popupWindow = new JWindow((Window) SwingUtilities
 				.getAncestorOfClass(Window.class, this.textComponent));
@@ -239,37 +239,37 @@ public class OPPLCompleter {
 	}
 
 	private void performAutoCompletion() {
-		List matches = this.getMatches();
+		List matches = getMatches();
 		if (matches.size() == 1) {
 			// Don't show popup
-			this.insertWord(this.getInsertText(matches.iterator().next()));
+			insertWord(getInsertText(matches.iterator().next()));
 		} else if (matches.size() > 1) {
 			// Show popup
 			this.lastTextUpdate = this.textComponent.getText();
-			this.showPopup();
-			this.updatePopup(matches);
+			showPopup();
+			updatePopup(matches);
 		}
 	}
 
 	private void insertWord(String word) {
 		try {
-			int index = this.getWordIndex();
+			int index = getWordIndex();
 			int caretIndex = this.textComponent.getCaretPosition();
 			this.textComponent.getDocument().remove(index, caretIndex - index);
 			this.textComponent.getDocument().insertString(index, word, null);
 		} catch (BadLocationException e) {
-			logger.log(Level.SEVERE, e.getMessage());
+			LOGGER.log(Level.SEVERE, e.getMessage());
 		}
 	}
 
 	private void showPopup() {
 		if (this.popupWindow == null) {
-			this.createPopupWindow();
+			createPopupWindow();
 		}
 		if (!this.popupWindow.isVisible()) {
 			this.popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
 			try {
-				int wordIndex = this.getWordIndex();
+				int wordIndex = getWordIndex();
 				if (wordIndex < 0) {
 					wordIndex = 0;
 				}
@@ -292,7 +292,7 @@ public class OPPLCompleter {
 		this.popupList.setListData(new Object[0]);
 	}
 
-	private void updatePopup(List matches) {
+	protected void updatePopup(List matches) {
 		int count = matches.size();
 		if (count > this.maxEntries) {
 			count = this.maxEntries;
@@ -363,21 +363,23 @@ public class OPPLCompleter {
 	}
 
 	private String getInsertText(Object o) {
+		String toReturn = null;
 		if (o instanceof OWLObject) {
 			OWLModelManager owlModelManager = this.owlEditorKit
 					.getModelManager();
-			return owlModelManager.getOWLObjectRenderer().render((OWLObject) o,
-					owlModelManager.getOWLEntityRenderer());
+			toReturn = owlModelManager.getOWLObjectRenderer().render(
+					(OWLObject) o, owlModelManager.getOWLEntityRenderer());
 		} else if (o instanceof Variable) {
-			return ((Variable) o).getName();
+			toReturn = ((Variable) o).getName();
 		} else {
-			return o.toString();
+			toReturn = o.toString();
 		}
+		return toReturn;
 	}
 
 	private String getWordToComplete() {
 		try {
-			int index = this.getWordIndex();
+			int index = getWordIndex();
 			int caretIndex = this.textComponent.getCaretPosition();
 			String toReturn = this.textComponent.getDocument().getText(index,
 					caretIndex - index);
