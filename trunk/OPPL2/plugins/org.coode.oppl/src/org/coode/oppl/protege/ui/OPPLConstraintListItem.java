@@ -18,7 +18,7 @@ import org.protege.editor.owl.OWLEditorKit;
  * 
  */
 public class OPPLConstraintListItem implements MListItem {
-	private AbstractConstraint constraint;
+	protected AbstractConstraint constraint;
 	private final OWLEditorKit owlEditorKit;
 	private ConstraintSystem constraintSystem;
 
@@ -27,7 +27,7 @@ public class OPPLConstraintListItem implements MListItem {
 	 * @param constraint
 	 * @param constraintSystem
 	 */
-	public OPPLConstraintListItem(OWLEditorKit owlEditorKit,
+	protected OPPLConstraintListItem(OWLEditorKit owlEditorKit,
 			AbstractConstraint constraint, ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraint = constraint;
@@ -39,14 +39,13 @@ public class OPPLConstraintListItem implements MListItem {
 	}
 
 	public boolean handleDelete() {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	public void handleEdit() {
 		final OPPLConstraintEditor editor = new OPPLConstraintEditor(
 				this.owlEditorKit, this.constraintSystem);
-		editor.setConstraint(this.getConstraint());
+		editor.setConstraint(getConstraint());
 		final VerifyingOptionPane optionPane = new VerifyingOptionPane(editor) {
 			/**
 			 * 

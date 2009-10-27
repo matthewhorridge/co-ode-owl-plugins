@@ -52,7 +52,7 @@ public class BindingTreeRenderer extends OWLCellRenderer {
 	public BindingTreeRenderer(OWLEditorKit owlEditorKit, ConstraintSystem cs) {
 		super(owlEditorKit);
 		if (cs == null) {
-			throw new NullPointerException(
+			throw new IllegalArgumentException(
 					"The constraint system cannot be null");
 		}
 		this.constraintSystem = cs;
@@ -76,9 +76,9 @@ public class BindingTreeRenderer extends OWLCellRenderer {
 			} else if (userObject instanceof BindingNode) {
 				toReturn = this.defaultTreeCellRenderer
 						.getTreeCellRendererComponent(tree,
-								((BindingNode) userObject).render(this
-										.getConstraintSystem()), selected,
-								expanded, leaf, row, hasFocus);
+								((BindingNode) userObject)
+										.render(getConstraintSystem()),
+								selected, expanded, leaf, row, hasFocus);
 			}
 		}
 		return toReturn;

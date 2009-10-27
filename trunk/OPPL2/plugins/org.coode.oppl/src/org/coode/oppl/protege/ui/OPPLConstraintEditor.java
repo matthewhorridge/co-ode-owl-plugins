@@ -56,8 +56,8 @@ public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor 
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private ExpressionEditor<AbstractConstraint> constraintEditor;
 	private AbstractConstraint constraint;
-	private final OWLEditorKit owlEditorKit;
-	private final ConstraintSystem constraintSystem;
+	protected final OWLEditorKit owlEditorKit;
+	protected final ConstraintSystem constraintSystem;
 
 	/**
 	 * @return the constraint
@@ -80,7 +80,7 @@ public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor 
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		listener.verifiedStatusChanged(this.check());
+		listener.verifiedStatusChanged(check());
 	}
 
 	private boolean check() {
@@ -114,7 +114,7 @@ public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor 
 	}
 
 	public void handleChange() {
-		boolean isValid = this.check();
+		boolean isValid = check();
 		if (isValid) {
 			try {
 				this.constraint = this.constraintEditor.createObject();
@@ -126,12 +126,12 @@ public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor 
 				throw new RuntimeException(e);
 			}
 		}
-		this.notifyListeners(isValid);
+		notifyListeners(isValid);
 	}
 
 	public OPPLConstraintEditor(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
-		this.setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
 		// Setup the constraint editor

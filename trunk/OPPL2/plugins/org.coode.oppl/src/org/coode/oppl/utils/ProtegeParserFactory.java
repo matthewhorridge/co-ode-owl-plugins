@@ -1,7 +1,5 @@
 package org.coode.oppl.utils;
 
-import java.io.StringReader;
-
 import org.coode.oppl.protege.ProtegeOPPLFactory;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.validation.OPPLScriptValidator;
@@ -12,22 +10,19 @@ public class ProtegeParserFactory {
 
 	public static OPPLParser initParser(String formulaBody,
 			OWLModelManager manager) {
-		return initParser(formulaBody, manager, null);
+		parser = ParserFactory.initParser(formulaBody, manager
+				.getActiveOntology(), manager.getOWLOntologyManager(), manager
+				.getReasoner(), null);
+		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager));
+		return parser;
 	}
 
 	public static OPPLParser initParser(String formulaBody,
 			OWLModelManager manager, OPPLScriptValidator validator) {
-		if (parser == null) {
-			parser = new OPPLParser(new StringReader(formulaBody), manager
-					.getOWLOntologyManager(), manager.getActiveOntology(),
-					manager.getReasoner());
-		} else {
-			OPPLParser.ReInit(new StringReader(formulaBody), manager
-					.getOWLOntologyManager(), manager.getActiveOntology(),
-					manager.getReasoner());
-		}
+		parser = ParserFactory.initParser(formulaBody, manager
+				.getActiveOntology(), manager.getOWLOntologyManager(), manager
+				.getReasoner(), validator);
 		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager));
-		OPPLParser.setOPPLScriptValidator(validator);
 		return parser;
 	}
 }

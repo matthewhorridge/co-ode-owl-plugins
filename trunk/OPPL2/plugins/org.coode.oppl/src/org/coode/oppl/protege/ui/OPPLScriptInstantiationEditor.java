@@ -60,7 +60,7 @@ public abstract class OPPLScriptInstantiationEditor<P extends InstantiatedOPPLSc
 		this.init();
 	}
 
-	protected void init() {
+	protected final void init() {
 		this.editor = this.getScriptExpressionEditor();
 		// will go away when the completer will be removed from the expression
 		// editor

@@ -37,7 +37,7 @@ import javax.swing.JScrollPane;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import org.coode.oppl.OPPLException;
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
@@ -74,7 +74,7 @@ public class OWLObjectList extends MList implements ActionListener,
 	 * 
 	 */
 	static class CreateNewVariableButton extends MListButton {
-		public CreateNewVariableButton(ActionListener actionListener) {
+		protected CreateNewVariableButton(ActionListener actionListener) {
 			super("Create new Variable", new Color(0, 0, 255), actionListener);
 		}
 
@@ -91,7 +91,7 @@ public class OWLObjectList extends MList implements ActionListener,
 	}
 
 	static class AddToVariableButton extends MListButton {
-		public AddToVariableButton(ActionListener actionListener) {
+		protected AddToVariableButton(ActionListener actionListener) {
 			super("Add to Variable", new Color(0, 0, 255), actionListener);
 		}
 
@@ -112,30 +112,30 @@ public class OWLObjectList extends MList implements ActionListener,
 	private List<OPPLMacroListener> listeners = new ArrayList<OPPLMacroListener>();
 	private final OWLEditorKit owlEditorKit;
 
-	public OWLObjectList(ConstraintSystem cs, OWLEditorKit owlEditorKit) {
+	protected OWLObjectList(ConstraintSystem cs, OWLEditorKit owlEditorKit) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = cs;
-		this.setCellRenderer(new VariableOWLCellRenderer(owlEditorKit,
+		setCellRenderer(new VariableOWLCellRenderer(owlEditorKit,
 				this.constraintSystem, new OWLCellRenderer(owlEditorKit)));
 	}
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() instanceof CreateNewVariableButton) {
-			this.createVariable();
+			createVariable();
 		} else if (e.getSource() instanceof AddToVariableButton) {
-			this.addToVariable();
+			addToVariable();
 		}
 	}
 
 	private void addToVariable() {
-		Object selectedValue = this.getSelectedValue();
+		Object selectedValue = getSelectedValue();
 		if (selectedValue instanceof OWLObjectListItem) {
 			OWLObject owlObject = ((OWLObjectListItem) selectedValue)
 					.getOwlObject();
 			VariableList variableList = new VariableList(this.owlEditorKit,
 					this.constraintSystem);
 			VariableType variableType = VariableType.getVariableType(owlObject);
-			for (Variable variable : this.getVariables()) {
+			for (Variable variable : getVariables()) {
 				if (variable.getType().equals(variableType)) {
 					((DefaultListModel) variableList.getModel())
 							.addElement(new VariableListItem(variable,
@@ -145,7 +145,7 @@ public class OWLObjectList extends MList implements ActionListener,
 			JScrollPane panel = ComponentFactory.createScrollPane(variableList);
 			JOptionPane jOptionPane = new JOptionPane(panel,
 					JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION);
-			JDialog jDialog = jOptionPane.createDialog(this.getParent(),
+			JDialog jDialog = jOptionPane.createDialog(getParent(),
 					"Choose your Variable");
 			jDialog.pack();
 			jDialog.setVisible(true);
@@ -157,13 +157,13 @@ public class OWLObjectList extends MList implements ActionListener,
 					boolean added = selectedVariable
 							.addPossibleBinding(owlObject);
 					if (!added) {
-						JOptionPane.showMessageDialog(this.getParent(),
+						JOptionPane.showMessageDialog(getParent(),
 								"Incompatible variable selected",
 								this.owlEditorKit.getModelManager()
 										.getRendering(owlObject),
 								JOptionPane.PLAIN_MESSAGE);
 					} else {
-						this.notifyAdded2Variable(selectedVariable, owlObject);
+						notifyAdded2Variable(selectedVariable, owlObject);
 					}
 				} catch (OWLReasonerException e) {
 					throw new RuntimeException(e);
@@ -176,7 +176,7 @@ public class OWLObjectList extends MList implements ActionListener,
 	 * 
 	 */
 	private void createVariable() {
-		Object[] selectedValues = this.getSelectedValues();
+		Object[] selectedValues = getSelectedValues();
 		for (Object object : selectedValues) {
 			if (object instanceof OWLObjectListItem) {
 				OWLObjectListItem owlObjectListItem = (OWLObjectListItem) object;
@@ -191,8 +191,8 @@ public class OWLObjectList extends MList implements ActionListener,
 						Variable variable = this.constraintSystem
 								.createVariable(name, variableType);
 						variable.addPossibleBinding(owlObject);
-						this.addVariable(variable);
-						((DefaultListModel) this.getModel())
+						addVariable(variable);
+						((DefaultListModel) getModel())
 								.removeElement(owlObjectListItem);
 					}
 				} catch (OPPLException opplException) {
@@ -206,7 +206,7 @@ public class OWLObjectList extends MList implements ActionListener,
 
 	private void addVariable(Variable variable) {
 		this.variables.add(variable);
-		this.notifyAddedVariable(variable);
+		notifyAddedVariable(variable);
 	}
 
 	@Override
@@ -214,8 +214,8 @@ public class OWLObjectList extends MList implements ActionListener,
 		List<MListButton> toReturn = new ArrayList<MListButton>(super
 				.getListItemButtons(item));
 		toReturn.add(new CreateNewVariableButton(this));
-		if (!this.getVariables().isEmpty()) {
-			Iterator<Variable> it = this.getVariables().iterator();
+		if (!getVariables().isEmpty()) {
+			Iterator<Variable> it = getVariables().iterator();
 			boolean found = false;
 			while (!found && it.hasNext()) {
 				Variable existingVariable = it.next();
@@ -271,7 +271,7 @@ public class OWLObjectList extends MList implements ActionListener,
 		Object source = e.getSource();
 		if (source instanceof DefaultListModel) {
 			DefaultListModel variableList = (DefaultListModel) source;
-			this.updateVariables(variableList);
+			updateVariables(variableList);
 		}
 	}
 
@@ -290,7 +290,7 @@ public class OWLObjectList extends MList implements ActionListener,
 		Object source = e.getSource();
 		if (source instanceof DefaultListModel) {
 			DefaultListModel variableList = (DefaultListModel) source;
-			this.updateVariables(variableList);
+			updateVariables(variableList);
 		}
 	}
 
@@ -298,7 +298,7 @@ public class OWLObjectList extends MList implements ActionListener,
 		Object source = e.getSource();
 		if (source instanceof DefaultListModel) {
 			DefaultListModel variableList = (DefaultListModel) source;
-			this.updateVariables(variableList);
+			updateVariables(variableList);
 		}
 	}
 }

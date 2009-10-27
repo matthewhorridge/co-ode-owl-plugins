@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.coode.oppl.protege.ui.message;
 
@@ -16,9 +16,10 @@ public abstract class AbstractMessage implements Message {
 	 * @param messageText
 	 *            the text in this AbstractMessage. Cannot be {@code null}.
 	 */
-	public AbstractMessage(String messageText) {
+	protected AbstractMessage(String messageText) {
 		if (messageText == null) {
-			throw new NullPointerException("The message text canno be null");
+			throw new IllegalArgumentException(
+					"The message text cannot be null");
 		}
 		this.messageText = messageText;
 	}

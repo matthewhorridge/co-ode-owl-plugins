@@ -50,14 +50,14 @@ import org.semanticweb.owl.model.OWLException;
  */
 public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -5171397595615341059L;
 	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private final OWLEditorKit owlEditorKit;
 	private OPPLScript opplScript = null;
 	private final ExpressionEditor<OPPLScript> editor;
-	private final OPPLScriptValidator validator;
+	protected final OPPLScriptValidator validator;
 
 	/**
 	 * @return the opplScript
@@ -89,7 +89,7 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 	 *            the editor kit for building the instance. Cannot be {@code
 	 *            null}.
 	 */
-	public OPPLTextEditor(OWLEditorKit owlEditorKit) {
+	protected OPPLTextEditor(OWLEditorKit owlEditorKit) {
 		this(owlEditorKit, null);
 	}
 
@@ -105,11 +105,11 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 	 * @throws NullPointerException
 	 *             when the input is {@code null}.
 	 */
-	public OPPLTextEditor(OWLEditorKit owlEditorKit,
+	protected OPPLTextEditor(OWLEditorKit owlEditorKit,
 			OPPLScriptValidator validator) {
 		this.owlEditorKit = owlEditorKit;
 		this.validator = validator;
-		this.editor = new ExpressionEditor<OPPLScript>(this.getOWLEditorKit(),
+		this.editor = new ExpressionEditor<OPPLScript>(this.owlEditorKit,
 				new OWLExpressionChecker<OPPLScript>() {
 					private OPPLScript lastCreatedObject = null;
 
@@ -140,17 +140,17 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 						OPPLTextEditor.this.handleChange();
 					}
 				});
-		this.initGUI();
+		initGUI();
 	}
 
 	private void initGUI() {
-		this.setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 		this.add(ComponentFactory.createScrollPane(this.editor));
 	}
 
 	protected void handleChange() {
-		boolean b = this.check();
-		this.notifyListeners(b);
+		boolean b = check();
+		notifyListeners(b);
 	}
 
 	private boolean check() {
@@ -179,7 +179,7 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		if (listener == null) {
-			throw new NullPointerException("The listenr cannot be null");
+			throw new IllegalArgumentException("The listenr cannot be null");
 		}
 		this.listeners.add(listener);
 	}
@@ -194,7 +194,7 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 		this.listeners.remove(listener);
 	}
 
-	public void clear() {
+	protected void clear() {
 		this.editor.setText("");
 	}
 

@@ -22,7 +22,7 @@
  */
 package org.coode.oppl.variablemansyntax;
 
-import org.coode.oppl.OPPLException;
+import org.coode.oppl.exceptions.OPPLException;
 import org.protege.editor.owl.model.OWLModelManager;
 
 /**

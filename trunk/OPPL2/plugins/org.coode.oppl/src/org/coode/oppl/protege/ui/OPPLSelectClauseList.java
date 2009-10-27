@@ -50,16 +50,16 @@ public class OPPLSelectClauseList extends MList {
 	 * 
 	 */
 	private static final long serialVersionUID = 3978563738563698974L;
-	private final OWLEditorKit owlEditorKit;
-	private ConstraintSystem constraintSystem;
+	protected final OWLEditorKit owlEditorKit;
+	protected ConstraintSystem constraintSystem;
 
 	public OPPLSelectClauseList(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
-		DefaultListModel model = this.clearModel();
-		this.setModel(model);
-		this.setCellRenderer(new OPPLSelectListItemCellRederer());
+		DefaultListModel model = clearModel();
+		setModel(model);
+		setCellRenderer(new OPPLSelectListItemCellRederer());
 	}
 
 	/**
@@ -94,6 +94,9 @@ public class OPPLSelectClauseList extends MList {
 
 	private static class OPPLAssertedSelectClauseListItemBorder implements
 			Border {
+		public OPPLAssertedSelectClauseListItemBorder() {
+		}
+
 		private static final String ASSERTED = "ASSERTED";
 
 		public Insets getBorderInsets(Component c) {
@@ -144,7 +147,7 @@ public class OPPLSelectClauseList extends MList {
 	}
 
 	public void clear() {
-		this.setModel(this.clearModel());
+		setModel(clearModel());
 	}
 
 	/**

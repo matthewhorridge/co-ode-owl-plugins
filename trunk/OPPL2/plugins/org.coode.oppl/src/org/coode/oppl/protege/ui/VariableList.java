@@ -77,7 +77,7 @@ public class VariableList extends MList {
 										.getClass()
 										.getClassLoader()
 										.getResource(
-												variable instanceof GeneratedVariable ? "cog.png"
+												variable instanceof GeneratedVariable<?> ? "cog.png"
 														: "user-icon.gif")));
 				label.setText(VariableList.this.constraintSystem
 						.render(variable)
@@ -92,22 +92,22 @@ public class VariableList extends MList {
 	 */
 	private static final long serialVersionUID = 6135780833694887712L;
 	private final VariableListCellRenderer variableListCellRenderer = new VariableListCellRenderer();
-	private final OWLEditorKit owlEditorKit;
-	private ConstraintSystem constraintSystem;
+	protected final OWLEditorKit owlEditorKit;
+	protected ConstraintSystem constraintSystem;
 
 	public VariableList(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
-		this.setModel(new DefaultListModel());
-		this.setCellRenderer(this.variableListCellRenderer);
+		setModel(new DefaultListModel());
+		setCellRenderer(this.variableListCellRenderer);
 	}
 
 	@Override
 	protected void handleDelete() {
 		super.handleDelete();
-		DefaultListModel model = (DefaultListModel) this.getModel();
-		Object selectedValue = this.getSelectedValue();
+		DefaultListModel model = (DefaultListModel) getModel();
+		Object selectedValue = getSelectedValue();
 		if (selectedValue != null) {
 			model.removeElement(selectedValue);
 		}

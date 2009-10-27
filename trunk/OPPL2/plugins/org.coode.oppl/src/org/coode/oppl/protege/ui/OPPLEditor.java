@@ -46,14 +46,14 @@ import org.protege.editor.owl.OWLEditorKit;
 public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 		ChangeListener {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3481576138019196471L;
 	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private final OWLEditorKit owlEditorKit;
-	private final OPPLBuilder opplBuilder;
-	private final OPPLTextEditor opplTextEditor;
-	private OPPLScript opplScript;
+	protected final OPPLBuilder opplBuilder;
+	protected final OPPLTextEditor opplTextEditor;
+	protected OPPLScript opplScript;
 
 	/**
 	 * @return the opplScript
@@ -68,20 +68,21 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 	 */
 	public void setOPPLScript(OPPLScript opplScript) {
 		this.opplBuilder.setOPPLScript(opplScript);
-		this.fireStateChanged();
+		fireStateChanged();
 	}
 
 	/**
 	 * @return the owlEditorKit
 	 */
-	public OWLEditorKit getOwlEditorKit() {
+	public final OWLEditorKit getOwlEditorKit() {
 		return this.owlEditorKit;
 	}
 
-	public OPPLEditor(OWLEditorKit owlEditor) {
+	public OPPLEditor(OWLEditorKit owlEditor, OPPLBuilder builder,
+			OPPLTextEditor textEditor) {
 		this.owlEditorKit = owlEditor;
-		this.opplBuilder = new OPPLBuilder(this.getOwlEditorKit());
-		this.opplTextEditor = new OPPLTextEditor(this.getOwlEditorKit());
+		this.opplBuilder = builder;
+		this.opplTextEditor = textEditor;
 		this.opplBuilder
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
 					public void verifiedStatusChanged(boolean newState) {
@@ -104,39 +105,18 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 						OPPLEditor.this.handleChange();
 					}
 				});
-		this.addChangeListener(this);
-		this.initGUI();
+		addChangeListener(this);
+		initGUI();
+	}
+
+	public OPPLEditor(OWLEditorKit owlEditor) {
+		this(owlEditor, new OPPLBuilder(owlEditor), new OPPLTextEditor(
+				owlEditor));
 	}
 
 	public OPPLEditor(OWLEditorKit owlEditor, OPPLScriptValidator validator) {
-		this.owlEditorKit = owlEditor;
-		this.opplBuilder = new OPPLBuilder(this.getOwlEditorKit(), validator);
-		this.opplTextEditor = new OPPLTextEditor(this.getOwlEditorKit(),
-				validator);
-		this.opplBuilder
-				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
-					public void verifiedStatusChanged(boolean newState) {
-						OPPLEditor.this.opplScript = null;
-						if (newState) {
-							OPPLEditor.this.opplScript = OPPLEditor.this.opplBuilder
-									.getOPPLScript();
-						}
-						OPPLEditor.this.handleChange();
-					}
-				});
-		this.opplTextEditor
-				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
-					public void verifiedStatusChanged(boolean newState) {
-						OPPLEditor.this.opplScript = null;
-						if (newState) {
-							OPPLEditor.this.opplScript = OPPLEditor.this.opplTextEditor
-									.getOPPLScript();
-						}
-						OPPLEditor.this.handleChange();
-					}
-				});
-		this.addChangeListener(this);
-		this.initGUI();
+		this(owlEditor, new OPPLBuilder(owlEditor, validator),
+				new OPPLTextEditor(owlEditor, validator));
 	}
 
 	private void initGUI() {
@@ -145,15 +125,15 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 	}
 
 	protected void handleChange() {
-		boolean newStatus = this.check();
-		this.notifyListeners(newStatus);
+		boolean newStatus = check();
+		notifyListeners(newStatus);
 	}
 
 	/**
 	 * @return
 	 */
 	private boolean check() {
-		return this.getOPPLScript() != null;
+		return getOPPLScript() != null;
 	}
 
 	/**
@@ -165,7 +145,7 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		if (listener == null) {
-			throw new NullPointerException("The listener canno be null");
+			throw new IllegalArgumentException("The listener cannot be null");
 		}
 		this.listeners.add(listener);
 	}
@@ -194,8 +174,8 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 		this.opplTextEditor.clear();
 	}
 
-	public void stateChanged(ChangeEvent changeEvent) {
-		Component selectedComponent = this.getSelectedComponent();
+	public void stateChanged(ChangeEvent changeEvent1) {
+		Component selectedComponent = getSelectedComponent();
 		if (selectedComponent.equals(this.opplBuilder)
 				&& this.opplScript != null) {
 			this.opplBuilder.setOPPLScript(this.opplScript);

@@ -45,28 +45,28 @@ import org.semanticweb.owl.model.OWLAxiomChange;
  */
 public class ActionList extends MList {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 6135780833694887712L;
 	private final OWLEditorKit owlEditorKit;
 	private final boolean canAdd;
 
-	public ActionList(OWLEditorKit owlEditorKit,
+	protected ActionList(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem, boolean canAdd) {
 		this.owlEditorKit = owlEditorKit;
-		this.setModel(new ActionListModel(canAdd));
+		setModel(new ActionListModel(canAdd));
 		this.canAdd = canAdd;
 		VariableOWLCellRenderer variableAxiomRenderer = new VariableOWLCellRenderer(
 				owlEditorKit, constraintSystem, new OWLCellRenderer(
 						owlEditorKit));
-		this.setCellRenderer(variableAxiomRenderer);
+		setCellRenderer(variableAxiomRenderer);
 	}
 
 	@Override
 	protected void handleDelete() {
 		super.handleDelete();
-		Object selectedValue = this.getSelectedValue();
-		((ActionListModel) this.getModel()).removeElement(selectedValue);
+		Object selectedValue = getSelectedValue();
+		((ActionListModel) getModel()).removeElement(selectedValue);
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class ActionList extends MList {
 		private static final String ADD = "Add";
 		private OWLAxiomChange axiomChange;
 
-		public ActionBorder(OWLAxiomChange axiomChange) {
+		ActionBorder(OWLAxiomChange axiomChange) {
 			this.axiomChange = axiomChange;
 		}
 
@@ -96,7 +96,7 @@ public class ActionList extends MList {
 			return false;
 		}
 
-		String getString() {
+		protected String getString() {
 			return this.axiomChange instanceof AddAxiom ? ActionBorder.ADD
 					: ActionBorder.REMOVE;
 		}
@@ -105,7 +105,7 @@ public class ActionList extends MList {
 				int width, int height) {
 			Color oldColor = g.getColor();
 			g.setColor(Color.DARK_GRAY);
-			g.drawString(this.getString(), x + 4, y + 2
+			g.drawString(getString(), x + 4, y + 2
 					+ g.getFontMetrics().getAscent()
 					+ g.getFontMetrics().getLeading());
 			g.setColor(oldColor);
@@ -113,11 +113,11 @@ public class ActionList extends MList {
 	}
 
 	public void setConstraintSystem(ConstraintSystem constraintSystem) {
-		this.setCellRenderer(new VariableOWLCellRenderer(this.owlEditorKit,
+		setCellRenderer(new VariableOWLCellRenderer(this.owlEditorKit,
 				constraintSystem, new OWLCellRenderer(this.owlEditorKit)));
 	}
 
-	public void clear() {
-		this.setModel(new ActionListModel(this.canAdd));
+	protected void clear() {
+		setModel(new ActionListModel(this.canAdd));
 	}
 }
