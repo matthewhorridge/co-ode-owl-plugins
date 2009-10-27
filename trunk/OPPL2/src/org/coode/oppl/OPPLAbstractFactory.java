@@ -27,9 +27,10 @@ import java.util.List;
 
 import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.entity.OWLEntityRenderer;
+import org.coode.oppl.exceptions.NullReasonerException;
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.NullReasonerException;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.semanticweb.owl.expression.OWLEntityChecker;

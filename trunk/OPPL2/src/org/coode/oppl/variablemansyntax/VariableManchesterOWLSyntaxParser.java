@@ -22,6 +22,7 @@
  */
 package org.coode.oppl.variablemansyntax;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -45,40 +46,109 @@ import org.semanticweb.owl.model.OWLConstant;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owl.model.OWLDataPropertyExpression;
-import org.semanticweb.owl.model.OWLDataRange;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLDisjointClassesAxiom;
 import org.semanticweb.owl.model.OWLIndividual;
+import org.semanticweb.owl.model.OWLIndividualAxiom;
+import org.semanticweb.owl.model.OWLLogicalAxiom;
 import org.semanticweb.owl.model.OWLObjectPropertyAssertionAxiom;
 import org.semanticweb.owl.model.OWLObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLObjectPropertyExpression;
+import org.semanticweb.owl.model.OWLPropertyDomainAxiom;
+import org.semanticweb.owl.model.OWLPropertyExpression;
+import org.semanticweb.owl.model.OWLPropertyRange;
+import org.semanticweb.owl.model.OWLPropertyRangeAxiom;
+import org.semanticweb.owl.model.OWLSubPropertyAxiom;
+import org.semanticweb.owl.model.OWLUnaryPropertyAxiom;
 
 /**
  * @author Luigi Iannone
  * 
  */
+@SuppressWarnings("unchecked")
 public class VariableManchesterOWLSyntaxParser extends
 		ManchesterOWLSyntaxEditorParser {
-	protected class ManchesterOWLSyntaxVariableTokeizer extends
+	private static final List<AxiomType<? extends OWLPropertyRangeAxiom<? extends OWLPropertyExpression<?, ? extends OWLPropertyRange>, ?>>> RANGE_AXIOMTYPES = Arrays
+			.asList(AxiomType.OBJECT_PROPERTY_RANGE,
+					AxiomType.DATA_PROPERTY_RANGE);
+	private static final List<AxiomType<? extends OWLPropertyDomainAxiom<? extends OWLPropertyExpression<?, ? extends OWLPropertyRange>>>> DOMAIN_AXIOMTYPES = Arrays
+			.asList(AxiomType.DATA_PROPERTY_DOMAIN,
+					AxiomType.OBJECT_PROPERTY_DOMAIN);
+	private static final List<AxiomType<? extends OWLSubPropertyAxiom<? extends OWLPropertyExpression<?, ? extends OWLPropertyRange>>>> SUBPROPERTY_AXIOMTYPES = Arrays
+			.asList(AxiomType.SUB_DATA_PROPERTY, AxiomType.SUB_OBJECT_PROPERTY);
+	private static final List<AxiomType<? extends OWLUnaryPropertyAxiom<? extends OWLPropertyExpression<?, ? extends OWLPropertyRange>>>> FUNCTIONAL_AXIOMTYPES = Arrays
+			.asList(AxiomType.FUNCTIONAL_DATA_PROPERTY,
+					AxiomType.FUNCTIONAL_OBJECT_PROPERTY);
+	private static final List<AxiomType<? extends OWLLogicalAxiom>> DISJOINTWITH_AXIOMTYPES = Arrays
+			.asList(AxiomType.DISJOINT_CLASSES,
+					AxiomType.DISJOINT_DATA_PROPERTIES,
+					AxiomType.DISJOINT_OBJECT_PROPERTIES);
+	private static final List<AxiomType<? extends OWLLogicalAxiom>> EQUIVALENTTO_AXIOMTYPES = Arrays
+			.asList(AxiomType.EQUIVALENT_CLASSES,
+					AxiomType.EQUIVALENT_DATA_PROPERTIES,
+					AxiomType.EQUIVALENT_OBJECT_PROPERTIES);
+	private static final List<AxiomType<? extends OWLIndividualAxiom>> AXIOM_TYPES = Arrays
+			.asList(AxiomType.CLASS_ASSERTION,
+					AxiomType.DATA_PROPERTY_ASSERTION,
+					AxiomType.OBJECT_PROPERTY_ASSERTION,
+					AxiomType.DATA_PROPERTY_ASSERTION,
+					AxiomType.SAME_INDIVIDUAL, AxiomType.DIFFERENT_INDIVIDUALS,
+					AxiomType.NEGATIVE_DATA_PROPERTY_ASSERTION,
+					AxiomType.NEGATIVE_OBJECT_PROPERTY_ASSERTION);
+	private static final Set<AxiomType<?>> CLASS_AXIOMTYPES = new HashSet<AxiomType<?>>(
+			Arrays.asList(AxiomType.SUBCLASS, AxiomType.EQUIVALENT_CLASSES,
+					AxiomType.DISJOINT_CLASSES));
+	private static final Set<AxiomType<?>> OBJECTPROPERTY_AXIOMTYPES = new HashSet<AxiomType<?>>(
+			Arrays.asList(AxiomType.ANTI_SYMMETRIC_OBJECT_PROPERTY,
+					AxiomType.DISJOINT_OBJECT_PROPERTIES,
+					AxiomType.FUNCTIONAL_OBJECT_PROPERTY,
+					AxiomType.SYMMETRIC_OBJECT_PROPERTY,
+					AxiomType.SUB_OBJECT_PROPERTY,
+					AxiomType.OBJECT_PROPERTY_DOMAIN,
+					AxiomType.OBJECT_PROPERTY_RANGE,
+					AxiomType.INVERSE_FUNCTIONAL_OBJECT_PROPERTY,
+					AxiomType.INVERSE_OBJECT_PROPERTIES,
+					AxiomType.IRREFLEXIVE_OBJECT_PROPERTY,
+					AxiomType.REFLEXIVE_OBJECT_PROPERTY,
+					AxiomType.TRANSITIVE_OBJECT_PROPERTY,
+					AxiomType.EQUIVALENT_OBJECT_PROPERTIES));
+	private static final Set<AxiomType<?>> DATAPROPERTY_AXIOMTYPES = new HashSet<AxiomType<?>>(
+			Arrays.asList(AxiomType.DISJOINT_DATA_PROPERTIES,
+					AxiomType.FUNCTIONAL_DATA_PROPERTY,
+					AxiomType.SUB_DATA_PROPERTY,
+					AxiomType.DATA_PROPERTY_DOMAIN,
+					AxiomType.DATA_PROPERTY_RANGE,
+					AxiomType.EQUIVALENT_DATA_PROPERTIES));
+	private static final Set<AxiomType<?>> ASSERTION_AXIOMTYPES = new HashSet<AxiomType<?>>(
+			Arrays.asList(AxiomType.CLASS_ASSERTION,
+					AxiomType.DATA_PROPERTY_ASSERTION,
+					AxiomType.OBJECT_PROPERTY_ASSERTION,
+					AxiomType.SAME_INDIVIDUAL, AxiomType.DIFFERENT_INDIVIDUALS,
+					AxiomType.NEGATIVE_DATA_PROPERTY_ASSERTION,
+					AxiomType.NEGATIVE_OBJECT_PROPERTY_ASSERTION));
+	private static final String COLON = ":";
+	private static final String OPEN_PAR = "(";
+	private static final String CLOSE_PAR = ")";
+	private static final String EOF = "<EOF>";
+
+	protected static class ManchesterOWLSyntaxVariableTokeizer extends
 			ManchesterOWLSyntaxTokenizer {
-		public ManchesterOWLSyntaxVariableTokeizer(String s) {
+		protected ManchesterOWLSyntaxVariableTokeizer(String s) {
 			super(s);
 			this.delims.remove('?');
 		}
 	}
 
 	private ConstraintSystem constraintSystem;
-	@SuppressWarnings("unchecked")
 	private Map<String, Set<AxiomType>> tokenAxiomTypesMap = new HashMap<String, Set<AxiomType>>();
 	private VariableShortFormEntityChecker owlEntityChecker;
 
 	public VariableManchesterOWLSyntaxParser(String s, ConstraintSystem cs) {
 		super(cs.getDataFactory(), s);
 		this.constraintSystem = cs;
-		this.owlEntityChecker = new VariableShortFormEntityChecker(OPPLParser
-				.getOPPLFactory().getOWLEntityChecker(), cs);
-		super.setOWLEntityChecker(this.owlEntityChecker);
-		this.setupTokenAximoTypeMap();
+		setOWLEntityChecker(OPPLParser.getOPPLFactory().getOWLEntityChecker());
+		// super.setOWLEntityChecker(this.owlEntityChecker);
+		setupTokenAximoTypeMap();
 	}
 
 	@Override
@@ -86,92 +156,62 @@ public class VariableManchesterOWLSyntaxParser extends
 		return new ManchesterOWLSyntaxVariableTokeizer(s);
 	}
 
-	@SuppressWarnings("unchecked")
+	private static final String key(ManchesterOWLSyntax o) {
+		return o.toString().toLowerCase();
+	}
+
+	private static final Set<AxiomType> singleton(AxiomType t) {
+		return Collections.singleton(t);
+	}
+
 	private void setupTokenAximoTypeMap() {
-		Set<AxiomType> subClassAxiomTypes = new HashSet<AxiomType>();
-		subClassAxiomTypes.add(AxiomType.SUBCLASS);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.SUBCLASS_OF.toString()
-				.toLowerCase(), subClassAxiomTypes);
-		Set<AxiomType> equivalentToAxiomTypes = new HashSet<AxiomType>();
-		equivalentToAxiomTypes.add(AxiomType.EQUIVALENT_CLASSES);
-		equivalentToAxiomTypes.add(AxiomType.EQUIVALENT_DATA_PROPERTIES);
-		equivalentToAxiomTypes.add(AxiomType.EQUIVALENT_OBJECT_PROPERTIES);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.EQUIVALENT_TO
-				.toString().toLowerCase(), equivalentToAxiomTypes);
-		Set<AxiomType> disjointWithAxiomTypes = new HashSet<AxiomType>();
-		disjointWithAxiomTypes.add(AxiomType.DISJOINT_CLASSES);
-		disjointWithAxiomTypes.add(AxiomType.DISJOINT_DATA_PROPERTIES);
-		disjointWithAxiomTypes.add(AxiomType.DISJOINT_OBJECT_PROPERTIES);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.DISJOINT_WITH
-				.toString().toLowerCase(), disjointWithAxiomTypes);
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.SUBCLASS_OF),
+				singleton(AxiomType.SUBCLASS));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.EQUIVALENT_TO),
+				new HashSet<AxiomType>(EQUIVALENTTO_AXIOMTYPES));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.DISJOINT_WITH),
+				new HashSet<AxiomType>(DISJOINTWITH_AXIOMTYPES));
 		// For n-ary disjoint classes axioms
-		Set<AxiomType> disjointClasses = new HashSet<AxiomType>();
-		disjointClasses.add(AxiomType.DISJOINT_CLASSES);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.DISJOINT_CLASSES
-				.toString(), disjointClasses);
+		// FIXME missing toLowerCase
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.DISJOINT_CLASSES),
+				singleton(AxiomType.DISJOINT_CLASSES));
 		// With or without (above) colon
-		this.tokenAxiomTypesMap.put(DISJOINT_CLASSES.toString(),
-				disjointClasses);
-		Set<AxiomType> antiSymmetricAxiomTypes = new HashSet<AxiomType>();
-		antiSymmetricAxiomTypes.add(AxiomType.ANTI_SYMMETRIC_OBJECT_PROPERTY);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.ANTI_SYMMETRIC
-				.toString().toLowerCase(), antiSymmetricAxiomTypes);
-		Set<AxiomType> functionalAxiomTypes = new HashSet<AxiomType>();
-		functionalAxiomTypes.add(AxiomType.FUNCTIONAL_DATA_PROPERTY);
-		functionalAxiomTypes.add(AxiomType.FUNCTIONAL_OBJECT_PROPERTY);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.FUNCTIONAL.toString()
-				.toLowerCase(), functionalAxiomTypes);
-		Set<AxiomType> symmetricAxiomTypes = new HashSet<AxiomType>();
-		symmetricAxiomTypes.add(AxiomType.SYMMETRIC_OBJECT_PROPERTY);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.SYMMETRIC.toString()
-				.toLowerCase(), symmetricAxiomTypes);
-		Set<AxiomType> subPropertyAxiomTypes = new HashSet<AxiomType>();
-		subPropertyAxiomTypes.add(AxiomType.SUB_DATA_PROPERTY);
-		subPropertyAxiomTypes.add(AxiomType.SUB_OBJECT_PROPERTY);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.SUB_PROPERTY_OF
-				.toString().toLowerCase(), subPropertyAxiomTypes);
-		Set<AxiomType> domainAxiomTypes = new HashSet<AxiomType>();
-		domainAxiomTypes.add(AxiomType.DATA_PROPERTY_DOMAIN);
-		domainAxiomTypes.add(AxiomType.OBJECT_PROPERTY_DOMAIN);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.DOMAIN.toString()
-				.toLowerCase(), domainAxiomTypes);
-		Set<AxiomType> rangeAxiomTypes = new HashSet<AxiomType>();
-		rangeAxiomTypes.add(AxiomType.OBJECT_PROPERTY_RANGE);
-		rangeAxiomTypes.add(AxiomType.DATA_PROPERTY_RANGE);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.RANGE.toString()
-				.toLowerCase(), rangeAxiomTypes);
-		Set<AxiomType> inverseFunctionalAxiomTypes = new HashSet<AxiomType>();
-		inverseFunctionalAxiomTypes
-				.add(AxiomType.INVERSE_FUNCTIONAL_OBJECT_PROPERTY);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.INVERSE_FUNCTIONAL
-				.toString().toLowerCase(), inverseFunctionalAxiomTypes);
-		Set<AxiomType> inverseAxiomTypes = new HashSet<AxiomType>();
-		inverseAxiomTypes.add(AxiomType.INVERSE_OBJECT_PROPERTIES);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.INVERSE_OF.toString()
-				.toLowerCase(), inverseAxiomTypes);
-		Set<AxiomType> irreflexiveAxiomTypes = new HashSet<AxiomType>();
-		irreflexiveAxiomTypes.add(AxiomType.IRREFLEXIVE_OBJECT_PROPERTY);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.IRREFLEXIVE.toString()
-				.toLowerCase(), irreflexiveAxiomTypes);
-		Set<AxiomType> reflexiveAxiomTypes = new HashSet<AxiomType>();
-		reflexiveAxiomTypes.add(AxiomType.REFLEXIVE_OBJECT_PROPERTY);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.REFLEXIVE.toString()
-				.toLowerCase(), reflexiveAxiomTypes);
-		Set<AxiomType> transitiveAxiomTypes = new HashSet<AxiomType>();
-		transitiveAxiomTypes.add(AxiomType.TRANSITIVE_OBJECT_PROPERTY);
-		this.tokenAxiomTypesMap.put(ManchesterOWLSyntax.TRANSITIVE.toString()
-				.toLowerCase(), transitiveAxiomTypes);
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.DISJOINT_CLASSES)
+				+ ":", singleton(AxiomType.DISJOINT_CLASSES));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.ANTI_SYMMETRIC),
+				singleton(AxiomType.ANTI_SYMMETRIC_OBJECT_PROPERTY));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.FUNCTIONAL),
+				new HashSet<AxiomType>(FUNCTIONAL_AXIOMTYPES));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.SYMMETRIC),
+				singleton(AxiomType.SYMMETRIC_OBJECT_PROPERTY));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.SUB_PROPERTY_OF),
+				new HashSet<AxiomType>(SUBPROPERTY_AXIOMTYPES));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.DOMAIN),
+				new HashSet<AxiomType>(DOMAIN_AXIOMTYPES));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.RANGE),
+				new HashSet<AxiomType>(RANGE_AXIOMTYPES));
+		this.tokenAxiomTypesMap.put(
+				key(ManchesterOWLSyntax.INVERSE_FUNCTIONAL),
+				singleton(AxiomType.INVERSE_FUNCTIONAL_OBJECT_PROPERTY));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.INVERSE_OF),
+				singleton(AxiomType.INVERSE_OBJECT_PROPERTIES));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.IRREFLEXIVE),
+				singleton(AxiomType.IRREFLEXIVE_OBJECT_PROPERTY));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.REFLEXIVE),
+				singleton(AxiomType.REFLEXIVE_OBJECT_PROPERTY));
+		this.tokenAxiomTypesMap.put(key(ManchesterOWLSyntax.TRANSITIVE),
+				singleton(AxiomType.TRANSITIVE_OBJECT_PROPERTY));
 	}
 
 	@Override
 	public OWLConstant parseConstant() throws ParserException {
 		OWLConstant toReturn = null;
-		Token tok = this.getToken();
+		Token tok = getToken();
 		Variable variable = this.constraintSystem.getVariable(tok.getToken());
 		if (variable != null
 				&& variable.getType().equals(VariableType.CONSTANT)) {
 			this.consumeToken();
-			toReturn = this.getDataFactory().getOWLUntypedConstant(
+			toReturn = getDataFactory().getOWLUntypedConstant(
 					variable.getName());
 		}
 		if (toReturn == null) {
@@ -180,14 +220,13 @@ public class VariableManchesterOWLSyntaxParser extends
 		return toReturn;
 	}
 
-	@SuppressWarnings("unchecked")
 	public OWLAxiom parseAxiom() throws ParserException {
 		OWLAxiom axiom = null;
 		String tok;
 		Set<AxiomType> axiomTypes = new HashSet<AxiomType>();
 		Set<AxiomType> tokenAxiomTypes;
 		Set<String> generatedElements = new HashSet<String>();
-		List<Token> axiomTokens = this.getTokens();
+		List<Token> axiomTokens = getTokens();
 		Iterator<Token> tokenIt = axiomTokens.iterator();
 		StringBuilder debugStringBuilder = new StringBuilder();
 		while (tokenIt.hasNext()) {
@@ -201,16 +240,9 @@ public class VariableManchesterOWLSyntaxParser extends
 				generatedElements.add(tok);
 			}
 		}
-		this.reset();
+		reset();
 		if (axiomTypes.isEmpty()) {
-			axiomTypes.add(AxiomType.CLASS_ASSERTION);
-			axiomTypes.add(AxiomType.DATA_PROPERTY_ASSERTION);
-			axiomTypes.add(AxiomType.OBJECT_PROPERTY_ASSERTION);
-			axiomTypes.add(AxiomType.DATA_PROPERTY_ASSERTION);
-			axiomTypes.add(AxiomType.SAME_INDIVIDUAL);
-			axiomTypes.add(AxiomType.DIFFERENT_INDIVIDUALS);
-			axiomTypes.add(AxiomType.NEGATIVE_DATA_PROPERTY_ASSERTION);
-			axiomTypes.add(AxiomType.NEGATIVE_OBJECT_PROPERTY_ASSERTION);
+			axiomTypes.addAll(AXIOM_TYPES);
 		}
 		Iterator<AxiomType> it = axiomTypes.iterator();
 		boolean found = false;
@@ -228,7 +260,7 @@ public class VariableManchesterOWLSyntaxParser extends
 			this.owlEntityChecker.generate(generatedElements);
 			do {
 				try {
-					this.reset();
+					reset();
 					axiom = this.parseAxiom(axiomType);
 					found = axiom != null;
 					if (!found) {
@@ -242,8 +274,7 @@ public class VariableManchesterOWLSyntaxParser extends
 		}
 		if (!found) {
 			ParserException bestTryExcpetion = exceptions.isEmpty() ? new ParserException(
-					this.getToken().getToken(), this.getTokenPos(), this
-							.getTokenRow(), this.getTokenCol())
+					peekToken(), getTokenPos(), getTokenRow(), getTokenCol())
 					: Collections.max(exceptions, peComparator);
 			throw bestTryExcpetion;
 		}
@@ -252,12 +283,8 @@ public class VariableManchesterOWLSyntaxParser extends
 
 	@Override
 	public OWLClassAxiom parseClassAxiom() throws ParserException {
-		String kw = this.peekToken();
-		if (kw.compareTo(DISJOINT_CLASSES.toString()) == 0
-				|| kw
-						.compareTo(ManchesterOWLSyntax.DISJOINT_CLASSES
-								.toString()) == 0) {
-			return this.parseDisjointClasses();
+		if (compareICColon(peekToken(), ManchesterOWLSyntax.DISJOINT_CLASSES)) {
+			return parseDisjointClasses();
 		} else {
 			return super.parseClassAxiom();
 		}
@@ -267,15 +294,13 @@ public class VariableManchesterOWLSyntaxParser extends
 	public OWLDisjointClassesAxiom parseDisjointClasses()
 			throws ParserException {
 		String section = this.consumeToken();
-		if (!section.equalsIgnoreCase(DISJOINT_CLASSES)
-				&& section
-						.equalsIgnoreCase(ManchesterOWLSyntax.DISJOINT_CLASSES
-								.toString())) {
+		// FIXME bogus check
+		if (!compareICColon(section, ManchesterOWLSyntax.DISJOINT_CLASSES)) {
 			this.throwException(DISJOINT_CLASSES,
 					ManchesterOWLSyntax.DISJOINT_CLASSES.toString());
 		}
 		Set<OWLDescription> descriptions = this.parseDescriptionList();
-		return this.getDataFactory().getOWLDisjointClassesAxiom(descriptions);
+		return getDataFactory().getOWLDisjointClassesAxiom(descriptions);
 	}
 
 	/**
@@ -284,218 +309,124 @@ public class VariableManchesterOWLSyntaxParser extends
 	 * @return
 	 * @throws ParserException
 	 */
-	@SuppressWarnings("unchecked")
 	private OWLAxiom parseAxiom(AxiomType axiomType) throws ParserException {
 		OWLAxiom axiom = null;
-		if (axiomType.equals(AxiomType.SUBCLASS)
-				|| axiomType.equals(AxiomType.EQUIVALENT_CLASSES)
-				|| axiomType.equals(AxiomType.DISJOINT_CLASSES)) {
-			axiom = this.parseClassAxiom();
-			if (this.getToken().getToken().compareTo("<EOF>") != 0) {
-				this.throwException("<EOF>");
-			}
-		} else if (axiomType.equals(AxiomType.ANTI_SYMMETRIC_OBJECT_PROPERTY)
-				|| axiomType.equals(AxiomType.DISJOINT_OBJECT_PROPERTIES)
-				|| axiomType.equals(AxiomType.FUNCTIONAL_OBJECT_PROPERTY)
-				|| axiomType.equals(AxiomType.SYMMETRIC_OBJECT_PROPERTY)
-				|| axiomType.equals(AxiomType.SUB_OBJECT_PROPERTY)
-				|| axiomType.equals(AxiomType.OBJECT_PROPERTY_DOMAIN)
-				|| axiomType.equals(AxiomType.OBJECT_PROPERTY_RANGE)
-				|| axiomType
-						.equals(AxiomType.INVERSE_FUNCTIONAL_OBJECT_PROPERTY)
-				|| axiomType.equals(AxiomType.INVERSE_OBJECT_PROPERTIES)
-				|| axiomType.equals(AxiomType.IRREFLEXIVE_OBJECT_PROPERTY)
-				|| axiomType.equals(AxiomType.REFLEXIVE_OBJECT_PROPERTY)
-				|| axiomType.equals(AxiomType.TRANSITIVE_OBJECT_PROPERTY)
-				|| axiomType.equals(AxiomType.EQUIVALENT_OBJECT_PROPERTIES)) {
-			axiom = this.parseObjectPropertyAxiom();
-			if (this.getToken().getToken().compareTo("<EOF>") != 0) {
-				this.throwException("<EOF>");
-			}
-		} else if (axiomType.equals(AxiomType.DISJOINT_DATA_PROPERTIES)
-				|| axiomType.equals(AxiomType.FUNCTIONAL_DATA_PROPERTY)
-				|| axiomType.equals(AxiomType.SUB_DATA_PROPERTY)
-				|| axiomType.equals(AxiomType.DATA_PROPERTY_DOMAIN)
-				|| axiomType.equals(AxiomType.DATA_PROPERTY_RANGE)
-				|| axiomType.equals(AxiomType.EQUIVALENT_DATA_PROPERTIES)) {
-			axiom = this.parseDataPropertyAxiom();
-			if (this.getToken().getToken().compareTo("<EOF>") != 0) {
-				this.throwException("<EOF>");
-			}
-		} else if (axiomType.equals(AxiomType.CLASS_ASSERTION)
-				|| axiomType.equals(AxiomType.DATA_PROPERTY_ASSERTION)
-				|| axiomType.equals(AxiomType.OBJECT_PROPERTY_ASSERTION)
-				|| axiomType.equals(AxiomType.SAME_INDIVIDUAL)
-				|| axiomType.equals(AxiomType.DIFFERENT_INDIVIDUALS)
-				|| axiomType.equals(AxiomType.NEGATIVE_DATA_PROPERTY_ASSERTION)
-				|| axiomType
-						.equals(AxiomType.NEGATIVE_OBJECT_PROPERTY_ASSERTION)) {
-			axiom = this.parseAssertion();
-			if (this.getToken().getToken().compareTo("<EOF>") != 0) {
-				this.throwException("<EOF>");
-			}
+		if (CLASS_AXIOMTYPES.contains(axiomType)) {
+			axiom = parseClassAxiom();
+			checkEOF();
+		} else if (OBJECTPROPERTY_AXIOMTYPES.contains(axiomType)) {
+			axiom = parseObjectPropertyAxiom();
+			checkEOF();
+		} else if (DATAPROPERTY_AXIOMTYPES.contains(axiomType)) {
+			axiom = parseDataPropertyAxiom();
+			checkEOF();
+		} else if (ASSERTION_AXIOMTYPES.contains(axiomType)) {
+			axiom = parseAssertion();
+			checkEOF();
 		}
 		return axiom;
+	}
+
+	private void checkEOF() throws ParserException {
+		if (!peekToken().equals(EOF)) {
+			this.throwException(EOF);
+		}
+	}
+
+	private boolean compareICColon(String tok, ManchesterOWLSyntax toCompare) {
+		return tok.equalsIgnoreCase(toCompare.toString())
+				|| tok.equalsIgnoreCase(toCompare.toString() + COLON);
+	}
+
+	private boolean compareIC(String tok, ManchesterOWLSyntax toCompare) {
+		return tok.equalsIgnoreCase(toCompare.toString());
+	}
+
+	private boolean equals(String tok, ManchesterOWLSyntax toCompare) {
+		return tok.equals(toCompare.toString());
 	}
 
 	@Override
 	public OWLObjectPropertyAxiom parseObjectPropertyAxiom()
 			throws ParserException {
-		String tok = this.getToken().getToken();
-		if (tok.compareToIgnoreCase(ManchesterOWLSyntax.FUNCTIONAL.toString()) == 0
-				|| tok.compareToIgnoreCase(ManchesterOWLSyntax.FUNCTIONAL
-						.toString()
-						+ ":") == 0) {
+		String tok = peekToken();
+		if (compareICColon(tok, ManchesterOWLSyntax.FUNCTIONAL)) {
+			// TODO verify whether only functional properties need the open and
+			// close check
 			this.consumeToken();
-			String open = this.consumeToken();
-			if (!open.equals("(")) {
-				this.throwException("(");
-			}
+			checkOpen();
 			OWLObjectPropertyExpression prop = this
 					.parseObjectPropertyExpression();
-			String close = this.consumeToken();
-			if (!close.equals(")")) {
-				this.throwException(")");
-			}
-			return this.getDataFactory().getOWLFunctionalObjectPropertyAxiom(
-					prop);
-		} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.TRANSITIVE
-				.toString()) == 0
-				|| tok.compareToIgnoreCase(ManchesterOWLSyntax.TRANSITIVE
-						.toString()
-						+ ":") == 0) {
+			checkClose();
+			return getDataFactory().getOWLFunctionalObjectPropertyAxiom(prop);
+		} else if (compareICColon(tok, ManchesterOWLSyntax.TRANSITIVE)) {
 			this.consumeToken();
-			String colon = this.getToken().getToken();
-			if (colon.equals(":")) {
-				this.consumeToken();
-			}
-			OWLObjectPropertyExpression prop = this
-					.parseObjectPropertyExpression();
-			return this.getDataFactory().getOWLTransitiveObjectPropertyAxiom(
-					prop);
-		} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.SYMMETRIC
-				.toString()) == 0
-				|| tok.compareToIgnoreCase(ManchesterOWLSyntax.SYMMETRIC
-						.toString()
-						+ ":") == 0) {
+			consumeColon();
+			return getDataFactory().getOWLTransitiveObjectPropertyAxiom(
+					this.parseObjectPropertyExpression());
+		} else if (compareICColon(tok, ManchesterOWLSyntax.SYMMETRIC)) {
 			this.consumeToken();
-			String colon = this.getToken().getToken();
-			if (colon.equals(":")) {
-				this.consumeToken();
-			}
-			OWLObjectPropertyExpression prop = this
-					.parseObjectPropertyExpression();
-			return this.getDataFactory().getOWLSymmetricObjectPropertyAxiom(
-					prop);
-		} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.REFLEXIVE
-				.toString()) == 0
-				|| tok.compareToIgnoreCase(ManchesterOWLSyntax.REFLEXIVE
-						.toString()
-						+ ":") == 0) {
+			consumeColon();
+			return getDataFactory().getOWLSymmetricObjectPropertyAxiom(
+					this.parseObjectPropertyExpression());
+		} else if (compareICColon(tok, ManchesterOWLSyntax.REFLEXIVE)) {
 			this.consumeToken();
-			String colon = this.getToken().getToken();
-			if (colon.equals(":")) {
-				this.consumeToken();
-			}
-			OWLObjectPropertyExpression prop = this
-					.parseObjectPropertyExpression();
-			return this.getDataFactory().getOWLReflexiveObjectPropertyAxiom(
-					prop);
-		} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.IRREFLEXIVE
-				.toString()) == 0
-				|| tok.compareToIgnoreCase(ManchesterOWLSyntax.IRREFLEXIVE
-						.toString()
-						+ ":") == 0) {
+			consumeColon();
+			return getDataFactory().getOWLReflexiveObjectPropertyAxiom(
+					this.parseObjectPropertyExpression());
+		} else if (compareICColon(tok, ManchesterOWLSyntax.IRREFLEXIVE)) {
 			this.consumeToken();
-			String colon = this.getToken().getToken();
-			if (colon.equals(":")) {
-				this.consumeToken();
-			}
-			OWLObjectPropertyExpression prop = this
-					.parseObjectPropertyExpression();
-			return this.getDataFactory().getOWLIrreflexiveObjectPropertyAxiom(
-					prop);
-		} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.ANTI_SYMMETRIC
-				.toString()) == 0
-				|| tok.compareToIgnoreCase(ManchesterOWLSyntax.TRANSITIVE
-						.toString()
-						+ ":") == 0) {
+			consumeColon();
+			return getDataFactory().getOWLIrreflexiveObjectPropertyAxiom(
+					this.parseObjectPropertyExpression());
+		}
+		// FIXME copy paste mistake here
+		else if (compareICColon(tok, ManchesterOWLSyntax.ANTI_SYMMETRIC)) {
 			this.consumeToken();
-			String colon = this.getToken().getToken();
-			if (colon.equals(":")) {
-				this.consumeToken();
-			}
-			OWLObjectPropertyExpression prop = this
-					.parseObjectPropertyExpression();
-			return this.getDataFactory()
-					.getOWLAntiSymmetricObjectPropertyAxiom(prop);
-		} else if (this.isObjectPropertyName(tok)) {
+			consumeColon();
+			return getDataFactory().getOWLAntiSymmetricObjectPropertyAxiom(
+					this.parseObjectPropertyExpression());
+		} else if (isObjectPropertyName(tok)) {
 			OWLObjectPropertyExpression property = this
 					.parseObjectPropertyExpression();
 			tok = this.consumeToken();
-			if (tok.compareToIgnoreCase(ManchesterOWLSyntax.EQUIVALENT_TO
-					.toString()) == 0) {
-				Set<OWLObjectPropertyExpression> equivalentProperties = this
-						.parseObjectPropertyList();
+			if (compareIC(tok, ManchesterOWLSyntax.EQUIVALENT_TO)) {
+				Set<OWLObjectPropertyExpression> equivalentProperties = parseObjectPropertyList();
 				equivalentProperties.add(property);
-				return this.getDataFactory()
-						.getOWLEquivalentObjectPropertiesAxiom(
-								equivalentProperties);
-			} else if (tok
-					.compareToIgnoreCase(ManchesterOWLSyntax.DISJOINT_WITH
-							.toString()) == 0) {
-				Set<OWLObjectPropertyExpression> disjointProperties = this
-						.parseObjectPropertyList();
+				return getDataFactory().getOWLEquivalentObjectPropertiesAxiom(
+						equivalentProperties);
+			} else if (compareIC(tok, ManchesterOWLSyntax.DISJOINT_WITH)) {
+				Set<OWLObjectPropertyExpression> disjointProperties = parseObjectPropertyList();
 				disjointProperties.add(property);
-				return this
-						.getDataFactory()
-						.getOWLDisjointObjectPropertiesAxiom(disjointProperties);
-			} else if (tok
-					.compareToIgnoreCase(ManchesterOWLSyntax.SUB_PROPERTY_OF
-							.toString()) == 0) {
+				return getDataFactory().getOWLDisjointObjectPropertiesAxiom(
+						disjointProperties);
+			} else if (compareIC(tok, ManchesterOWLSyntax.SUB_PROPERTY_OF)) {
 				OWLObjectPropertyExpression superProperty = this
 						.parseObjectPropertyExpression();
-				return this.getDataFactory().getOWLSubObjectPropertyAxiom(
-						property, superProperty);
-			} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.DOMAIN
-					.toString()) == 0) {
-				OWLDescription domain = this.parseDescription();
-				return this.getDataFactory().getOWLObjectPropertyDomainAxiom(
+				return getDataFactory().getOWLSubObjectPropertyAxiom(property,
+						superProperty);
+			} else if (compareIC(tok, ManchesterOWLSyntax.DOMAIN)) {
+				OWLDescription domain = parseDescription();
+				return getDataFactory().getOWLObjectPropertyDomainAxiom(
 						property, domain);
-			} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.RANGE
-					.toString()) == 0) {
-				OWLDescription range = this.parseDescription();
-				return this.getDataFactory().getOWLObjectPropertyRangeAxiom(
+			} else if (compareIC(tok, ManchesterOWLSyntax.RANGE)) {
+				OWLDescription range = parseDescription();
+				return getDataFactory().getOWLObjectPropertyRangeAxiom(
 						property, range);
-			} else if (tok
-					.compareToIgnoreCase(ManchesterOWLSyntax.INVERSE_FUNCTIONAL
-							.toString()) == 0) {
-				String open = this.consumeToken();
-				if (!open.equals("(")) {
-					this.throwException("(");
-				}
+			} else if (compareIC(tok, ManchesterOWLSyntax.INVERSE_FUNCTIONAL)) {
+				checkOpen();
 				OWLObjectPropertyExpression prop = this
 						.parseObjectPropertyExpression();
-				String close = this.consumeToken();
-				if (!close.equals(")")) {
-					this.throwException(")");
-				}
-				return this.getDataFactory()
+				checkClose();
+				return getDataFactory()
 						.getOWLInverseFunctionalObjectPropertyAxiom(prop);
-			} else if (tok.compareToIgnoreCase(ManchesterOWLSyntax.INVERSE_OF
-					.toString()) == 0) {
-				String open = this.consumeToken();
-				if (!open.equals("(")) {
-					this.throwException("(");
-				}
+			} else if (compareIC(tok, ManchesterOWLSyntax.INVERSE_OF)) {
+				checkOpen();
 				OWLObjectPropertyExpression prop = this
 						.parseObjectPropertyExpression();
-				String close = this.consumeToken();
-				if (!close.equals(")")) {
-					this.throwException(")");
-				}
-				return this.getDataFactory()
-						.getOWLInverseObjectPropertiesAxiom(property, prop);
+				checkClose();
+				return getDataFactory().getOWLInverseObjectPropertiesAxiom(
+						property, prop);
 			} else {
 				this.throwException(ManchesterOWLSyntax.EQUIVALENT_TO
 						.toString(), ManchesterOWLSyntax.SUB_PROPERTY_OF
@@ -506,22 +437,44 @@ public class VariableManchesterOWLSyntaxParser extends
 		return null;
 	}
 
-	private OWLAxiom parseAssertion() throws ParserException {
-		String tok = this.getToken().getToken();
-		if (tok.equals(ManchesterOWLSyntax.NOT.toString())) {
+	private void consumeColon() {
+		String colon = peekToken();
+		if (colon.equals(COLON)) {
 			this.consumeToken();
-			this.getToken().getToken();
-			OWLAxiom negatedTargetAssertion = this.parseAssertion();
+		}
+	}
+
+	private void checkClose() throws ParserException {
+		String close = this.consumeToken();
+		if (!close.equals(CLOSE_PAR)) {
+			this.throwException(CLOSE_PAR);
+		}
+	}
+
+	private void checkOpen() throws ParserException {
+		String open = this.consumeToken();
+		if (!open.equals(OPEN_PAR)) {
+			this.throwException(OPEN_PAR);
+		}
+	}
+
+	private OWLAxiom parseAssertion() throws ParserException {
+		String tok = peekToken();
+		if (equals(tok, ManchesterOWLSyntax.NOT)) {
+			this.consumeToken();
+			// FIXME probably useless instruction, or missing assignment
+			peekToken();
+			OWLAxiom negatedTargetAssertion = parseAssertion();
 			if (negatedTargetAssertion instanceof OWLDataPropertyAssertionAxiom) {
 				OWLDataPropertyAssertionAxiom dataPropertyAssertionAxiom = (OWLDataPropertyAssertionAxiom) negatedTargetAssertion;
-				return this.getDataFactory()
+				return getDataFactory()
 						.getOWLNegativeDataPropertyAssertionAxiom(
 								dataPropertyAssertionAxiom.getSubject(),
 								dataPropertyAssertionAxiom.getProperty(),
 								dataPropertyAssertionAxiom.getObject());
 			} else if (negatedTargetAssertion instanceof OWLObjectPropertyAssertionAxiom) {
 				OWLObjectPropertyAssertionAxiom objectPropertyAssertionAxiom = (OWLObjectPropertyAssertionAxiom) negatedTargetAssertion;
-				return this.getDataFactory()
+				return getDataFactory()
 						.getOWLNegativeObjectPropertyAssertionAxiom(
 								objectPropertyAssertionAxiom.getSubject(),
 								objectPropertyAssertionAxiom.getProperty(),
@@ -530,40 +483,38 @@ public class VariableManchesterOWLSyntaxParser extends
 				this.throwException("object property assertion",
 						"data property assertion");
 			}
-		} else if (this.isIndividualName(tok)) {
+		} else if (isIndividualName(tok)) {
 			OWLIndividual individual = this.parseIndividual();
-			tok = this.getToken().getToken();
-			if (tok.equals(ManchesterOWLSyntax.SAME_AS.toString())) {
-				Set<OWLIndividual> sameIndividuals = this.parseIndividualList();
+			tok = peekToken();
+			if (equals(tok, ManchesterOWLSyntax.SAME_AS)) {
+				Set<OWLIndividual> sameIndividuals = parseIndividualList();
 				sameIndividuals.add(individual);
-				return this.getDataFactory().getOWLSameIndividualsAxiom(
+				return getDataFactory().getOWLSameIndividualsAxiom(
 						sameIndividuals);
-			} else if (tok
-					.equals(ManchesterOWLSyntax.DIFFERENT_FROM.toString())) {
-				Set<OWLIndividual> differentIndividuals = this
-						.parseIndividualList();
+			} else if (equals(tok, ManchesterOWLSyntax.DIFFERENT_FROM)) {
+				Set<OWLIndividual> differentIndividuals = parseIndividualList();
 				differentIndividuals.add(individual);
-				return this.getDataFactory().getOWLDifferentIndividualsAxiom(
+				return getDataFactory().getOWLDifferentIndividualsAxiom(
 						differentIndividuals);
-			} else if (this.isDataPropertyName(tok)) {
-				OWLDataPropertyExpression dataProperty = this
-						.parseDataProperty();
-				OWLConstant filler = this.parseConstant();
-				return this.getDataFactory().getOWLDataPropertyAssertionAxiom(
+			} else if (isDataPropertyName(tok)) {
+				OWLDataPropertyExpression dataProperty = parseDataProperty();
+				OWLConstant filler = parseConstant();
+				return getDataFactory().getOWLDataPropertyAssertionAxiom(
 						individual, dataProperty, filler);
-			} else if (this.isObjectPropertyName(tok)) {
+			} else if (isObjectPropertyName(tok)) {
 				OWLObjectPropertyExpression objectProperty = this
 						.parseObjectPropertyExpression();
 				OWLIndividual filler = this.parseIndividual();
-				return this.getDataFactory()
-						.getOWLObjectPropertyAssertionAxiom(individual,
-								objectProperty, filler);
-			} else if (tok.compareToIgnoreCase("InstanceOf") == 0
-					|| tok.compareToIgnoreCase("types") == 0) {
+				return getDataFactory().getOWLObjectPropertyAssertionAxiom(
+						individual, objectProperty, filler);
+			}
+			// FIXME these strings are from the manchester OWL syntax: check
+			// whether they are the onl valid form
+			else if (tok.equals("InstanceOf") || tok.equals("types")) {
 				this.consumeToken();
-				OWLDescription description = this.parseDescription();
-				return this.getDataFactory().getOWLClassAssertionAxiom(
-						individual, description);
+				OWLDescription description = parseDescription();
+				return getDataFactory().getOWLClassAssertionAxiom(individual,
+						description);
 			}
 		}
 		return null;
@@ -571,60 +522,64 @@ public class VariableManchesterOWLSyntaxParser extends
 
 	@Override
 	public OWLDescription parseDescription() throws ParserException {
-		OWLDescription desc = this.parseIntersection();
-		return desc;
+		// try {
+		return parseIntersection();
+		// } catch (ParserException e) {
+		// Token t = getLastToken();
+		// throw new ParserException(t.getToken(), t.getPos(), t.getRow(), t
+		// .getCol(), e.isClassNameExpected(), e
+		// .isObjectPropertyNameExpected(), e
+		// .isDataPropertyNameExpected(),
+		// e.isIndividualNameExpected(), e.isDatatypeNameExpected(), e
+		// .getExpectedKeywords());
+		// // System.out
+		// // .println("VariableManchesterOWLSyntaxParser.parseDescription() "
+		// // + e.getLineNumber()
+		// // + " "
+		// // + e.getColumnNumber()
+		// // + " current token: "
+		// // + getTokenRow()
+		// // + " "
+		// // + getTokenCol());
+		// // throw e;
+		// }
 	}
 
-	public OWLAxiom parseDataPropertyAxiom() throws ParserException {
-		String tok = this.getToken().getToken();
-		if (tok.compareTo(ManchesterOWLSyntax.FUNCTIONAL.toString()) == 0) {
+	private OWLAxiom parseDataPropertyAxiom() throws ParserException {
+		String tok = peekToken();
+		if (equals(tok, ManchesterOWLSyntax.FUNCTIONAL)) {
 			this.consumeToken();
-			String open = this.consumeToken();
-			if (!open.equals("(")) {
-				this.throwException("(");
-			}
-			OWLDataPropertyExpression prop = this.parseDataProperty();
-			String close = this.consumeToken();
-			if (!close.equals(")")) {
-				this.throwException(")");
-			}
-			return this.getDataFactory()
-					.getOWLFunctionalDataPropertyAxiom(prop);
-		} else if (this.isDataPropertyName(tok)) {
-			OWLDataPropertyExpression dataProperty = this
-					.getOWLDataProperty(tok);
+			checkOpen();
+			OWLDataPropertyExpression prop = parseDataProperty();
+			checkClose();
+			return getDataFactory().getOWLFunctionalDataPropertyAxiom(prop);
+		} else if (isDataPropertyName(tok)) {
+			OWLDataPropertyExpression dataProperty = getOWLDataProperty(tok);
 			tok = this.consumeToken();
-			if (tok.equalsIgnoreCase(ManchesterOWLSyntax.SUB_PROPERTY_OF
-					.toString())) {
-				OWLDataProperty anotherDataProperty = this.parseDataProperty();
-				return this.getDataFactory().getOWLSubDataPropertyAxiom(
+			if (compareIC(tok, ManchesterOWLSyntax.SUB_PROPERTY_OF)) {
+				OWLDataProperty anotherDataProperty = parseDataProperty();
+				return getDataFactory().getOWLSubDataPropertyAxiom(
 						dataProperty, anotherDataProperty);
-			} else if (tok.equalsIgnoreCase(ManchesterOWLSyntax.DISJOINT_WITH
-					.toString())) {
-				OWLDataProperty anotherDataProperty = this.parseDataProperty();
+			} else if (compareIC(tok, ManchesterOWLSyntax.DISJOINT_WITH)) {
+				OWLDataProperty anotherDataProperty = parseDataProperty();
 				Set<OWLDataPropertyExpression> properties = new HashSet<OWLDataPropertyExpression>();
 				properties.add(dataProperty);
 				properties.add(anotherDataProperty);
-				return this.getDataFactory().getOWLDisjointDataPropertiesAxiom(
+				return getDataFactory().getOWLDisjointDataPropertiesAxiom(
 						properties);
-			} else if (tok.equalsIgnoreCase(ManchesterOWLSyntax.EQUIVALENT_TO
-					.toString())) {
-				OWLDataProperty anotherDataProperty = this.parseDataProperty();
+			} else if (compareIC(tok, ManchesterOWLSyntax.EQUIVALENT_TO)) {
+				OWLDataProperty anotherDataProperty = parseDataProperty();
 				Set<OWLDataPropertyExpression> properties = new HashSet<OWLDataPropertyExpression>();
 				properties.add(dataProperty);
 				properties.add(anotherDataProperty);
-				return this.getDataFactory()
-						.getOWLEquivalentDataPropertiesAxiom(properties);
-			} else if (tok.equalsIgnoreCase(ManchesterOWLSyntax.DOMAIN
-					.toString())) {
-				OWLDescription domain = this.parseDescription();
-				return this.getDataFactory().getOWLDataPropertyDomainAxiom(
-						dataProperty, domain);
-			} else if (tok.equalsIgnoreCase(ManchesterOWLSyntax.RANGE
-					.toString())) {
-				OWLDataRange range = this.parseDataRange(true);
-				return this.getDataFactory().getOWLDataPropertyRangeAxiom(
-						dataProperty, range);
+				return getDataFactory().getOWLEquivalentDataPropertiesAxiom(
+						properties);
+			} else if (compareIC(tok, ManchesterOWLSyntax.DOMAIN)) {
+				return getDataFactory().getOWLDataPropertyDomainAxiom(
+						dataProperty, parseDescription());
+			} else if (compareIC(tok, ManchesterOWLSyntax.RANGE)) {
+				return getDataFactory().getOWLDataPropertyRangeAxiom(
+						dataProperty, parseDataRange(true));
 			}
 			this.throwException(SUB_PROPERTY_OF, EQUIVALENT_TO, DISJOINT_WITH,
 					DOMAIN, RANGE);
@@ -633,7 +588,7 @@ public class VariableManchesterOWLSyntaxParser extends
 	}
 
 	@Override
-	public void setOWLEntityChecker(OWLEntityChecker owlEntityChecker) {
+	public final void setOWLEntityChecker(OWLEntityChecker owlEntityChecker) {
 		this.owlEntityChecker = new VariableShortFormEntityChecker(
 				owlEntityChecker, this.constraintSystem);
 		super.setOWLEntityChecker(this.owlEntityChecker);

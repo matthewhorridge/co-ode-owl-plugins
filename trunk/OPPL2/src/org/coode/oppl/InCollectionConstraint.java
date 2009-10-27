@@ -89,7 +89,7 @@ public class InCollectionConstraint<P extends OWLObject> implements
 	@Override
 	public boolean equals(Object obj) {
 		boolean toReturn = false;
-		if (obj instanceof InCollectionConstraint) {
+		if (obj instanceof InCollectionConstraint<?>) {
 			InCollectionConstraint<?> toCompare = (InCollectionConstraint<?>) obj;
 			toReturn = this.getVariable().equals(toCompare.variable)
 					&& this.getCollection().equals(toCompare.collection);

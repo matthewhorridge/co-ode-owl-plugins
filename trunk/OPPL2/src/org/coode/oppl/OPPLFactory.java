@@ -31,6 +31,7 @@ import org.coode.oppl.entity.OWLEntityCreationException;
 import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.entity.OWLEntityRendererImpl;
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.rendering.VariableOWLEntityRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
@@ -63,13 +64,15 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
 public class OPPLFactory implements OPPLAbstractFactory {
 	private class EntityFactory implements
 			org.coode.oppl.entity.OWLEntityFactory {
+		public EntityFactory() {
+		}
+
 		/**
 		 * @param shortName
 		 * @return
 		 */
 		private URI buildURI(String shortName) {
-			URI uri = OPPLFactory.this.getConstraintSystem().getOntology()
-					.getURI();
+			URI uri = getConstraintSystem().getOntology().getURI();
 			String baseURIString = uri.toString();
 			URI owlClassURI = URI.create(baseURIString + "#" + shortName);
 			return owlClassURI;
@@ -124,8 +127,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 
 		private <T extends OWLEntity> boolean isValidNewID(String shortName,
 				URI baseURI, Class<T> type) {
-			return baseURI.equals(OPPLFactory.this.getConstraintSystem()
-					.getOntology().getURI());
+			return baseURI.equals(getConstraintSystem().getOntology().getURI());
 		}
 
 		/*
@@ -137,10 +139,10 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		public <T extends OWLEntity> OWLEntityCreationSet<T> createOWLEntity(
 				Class<T> type, String shortName, URI baseURI)
 				throws OWLEntityCreationException {
-			URI anURI = this.buildURI(shortName);
+			URI anURI = buildURI(shortName);
 			T entity = this.getOWLEntity(type, anURI);
-			OWLDeclarationAxiom declarationAxiom = OPPLFactory.this
-					.getOWLDataFactory().getOWLDeclarationAxiom(entity);
+			OWLDeclarationAxiom declarationAxiom = getOWLDataFactory()
+					.getOWLDeclarationAxiom(entity);
 			List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 			changes.add(new AddAxiom(OPPLFactory.this.constraintSystem
 					.getOntology(), declarationAxiom));
@@ -165,17 +167,13 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		@SuppressWarnings("unchecked")
 		private <T extends OWLEntity> T getOWLEntity(Class<T> type, URI uri) {
 			if (OWLClass.class.isAssignableFrom(type)) {
-				return (T) OPPLFactory.this.getOWLDataFactory()
-						.getOWLClass(uri);
+				return (T) getOWLDataFactory().getOWLClass(uri);
 			} else if (OWLObjectProperty.class.isAssignableFrom(type)) {
-				return (T) OPPLFactory.this.getOWLDataFactory()
-						.getOWLObjectProperty(uri);
+				return (T) getOWLDataFactory().getOWLObjectProperty(uri);
 			} else if (OWLDataProperty.class.isAssignableFrom(type)) {
-				return (T) OPPLFactory.this.getOWLDataFactory()
-						.getOWLDataProperty(uri);
+				return (T) getOWLDataFactory().getOWLDataProperty(uri);
 			} else if (OWLIndividual.class.isAssignableFrom(type)) {
-				return (T) OPPLFactory.this.getOWLDataFactory()
-						.getOWLIndividual(uri);
+				return (T) getOWLDataFactory().getOWLIndividual(uri);
 			}
 			return null;
 		}
@@ -194,7 +192,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	}
 
 	private OWLOntologyManager ontologyManager;
-	private ConstraintSystem constraintSystem;
+	protected ConstraintSystem constraintSystem;
 	private VariableScopeChecker variableScopeChecker = null;
 	private OWLReasoner reasoner = null;
 	private OWLOntology ontology;
@@ -211,11 +209,6 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		this.reasoner = reasoner;
 	}
 
-	public OPPLFactory(OWLOntologyManager ontologyManager, OWLOntology ontology) {
-		this.ontologyManager = ontologyManager;
-		this.ontology = ontology;
-	}
-
 	/**
 	 * 
 	 * @see org.coode.oppl.OPPLAbstractFactory#getOWLEntityChecker()
@@ -224,6 +217,8 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		BidirectionalShortFormProviderAdapter bshp = new BidirectionalShortFormProviderAdapter(
 				this.ontologyManager.getOntologies(),
 				new SimpleShortFormProvider());
+		// XXX fix for missing Thing
+		bshp.add(this.ontologyManager.getOWLDataFactory().getOWLThing());
 		return new ShortFormEntityChecker(bshp);
 	}
 
@@ -241,7 +236,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 
 	public OWLEntityRenderer getOWLEntityRenderer(ConstraintSystem cs) {
 		if (cs == null) {
-			throw new NullPointerException(
+			throw new IllegalArgumentException(
 					"The constraint system cannot be null");
 		}
 		OWLEntityRendererImpl defaultRenderer = new OWLEntityRendererImpl();
@@ -252,31 +247,31 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		return new EntityFactory();
 	}
 
-	public OPPLScript buildOPPLScript(ConstraintSystem constraintSystem,
+	public OPPLScript buildOPPLScript(ConstraintSystem constraintSystem1,
 			List<Variable> variables, OPPLQuery opplQuery,
 			List<OWLAxiomChange> actions) {
-		return new OPPLScriptImpl(constraintSystem, variables, opplQuery,
+		return new OPPLScriptImpl(constraintSystem1, variables, opplQuery,
 				actions);
 	}
 
-	public OPPLQuery buildNewQuery(ConstraintSystem constraintSystem) {
-		return new OPPLQueryImpl(constraintSystem);
+	public OPPLQuery buildNewQuery(ConstraintSystem constraintSystem1) {
+		return new OPPLQueryImpl(constraintSystem1);
 	}
 
 	public ManchesterOWLSyntaxObjectRenderer getOWLObjectRenderer(
 			StringWriter writer) {
 		ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
 				writer);
-		renderer.setShortFormProvider(new SimpleVariableShortFormProvider(this
-				.getConstraintSystem()));
+		renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
+				getConstraintSystem()));
 		return renderer;
 	}
 
 	/**
 	 * @return the constraintSystem
 	 */
-	private final ConstraintSystem getConstraintSystem() {
-		return this.constraintSystem == null ? this.createConstraintSystem()
+	protected final ConstraintSystem getConstraintSystem() {
+		return this.constraintSystem == null ? createConstraintSystem()
 				: this.constraintSystem;
 	}
 
@@ -299,11 +294,11 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer(
 			ConstraintSystem cs) {
 		if (cs == null) {
-			throw new NullPointerException(
+			throw new IllegalArgumentException(
 					"The constraint system cannot be null");
 		}
-		return new ManchesterSyntaxRenderer(this.ontologyManager, this
-				.getOWLEntityRenderer(cs), cs);
+		return new ManchesterSyntaxRenderer(this.ontologyManager,
+				getOWLEntityRenderer(cs), cs);
 	}
 
 	public OWLOntologyManager getOntologyManager() {

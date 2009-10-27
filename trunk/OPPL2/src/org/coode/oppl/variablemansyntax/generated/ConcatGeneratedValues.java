@@ -28,13 +28,14 @@ import java.util.List;
  * @author Luigi Iannone
  * 
  */
-public class ConcatGeneratedValues extends AggregatedGeneratedValue<String> {
-	public ConcatGeneratedValues(List<GeneratedValue<String>> values2Aggregate) {
+public class ConcatGeneratedValues extends AbstractAggregatedGeneratedValue<String> {
+	public ConcatGeneratedValues(
+			List<GeneratedValues<String>> values2Aggregate) {
 		super(values2Aggregate);
 	}
 
 	/**
-	 * @see org.coode.oppl.variablemansyntax.generated.AggregatedGeneratedValue#aggregateValues(java.util.List)
+	 * @see org.coode.oppl.variablemansyntax.generated.AbstractAggregatedGeneratedValue#aggregateValues(java.util.List)
 	 */
 	@Override
 	protected String aggregateValues(List<String> values) {

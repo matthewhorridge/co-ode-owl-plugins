@@ -36,7 +36,7 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public abstract class ClassVariableScope implements VariableScope {
-	protected OWLDescription description;
+	private OWLDescription description;
 	private static Map<OWLDescription, SuperClassVariableScope> superClassesScopes = new HashMap<OWLDescription, SuperClassVariableScope>();
 	private static Map<OWLDescription, SubClassVariableScope> subClassesScopes = new HashMap<OWLDescription, SubClassVariableScope>();
 
@@ -78,6 +78,6 @@ public abstract class ClassVariableScope implements VariableScope {
 	 * @see org.coode.oppl.variablemansyntax.VariableScope#getScopingObject()
 	 */
 	public OWLObject getScopingObject() {
-		return this.getDescription();
+		return getDescription();
 	}
 }

@@ -23,8 +23,6 @@
 package org.coode.oppl.variablemansyntax.generated;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
@@ -36,96 +34,77 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
  * @author Luigi Iannone
  * 
  */
-public abstract class AggregatedGeneratedValue<N> implements GeneratedValue<N> {
+public abstract class AbstractAggregatedGeneratedValue<N> implements GeneratedValue<N>,
+		GeneratedValues<N> {
 	private static class ValueTreeNode<N> {
-		private final List<List<N>> toAssign;
-		private final List<N> assigned;
+		protected final List<List<N>> toAssign;
+		protected final List<N> assigned;
 
-		private ValueTreeNode(List<List<N>> toAssign, List<N> assigned) {
+		ValueTreeNode(List<List<N>> toAssign, List<N> assigned) {
 			this.toAssign = toAssign;
 			this.assigned = assigned;
 		}
 
-		/**
-		 * @return the toAssign
-		 */
-		private List<List<N>> getToAssign() {
-			return this.toAssign;
-		}
-
-		/**
-		 * @return the assigned
-		 */
-		private List<N> getAssigned() {
-			return this.assigned;
-		}
-
-		private boolean isLeaf() {
+		boolean isLeaf() {
 			return this.toAssign.isEmpty();
 		}
 
 		@Override
 		public String toString() {
 			return "assigned: " + this.assigned.toString() + " to assign: "
-					+ this.toAssign;
+					+ this.toAssign.toString();
 		}
 	}
 
 	private static class ValueTree<N> {
 		private final ValueTreeNode<N> rootNode;
 
-		ValueTree(List<GeneratedValue<N>> root) {
+		ValueTree(List<GeneratedValues<N>> root) {
 			List<List<N>> rootNode2Assign = new ArrayList<List<N>>();
-			for (GeneratedValue<N> generatedValue : root) {
+			for (GeneratedValues<N> generatedValue : root) {
 				rootNode2Assign.add(generatedValue.getGeneratedValues());
 			}
-			this.rootNode = new ValueTreeNode(rootNode2Assign,
+			this.rootNode = new ValueTreeNode<N>(rootNode2Assign,
 					new ArrayList<N>());
 		}
 
-		private List<ValueTreeNode<N>> getLeaves() {
-			List<ValueTreeNode<N>> nodes = new ArrayList<ValueTreeNode<N>>(
-					Collections.singleton(this.rootNode));
-			boolean allLeaves = this.rootNode.isLeaf();
-			while (!allLeaves) {
-				for (ValueTreeNode<N> generatedChild : new ArrayList<ValueTreeNode<N>>(
+		List<ValueTreeNode<N>> getLeaves() {
+			List<ValueTreeNode<N>> nodes = new ArrayList<ValueTreeNode<N>>();
+			nodes.add(this.rootNode);
+			while (!this.allLeaves(nodes)) {
+				for (ValueTreeNode<N> child : new ArrayList<ValueTreeNode<N>>(
 						nodes)) {
-					if (!generatedChild.isLeaf()) {
-						nodes.remove(generatedChild);
-						List<ValueTreeNode<N>> generatedChildren = this
-								.generateChildren(generatedChild);
-						nodes.addAll(generatedChildren);
+					if (!child.isLeaf()) {
+						nodes.remove(child);
+						nodes.addAll(this.generateChildren(child));
 					}
-					allLeaves = this.allLeaves(nodes);
 				}
 			}
 			return nodes;
 		}
 
 		private boolean allLeaves(List<ValueTreeNode<N>> nodes) {
-			Iterator<ValueTreeNode<N>> it = nodes.iterator();
-			ValueTreeNode<N> aNode;
-			boolean allLeaves = true;
-			while (allLeaves && it.hasNext()) {
-				aNode = it.next();
-				allLeaves = aNode.isLeaf();
+			for (ValueTreeNode<N> aNode : nodes) {
+				if (!aNode.isLeaf()) {
+					return false;
+				}
 			}
-			return allLeaves;
+			return true;
 		}
 
 		private List<ValueTreeNode<N>> generateChildren(ValueTreeNode<N> node) {
 			List<ValueTreeNode<N>> toReturn = new ArrayList<ValueTreeNode<N>>();
 			if (!node.isLeaf()) {
-				List<List<N>> values2Assign = new ArrayList<List<N>>(node
-						.getToAssign());
+				List<List<N>> values2Assign = new ArrayList<List<N>>(
+						node.toAssign);
 				List<N> head = values2Assign.remove(0);
 				for (N value : head) {
 					List<List<N>> childUnassignedVariables = new ArrayList<List<N>>(
 							values2Assign);
-					List<N> assigned = node.getAssigned();
+					List<N> assigned = node.assigned;
 					List<N> childAssignements = new ArrayList<N>(assigned);
 					childAssignements.add(value);
-					toReturn.add(new ValueTreeNode(childUnassignedVariables,
+					toReturn.add(new ValueTreeNode<N>(childUnassignedVariables,
 							childAssignements));
 				}
 			} else {
@@ -135,56 +114,41 @@ public abstract class AggregatedGeneratedValue<N> implements GeneratedValue<N> {
 		}
 	}
 
-	private final List<GeneratedValue<N>> values2Aggregate;
+	private final List<GeneratedValues<N>> values2Aggregate;
 
 	/**
-	 * @param values2Aggregate
+	 * @param values
 	 */
-	public AggregatedGeneratedValue(List<GeneratedValue<N>> values2Aggregate) {
-		this.values2Aggregate = values2Aggregate;
+	protected AbstractAggregatedGeneratedValue(List<GeneratedValues<N>> values) {
+		this.values2Aggregate = values;
 	}
 
-	/**
-	 * @see org.coode.oppl.variablemansyntax.generated.GeneratedValue#getGeneratedValues()
-	 */
 	public List<N> getGeneratedValues() {
-		ValueTree<N> tree = new ValueTree(this.values2Aggregate);
-		List<ValueTreeNode<N>> leaves = tree.getLeaves();
 		List<N> toReturn = new ArrayList<N>();
-		for (ValueTreeNode<N> leaf : leaves) {
-			List<N> assigned = leaf.getAssigned();
-			N aggregation = this.aggregateValues(assigned);
+		ValueTree<N> tree = new ValueTree<N>(this.values2Aggregate);
+		for (ValueTreeNode<N> leaf : tree.getLeaves()) {
+			N aggregation = this.aggregateValues(leaf.assigned);
 			toReturn.add(aggregation);
 		}
 		return toReturn;
 	}
 
-	/**
-	 * @return an aggregation of the values
-	 * @see {@link AggregatedGeneratedValue#getValues2Aggregate()}
-	 */
-	protected abstract N aggregateValues(List<N> values);
-
-	/**
-	 * @return the values2Aggregate
-	 */
-	public List<GeneratedValue<N>> getValues2Aggregate() {
-		return this.values2Aggregate;
-	}
-
 	public N getGeneratedValue(BindingNode node) {
 		List<N> toAggregate = new ArrayList<N>();
-		for (GeneratedValue<N> value : this.values2Aggregate) {
-			toAggregate.add(value.getGeneratedValue(node));
+		for (GeneratedValues<N> value : this.values2Aggregate) {
+			if (value instanceof GeneratedValue<?>) {
+				toAggregate.add(((GeneratedValue<N>) value)
+						.getGeneratedValue(node));
+			}
 		}
 		return this.aggregateValues(toAggregate);
 	}
 
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		boolean first = true;
-		for (GeneratedValue<N> value2Aggregate : this.getValues2Aggregate()) {
+		for (GeneratedValues<N> value2Aggregate : this.values2Aggregate) {
 			String aggregator = first ? "" : this.getAggregatorSymbol() + " ";
 			first = false;
 			buffer.append(aggregator);
@@ -192,6 +156,12 @@ public abstract class AggregatedGeneratedValue<N> implements GeneratedValue<N> {
 		}
 		return buffer.toString();
 	}
+
+	/**
+	 * @return an aggregation of the values
+	 * @see {@link AbstractAggregatedGeneratedValue#getValues2Aggregate()}
+	 */
+	protected abstract N aggregateValues(List<N> values);
 
 	protected abstract String getAggregatorSymbol();
 }

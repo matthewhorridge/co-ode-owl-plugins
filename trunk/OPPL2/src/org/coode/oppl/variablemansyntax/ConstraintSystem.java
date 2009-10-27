@@ -34,7 +34,8 @@ import org.coode.oppl.AssertedAxiomQuery;
 import org.coode.oppl.AxiomQuery;
 import org.coode.oppl.ConstraintChecker;
 import org.coode.oppl.InferredAxiomQuery;
-import org.coode.oppl.OPPLException;
+import org.coode.oppl.exceptions.InvalidVariableNameException;
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.utils.VariableDetector;
 import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
@@ -43,7 +44,7 @@ import org.coode.oppl.variablemansyntax.bindingtree.LeafBrusher;
 import org.coode.oppl.variablemansyntax.generated.CollectionGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
-import org.coode.oppl.variablemansyntax.generated.OWLObjectCollectionGeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.AbstractOWLObjectCollectionGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.StringGeneratedVariable;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.semanticweb.owl.inference.OWLReasoner;
@@ -122,9 +123,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 
 	public ConstraintSystem(OWLOntology ontology,
 			OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
-		this.ontology = ontology;
-		this.ontologies = ontologyManager.getOntologies();
-		this.dataFactory = ontologyManager.getOWLDataFactory();
+		this(ontology, ontologyManager);
 		this.reasoner = reasoner;
 	}
 
@@ -150,12 +149,12 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public void visit(OWLSubClassAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	private void updateBindings(OWLAxiom axiom) {
-		if (this.isVariableAxiom(axiom)) {
-			this.updateLeaves(axiom);
+		if (isVariableAxiom(axiom)) {
+			updateLeaves(axiom);
 			System.out.println("Initial size: "
 					+ (this.leaves == null ? "empty" : this.leaves.size()));
 			AxiomQuery query = this.reasoner == null
@@ -188,7 +187,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	private void updateLeaves(OWLAxiom axiom) {
 		if (this.leaves != null) {
 			for (BindingNode bindingNode : this.leaves) {
-				Set<Variable> axiomVariables = this.getAxiomVariables(axiom);
+				Set<Variable> axiomVariables = getAxiomVariables(axiom);
 				for (Variable variable : axiomVariables) {
 					if (!(bindingNode.getAssignedVariables().contains(variable) || bindingNode
 							.getAssignedVariables().contains(variable))) {
@@ -205,7 +204,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	private void updateBindingsAssertedAxiom(OWLAxiom axiom) {
-		if (this.isVariableAxiom(axiom)) {
+		if (isVariableAxiom(axiom)) {
 			System.out.println("Initial size: "
 					+ (this.leaves == null ? "empty" : this.leaves.size()));
 			AxiomQuery query = new AssertedAxiomQuery(this.ontologies, this);
@@ -217,7 +216,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	private boolean isVariableAxiom(OWLAxiom axiom) {
-		return !this.getAxiomVariables(axiom).isEmpty();
+		return !getAxiomVariables(axiom).isEmpty();
 	}
 
 	public Set<Variable> getAxiomVariables(OWLAxiom axiom) {
@@ -253,159 +252,159 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public void visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLAntiSymmetricObjectPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLReflexiveObjectPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLDisjointClassesAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLDataPropertyDomainAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLImportsDeclaration axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLAxiomAnnotationAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLObjectPropertyDomainAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLEquivalentObjectPropertiesAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLDifferentIndividualsAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLDisjointDataPropertiesAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLDisjointObjectPropertiesAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLObjectPropertyRangeAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLObjectPropertyAssertionAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLFunctionalObjectPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLObjectSubPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLDisjointUnionAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLDeclarationAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLEntityAnnotationAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLOntologyAnnotationAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLSymmetricObjectPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLDataPropertyRangeAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLFunctionalDataPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLEquivalentDataPropertiesAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLClassAssertionAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLEquivalentClassesAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLDataPropertyAssertionAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLTransitiveObjectPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLDataSubPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLSameIndividualsAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLObjectPropertyChainSubPropertyAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(OWLInverseObjectPropertiesAxiom axiom) {
-		this.updateBindings(axiom);
+		updateBindings(axiom);
 	}
 
 	public void visit(SWRLRule rule) {
-		this.updateBindings(rule);
+		updateBindings(rule);
 	}
 
 	public boolean isVariable(OWLObjectProperty property) {
-		return this.isVariableURI(property.getURI());
+		return isVariableURI(property.getURI());
 	}
 
 	public boolean isVariable(OWLDataProperty property) {
-		return this.isVariableURI(property.getURI());
+		return isVariableURI(property.getURI());
 	}
 
 	public boolean isVariable(OWLIndividual individual) {
-		return this.isVariableURI(individual.getURI());
+		return isVariableURI(individual.getURI());
 	}
 
 	/**
@@ -414,27 +413,26 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	public Set<BindingNode> getLeaves() {
 		// No query nor constraint has been added to this ConstraintSystem
 		// variables will assume all the possible values they can
-		if (this.leaves == null && this.getAxioms().isEmpty()
-				&& this.getConstraints().isEmpty()) {
-			this.setupLeaves();
+		if (this.leaves == null && getAxioms().isEmpty()
+				&& getConstraints().isEmpty()) {
+			setupLeaves();
 		}
 		return this.leaves;
 	}
 
 	/**
-	 * 
+	 *
 	 */
-	protected void setupLeaves() {
-		for (Variable variable : this.getVariables()) {
+	private void setupLeaves() {
+		for (Variable variable : getVariables()) {
 			if (variable instanceof InputVariable) {
-				for (OWLOntology ontology : this.getOntologies()) {
+				for (OWLOntology ontology1 : getOntologies()) {
 					Set<? extends OWLObject> referencedValues = variable
-							.getType().getReferencedValues(ontology);
+							.getType().getReferencedValues(ontology1);
 					for (OWLObject object : referencedValues) {
 						try {
 							variable.addPossibleBinding(object);
 						} catch (OWLReasonerException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
@@ -442,7 +440,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 			}
 		}
 		BindingNode root = new BindingNode(new HashSet<Assignment>(),
-				new HashSet<Variable>(this.getInputVariables()));
+				new HashSet<Variable>(getInputVariables()));
 		LeafBrusher leafBrusher = new LeafBrusher();
 		root.accept(leafBrusher);
 		this.leaves = leafBrusher.getLeaves();
@@ -450,7 +448,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 
 	public Set<InputVariable> getInputVariables() {
 		Set<InputVariable> toReturn = new HashSet<InputVariable>();
-		for (Variable variable : this.getVariables()) {
+		for (Variable variable : getVariables()) {
 			if (variable instanceof InputVariable) {
 				toReturn.add((InputVariable) variable);
 			}
@@ -483,7 +481,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 			BindingNode leaf;
 			while (it.hasNext()) {
 				leaf = it.next();
-				boolean holdingLeaf = this.checkConstraints(leaf);
+				boolean holdingLeaf = checkConstraints(leaf);
 				if (!holdingLeaf) {
 					it.remove();
 				}
@@ -516,9 +514,9 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	 * @param leaf
 	 * @return if the BindingNode satisfies the constraints
 	 */
-	public boolean checkConstraints(BindingNode leaf) {
+	private boolean checkConstraints(BindingNode leaf) {
 		boolean hold = true;
-		Iterator<AbstractConstraint> it = this.getConstraints().iterator();
+		Iterator<AbstractConstraint> it = getConstraints().iterator();
 		AbstractConstraint c;
 		ConstraintChecker constraintChecker = new ConstraintChecker(leaf, this);
 		while (hold && it.hasNext()) {
@@ -565,10 +563,9 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public Variable createStringGeneratedVariable(String name,
-			VariableType type, GeneratedValue<String> value)
-			throws IncompatibleValueException {
+			VariableType type, GeneratedValue<String> value) {
 		GeneratedVariable<String> generatedVariable = StringGeneratedVariable
-				.buildGeneratedVariable(name, type, value, this.getOntology());
+				.buildGeneratedVariable(name, type, value, getOntology());
 		this.variables.put(name, generatedVariable);
 		return generatedVariable;
 	}
@@ -582,9 +579,9 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 
 	public Set<GeneratedVariable<?>> getGeneratedVariables() {
 		Set<GeneratedVariable<?>> toReturn = new HashSet<GeneratedVariable<?>>(
-				this.getVariables().size());
-		for (Variable v : this.getVariables()) {
-			if (v instanceof GeneratedVariable) {
+				getVariables().size());
+		for (Variable v : getVariables()) {
+			if (v instanceof GeneratedVariable<?>) {
 				toReturn.add((GeneratedVariable<?>) v);
 			}
 		}
@@ -600,7 +597,7 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 
 	public void addAssertedAxiom(OWLAxiom axiom) {
 		this.axioms.add(axiom);
-		this.updateBindingsAssertedAxiom(axiom);
+		updateBindingsAssertedAxiom(axiom);
 	}
 
 	/**
@@ -622,14 +619,12 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	public Variable createIntersectionGeneratedVariable(String name,
 			VariableType type, CollectionGeneratedValue<OWLClass> collection) {
 		Variable toReturn = null;
-		switch (type) {
-		case CLASS:
-			toReturn = OWLObjectCollectionGeneratedVariable.getConjunction(
+		if (type.equals(VariableType.CLASS)) {
+			toReturn = AbstractOWLObjectCollectionGeneratedVariable.getConjunction(
 					name, type, collection, this.dataFactory);
 			this.variables.put(name, toReturn);
-			break;
-		default:
-			throw new IllegalArgumentException("Incopatibile type " + type);
+		} else {
+			throw new IllegalArgumentException("Incompatibile type " + type);
 		}
 		return toReturn;
 	}
@@ -637,14 +632,13 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	public Variable createUnionGeneratedVariable(String name,
 			VariableType type, CollectionGeneratedValue<OWLClass> collection) {
 		Variable toReturn = null;
-		switch (type) {
-		case CLASS:
-			toReturn = OWLObjectCollectionGeneratedVariable.getDisjunction(
+		if (type.equals(VariableType.CLASS)) {
+			toReturn = AbstractOWLObjectCollectionGeneratedVariable.getDisjunction(
 					name, type, collection, this.dataFactory);
 			this.variables.put(name, toReturn);
-			break;
-		default:
-			throw new IllegalArgumentException("Incopatibile type " + type);
+		}
+		if (toReturn == null) {
+			throw new IllegalArgumentException("Incompatibile type " + type);
 		}
 		return toReturn;
 	}

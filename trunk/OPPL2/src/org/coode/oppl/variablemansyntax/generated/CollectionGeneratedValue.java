@@ -34,7 +34,8 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
  * 
  */
 public abstract class CollectionGeneratedValue<N> extends
-		VariableGeneratedValue<Collection<N>> {
+		VariableGeneratedValue<Collection<N>> implements
+		GeneratedValues<Collection<N>> {
 	private final ConstraintSystem constraintSystem;
 
 	public CollectionGeneratedValue(Variable variable, Attribute attribute,

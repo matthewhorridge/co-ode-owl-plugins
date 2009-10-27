@@ -43,6 +43,7 @@ import org.semanticweb.owl.model.OWLOntology;
  * @author Luigi Iannone
  * 
  */
+@SuppressWarnings("unused")
 public enum VariableType implements OWLEntityVisitorEx<VariableType> {
 	CLASS("CLASS") {
 		@Override
@@ -142,13 +143,13 @@ public enum VariableType implements OWLEntityVisitorEx<VariableType> {
 				: this.isCompatibleWith((OWLConstant) o);
 	}
 
-	public boolean isCompatibleWith(OWLEntity entity) {
+	protected boolean isCompatibleWith(OWLEntity entity) {
 		CompatibilityChecker checker = new CompatibilityChecker(this);
 		return entity.accept(checker);
 	}
 
-	public boolean isCompatibleWith(OWLConstant constant) {
-		return this.equals(CONSTANT);
+	protected boolean isCompatibleWith(OWLConstant constant) {
+		return equals(CONSTANT);
 	}
 
 	public VariableType visit(OWLClass owlClass) {

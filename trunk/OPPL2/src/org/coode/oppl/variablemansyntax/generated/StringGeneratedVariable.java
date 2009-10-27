@@ -35,80 +35,81 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 				.getOntologyManager();
 		OWLEntityFactory entityFactory = OPPLParser.getOPPLFactory()
 				.getOWLEntityFactory();
-		switch (this.getType()) {
-		case CLASS:
-			try {
-				value = entityChecker.getOWLClass(aValue);
-				if (value == null) {
-					OWLEntityCreationSet<OWLClass> creationEntitySet = entityFactory
-							.createOWLClass(aValue, null);
-					value = creationEntitySet.getOWLEntity();
-					ontologyManager.applyChanges(creationEntitySet
-							.getOntologyChanges());
+		switch (getType()) {
+			case CLASS:
+				try {
+					value = entityChecker.getOWLClass(aValue);
+					if (value == null) {
+						OWLEntityCreationSet<OWLClass> creationEntitySet = entityFactory
+								.createOWLClass(aValue, null);
+						value = creationEntitySet.getOWLEntity();
+						ontologyManager.applyChanges(creationEntitySet
+								.getOntologyChanges());
+					}
+				} catch (OWLEntityCreationException e) {
+					value = OPPLParser.getOPPLFactory().getOWLDataFactory()
+							.getOWLClass(buildURI(aValue));
+				} catch (OWLOntologyChangeException e) {
+					throw new RuntimeException(e);
 				}
-			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
-						.getOWLClass(this.buildURI(aValue));
-			} catch (OWLOntologyChangeException e) {
-				throw new RuntimeException(e);
-			}
-			break;
-		case OBJECTPROPERTY:
-			try {
-				value = entityChecker.getOWLObjectProperty(aValue);
-				if (value == null) {
-					OWLEntityCreationSet<OWLObjectProperty> creationEntitySet = entityFactory
-							.createOWLObjectProperty(aValue, null);
-					value = creationEntitySet.getOWLEntity();
-					ontologyManager.applyChanges(creationEntitySet
-							.getOntologyChanges());
+				break;
+			case OBJECTPROPERTY:
+				try {
+					value = entityChecker.getOWLObjectProperty(aValue);
+					if (value == null) {
+						OWLEntityCreationSet<OWLObjectProperty> creationEntitySet = entityFactory
+								.createOWLObjectProperty(aValue, null);
+						value = creationEntitySet.getOWLEntity();
+						ontologyManager.applyChanges(creationEntitySet
+								.getOntologyChanges());
+					}
+				} catch (OWLEntityCreationException e) {
+					value = OPPLParser.getOPPLFactory().getOWLDataFactory()
+							.getOWLObjectProperty(buildURI(aValue));
+				} catch (OWLOntologyChangeException e) {
+					throw new RuntimeException(e);
 				}
-			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
-						.getOWLObjectProperty(this.buildURI(aValue));
-			} catch (OWLOntologyChangeException e) {
-				new RuntimeException(e);
-			}
-			break;
-		case DATAPROPERTY:
-			try {
-				value = entityChecker.getOWLDataProperty(aValue);
-				if (value == null) {
-					OWLEntityCreationSet<OWLDataProperty> creationEntitySet = entityFactory
-							.createOWLDataProperty(aValue, null);
-					value = creationEntitySet.getOWLEntity();
-					ontologyManager.applyChanges(creationEntitySet
-							.getOntologyChanges());
+				break;
+			case DATAPROPERTY:
+				try {
+					value = entityChecker.getOWLDataProperty(aValue);
+					if (value == null) {
+						OWLEntityCreationSet<OWLDataProperty> creationEntitySet = entityFactory
+								.createOWLDataProperty(aValue, null);
+						value = creationEntitySet.getOWLEntity();
+						ontologyManager.applyChanges(creationEntitySet
+								.getOntologyChanges());
+					}
+				} catch (OWLEntityCreationException e) {
+					value = OPPLParser.getOPPLFactory().getOWLDataFactory()
+							.getOWLDataProperty(buildURI(aValue));
+				} catch (OWLOntologyChangeException e) {
+					throw new RuntimeException(e);
 				}
-			} catch (OWLEntityCreationException e) {
-				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
-						.getOWLDataProperty(this.buildURI(aValue));
-			} catch (OWLOntologyChangeException e) {
-				throw new RuntimeException(e);
-			}
-			break;
-		case INDIVIDUAL:
-			try {
-				value = entityChecker.getOWLIndividual(aValue);
-				if (value == null) {
-					OWLEntityCreationSet<OWLIndividual> creationEntitySet = entityFactory
-							.createOWLIndividual(aValue, null);
-					value = creationEntitySet.getOWLEntity();
-					ontologyManager.applyChanges(creationEntitySet
-							.getOntologyChanges());
+				break;
+			case INDIVIDUAL:
+				try {
+					value = entityChecker.getOWLIndividual(aValue);
+					if (value == null) {
+						OWLEntityCreationSet<OWLIndividual> creationEntitySet = entityFactory
+								.createOWLIndividual(aValue, null);
+						value = creationEntitySet.getOWLEntity();
+						ontologyManager.applyChanges(creationEntitySet
+								.getOntologyChanges());
+					}
+				} catch (OWLEntityCreationException e) {
+					value = OPPLParser.getOPPLFactory().getOWLDataFactory()
+							.getOWLIndividual(buildURI(aValue));
+				} catch (OWLOntologyChangeException e) {
+					throw new RuntimeException(e);
 				}
-			} catch (OWLEntityCreationException e) {
+				break;
+			case CONSTANT:
 				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
-						.getOWLIndividual(this.buildURI(aValue));
-			} catch (OWLOntologyChangeException e) {
-				throw new RuntimeException(e);
-			}
-			break;
-		case CONSTANT:
-			value = OPPLParser.getOPPLFactory().getOWLDataFactory()
-					.getOWLTypedConstant(aValue);
-		default:
-			break;
+						.getOWLTypedConstant(aValue);
+				//$FALL-THROUGH$
+			default:
+				break;
 		}
 		return value;
 	}
@@ -118,8 +119,7 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 	 * @return
 	 */
 	private URI buildURI(String aValue) {
-		return URI
-				.create(this.getOntology().getURI().toString() + "#" + aValue);
+		return URI.create(getOntology().getURI().toString() + "#" + aValue);
 	}
 
 	public static StringGeneratedVariable buildGeneratedVariable(String name,
@@ -130,8 +130,8 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 
 	@Override
 	protected GeneratedVariable<String> replace(GeneratedValue<String> value) {
-		return buildGeneratedVariable(this.getName(), this.getType(), value,
-				this.getOntology());
+		return buildGeneratedVariable(getName(), getType(), value,
+				getOntology());
 	}
 
 	/**
@@ -143,6 +143,6 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 
 	@Override
 	public String getOPPLFunction() {
-		return "create(" + this.getValue() + ")";
+		return "create(" + getValue() + ")";
 	}
 }

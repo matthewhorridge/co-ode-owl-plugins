@@ -28,10 +28,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.ManchesterVariableSyntax;
+import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableVisitor;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLObject;
@@ -44,17 +46,21 @@ public abstract class GeneratedVariable<N> implements Variable {
 	private final String name;
 	private final VariableType type;
 	private GeneratedValue<N> value;
+	private GeneratedValues<N> valueCollection;
 
 	/**
 	 * @param name
 	 * @param type
 	 * @param value
 	 */
-	public GeneratedVariable(String name, VariableType type,
+	protected GeneratedVariable(String name, VariableType type,
 			GeneratedValue<N> value) {
 		this.name = name;
 		this.type = type;
 		this.value = value;
+		if (this.value instanceof GeneratedValues<?>) {
+			this.valueCollection = (GeneratedValues<N>) this.value;
+		}
 	}
 
 	/**
@@ -96,7 +102,7 @@ public abstract class GeneratedVariable<N> implements Variable {
 
 	public boolean addPossibleBinding(OWLObject object)
 			throws OWLReasonerException {
-		return false;
+		return Boolean.FALSE;
 	}
 
 	public void clearBindings() {
@@ -104,9 +110,9 @@ public abstract class GeneratedVariable<N> implements Variable {
 
 	public Set<OWLObject> getPossibleBindings() {
 		Set<OWLObject> toReturn = new HashSet<OWLObject>();
-		List<N> generatedValues = this.value.getGeneratedValues();
-		for (N value : generatedValues) {
-			toReturn.add(this.generateObject(value));
+		List<N> generatedValues = this.valueCollection.getGeneratedValues();
+		for (N value1 : generatedValues) {
+			toReturn.add(this.generateObject(value1));
 		}
 		return toReturn;
 	}
@@ -146,10 +152,10 @@ public abstract class GeneratedVariable<N> implements Variable {
 		visitor.visit(this);
 	}
 
-	protected abstract GeneratedVariable<N> replace(GeneratedValue<N> value);
+	protected abstract GeneratedVariable<N> replace(GeneratedValue<N> value1);
 
-	public GeneratedVariable<N> replaceValue(GeneratedValue<?> replaceValue) {
-		return this.replace((GeneratedValue<N>) replaceValue);
+	public GeneratedVariable<N> replaceValue(GeneratedValue<N> replaceValue) {
+		return this.replace(replaceValue);
 	}
 
 	/**

@@ -20,18 +20,16 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oppl.variablemansyntax;
-
-import org.coode.oppl.OPPLException;
-
+package org.coode.oppl.exceptions;
 
 /**
  * @author Luigi Iannone
  * 
  */
-@SuppressWarnings("serial")
-public class InvalidVariableNameException extends OPPLException {
-	public InvalidVariableNameException(String message) {
-		super(message);
+public class NullReasonerException extends OPPLException {
+	private static final long serialVersionUID = 5123760931519545671L;
+
+	public NullReasonerException() {
+		super("No reasoner selected");
 	}
 }

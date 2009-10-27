@@ -22,6 +22,7 @@
  */
 package org.coode.oppl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
@@ -56,12 +57,12 @@ public class Executor implements OPPLScriptVisitor {
 	}
 
 	public void visitActions(List<OWLAxiomChange> changes) {
-		List<OWLAxiomChange> actions = this.changeExtractor.visitActions(
-				changes, null);
+		List<OWLAxiomChange> actions = new ArrayList<OWLAxiomChange>();
+		this.changeExtractor.visitActions(changes, actions);
 		try {
 			this.ontologyManager.applyChanges(actions);
 		} catch (OWLOntologyChangeException e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
 		}
 	}
 }

@@ -55,32 +55,33 @@ public class OPPLVariableMatcher {
 		Set<Variable> toReturn = new HashSet<Variable>(variables.size());
 		for (Variable variable : variables) {
 			switch (variable.getType()) {
-			case CLASS:
-				if (matchClasses && variable.getName().startsWith(name)) {
-					toReturn.add(variable);
-				}
-				break;
-			case OBJECTPROPERTY:
-				if (matchObjectProperties
-						&& variable.getName().startsWith(name)) {
-					toReturn.add(variable);
-				}
-				break;
-			case DATAPROPERTY:
-				if (matchDataProperties && variable.getName().startsWith(name)) {
-					toReturn.add(variable);
-				}
-				break;
-			case INDIVIDUAL:
-				if (matchIndividuals && variable.getName().startsWith(name)) {
-					toReturn.add(variable);
-				}
-				break;
-			case CONSTANT:
-				if (matchConstants && variable.getName().startsWith(name)) {
-					toReturn.add(variable);
-				}
-				break;
+				case CLASS:
+					if (matchClasses && variable.getName().startsWith(name)) {
+						toReturn.add(variable);
+					}
+					break;
+				case OBJECTPROPERTY:
+					if (matchObjectProperties
+							&& variable.getName().startsWith(name)) {
+						toReturn.add(variable);
+					}
+					break;
+				case DATAPROPERTY:
+					if (matchDataProperties
+							&& variable.getName().startsWith(name)) {
+						toReturn.add(variable);
+					}
+					break;
+				case INDIVIDUAL:
+					if (matchIndividuals && variable.getName().startsWith(name)) {
+						toReturn.add(variable);
+					}
+					break;
+				case CONSTANT:
+					if (matchConstants && variable.getName().startsWith(name)) {
+						toReturn.add(variable);
+					}
+					break;
 			}
 		}
 		return toReturn;

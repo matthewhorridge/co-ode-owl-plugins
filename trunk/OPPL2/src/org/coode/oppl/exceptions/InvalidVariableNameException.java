@@ -20,38 +20,16 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oppl;
+package org.coode.oppl.exceptions;
 
 /**
- * Generic OPPL Exception
- * 
  * @author Luigi Iannone
  * 
  */
-@SuppressWarnings("serial")
-public class OPPLException extends Exception {
-	/**
-	 * @param message
-	 * @see Exception#Exception(String)
-	 */
-	public OPPLException(String message) {
+public class InvalidVariableNameException extends OPPLException {
+	private static final long serialVersionUID = 8798358304817114024L;
+
+	public InvalidVariableNameException(String message) {
 		super(message);
-	}
-
-	/**
-	 * @see Exception#Exception(Throwable)
-	 * @param t
-	 */
-	public OPPLException(Throwable t) {
-		super(t);
-	}
-
-	/**
-	 * @param message
-	 * @param t
-	 * @see Exception#Exception(String, Throwable)
-	 */
-	public OPPLException(String message, Throwable t) {
-		super(message, t);
 	}
 }

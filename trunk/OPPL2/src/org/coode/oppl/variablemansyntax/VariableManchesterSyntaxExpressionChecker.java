@@ -22,19 +22,19 @@
  */
 package org.coode.oppl.variablemansyntax;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.syntax.TokenMgrError;
-import org.coode.oppl.utils.ProtegeParserFactory;
-import org.protege.editor.owl.OWLEditorKit;
+import org.coode.oppl.utils.ParserFactory;
 import org.protege.editor.owl.model.description.OWLExpressionParserException;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
 import org.semanticweb.owl.inference.OWLReasoner;
+import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -42,11 +42,16 @@ import org.semanticweb.owl.inference.OWLReasoner;
  */
 public class VariableManchesterSyntaxExpressionChecker implements
 		OWLExpressionChecker<OPPLScript> {
-	private OWLEditorKit owlEditorKit;
+	private OWLOntologyManager manager;
+	private OWLReasoner reasoner;
+	private OWLOntology ontology;
 	private OPPLScript lastCheckedObject = null;
 
-	public VariableManchesterSyntaxExpressionChecker(OWLEditorKit owlEditorKit) {
-		this.owlEditorKit = owlEditorKit;
+	public VariableManchesterSyntaxExpressionChecker(OWLOntologyManager mgr,
+			OWLOntology onto, OWLReasoner r) {
+		this.manager = mgr;
+		this.ontology = onto;
+		this.reasoner = r;
 	}
 
 	/**
@@ -54,27 +59,20 @@ public class VariableManchesterSyntaxExpressionChecker implements
 	 */
 	public void check(String text) throws OWLExpressionParserException {
 		this.lastCheckedObject = null;
-		this.initParser(text);
+		initParser(text);
 		try {
 			OPPLScript statementModel = OPPLParser.Start();
-			OWLReasoner reasoner = this.owlEditorKit.getModelManager()
-					.getReasoner();
-			if (reasoner == null || reasoner instanceof NoOpReasoner) {
+			if (this.reasoner == null || this.reasoner instanceof NoOpReasoner) {
 				List<InputVariable> variables = statementModel
 						.getInputVariables();
-				Iterator<InputVariable> iterator = variables.iterator();
-				boolean found = false;
-				InputVariable v = null;
-				while (!found && iterator.hasNext()) {
-					v = iterator.next();
-					found = v.getVariableScope() != null;
-				}
-				if (found) {
-					throw new OWLExpressionParserException(
-							new Exception(
-									"Variable "
-											+ v.toString()
-											+ " has got a scope restriction and there is no Reasoner activated to check"));
+				for (InputVariable v : variables) {
+					if (v.getVariableScope() != null) {
+						throw new OWLExpressionParserException(
+								new Exception(
+										"Variable "
+												+ v.toString()
+												+ " has got a scope restriction and there is no Reasoner activated to check"));
+					}
 				}
 			}
 			this.lastCheckedObject = statementModel;
@@ -90,7 +88,7 @@ public class VariableManchesterSyntaxExpressionChecker implements
 	 */
 	public OPPLScript createObject(String text)
 			throws OWLExpressionParserException {
-		this.check(text);
+		check(text);
 		return this.lastCheckedObject;
 	}
 
@@ -99,7 +97,7 @@ public class VariableManchesterSyntaxExpressionChecker implements
 	 * @return
 	 */
 	protected OPPLParser initParser(String text) {
-		return ProtegeParserFactory.initParser(text, this.owlEditorKit
-				.getModelManager());
+		return ParserFactory.initParser(text, this.ontology, this.manager,
+				this.reasoner);
 	}
 }

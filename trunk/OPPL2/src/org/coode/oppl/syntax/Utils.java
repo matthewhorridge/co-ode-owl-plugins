@@ -36,22 +36,21 @@ import org.semanticweb.owl.model.OWLObject;
  */
 public class Utils {
 	public static String readString(int... delimiterTokenKinds) {
-		String toReturn = "";
-		while (true) {
+		StringBuilder toReturn = new StringBuilder();
+		boolean found = false;
+		while (!found) {
 			Token token = OPPLParser.getToken(1);
-			boolean found = false;
 			for (int i = 0; !found && i < delimiterTokenKinds.length; i++) {
-				found = token.kind == OPPLParser.EOF
+				found = token.kind == OPPLParserConstants.EOF
 						|| delimiterTokenKinds[i] == token.kind;
 			}
-			if (found) {
-				break;
-			} else {
-				toReturn += token.image + " ";
+			if (!found) {
+				toReturn.append(token.image);
+				toReturn.append(" ");
 				OPPLParser.getNextToken();
 			}
 		}
-		return toReturn;
+		return toReturn.toString();
 	}
 
 	public static Variable parseVariableExpressionGeneratedVariable(
@@ -61,24 +60,24 @@ public class Utils {
 				string, constraintSystem);
 		OWLObject owlObject = null;
 		switch (type) {
-		case CLASS:
-			owlObject = parser.parseDescription();
-			break;
-		case OBJECTPROPERTY:
-			owlObject = parser.parseObjectPropertyExpression();
-			break;
-		case DATAPROPERTY:
-			owlObject = parser.parseDataProperty();
-			break;
-		case INDIVIDUAL:
-			owlObject = parser.parseIndividual();
-			break;
-		case CONSTANT:
-			owlObject = parser.parseConstant();
-			break;
-		default:
-			throw new IllegalArgumentException("Unsupported type: "
-					+ type.toString());
+			case CLASS:
+				owlObject = parser.parseDescription();
+				break;
+			case OBJECTPROPERTY:
+				owlObject = parser.parseObjectPropertyExpression();
+				break;
+			case DATAPROPERTY:
+				owlObject = parser.parseDataProperty();
+				break;
+			case INDIVIDUAL:
+				owlObject = parser.parseIndividual();
+				break;
+			case CONSTANT:
+				owlObject = parser.parseConstant();
+				break;
+			default:
+				throw new IllegalArgumentException("Unsupported type: "
+						+ type.toString());
 		}
 		VariableExpressionGeneratedVariable variableExpressionGeneratedVariable = new VariableExpressionGeneratedVariable(
 				name, owlObject, constraintSystem);
