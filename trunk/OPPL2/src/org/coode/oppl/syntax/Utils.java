@@ -35,7 +35,20 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public class Utils {
-	public static String readString(int... delimiterTokenKinds) {
+	public static ParserException buildException(int beginningSubSection,
+			int beginningSubSectionLine, ParserException e) {
+		ParserException test = new ParserException(e.getCurrentToken(), e
+				.getStartPos()
+				+ beginningSubSection, e.getLineNumber()
+				+ beginningSubSectionLine - 1, e.getColumnNumber()
+				+ beginningSubSection, e.isClassNameExpected(), e
+				.isObjectPropertyNameExpected(),
+				e.isDataPropertyNameExpected(), e.isIndividualNameExpected(), e
+						.isDatatypeNameExpected(), e.getExpectedKeywords());
+		return test;
+	}
+
+	protected static String readString(int... delimiterTokenKinds) {
 		StringBuilder toReturn = new StringBuilder();
 		boolean found = false;
 		while (!found) {
@@ -53,7 +66,7 @@ public class Utils {
 		return toReturn.toString();
 	}
 
-	public static Variable parseVariableExpressionGeneratedVariable(
+	protected static Variable parseVariableExpressionGeneratedVariable(
 			String name, VariableType type, String string,
 			ConstraintSystem constraintSystem) throws ParserException {
 		VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(
