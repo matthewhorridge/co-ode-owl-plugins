@@ -27,9 +27,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.coode.oppl.variablemansyntax.InputVariable;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.generated.AbstractGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.coode.patterns.syntax.PatternParser;
@@ -43,7 +44,7 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
  *         Dec 10, 2008
  */
 public class PatternReferenceGeneratedVariable extends
-		GeneratedVariable<PatternReference> {
+		AbstractGeneratedVariable<PatternReference> {
 	public PatternReferenceGeneratedVariable(VariableType type,
 			GeneratedValue<PatternReference> value) {
 		super(value.toString(), type, value);
@@ -71,11 +72,11 @@ public class PatternReferenceGeneratedVariable extends
 							.getInputVariables().size());
 			PatternOPPLScript pattern = this.patternReference
 					.getExtractedPattern();
-			List<InputVariable> inputVariables = pattern.getInputVariables();
+			List<Variable> inputVariables = pattern.getInputVariables();
 			PatternConstraintSystem constraintSystem = this.patternReference
 					.getConstraintSystem();
 			for (int i = 0; i < inputVariables.size(); i++) {
-				InputVariable inputVariable = inputVariables.get(i);
+				Variable inputVariable = inputVariables.get(i);
 				OWLObject assignmentValue = node
 						.getAssignmentValue(inputVariable);
 				if (assignmentValue != null) {
@@ -101,10 +102,7 @@ public class PatternReferenceGeneratedVariable extends
 			}
 		}
 
-		/**
-		 * @see org.coode.oppl.variablemansyntax.generated.GeneratedValue#getGeneratedValues()
-		 */
-		public List<PatternReference> getGeneratedValues() {
+		public List<PatternReference> computePossibleValues() {
 			return new ArrayList<PatternReference>(Collections
 					.singleton(this.patternReference));
 		}
@@ -135,7 +133,7 @@ public class PatternReferenceGeneratedVariable extends
 	@Override
 	protected GeneratedVariable<PatternReference> replace(
 			GeneratedValue<PatternReference> value) {
-		return new PatternReferenceGeneratedVariable(this.getType(), value);
+		return new PatternReferenceGeneratedVariable(getType(), value);
 	}
 
 	public static GeneratedValue<PatternReference> getPatternReferenceGeneratedValue(
@@ -143,8 +141,7 @@ public class PatternReferenceGeneratedVariable extends
 		return new PatternReferenceGeneratedValue(patternReference);
 	}
 
-	@Override
 	public String getOPPLFunction() {
-		return this.getValue().toString();
+		return getValue().toString();
 	}
 }

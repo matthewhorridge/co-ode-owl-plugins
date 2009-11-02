@@ -22,12 +22,13 @@
  */
 package org.coode.patterns;
 
+import java.net.URI;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import org.coode.oppl.variablemansyntax.InputVariable;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
@@ -124,11 +125,13 @@ import org.semanticweb.owl.model.SWRLSameAsAtom;
 /**
  * @author Luigi Iannone
  * 
- * Jun 26, 2008
+ *         Jun 26, 2008
  */
 public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
-	private List<InputVariable> patternVariables;
-	private List<Object> replacements;
+	// TODO check that no generated variables are in this list
+	// private List<Variable> patternVariables;
+	// private List<Object> replacements;
+	private Map<Variable, Object> patternVariablesReplacement = new HashMap<Variable, Object>();
 	private PatternConstraintSystem constraintSystem;
 	private OWLDataFactory dataFactory;
 
@@ -138,12 +141,16 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 	 * @throws PatternException
 	 */
 	public ReferenceReplacement(String patternName,
-			List<InputVariable> patternVariables, List<Object> replacements,
+			List<Variable> patternVariables, List<Object> replacements,
 			PatternConstraintSystem constraintSystem, OWLDataFactory dataFactory)
 			throws PatternException {
 		if (patternVariables.size() == replacements.size()) {
-			this.patternVariables = patternVariables;
-			this.replacements = replacements;
+			// this.patternVariables = patternVariables;
+			// this.replacements = replacements;
+			for (int i = 0; i < patternVariables.size(); i++) {
+				this.patternVariablesReplacement.put(patternVariables.get(i),
+						replacements.get(i));
+			}
 			this.constraintSystem = constraintSystem;
 			this.dataFactory = dataFactory;
 		} else {
@@ -154,27 +161,30 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 
 	protected Object replace(Variable v) {
 		Object toReturn = null;
-		if (this.patternVariables.contains(v)) {
-			boolean found = false;
-			Variable variable = null;
-			Iterator<InputVariable> it = this.patternVariables.iterator();
-			int i = -1;
-			while (!found && it.hasNext()) {
-				variable = it.next();
-				found = variable.equals(v);
-				i++;
-			}
-			if (found) {
-				toReturn = this.replacements.get(i);
-			}
-		} else if (v instanceof GeneratedVariable<?>) {
+		if (this.patternVariablesReplacement.containsKey(v)) {
+			toReturn = this.patternVariablesReplacement.get(v);
+		}
+		// if (this.patternVariables.contains(v)) {
+		// boolean found = false;
+		// Variable variable = null;
+		// Iterator<Variable> it = this.patternVariables.iterator();
+		// int i = -1;
+		// while (!found && it.hasNext()) {
+		// variable = it.next();
+		// found = variable.equals(v);
+		// i++;
+		// }
+		// if (found) {
+		// toReturn = this.replacements.get(i);
+		// }
+		// }
+		else if (v instanceof GeneratedVariable<?>) {
 			// generated variable
 			GeneratedValue<?> value = ((GeneratedVariable<?>) v).getValue();
-			if (value instanceof VariableGeneratedValue) {
+			if (value instanceof VariableGeneratedValue<?>) {
 				Variable generatingVariable = ((VariableGeneratedValue<?>) value)
 						.getVariable();
-				Object generatingVaribaleReplacement = this
-						.replace(generatingVariable);
+				Object generatingVaribaleReplacement = replace(generatingVariable);
 				if (generatingVaribaleReplacement instanceof Variable) {
 					VariableGeneratedValue<?> replaceValue = ((VariableGeneratedValue<?>) value)
 							.replaceVariable(generatingVariable,
@@ -200,38 +210,209 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 		return axiom;
 	}
 
+	private boolean isGenVariable(Variable variable) {
+		return variable instanceof GeneratedVariable<?>
+				&& ((GeneratedVariable<?>) variable).getValue() instanceof VariableGeneratedValue<?>;
+	}
+
+	public OWLObject visit(OWLIndividual individual) {
+		OWLIndividual toReturn = individual;
+		if (this.constraintSystem.isVariable(individual)) {
+			Variable variable = this.constraintSystem.getVariable(individual
+					.getURI());
+			if (isGenVariable(variable)) {
+				VariableGeneratedValue<?> variableGeneratedValue = (VariableGeneratedValue<?>) ((GeneratedVariable<?>) variable)
+						.getValue();
+				Object replacement = getReplacement(variableGeneratedValue);
+				if (replacement instanceof Variable) {
+					VariableGeneratedValue<?> replaceValue = variableGeneratedValue
+							.replaceVariable((Variable) replacement,
+									this.constraintSystem);
+					GeneratedVariable<?> replaceVariable = ((GeneratedVariable<?>) variable)
+							.replaceValue(replaceValue);
+					toReturn = this.dataFactory
+							.getOWLIndividual(replaceVariable.getURI());
+				} else {
+					toReturn = (OWLIndividual) replacement;
+				}
+			} else {
+				Object replacement = replace(variable);
+				toReturn = replacement instanceof Variable ? this.dataFactory
+						.getOWLIndividual(((Variable) replacement).getURI())
+						: (OWLIndividual) replacement;
+				if (replacement instanceof Variable) {
+					this.constraintSystem
+							.importVariable((Variable) replacement);
+				}
+			}
+		}
+		return toReturn;
+	}
+
+	private Object getReplacement(
+			VariableGeneratedValue<?> variableGeneratedValue) {
+		Variable variable2replace = variableGeneratedValue.getVariable();
+		return replace(variable2replace);
+	}
+
+	private VariableGeneratedValue<?> getVGenValue(Variable v) {
+		return (VariableGeneratedValue<?>) ((GeneratedVariable<?>) v)
+				.getValue();
+	}
+
+	public OWLObject visit(OWLTypedConstant node) {
+		OWLConstant toReturn = node;
+		if (this.constraintSystem.isVariable(node)) {
+			Variable variable = this.constraintSystem.getVariable(node
+					.toString());
+			if (isGenVariable(variable)) {
+				VariableGeneratedValue<?> vGenValue = getVGenValue(variable);
+				Object replacement = getReplacement(vGenValue);
+				if (replacement instanceof Variable) {
+					URI v = getReplaceGenVariable(variable, vGenValue,
+							replacement);
+					toReturn = this.dataFactory.getOWLTypedConstant(v
+							.toString());
+				} else {
+					toReturn = (OWLConstant) replacement;
+				}
+			} else {
+				Object replacement = replace(variable);
+				toReturn = replacement instanceof Variable ? this.dataFactory
+						.getOWLTypedConstant(((Variable) replacement).getURI()
+								.toString()) : (OWLTypedConstant) replacement;
+				if (replacement instanceof Variable) {
+					this.constraintSystem
+							.importVariable((Variable) replacement);
+				}
+			}
+		}
+		return toReturn;
+	}
+
+	public OWLObject visit(OWLObjectProperty property) {
+		OWLObjectProperty toReturn = property;
+		if (this.constraintSystem.isVariable(property)) {
+			Variable variable = this.constraintSystem.getVariable(property
+					.getURI());
+			if (isGenVariable(variable)) {
+				VariableGeneratedValue<?> vGenValue = getVGenValue(variable);
+				Object replacement = getReplacement(vGenValue);
+				if (replacement instanceof Variable) {
+					URI v = getReplaceGenVariable(variable, vGenValue,
+							replacement);
+					toReturn = this.dataFactory.getOWLObjectProperty(v);
+				} else {
+					toReturn = (OWLObjectProperty) replacement;
+				}
+			} else {
+				Object replacement = replace(variable);
+				toReturn = replacement instanceof Variable ? this.dataFactory
+						.getOWLObjectProperty(((Variable) replacement).getURI())
+						: (OWLObjectProperty) replacement;
+				if (replacement instanceof Variable) {
+					this.constraintSystem
+							.importVariable((Variable) replacement);
+				}
+			}
+		}
+		return toReturn;
+	}
+
+	private URI getReplaceGenVariable(Variable variable,
+			VariableGeneratedValue<?> vGenValue, Object replacement) {
+		VariableGeneratedValue<?> replaceValue = vGenValue.replaceVariable(
+				(Variable) replacement, this.constraintSystem);
+		GeneratedVariable<?> replaceVariable = ((GeneratedVariable<?>) variable)
+				.replaceValue(replaceValue);
+		return replaceVariable.getURI();
+	}
+
+	public OWLObject visit(OWLUntypedConstant node) {
+		OWLConstant toReturn = node;
+		if (this.constraintSystem.isVariable(node)) {
+			Variable variable = this.constraintSystem.getVariable(node
+					.toString());
+			if (isGenVariable(variable)) {
+				VariableGeneratedValue<?> vGenValue = getVGenValue(variable);
+				Object replacement = getReplacement(vGenValue);
+				if (replacement instanceof Variable) {
+					URI v = getReplaceGenVariable(variable, vGenValue,
+							replacement);
+					toReturn = this.dataFactory.getOWLUntypedConstant(v
+							.toString());
+				} else {
+					toReturn = (OWLConstant) replacement;
+				}
+			} else {
+				Object replacement = replace(variable);
+				toReturn = replacement instanceof Variable ? this.dataFactory
+						.getOWLUntypedConstant(((Variable) replacement)
+								.getName()) : (OWLConstant) replacement;
+				if (replacement instanceof Variable) {
+					this.constraintSystem
+							.importVariable((Variable) replacement);
+				}
+			}
+		}
+		return toReturn;
+	}
+
+	public OWLObject visit(OWLDataProperty property) {
+		OWLDataProperty toReturn = property;
+		if (this.constraintSystem.isVariable(property)) {
+			Variable variable = this.constraintSystem.getVariable(property
+					.getURI());
+			if (isGenVariable(variable)) {
+				VariableGeneratedValue<?> vGenValue = getVGenValue(variable);
+				Object replacement = getReplacement(vGenValue);
+				if (replacement instanceof Variable) {
+					URI v = getReplaceGenVariable(variable, vGenValue,
+							replacement);
+					toReturn = this.dataFactory.getOWLDataProperty(v);
+				} else {
+					toReturn = (OWLDataProperty) replacement;
+				}
+			} else {
+				Object replacement = replace(variable);
+				toReturn = replacement instanceof Variable ? this.dataFactory
+						.getOWLDataProperty(((Variable) replacement).getURI())
+						: (OWLDataProperty) replacement;
+				if (replacement instanceof Variable) {
+					this.constraintSystem
+							.importVariable((Variable) replacement);
+				}
+			}
+		}
+		return toReturn;
+	}
+
 	public OWLDescription visit(OWLClass desc) {
 		OWLDescription toReturn = null;
 		if (this.constraintSystem.isVariable(desc)) {
 			Variable variable = this.constraintSystem
 					.getVariable(desc.getURI());
 			if (!this.constraintSystem.isThisClassVariable(variable)) {
-				if (variable instanceof InputVariable) {
-					Object replacement = this.replace(variable);
+				if (isGenVariable(variable)) {
+					VariableGeneratedValue<?> vGenValue = getVGenValue(variable);
+					Object replacement = getReplacement(vGenValue);
+					if (replacement instanceof Variable) {
+						URI v = getReplaceGenVariable(variable, vGenValue,
+								replacement);
+						toReturn = this.dataFactory.getOWLClass(v);
+						// TODO check: the other side of the if calls
+						// importVariable, this one does not
+					} else {
+						toReturn = (OWLDescription) replacement;
+					}
+				} else {
+					Object replacement = replace(variable);
 					toReturn = replacement instanceof Variable ? this.dataFactory
 							.getOWLClass(((Variable) replacement).getURI())
 							: (OWLClass) replacement;
 					if (replacement instanceof Variable) {
 						this.constraintSystem
 								.importVariable((Variable) replacement);
-					}
-				} else if (variable instanceof GeneratedVariable
-						&& ((GeneratedVariable<?>) variable).getValue() instanceof VariableGeneratedValue) {
-					VariableGeneratedValue<?> variableGeneratedValue = (VariableGeneratedValue<?>) ((GeneratedVariable<?>) variable)
-							.getValue();
-					Variable variable2replace = variableGeneratedValue
-							.getVariable();
-					Object replacement = this.replace(variable2replace);
-					if (replacement instanceof Variable) {
-						VariableGeneratedValue<?> replaceValue = variableGeneratedValue
-								.replaceVariable((Variable) replacement,
-										this.constraintSystem);
-						GeneratedVariable<?> replaceVariable = ((GeneratedVariable<?>) variable)
-								.replaceValue(replaceValue);
-						toReturn = this.dataFactory.getOWLClass(replaceVariable
-								.getURI());
-					} else {
-						toReturn = (OWLDescription) replacement;
 					}
 				}
 			} else {
@@ -315,43 +496,6 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 			instantiatedValues.add((OWLConstant) constant.accept(this));
 		}
 		return this.dataFactory.getOWLDataOneOf(instantiatedValues);
-	}
-
-	public OWLObject visit(OWLDataProperty property) {
-		OWLDataProperty toReturn = property;
-		if (this.constraintSystem.isVariable(property)) {
-			Variable variable = this.constraintSystem.getVariable(property
-					.getURI());
-			if (variable instanceof InputVariable) {
-				Object replacement = this.replace(variable);
-				toReturn = replacement instanceof Variable ? this.dataFactory
-						.getOWLDataProperty(((Variable) replacement).getURI())
-						: (OWLDataProperty) replacement;
-				if (replacement instanceof Variable) {
-					this.constraintSystem
-							.importVariable((Variable) replacement);
-				}
-			} else if (variable instanceof GeneratedVariable
-					&& ((GeneratedVariable<?>) variable).getValue() instanceof VariableGeneratedValue) {
-				VariableGeneratedValue<?> variableGeneratedValue = (VariableGeneratedValue<?>) ((GeneratedVariable<?>) variable)
-						.getValue();
-				Variable variable2replace = variableGeneratedValue
-						.getVariable();
-				Object replacement = this.replace(variable2replace);
-				if (replacement instanceof Variable) {
-					VariableGeneratedValue<?> replaceValue = variableGeneratedValue
-							.replaceVariable((Variable) replacement,
-									this.constraintSystem);
-					GeneratedVariable<?> replaceVariable = ((GeneratedVariable<?>) variable)
-							.replaceValue(replaceValue);
-					toReturn = this.dataFactory
-							.getOWLDataProperty(replaceVariable.getURI());
-				} else {
-					toReturn = (OWLDataProperty) replacement;
-				}
-			}
-		}
-		return toReturn;
 	}
 
 	public OWLObject visit(OWLDataPropertyAssertionAxiom axiom) {
@@ -539,43 +683,6 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 		return axiom;
 	}
 
-	public OWLObject visit(OWLIndividual individual) {
-		OWLIndividual toReturn = individual;
-		if (this.constraintSystem.isVariable(individual)) {
-			Variable variable = this.constraintSystem.getVariable(individual
-					.getURI());
-			if (variable instanceof InputVariable) {
-				Object replacement = this.replace(variable);
-				toReturn = replacement instanceof Variable ? this.dataFactory
-						.getOWLIndividual(((Variable) replacement).getURI())
-						: (OWLIndividual) replacement;
-				if (replacement instanceof Variable) {
-					this.constraintSystem
-							.importVariable((Variable) replacement);
-				}
-			} else if (variable instanceof GeneratedVariable
-					&& ((GeneratedVariable<?>) variable).getValue() instanceof VariableGeneratedValue) {
-				VariableGeneratedValue<?> variableGeneratedValue = (VariableGeneratedValue<?>) ((GeneratedVariable<?>) variable)
-						.getValue();
-				Variable variable2replace = variableGeneratedValue
-						.getVariable();
-				Object replacement = this.replace(variable2replace);
-				if (replacement instanceof Variable) {
-					VariableGeneratedValue<?> replaceValue = variableGeneratedValue
-							.replaceVariable((Variable) replacement,
-									this.constraintSystem);
-					GeneratedVariable<?> replaceVariable = ((GeneratedVariable<?>) variable)
-							.replaceValue(replaceValue);
-					toReturn = this.dataFactory
-							.getOWLIndividual(replaceVariable.getURI());
-				} else {
-					toReturn = (OWLIndividual) replacement;
-				}
-			}
-		}
-		return toReturn;
-	}
-
 	public OWLObject visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
 		OWLObjectPropertyExpression property = axiom.getProperty();
 		return this.dataFactory
@@ -684,43 +791,6 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 					.add((OWLIndividual) individual.accept(this));
 		}
 		return this.dataFactory.getOWLObjectOneOf(instantiatedIndividuals);
-	}
-
-	public OWLObject visit(OWLObjectProperty property) {
-		OWLObjectProperty toReturn = property;
-		if (this.constraintSystem.isVariable(property)) {
-			Variable variable = this.constraintSystem.getVariable(property
-					.getURI());
-			if (variable instanceof InputVariable) {
-				Object replacement = this.replace(variable);
-				toReturn = replacement instanceof Variable ? this.dataFactory
-						.getOWLObjectProperty(((Variable) replacement).getURI())
-						: (OWLObjectProperty) replacement;
-				if (replacement instanceof Variable) {
-					this.constraintSystem
-							.importVariable((Variable) replacement);
-				}
-			} else if (variable instanceof GeneratedVariable
-					&& ((GeneratedVariable<?>) variable).getValue() instanceof VariableGeneratedValue) {
-				VariableGeneratedValue<?> variableGeneratedValue = (VariableGeneratedValue<?>) ((GeneratedVariable<?>) variable)
-						.getValue();
-				Variable variable2replace = variableGeneratedValue
-						.getVariable();
-				Object replacement = this.replace(variable2replace);
-				if (replacement instanceof Variable) {
-					VariableGeneratedValue<?> replaceValue = variableGeneratedValue
-							.replaceVariable((Variable) replacement,
-									this.constraintSystem);
-					GeneratedVariable<?> replaceVariable = ((GeneratedVariable<?>) variable)
-							.replaceValue(replaceValue);
-					toReturn = this.dataFactory
-							.getOWLObjectProperty(replaceVariable.getURI());
-				} else {
-					toReturn = (OWLObjectProperty) replacement;
-				}
-			}
-		}
-		return toReturn;
 	}
 
 	public OWLObject visit(OWLObjectPropertyAssertionAxiom axiom) {
@@ -858,82 +928,6 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 		return this.dataFactory
 				.getOWLTransitiveObjectPropertyAxiom((OWLObjectPropertyExpression) property
 						.accept(this));
-	}
-
-	public OWLObject visit(OWLTypedConstant node) {
-		OWLConstant toReturn = node;
-		if (this.constraintSystem.isVariable(node)) {
-			Variable variable = this.constraintSystem.getVariable(node
-					.toString());
-			if (variable instanceof InputVariable) {
-				Object replacement = this.replace(variable);
-				toReturn = replacement instanceof Variable ? this.dataFactory
-						.getOWLTypedConstant(((Variable) replacement).getURI()
-								.toString()) : (OWLTypedConstant) replacement;
-				if (replacement instanceof Variable) {
-					this.constraintSystem
-							.importVariable((Variable) replacement);
-				}
-			} else if (variable instanceof GeneratedVariable
-					&& ((GeneratedVariable<?>) variable).getValue() instanceof VariableGeneratedValue) {
-				VariableGeneratedValue<?> variableGeneratedValue = (VariableGeneratedValue<?>) ((GeneratedVariable<?>) variable)
-						.getValue();
-				Variable variable2replace = variableGeneratedValue
-						.getVariable();
-				Object replacement = this.replace(variable2replace);
-				if (replacement instanceof Variable) {
-					VariableGeneratedValue<?> replaceValue = variableGeneratedValue
-							.replaceVariable((Variable) replacement,
-									this.constraintSystem);
-					GeneratedVariable<?> replaceVariable = ((GeneratedVariable<?>) variable)
-							.replaceValue(replaceValue);
-					toReturn = this.dataFactory
-							.getOWLTypedConstant(replaceVariable.getURI()
-									.toString());
-				} else {
-					toReturn = (OWLConstant) replacement;
-				}
-			}
-		}
-		return toReturn;
-	}
-
-	public OWLObject visit(OWLUntypedConstant node) {
-		OWLConstant toReturn = node;
-		if (this.constraintSystem.isVariable(node)) {
-			Variable variable = this.constraintSystem.getVariable(node
-					.toString());
-			if (variable instanceof InputVariable) {
-				Object replacement = this.replace(variable);
-				toReturn = replacement instanceof Variable ? this.dataFactory
-						.getOWLUntypedConstant(((Variable) replacement)
-								.getName()) : (OWLConstant) replacement;
-				if (replacement instanceof Variable) {
-					this.constraintSystem
-							.importVariable((Variable) replacement);
-				}
-			} else if (variable instanceof GeneratedVariable
-					&& ((GeneratedVariable<?>) variable).getValue() instanceof VariableGeneratedValue) {
-				VariableGeneratedValue<?> variableGeneratedValue = (VariableGeneratedValue<?>) ((GeneratedVariable<?>) variable)
-						.getValue();
-				Variable variable2replace = variableGeneratedValue
-						.getVariable();
-				Object replacement = this.replace(variable2replace);
-				if (replacement instanceof Variable) {
-					VariableGeneratedValue<?> replaceValue = variableGeneratedValue
-							.replaceVariable((Variable) replacement,
-									this.constraintSystem);
-					GeneratedVariable<?> replaceVariable = ((GeneratedVariable<?>) variable)
-							.replaceValue(replaceValue);
-					toReturn = this.dataFactory
-							.getOWLUntypedConstant(replaceVariable.getURI()
-									.toString());
-				} else {
-					toReturn = (OWLConstant) replacement;
-				}
-			}
-		}
-		return toReturn;
 	}
 
 	public OWLObject visit(SWRLAtomConstantObject node) {

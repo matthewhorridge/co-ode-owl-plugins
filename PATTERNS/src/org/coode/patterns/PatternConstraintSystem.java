@@ -23,6 +23,7 @@
 package org.coode.patterns;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,13 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.coode.oppl.OPPLException;
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.IncompatibleValueException;
-import org.coode.oppl.variablemansyntax.InputVariable;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
-import org.coode.oppl.variablemansyntax.generated.CollectionGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.AbstractCollectionGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.semanticweb.owl.inference.OWLReasoner;
@@ -60,7 +59,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 			OWLOntologyManager ontologyManager) {
 		super(cs.getOntology(), ontologyManager, cs.getReasoner());
 		this.constraintSystem = cs;
-		this.init();
+		init();
 	}
 
 	@Override
@@ -78,14 +77,14 @@ public class PatternConstraintSystem extends ConstraintSystem {
 		super(ontology, ontologyManager, reasoner);
 		this.constraintSystem = new ConstraintSystem(ontology, ontologyManager,
 				reasoner);
-		this.init();
+		init();
 	}
 
 	private void init() {
 		PatternConstant<OWLClass> patternConstant = new PatternConstant<OWLClass>(
 				THIS_CLASS_VARIABLE_NAME, VariableType.CLASS,
 				this.constraintSystem.getDataFactory());
-		this.createSpecialVariable(patternConstant.getName(),
+		createSpecialVariable(patternConstant.getName(),
 				THIS_CLASS_VARIABLE_CONSTANT_SYMBOL, patternConstant);
 	}
 
@@ -93,7 +92,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 			OWLOntologyManager ontologyManager) {
 		super(ontology, ontologyManager);
 		this.constraintSystem = new ConstraintSystem(ontology, ontologyManager);
-		this.init();
+		init();
 	}
 
 	public Variable getThisClassVariable() {
@@ -128,7 +127,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	public Variable getVariable(URI uri) {
 		Variable variable = this.constraintSystem.getVariable(uri);
 		if (variable == null) {
-			variable = this.getSpecialVariable(uri);
+			variable = getSpecialVariable(uri);
 		}
 		return variable;
 	}
@@ -197,13 +196,13 @@ public class PatternConstraintSystem extends ConstraintSystem {
 		PatternReferenceGeneratedVariable patternReferenceGeneratedVariable = new PatternReferenceGeneratedVariable(
 				variableType, PatternReferenceGeneratedVariable
 						.getPatternReferenceGeneratedValue(patternReference));
-		this.createSpecialVariable(patternReferenceGeneratedVariable.getName(),
+		createSpecialVariable(patternReferenceGeneratedVariable.getName(),
 				patternReference.toString(), patternReferenceGeneratedVariable);
 		List<Variable> referenceVariables = patternReference
 				.getExtractedPattern().getVariables();
 		for (Variable variable : referenceVariables) {
-			if (variable instanceof GeneratedVariable) {
-				this.importVariable(variable);
+			if (variable instanceof GeneratedVariable<?>) {
+				importVariable(variable);
 			}
 		}
 		return patternReferenceGeneratedVariable.getName();
@@ -220,14 +219,13 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	}
 
 	public void instantiateThisClass(PatternConstant<OWLClass> patternConstant) {
-		this.createSpecialVariable(patternConstant.getName(),
+		createSpecialVariable(patternConstant.getName(),
 				THIS_CLASS_VARIABLE_CONSTANT_SYMBOL, patternConstant);
 	}
 
 	@Override
-	public Variable createStringGeneratedVariable(String name,
-			VariableType type, GeneratedValue<String> value)
-			throws IncompatibleValueException {
+	public GeneratedVariable<String> createStringGeneratedVariable(String name,
+			VariableType type, GeneratedValue<String> value) {
 		return this.constraintSystem.createStringGeneratedVariable(name, type,
 				value);
 	}
@@ -238,15 +236,17 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	}
 
 	@Override
-	public Variable createIntersectionGeneratedVariable(String name,
-			VariableType type, CollectionGeneratedValue<OWLClass> collection) {
+	public GeneratedVariable<Collection<OWLClass>> createIntersectionGeneratedVariable(
+			String name, VariableType type,
+			AbstractCollectionGeneratedValue<OWLClass> collection) {
 		return this.constraintSystem.createIntersectionGeneratedVariable(name,
 				type, collection);
 	}
 
 	@Override
-	public Variable createUnionGeneratedVariable(String name,
-			VariableType type, CollectionGeneratedValue<OWLClass> collection) {
+	public GeneratedVariable<Collection<OWLClass>> createUnionGeneratedVariable(
+			String name, VariableType type,
+			AbstractCollectionGeneratedValue<OWLClass> collection) {
 		return this.constraintSystem.createUnionGeneratedVariable(name, type,
 				collection);
 	}
@@ -256,7 +256,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	}
 
 	@Override
-	public Set<InputVariable> getInputVariables() {
+	public Set<Variable> getInputVariables() {
 		return this.constraintSystem.getInputVariables();
 	}
 
@@ -286,6 +286,6 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	@Override
 	public void clearVariables() {
 		this.constraintSystem.clearVariables();
-		this.init();
+		init();
 	}
 }
