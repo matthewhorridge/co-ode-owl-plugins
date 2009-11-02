@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.generated.AbstractGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.semanticweb.owl.model.OWLDataFactory;
@@ -42,7 +43,7 @@ import org.semanticweb.owl.model.OWLObject;
  *         Jun 24, 2008
  */
 public class PatternConstant<P extends OWLEntity> extends
-		GeneratedVariable<OWLObject> {
+		AbstractGeneratedVariable<OWLObject> {
 	private class EmptyConstantGeratedValue implements
 			GeneratedValue<OWLObject> {
 		private final OWLDataFactory dataFactory;
@@ -56,35 +57,31 @@ public class PatternConstant<P extends OWLEntity> extends
 
 		public OWLObject getGeneratedValue(BindingNode node) {
 			OWLObject toReturn = null;
-			VariableType variableType = PatternConstant.this.getType();
+			VariableType variableType = getType();
 			switch (variableType) {
-			case CLASS:
-				toReturn = this.dataFactory.getOWLClass(PatternConstant.this
-						.getURI());
-				break;
-			case OBJECTPROPERTY:
-				toReturn = this.dataFactory
-						.getOWLObjectProperty(PatternConstant.this.getURI());
-				break;
-			case DATAPROPERTY:
-				toReturn = this.dataFactory
-						.getOWLDataProperty(PatternConstant.this.getURI());
-				break;
-			case INDIVIDUAL:
-				toReturn = this.dataFactory
-						.getOWLIndividual(PatternConstant.this.getURI());
-				break;
-			case CONSTANT:
-				toReturn = this.dataFactory
-						.getOWLUntypedConstant(PatternConstant.this.getName());
-				break;
-			default:
-				break;
+				case CLASS:
+					toReturn = this.dataFactory.getOWLClass(getURI());
+					break;
+				case OBJECTPROPERTY:
+					toReturn = this.dataFactory.getOWLObjectProperty(getURI());
+					break;
+				case DATAPROPERTY:
+					toReturn = this.dataFactory.getOWLDataProperty(getURI());
+					break;
+				case INDIVIDUAL:
+					toReturn = this.dataFactory.getOWLIndividual(getURI());
+					break;
+				case CONSTANT:
+					toReturn = this.dataFactory
+							.getOWLUntypedConstant(getName());
+					break;
+				default:
+					break;
 			}
 			return toReturn;
 		}
 
-		public List<OWLObject> getGeneratedValues() {
+		public List<OWLObject> computePossibleValues() {
 			// return new ArrayList<OWLObject>(Collections.singleton(this
 			// .getGeneratedValue(null)));
 			return Collections.emptyList();
@@ -106,7 +103,7 @@ public class PatternConstant<P extends OWLEntity> extends
 			return this.constantValue;
 		}
 
-		public List<OWLObject> getGeneratedValues() {
+		public List<OWLObject> computePossibleValues() {
 			return new ArrayList<OWLObject>(Collections
 					.singleton(this.constantValue));
 		}
@@ -120,7 +117,7 @@ public class PatternConstant<P extends OWLEntity> extends
 	public PatternConstant(String name, VariableType type,
 			OWLDataFactory dataFactory) {
 		super(name, type, null);
-		this.setValue(new EmptyConstantGeratedValue(dataFactory));
+		setValue(new EmptyConstantGeratedValue(dataFactory));
 	}
 
 	public static GeneratedValue<OWLObject> createConstantGeneratedValue(
@@ -139,13 +136,12 @@ public class PatternConstant<P extends OWLEntity> extends
 		return this;
 	}
 
-	@Override
 	public String getOPPLFunction() {
-		return this.getValue().toString();
+		return getValue().toString();
 	}
 
 	@Override
 	public Set<OWLObject> getPossibleBindings() {
-		return new HashSet<OWLObject>(this.getValue().getGeneratedValues());
+		return new HashSet<OWLObject>(getValue().computePossibleValues());
 	}
 }

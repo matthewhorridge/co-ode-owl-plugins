@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.coode.oppl.OPPLException;
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
@@ -45,7 +45,7 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 /**
  * @author Luigi Iannone
  * 
- * Jul 15, 2008
+ *         Jul 15, 2008
  */
 public class PatternSignature {
 	private String name;
@@ -80,66 +80,66 @@ public class PatternSignature {
 			OPPLException, OWLReasonerException {
 		List<OWLObject> toReturn = new ArrayList<OWLObject>();
 		Variable variable = this.pattern.getInputVariables().get(i);
-		VariableType variableType = this.getIthVariableType(i);
+		VariableType variableType = getIthVariableType(i);
 		VariableScopeChecker variableScopeChecker = OPPLParser.getOPPLFactory()
 				.getVariableScopeChecker();
 		Set<OWLOntology> ontologies = this.ontologyManager.getOntologies();
 		switch (variableType) {
-		case CLASS:
-			for (OWLOntology ontology : ontologies) {
-				Set<OWLClass> referencedClasses = ontology
-						.getReferencedClasses();
-				for (OWLClass owlClass : referencedClasses) {
-					if (variable.getVariableScope() == null
-							|| variable.getVariableScope().check(owlClass,
-									variableScopeChecker)) {
-						toReturn.add(owlClass);
+			case CLASS:
+				for (OWLOntology ontology : ontologies) {
+					Set<OWLClass> referencedClasses = ontology
+							.getReferencedClasses();
+					for (OWLClass owlClass : referencedClasses) {
+						if (variable.getVariableScope() == null
+								|| variable.getVariableScope().check(owlClass,
+										variableScopeChecker)) {
+							toReturn.add(owlClass);
+						}
 					}
 				}
-			}
-			break;
-		case DATAPROPERTY:
-			for (OWLOntology ontology : ontologies) {
-				Set<OWLDataProperty> referencedDataProperties = ontology
-						.getReferencedDataProperties();
-				for (OWLDataProperty dataProperty : referencedDataProperties) {
-					if (variable.getVariableScope() == null
-							|| variable.getVariableScope().check(dataProperty,
-									variableScopeChecker)) {
-						toReturn.add(dataProperty);
+				break;
+			case DATAPROPERTY:
+				for (OWLOntology ontology : ontologies) {
+					Set<OWLDataProperty> referencedDataProperties = ontology
+							.getReferencedDataProperties();
+					for (OWLDataProperty dataProperty : referencedDataProperties) {
+						if (variable.getVariableScope() == null
+								|| variable.getVariableScope().check(
+										dataProperty, variableScopeChecker)) {
+							toReturn.add(dataProperty);
+						}
 					}
 				}
-			}
-			break;
-		case OBJECTPROPERTY:
-			for (OWLOntology ontology : ontologies) {
-				Set<OWLObjectProperty> referencedObjectProperties = ontology
-						.getReferencedObjectProperties();
-				for (OWLObjectProperty objectProperty : referencedObjectProperties) {
-					if (variable.getVariableScope() == null
-							|| variable.getVariableScope().check(
-									objectProperty, variableScopeChecker)) {
-						toReturn.add(objectProperty);
+				break;
+			case OBJECTPROPERTY:
+				for (OWLOntology ontology : ontologies) {
+					Set<OWLObjectProperty> referencedObjectProperties = ontology
+							.getReferencedObjectProperties();
+					for (OWLObjectProperty objectProperty : referencedObjectProperties) {
+						if (variable.getVariableScope() == null
+								|| variable.getVariableScope().check(
+										objectProperty, variableScopeChecker)) {
+							toReturn.add(objectProperty);
+						}
 					}
 				}
-			}
-			break;
-		case INDIVIDUAL:
-			for (OWLOntology ontology : ontologies) {
-				Set<OWLIndividual> referencedIndividuals = ontology
-						.getReferencedIndividuals();
-				for (OWLIndividual individual : referencedIndividuals) {
-					if (variable.getVariableScope() == null
-							|| variable.getVariableScope().check(individual,
-									variableScopeChecker)) {
-						toReturn.add(individual);
+				break;
+			case INDIVIDUAL:
+				for (OWLOntology ontology : ontologies) {
+					Set<OWLIndividual> referencedIndividuals = ontology
+							.getReferencedIndividuals();
+					for (OWLIndividual individual : referencedIndividuals) {
+						if (variable.getVariableScope() == null
+								|| variable.getVariableScope().check(
+										individual, variableScopeChecker)) {
+							toReturn.add(individual);
+						}
 					}
 				}
-			}
-			break;
-		case CONSTANT:
-		default:
-			break;
+				break;
+			case CONSTANT:
+			default:
+				break;
 		}
 		return toReturn;
 	}
