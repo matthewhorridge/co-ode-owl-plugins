@@ -33,7 +33,7 @@ public class BracketWriter extends OWLDescriptionVisitorAdapter implements
 	public BracketWriter() {
 	}
 
-	boolean nested = false;
+	private boolean nested = false;
 
 	public boolean writeBrackets() {
 		return this.nested;

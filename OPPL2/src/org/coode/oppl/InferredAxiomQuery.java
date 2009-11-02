@@ -29,8 +29,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.bindingtree.LeafBrusher;
@@ -50,11 +50,11 @@ import com.clarkparsia.explanation.SatisfiabilityConverter;
  * 
  */
 public class InferredAxiomQuery extends AbstractAxiomQuery {
-	private Set<OWLOntology> ontologies;
-	private ConstraintSystem constraintSystem;
-	private OWLDataFactory dataFactory;
-	private Map<BindingNode, Set<OWLAxiom>> instantiatedAxioms = new HashMap<BindingNode, Set<OWLAxiom>>();
-	private OWLReasoner reasoner;
+	private final Set<OWLOntology> ontologies;
+	private final ConstraintSystem constraintSystem;
+	private final OWLDataFactory dataFactory;
+	private final Map<BindingNode, Set<OWLAxiom>> instantiatedAxioms = new HashMap<BindingNode, Set<OWLAxiom>>();
+	private final OWLReasoner reasoner;
 
 	/**
 	 * @param ontologies

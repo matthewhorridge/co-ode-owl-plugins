@@ -42,15 +42,15 @@ public class InCollectionConstraint<P extends OWLObject> implements
 		AbstractConstraint {
 	private final Variable variable;
 	private final Collection<P> collection;
-	private ConstraintSystem constraintSystem;
+	private final ConstraintSystem constraintSystem;
 
 	/**
 	 * @param variable
 	 * @param collection
 	 * @param constraintSystem
 	 */
-	public InCollectionConstraint(Variable variable, Collection<P> collection,
-			ConstraintSystem constraintSystem) {
+	public InCollectionConstraint(Variable variable,
+			Collection<P> collection, ConstraintSystem constraintSystem) {
 		this.variable = variable;
 		this.collection = collection;
 		this.constraintSystem = constraintSystem;
@@ -117,7 +117,7 @@ public class InCollectionConstraint<P extends OWLObject> implements
 				buffer.append(p.toString());
 			}
 		}
-		buffer.append("}");
+		buffer.append('}');
 		return buffer.toString();
 	}
 
@@ -136,7 +136,7 @@ public class InCollectionConstraint<P extends OWLObject> implements
 			p.accept(renderer);
 			buffer.append(renderer.toString());
 		}
-		buffer.append("}");
+		buffer.append('}');
 		return buffer.toString();
 	}
 

@@ -20,7 +20,7 @@ import org.protege.editor.owl.OWLEditorKit;
 public class OPPLConstraintListItem implements MListItem {
 	protected AbstractConstraint constraint;
 	private final OWLEditorKit owlEditorKit;
-	private ConstraintSystem constraintSystem;
+	private final ConstraintSystem constraintSystem;
 
 	/**
 	 * @param owlEditorKit
@@ -48,12 +48,12 @@ public class OPPLConstraintListItem implements MListItem {
 		editor.setConstraint(getConstraint());
 		final VerifyingOptionPane optionPane = new VerifyingOptionPane(editor) {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 7816306100172449202L;
 
 			/**
-			 * 
+			 *
 			 */
 			@Override
 			public void selectInitialValue() {
@@ -111,10 +111,6 @@ public class OPPLConstraintListItem implements MListItem {
 		return this.constraint.toString();
 	}
 
-	/**
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -126,7 +122,7 @@ public class OPPLConstraintListItem implements MListItem {
 
 	/**
 	 * @return true if the input Object is an instance of OPPLConstraintListItem
-	 *         whose inner constraint is equal to this one&apos;s.
+	 *         whose inner constraint is equal to this one inner constraint.
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override

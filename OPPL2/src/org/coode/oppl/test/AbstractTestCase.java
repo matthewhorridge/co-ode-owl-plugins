@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
-import java.util.Collections;
 
 import junit.framework.TestCase;
 import net.sf.saxon.exslt.Math;
@@ -16,11 +15,9 @@ import org.coode.oppl.utils.ParserFactory;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.inference.OWLReasonerFactory;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyCreationException;
 import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.reasonerfactory.pellet.PelletReasonerFactory;
 
 public abstract class AbstractTestCase extends TestCase {
 	private static final int TOLERANCE = 3;
@@ -82,15 +79,14 @@ public abstract class AbstractTestCase extends TestCase {
 		return toReturn;
 	}
 
-	private OWLReasoner initReasoner() throws OWLReasonerException {
-		OWLReasonerFactory reasonerFactory = new PelletReasonerFactory();
-		OWLReasoner reasoner = reasonerFactory
-				.createReasoner(this.ontologyManager);
-		reasoner.loadOntologies(Collections.singleton(this.ontology1));
-		reasoner.classify();
-		return reasoner;
-	}
-
+	// private OWLReasoner initReasoner() throws OWLReasonerException {
+	// OWLReasonerFactory reasonerFactory = new PelletReasonerFactory();
+	// OWLReasoner reasoner = reasonerFactory
+	// .createReasoner(this.ontologyManager);
+	// reasoner.loadOntologies(Collections.singleton(this.ontology1));
+	// reasoner.classify();
+	// return reasoner;
+	// }
 	private OWLReasoner initDummyReasoner() throws OWLReasonerException {
 		return null;
 	}

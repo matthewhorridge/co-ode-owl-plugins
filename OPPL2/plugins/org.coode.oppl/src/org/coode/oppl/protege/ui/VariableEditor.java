@@ -48,6 +48,7 @@ import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifyingOptionPane;
@@ -157,7 +158,7 @@ public class VariableEditor extends AbstractVariableEditor {
 		}
 	}
 
-	protected VariableEditor(OWLEditorKit owlEditorKit,
+	public VariableEditor(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
 		setLayout(new BorderLayout());
 		this.owlEditorKit = owlEditorKit;
@@ -347,5 +348,11 @@ public class VariableEditor extends AbstractVariableEditor {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void setVariable(GeneratedVariable<?> variable) {
+		throw new RuntimeException(
+				"GeneratedVariables not allowed on a regular VariableEditor!");
 	}
 }

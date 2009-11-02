@@ -28,9 +28,9 @@ import java.util.List;
  * @author Luigi Iannone
  * 
  */
-public class ConcatGeneratedValues extends AbstractAggregatedGeneratedValue<String> {
-	public ConcatGeneratedValues(
-			List<GeneratedValues<String>> values2Aggregate) {
+public class ConcatGeneratedValues extends
+		AbstractAggregatedGeneratedValue<String> {
+	public ConcatGeneratedValues(List<GeneratedValue<String>> values2Aggregate) {
 		super(values2Aggregate);
 	}
 
@@ -39,11 +39,11 @@ public class ConcatGeneratedValues extends AbstractAggregatedGeneratedValue<Stri
 	 */
 	@Override
 	protected String aggregateValues(List<String> values) {
-		String toReturn = "";
+		StringBuilder toReturn = new StringBuilder();
 		for (String value : values) {
-			toReturn += value;
+			toReturn.append(value);
 		}
-		return toReturn;
+		return toReturn.toString();
 	}
 
 	@Override

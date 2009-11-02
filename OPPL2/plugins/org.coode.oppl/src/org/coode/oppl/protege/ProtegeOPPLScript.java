@@ -31,7 +31,6 @@ import org.coode.oppl.OPPLScriptVisitorEx;
 import org.coode.oppl.protege.ui.VariableOWLObjectRenderer;
 import org.coode.oppl.protege.ui.rendering.ShortFormVariableOWLEntityRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.InputVariable;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.AddAxiom;
@@ -89,7 +88,7 @@ public class ProtegeOPPLScript implements OPPLScript {
 	/**
 	 * @see org.coode.oppl.OPPLScript#getInputVariables()
 	 */
-	public List<InputVariable> getInputVariables() {
+	public List<Variable> getInputVariables() {
 		return this.opplScript.getInputVariables();
 	}
 
@@ -111,21 +110,21 @@ public class ProtegeOPPLScript implements OPPLScript {
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		boolean first = true;
-		for (Variable v : this.getVariables()) {
+		for (Variable v : getVariables()) {
 			String commaString = first ? "" : ", ";
 			first = false;
 			buffer.append(commaString);
 			buffer.append(v.toString());
 		}
-		buffer.append(" ");
-		OPPLQuery opplQuery = this.getQuery();
-		if (this.getQuery() != null) {
+		buffer.append(' ');
+		OPPLQuery opplQuery = getQuery();
+		if (getQuery() != null) {
 			buffer.append(opplQuery.toString());
 		}
-		if (this.getActions().size() > 0) {
+		if (getActions().size() > 0) {
 			buffer.append(" BEGIN ");
 			first = true;
-			for (OWLAxiomChange action : this.getActions()) {
+			for (OWLAxiomChange action : getActions()) {
 				String commaString = first ? "" : ", ";
 				String actionString = action instanceof AddAxiom ? "ADD "
 						: "REMOVE ";

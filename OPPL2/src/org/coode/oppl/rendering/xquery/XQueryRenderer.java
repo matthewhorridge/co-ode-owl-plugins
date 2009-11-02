@@ -53,7 +53,7 @@ public class XQueryRenderer {
 
 	public String render(OPPLScript script) {
 		StringWriter writer = new StringWriter();
-		this.renderQuery(script, writer);
+		renderQuery(script, writer);
 		List<OWLAxiomChange> actions = script.getActions();
 		if (!actions.isEmpty()) {
 			writer.append("\nreturn");
@@ -96,11 +96,12 @@ public class XQueryRenderer {
 			writer.append("for ");
 			writer.append(axiomName);
 			writer.append(" in ");
-			writer.append(this.getContext());
+			writer.append(getContext());
 			String axiomQuery = axiom.accept(builder);
 			writer.append(axiomQuery);
 			writer.append("\n");
-			Map<Variable, List<String>> allPaths = builder.getVariablePaths();
+			Map<Variable, List<String>> allPaths = builder
+					.getVariablePaths();
 			for (Variable v : allPaths.keySet()) {
 				List<String> variablePaths = allPaths.get(v);
 				String variableReference = v.getName().replace('?', '$');

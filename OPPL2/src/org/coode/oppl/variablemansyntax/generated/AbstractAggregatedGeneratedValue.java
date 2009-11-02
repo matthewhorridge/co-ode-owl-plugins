@@ -34,8 +34,57 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
  * @author Luigi Iannone
  * 
  */
-public abstract class AbstractAggregatedGeneratedValue<N> implements GeneratedValue<N>,
-		GeneratedValues<N> {
+public abstract class AbstractAggregatedGeneratedValue<N> implements
+		GeneratedValue<N> {
+	private final List<GeneratedValue<N>> values2Aggregate;
+
+	/**
+	 * @param values
+	 */
+	protected AbstractAggregatedGeneratedValue(List<GeneratedValue<N>> values) {
+		this.values2Aggregate = values;
+	}
+
+	public List<N> computePossibleValues() {
+		List<N> toReturn = new ArrayList<N>();
+		ValueTree<N> tree = new ValueTree<N>(this.values2Aggregate);
+		for (ValueTreeNode<N> leaf : tree.getLeaves()) {
+			N aggregation = this.aggregateValues(leaf.assigned);
+			toReturn.add(aggregation);
+		}
+		return toReturn;
+	}
+
+	public N getGeneratedValue(BindingNode node) {
+		List<N> toAggregate = new ArrayList<N>();
+		for (GeneratedValue<N> value : this.values2Aggregate) {
+			toAggregate.add(value.getGeneratedValue(node));
+		}
+		return this.aggregateValues(toAggregate);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder buffer = new StringBuilder();
+		boolean first = true;
+		for (GeneratedValue<N> value2Aggregate : this.values2Aggregate) {
+			String aggregator = first ? "" : this.getAggregatorSymbol() + " ";
+			first = false;
+			buffer.append(aggregator);
+			buffer.append(value2Aggregate.toString());
+		}
+		return buffer.toString();
+	}
+
+	/**
+	 * @return an aggregation of the values
+	 * @see {@link AbstractAggregatedGeneratedValue#getValues2Aggregate()}
+	 */
+	protected abstract N aggregateValues(List<N> values);
+
+	protected abstract String getAggregatorSymbol();
+
+	// internals
 	private static class ValueTreeNode<N> {
 		protected final List<List<N>> toAssign;
 		protected final List<N> assigned;
@@ -59,10 +108,10 @@ public abstract class AbstractAggregatedGeneratedValue<N> implements GeneratedVa
 	private static class ValueTree<N> {
 		private final ValueTreeNode<N> rootNode;
 
-		ValueTree(List<GeneratedValues<N>> root) {
+		ValueTree(List<GeneratedValue<N>> root) {
 			List<List<N>> rootNode2Assign = new ArrayList<List<N>>();
-			for (GeneratedValues<N> generatedValue : root) {
-				rootNode2Assign.add(generatedValue.getGeneratedValues());
+			for (GeneratedValue<N> generatedValue : root) {
+				rootNode2Assign.add(generatedValue.computePossibleValues());
 			}
 			this.rootNode = new ValueTreeNode<N>(rootNode2Assign,
 					new ArrayList<N>());
@@ -113,55 +162,4 @@ public abstract class AbstractAggregatedGeneratedValue<N> implements GeneratedVa
 			return toReturn;
 		}
 	}
-
-	private final List<GeneratedValues<N>> values2Aggregate;
-
-	/**
-	 * @param values
-	 */
-	protected AbstractAggregatedGeneratedValue(List<GeneratedValues<N>> values) {
-		this.values2Aggregate = values;
-	}
-
-	public List<N> getGeneratedValues() {
-		List<N> toReturn = new ArrayList<N>();
-		ValueTree<N> tree = new ValueTree<N>(this.values2Aggregate);
-		for (ValueTreeNode<N> leaf : tree.getLeaves()) {
-			N aggregation = this.aggregateValues(leaf.assigned);
-			toReturn.add(aggregation);
-		}
-		return toReturn;
-	}
-
-	public N getGeneratedValue(BindingNode node) {
-		List<N> toAggregate = new ArrayList<N>();
-		for (GeneratedValues<N> value : this.values2Aggregate) {
-			if (value instanceof GeneratedValue<?>) {
-				toAggregate.add(((GeneratedValue<N>) value)
-						.getGeneratedValue(node));
-			}
-		}
-		return this.aggregateValues(toAggregate);
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder buffer = new StringBuilder();
-		boolean first = true;
-		for (GeneratedValues<N> value2Aggregate : this.values2Aggregate) {
-			String aggregator = first ? "" : this.getAggregatorSymbol() + " ";
-			first = false;
-			buffer.append(aggregator);
-			buffer.append(value2Aggregate.toString());
-		}
-		return buffer.toString();
-	}
-
-	/**
-	 * @return an aggregation of the values
-	 * @see {@link AbstractAggregatedGeneratedValue#getValues2Aggregate()}
-	 */
-	protected abstract N aggregateValues(List<N> values);
-
-	protected abstract String getAggregatorSymbol();
 }

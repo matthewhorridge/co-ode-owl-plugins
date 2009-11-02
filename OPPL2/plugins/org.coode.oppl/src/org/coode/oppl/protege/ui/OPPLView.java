@@ -87,28 +87,34 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		OWLModelManagerListener {
 	private final class ReasonerOPPLScriptValiator implements
 			OPPLScriptValidator {
+		private final class ScriptVisitor implements
+				OPPLScriptVisitorEx<Boolean> {
+			public ScriptVisitor() {
+				// TODO Auto-generated constructor stub
+			}
+
+			public Boolean visitActions(List<OWLAxiomChange> changes, Boolean p) {
+				return p == null ? true : p;
+			}
+
+			public Boolean visit(OPPLQuery q, Boolean p) {
+				return p == null ? true : p;
+			}
+
+			public Boolean visit(Variable v, Boolean p) {
+				return p == null ? v.getVariableScope() == null : p
+						|| v.getVariableScope() == null;
+			}
+		}
+
 		public ReasonerOPPLScriptValiator() {
 		}
 
 		public boolean accept(OPPLScript script) {
 			OWLReasoner reasoner = getOWLEditorKit().getModelManager()
 					.getReasoner();
-			return !(reasoner instanceof NoOpReasoner)
-					|| script.accept(new OPPLScriptVisitorEx<Boolean>() {
-						public Boolean visitActions(
-								List<OWLAxiomChange> changes, Boolean p) {
-							return p == null ? true : p;
-						}
-
-						public Boolean visit(OPPLQuery q, Boolean p) {
-							return p == null ? true : p;
-						}
-
-						public Boolean visit(Variable v, Boolean p) {
-							return p == null ? v.getVariableScope() == null : p
-									|| v.getVariableScope() == null;
-						}
-					});
+			Boolean accept = script.accept(new ScriptVisitor());
+			return !(reasoner instanceof NoOpReasoner) || accept;
 		}
 
 		public String getValidationRuleDescription() {
@@ -215,7 +221,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 			"When removing consider Active Ontology Imported Closure", false);
 	private DefaultTreeModel bindingTreeNodeModel = new DefaultTreeModel(
 			new DefaultMutableTreeNode("Bindings"));
-	private JTree bindingNodeTree = new JTree(this.bindingTreeNodeModel);
+	private final JTree bindingNodeTree = new JTree(this.bindingTreeNodeModel);
 
 	@Override
 	protected void disposeOWLView() {

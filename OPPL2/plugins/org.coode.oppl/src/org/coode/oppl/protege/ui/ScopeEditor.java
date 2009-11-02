@@ -68,15 +68,15 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 	static class ClassScopeEditor extends ScopeEditor implements
 			InputVerificationStatusChangedListener, ChangeListener {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1748983757452740791L;
-		private ExpressionEditor<OWLDescription> editor = new ExpressionEditor<OWLDescription>(
+		private final ExpressionEditor<OWLDescription> editor = new ExpressionEditor<OWLDescription>(
 				this.owlEditorKit, new OWLDescriptionChecker(this.owlEditorKit
 						.getModelManager()));
-		private ButtonGroup directionButtonGroup = new ButtonGroup();
-		private Map<JRadioButton, Direction> radioButtonDirectionMap = new HashMap<JRadioButton, Direction>();
-		private Map<Direction, JRadioButton> directionRadioButtonMap = new HashMap<Direction, JRadioButton>();
+		private final ButtonGroup directionButtonGroup = new ButtonGroup();
+		private final Map<JRadioButton, Direction> radioButtonDirectionMap = new HashMap<JRadioButton, Direction>();
+		private final Map<Direction, JRadioButton> directionRadioButtonMap = new HashMap<Direction, JRadioButton>();
 		private static final String CLASS_TITLE = "Class Variable Scope";
 
 		public ClassScopeEditor(OWLEditorKit owlEditorKit) {
@@ -204,10 +204,10 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 	static class IndividualScopeEditor extends ScopeEditor implements
 			InputVerificationStatusChangedListener {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1748983757452740791L;
-		private ExpressionEditor<OWLDescription> editor = new ExpressionEditor<OWLDescription>(
+		private final ExpressionEditor<OWLDescription> editor = new ExpressionEditor<OWLDescription>(
 				this.owlEditorKit, new OWLDescriptionChecker(this.owlEditorKit
 						.getModelManager()));
 		private static final String INDIVIDUAL_TITLE = "Individual Variable Scope";
@@ -259,7 +259,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 	static class PropertyScopeEditor extends ScopeEditor implements
 			ChangeListener {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 1014596361426722995L;
 		private ButtonGroup directionButtonGroup = new ButtonGroup();
@@ -384,7 +384,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 2459124639459085302L;
 	protected final OWLEditorKit owlEditorKit;

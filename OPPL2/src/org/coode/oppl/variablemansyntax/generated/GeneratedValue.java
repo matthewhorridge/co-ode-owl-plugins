@@ -22,13 +22,15 @@
  */
 package org.coode.oppl.variablemansyntax.generated;
 
+import java.util.List;
+
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 
 /**
  * Generic interface that abstracts over a generated Value to be assigned to a
  * generated variable
  * 
- * @see GeneratedVariable
+ * @see AbstractGeneratedVariable
  * 
  * @param <O>
  *            Generic object that will be used to generate a value.
@@ -43,4 +45,9 @@ public interface GeneratedValue<O> {
 	 *         node, it may be null
 	 */
 	O getGeneratedValue(BindingNode node);
+
+	/**
+	 * @return the List of possible generated values
+	 */
+	public abstract List<O> computePossibleValues();
 }

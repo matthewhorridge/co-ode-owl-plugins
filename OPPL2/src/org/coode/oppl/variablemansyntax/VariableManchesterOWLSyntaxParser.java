@@ -140,7 +140,7 @@ public class VariableManchesterOWLSyntaxParser extends
 	}
 
 	private ConstraintSystem constraintSystem;
-	private Map<String, Set<AxiomType>> tokenAxiomTypesMap = new HashMap<String, Set<AxiomType>>();
+	private final Map<String, Set<AxiomType>> tokenAxiomTypesMap = new HashMap<String, Set<AxiomType>>();
 	private VariableShortFormEntityChecker owlEntityChecker;
 
 	public VariableManchesterOWLSyntaxParser(String s, ConstraintSystem cs) {
@@ -207,7 +207,8 @@ public class VariableManchesterOWLSyntaxParser extends
 	public OWLConstant parseConstant() throws ParserException {
 		OWLConstant toReturn = null;
 		Token tok = getToken();
-		Variable variable = this.constraintSystem.getVariable(tok.getToken());
+		Variable variable = this.constraintSystem.getVariable(tok
+				.getToken());
 		if (variable != null
 				&& variable.getType().equals(VariableType.CONSTANT)) {
 			this.consumeToken();

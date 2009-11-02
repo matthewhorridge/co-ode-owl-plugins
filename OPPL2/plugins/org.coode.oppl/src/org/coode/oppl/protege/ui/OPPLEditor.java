@@ -31,6 +31,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.coode.oppl.OPPLScript;
+import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.validation.OPPLScriptValidator;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
@@ -144,9 +145,7 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 	 */
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		if (listener == null) {
-			throw new IllegalArgumentException("The listener cannot be null");
-		}
+		ArgCheck.checkNullArgument("The listener", listener);
 		this.listeners.add(listener);
 	}
 

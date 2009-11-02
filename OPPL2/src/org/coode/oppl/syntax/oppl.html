@@ -42,6 +42,17 @@
   <TD>
    <PRE>
 &lt;DEFAULT&gt; TOKEN : {
+&lt;REGEXPMETACHAR: ["\\","-","$","|","?","*"]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
 &lt;IDENTIFIER: "?" &lt;NAME&gt;&gt;
 | &lt;#NAME: &lt;LETTER&gt; (&lt;LETTER&gt; | &lt;DIGIT&gt;)*&gt;
 | &lt;#LETTER: ["_","a"-"z","A"-"Z","\u00e0"-"\u00f9"]&gt;
@@ -59,6 +70,7 @@
 &lt;CREATE: "create"&gt;
 | &lt;CREATEINTERSECTION: "CreateIntersection"&gt;
 | &lt;CREATEUNION: "CreateUnion"&gt;
+| &lt;MATCH: "Match"&gt;
 }
 
    </PRE>
@@ -106,7 +118,7 @@
 | &lt;POWER: "^"&gt;
 | &lt;OPENCURLYBRACKETS: "{"&gt;
 | &lt;CLOSEDCURLYBRACKETS: "}"&gt;
-| &lt;OPENSQUAREYBRACKETS: "["&gt;
+| &lt;OPENSQUAREBRACKETS: "["&gt;
 | &lt;CLOSEDSQUAREBRACKETS: "]"&gt;
 }
 
@@ -230,7 +242,7 @@
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod6">VariableDefinition</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;IDENTIFIER&gt; &lt;COLON&gt; &lt;VARIABLETYPE&gt; "=" <A HREF="#prod8">opplFunction</A> | &lt;IDENTIFIER&gt; &lt;COLON&gt; &lt;VARIABLETYPE&gt; &lt;OPENSQUAREYBRACKETS&gt; <A HREF="#prod9">direction</A> <A HREF="#prod10">typeScope</A> &lt;CLOSEDSQUAREBRACKETS&gt; | &lt;IDENTIFIER&gt; &lt;COLON&gt; &lt;VARIABLETYPE&gt; )</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;IDENTIFIER&gt; &lt;COLON&gt; &lt;VARIABLETYPE&gt; "=" <A HREF="#prod8">opplFunction</A> | &lt;IDENTIFIER&gt; &lt;COLON&gt; &lt;VARIABLETYPE&gt; &lt;OPENSQUAREBRACKETS&gt; <A HREF="#prod9">direction</A> <A HREF="#prod10">typeScope</A> &lt;CLOSEDSQUAREBRACKETS&gt; | &lt;IDENTIFIER&gt; &lt;COLON&gt; &lt;VARIABLETYPE&gt; )</TD>
 </TR>
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod8">opplFunction</A></TD>
@@ -257,6 +269,10 @@
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE><I>java code</I></TD></TR>
 <TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod14">regexpOperation</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><I>java code</I></TD></TR>
+<TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod12">set</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDENTIFIER&gt; "." &lt;VALUESVARIABLEATTRIBUTE&gt;</TD>
@@ -264,15 +280,15 @@
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod11">stringOperation</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod14">stringConcat</A></TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod15">stringConcat</A></TD>
 </TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod14">stringConcat</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod15">stringConcat</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod15">generatedValue</A> ( "+" <A HREF="#prod15">generatedValue</A> )*</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod16">generatedValue</A> ( "+" <A HREF="#prod16">generatedValue</A> )*</TD>
 </TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod15">generatedValue</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod16">generatedValue</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE>&lt;QUOTE&gt; &lt;ENTITYNAMES&gt; &lt;QUOTE&gt;</TD>
 </TR>
@@ -301,45 +317,49 @@
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE><I>java code</I></TD></TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod16">parseScope</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod17">parseScope</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE><I>java code</I></TD></TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod17">Constraint</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod18">Constraint</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDENTIFIER&gt; ( &lt;NEQ&gt; <A HREF="#prod18">OWLExpression</A> | &lt;IN&gt; &lt;OPENCURLYBRACKETS&gt; <A HREF="#prod18">OWLExpression</A> ( &lt;COMMA&gt; <A HREF="#prod18">OWLExpression</A> )* &lt;CLOSEDCURLYBRACKETS&gt; )</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;IDENTIFIER&gt; ( &lt;MATCH&gt; &lt;QUOTE&gt; <A HREF="#prod19">matchConstraint</A> &lt;QUOTE&gt; | &lt;NEQ&gt; <A HREF="#prod20">OWLExpression</A> | &lt;IN&gt; &lt;OPENCURLYBRACKETS&gt; <A HREF="#prod20">OWLExpression</A> ( &lt;COMMA&gt; <A HREF="#prod20">OWLExpression</A> )* &lt;CLOSEDCURLYBRACKETS&gt; )</TD>
 </TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod18">OWLExpression</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod19">matchConstraint</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE><I>java code</I></TD></TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod19">variableType</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod20">OWLExpression</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><I>java code</I></TD></TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod21">variableType</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE>&lt;VARIABLETYPE&gt;</TD>
 </TR>
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod4">query</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>&lt;SELECT&gt; <A HREF="#prod20">queryAtom</A> ( &lt;COMMA&gt; <A HREF="#prod20">queryAtom</A> )* ( &lt;WHERE&gt; <A HREF="#prod17">Constraint</A> ( &lt;COMMA&gt; <A HREF="#prod17">Constraint</A> )* )?</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;SELECT&gt; <A HREF="#prod22">queryAtom</A> ( &lt;COMMA&gt; <A HREF="#prod22">queryAtom</A> )* ( &lt;WHERE&gt; <A HREF="#prod18">Constraint</A> ( &lt;COMMA&gt; <A HREF="#prod18">Constraint</A> )* )?</TD>
 </TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod20">queryAtom</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod22">queryAtom</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>&lt;ASSERTED&gt; <A HREF="#prod21">Clause</A></TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;ASSERTED&gt; <A HREF="#prod23">Clause</A></TD>
 </TR>
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>|</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod21">Clause</A></TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod23">Clause</A></TD>
 </TR>
 <TR>
 <TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod7">Action</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
-<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;ADD&gt; <A HREF="#prod21">Clause</A> | &lt;REMOVE&gt; <A HREF="#prod21">Clause</A> )</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;ADD&gt; <A HREF="#prod23">Clause</A> | &lt;REMOVE&gt; <A HREF="#prod23">Clause</A> )</TD>
 </TR>
 <TR>
-<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod21">Clause</A></TD>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod23">Clause</A></TD>
 <TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
 <TD ALIGN=LEFT VALIGN=BASELINE><I>java code</I></TD></TR>
 </TABLE>

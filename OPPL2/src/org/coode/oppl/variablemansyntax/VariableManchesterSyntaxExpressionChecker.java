@@ -42,8 +42,8 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  */
 public class VariableManchesterSyntaxExpressionChecker implements
 		OWLExpressionChecker<OPPLScript> {
-	private OWLOntologyManager manager;
-	private OWLReasoner reasoner;
+	private final OWLOntologyManager manager;
+	private final OWLReasoner reasoner;
 	private OWLOntology ontology;
 	private OPPLScript lastCheckedObject = null;
 
@@ -63,9 +63,9 @@ public class VariableManchesterSyntaxExpressionChecker implements
 		try {
 			OPPLScript statementModel = OPPLParser.Start();
 			if (this.reasoner == null || this.reasoner instanceof NoOpReasoner) {
-				List<InputVariable> variables = statementModel
+				List<Variable> variables = statementModel
 						.getInputVariables();
-				for (InputVariable v : variables) {
+				for (Variable v : variables) {
 					if (v.getVariableScope() != null) {
 						throw new OWLExpressionParserException(
 								new Exception(

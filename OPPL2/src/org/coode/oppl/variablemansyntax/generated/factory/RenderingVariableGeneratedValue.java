@@ -18,14 +18,12 @@ public class RenderingVariableGeneratedValue extends
 		this.constraintSystem = constraintSystem;
 	}
 
-	@Override
 	public String getGeneratedValue(BindingNode node) {
 		return RenderingAttributeGenerator.getInstance(this.constraintSystem)
 				.getValue(node.getAssignmentValue(getVariable()));
 	}
 
-	@Override
-	public List<String> getGeneratedValues() {
+	public List<String> computePossibleValues() {
 		return RenderingAttributeGenerator.getInstance(this.constraintSystem)
 				.getValues(getVariable());
 	}

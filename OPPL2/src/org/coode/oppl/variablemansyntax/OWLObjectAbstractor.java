@@ -124,8 +124,8 @@ import org.semanticweb.owl.model.SWRLSameAsAtom;
  * 
  */
 public class OWLObjectAbstractor implements OWLObjectVisitorEx<OWLObject> {
-	private OWLDataFactory dataFactory;
-	private Collection<Variable> variables;
+	private final OWLDataFactory dataFactory;
+	private final Collection<Variable> variables;
 
 	public OWLObjectAbstractor(Collection<Variable> variables,
 			OWLDataFactory dataFactory) {

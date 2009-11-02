@@ -32,6 +32,7 @@ import org.coode.oppl.protege.ui.OPPLSelectClauseListItem;
 import org.coode.oppl.protege.ui.OWLObjectListItem;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
@@ -66,28 +67,16 @@ public class VariableOWLCellRenderer extends OWLCellRenderer implements
 	public VariableOWLCellRenderer(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem, OWLCellRenderer defaultRenderer) {
 		super(owlEditorKit);
-		if (owlEditorKit == null) {
-			throw new IllegalArgumentException(
-					"The OWL editor kit cannot be null");
-		}
-		if (constraintSystem == null) {
-			throw new IllegalArgumentException(
-					"The constraint system cannot be null");
-		}
-		if (defaultRenderer == null) {
-			throw new IllegalArgumentException(
-					"The default cell renderer cannot be null");
-		}
+		ArgCheck.checkNullArgument("The OWL editor kit", owlEditorKit);
+		ArgCheck.checkNullArgument("The constraint system", constraintSystem);
+		ArgCheck
+				.checkNullArgument("The default cell renderer", defaultRenderer);
 		this.constraintSystem = constraintSystem;
 		this.defaultRenderer = defaultRenderer;
 		setHighlightKeywords(true);
 		setWrap(true);
 	}
 
-	/**
-	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing
-	 *      .JList, java.lang.Object, int, boolean, boolean)
-	 */
 	@Override
 	public Component getListCellRendererComponent(JList list, Object value,
 			int index, boolean isSelected, boolean cellHasFocus) {

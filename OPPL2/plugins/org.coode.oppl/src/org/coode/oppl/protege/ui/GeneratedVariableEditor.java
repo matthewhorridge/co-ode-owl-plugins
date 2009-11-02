@@ -57,11 +57,11 @@ import org.semanticweb.owl.model.OWLException;
  */
 public class GeneratedVariableEditor extends AbstractVariableEditor {
 	private final class VariableOWLExpressionChecker implements
-			OWLExpressionChecker<Variable> {
+			OWLExpressionChecker<GeneratedVariable> {
 		public VariableOWLExpressionChecker() {
 		}
 
-		private Variable lastEditedObject = null;
+		private GeneratedVariable lastEditedObject = null;
 
 		public void check(String text) throws OWLExpressionParserException {
 			this.lastEditedObject = null;
@@ -74,9 +74,11 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 				Object selectedValue = GeneratedVariableEditor.this.jRadioButtonTypeMap
 						.get(findSelectedButton());
 				if (selectedValue instanceof VariableType) {
-					Variable variableDefinition = OPPLParser.opplFunction(
-							variableName, (VariableType) selectedValue,
-							GeneratedVariableEditor.this.constraintSystem);
+					GeneratedVariable variableDefinition = OPPLParser
+							.opplFunction(
+									variableName,
+									(VariableType) selectedValue,
+									GeneratedVariableEditor.this.constraintSystem);
 					this.lastEditedObject = variableDefinition;
 				} else {
 					this.lastEditedObject = null;
@@ -95,7 +97,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 			}
 		}
 
-		public Variable createObject(String text)
+		public GeneratedVariable createObject(String text)
 				throws OWLExpressionParserException {
 			this.check(text);
 			return this.lastEditedObject;
@@ -117,7 +119,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 	protected final ConstraintSystem constraintSystem;
 	protected final Map<JRadioButton, VariableType> jRadioButtonTypeMap = new HashMap<JRadioButton, VariableType>();
 	private final Map<VariableType, JRadioButton> typeJRadioButonMap = new HashMap<VariableType, JRadioButton>();
-	private ExpressionEditor<Variable> opplFunctionEditor;
+	private final ExpressionEditor<GeneratedVariable> opplFunctionEditor;
 	static {
 		typeLabelStringMap = new HashMap<VariableType, String>();
 		EnumSet<VariableType> types = EnumSet.allOf(VariableType.class);
@@ -126,7 +128,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 		}
 	}
 
-	protected GeneratedVariableEditor(OWLEditorKit owlEditorKit,
+	public GeneratedVariableEditor(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
 		setLayout(new BorderLayout());
 		this.owlEditorKit = owlEditorKit;
@@ -187,7 +189,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 		variableTypeAndScopePanel.setBorder(ComponentFactory
 				.createTitledBorder("Variable Type"));
 		this.add(variableTypeAndScopePanel, BorderLayout.CENTER);
-		this.opplFunctionEditor = new ExpressionEditor<Variable>(
+		this.opplFunctionEditor = new ExpressionEditor<GeneratedVariable>(
 				this.owlEditorKit, new VariableOWLExpressionChecker());
 		this.opplFunctionEditor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
@@ -239,12 +241,20 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 	}
 
 	@Override
-	public void setVariable(Variable v) {
+	public void setVariable(GeneratedVariable<?> v) {
 		clear();
 		this.variableNameExpressionEditor.setText(v.getName());
 		this.typeJRadioButonMap.get(v.getType()).setSelected(true);
-		this.opplFunctionEditor.setText(((GeneratedVariable<?>) v)
-				.getOPPLFunction());
+		this.opplFunctionEditor.setText(v.getOPPLFunction());
+	}
+
+	@Override
+	public void setVariable(Variable variable) {
+		if (variable instanceof GeneratedVariable<?>) {
+			setVariable((GeneratedVariable<?>) variable);
+		}
+		throw new RuntimeException(
+				"Regular InputVariables not allowed on a GeneratedVariableEditor!");
 	}
 
 	@Override

@@ -120,7 +120,8 @@ import org.semanticweb.owl.model.SWRLSameAsAtom;
  * 
  */
 @SuppressWarnings("unused")
-public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
+public class VariableExtractor implements
+		OWLObjectVisitorEx<Set<Variable>> {
 	protected ConstraintSystem constraintSystem;
 
 	/**
@@ -139,7 +140,8 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 		return toReturn;
 	}
 
-	public Set<Variable> visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
+	public Set<Variable> visit(
+			OWLNegativeObjectPropertyAssertionAxiom axiom) {
 		OWLIndividual object = axiom.getObject();
 		OWLObjectPropertyExpression property = axiom.getProperty();
 		OWLIndividual subject = axiom.getSubject();
@@ -387,7 +389,8 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 		return toReturn;
 	}
 
-	public Set<Variable> visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
+	public Set<Variable> visit(
+			OWLInverseFunctionalObjectPropertyAxiom axiom) {
 		Set<Variable> toReturn = new HashSet<Variable>();
 		OWLObjectPropertyExpression property = axiom.getProperty();
 		toReturn.addAll(property.accept(this));
@@ -430,8 +433,8 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 		boolean isVariable = this.constraintSystem.isVariable(desc);
 		Set<Variable> toReturn = new HashSet<Variable>();
 		if (isVariable) {
-			Variable variable = this.constraintSystem
-					.getVariable(desc.getURI());
+			Variable variable = this.constraintSystem.getVariable(desc
+					.getURI());
 			toReturn.add(variable);
 		}
 		return toReturn;
@@ -672,8 +675,8 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 		Set<Variable> toReturn = new HashSet<Variable>();
 		boolean isVariable = this.constraintSystem.isVariable(individual);
 		if (isVariable) {
-			Variable variable = this.constraintSystem.getVariable(individual
-					.getURI());
+			Variable variable = this.constraintSystem
+					.getVariable(individual.getURI());
 			toReturn.add(variable);
 		}
 		return toReturn;

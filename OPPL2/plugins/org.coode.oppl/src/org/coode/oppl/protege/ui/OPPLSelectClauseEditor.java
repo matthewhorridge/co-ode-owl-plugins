@@ -44,14 +44,14 @@ import org.protege.editor.owl.OWLEditorKit;
 public class OPPLSelectClauseEditor extends JPanel implements
 		VerifiedInputEditor {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -4594021425664502052L;
 	private final OWLEditorKit owlEditorKit;
 	private final ConstraintSystem constraintSystem;
-	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
-	private AxiomEditor axiomEditor;
-	private JCheckBox assertedCheckBox = new JCheckBox("ASSERTED");
+	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
+	private final AxiomEditor axiomEditor;
+	private final JCheckBox assertedCheckBox = new JCheckBox("ASSERTED");
 	private OPPLSelectClauseListItem selectListItem;
 
 	/**
@@ -72,7 +72,7 @@ public class OPPLSelectClauseEditor extends JPanel implements
 
 	public OPPLSelectClauseEditor(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
-		this.setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
 		// Setting up the axiom editor
@@ -103,7 +103,7 @@ public class OPPLSelectClauseEditor extends JPanel implements
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		listener.verifiedStatusChanged(this.check());
+		listener.verifiedStatusChanged(check());
 	}
 
 	private boolean check() {
@@ -119,13 +119,13 @@ public class OPPLSelectClauseEditor extends JPanel implements
 	}
 
 	public void handleChange() {
-		boolean isValid = this.check();
+		boolean isValid = check();
 		if (isValid) {
 			this.selectListItem = new OPPLSelectClauseListItem(
 					this.assertedCheckBox.getModel().isSelected(),
 					this.axiomEditor.getAxiom());
 		}
-		this.notifyListeners(isValid);
+		notifyListeners(isValid);
 	}
 
 	/**

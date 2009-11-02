@@ -22,38 +22,42 @@
  */
 package org.coode.oppl.variablemansyntax.generated;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.List;
 
-import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 
 /**
+ * Represents a constant value. All the variables generated from this will have
+ * a constant value in their bindings
+ * 
+ * 
  * @author Luigi Iannone
  * 
  */
-public abstract class CollectionGeneratedValue<N> extends
-		VariableGeneratedValue<Collection<N>> implements
-		GeneratedValues<Collection<N>> {
-	private final ConstraintSystem constraintSystem;
+public class StringGeneratedValue implements GeneratedValue<String> {
+	private final String constant;
 
-	public CollectionGeneratedValue(Variable variable, Attribute attribute,
-			ConstraintSystem constraintSystem) {
-		super(variable, attribute);
-		this.constraintSystem = constraintSystem;
+	public StringGeneratedValue(String constant) {
+		this.constant = constant;
+	}
+
+	/**
+	 * @see org.coode.oppl.variablemansyntax.generated.GeneratedValue#getGeneratedValues()
+	 */
+	public List<String> computePossibleValues() {
+		// no need to return an unmodifiable list: the only element in the list
+		// is the string representing this constant, and that is immutable per
+		// se
+		return Arrays.asList(this.constant);
 	}
 
 	@Override
-	public abstract Collection<N> getGeneratedValue(BindingNode node);
+	public String toString() {
+		return "\"" + this.constant + "\"";
+	}
 
-	@Override
-	public abstract List<Collection<N>> getGeneratedValues();
-
-	/**
-	 * @return the constraintSystem
-	 */
-	public ConstraintSystem getConstraintSystem() {
-		return this.constraintSystem;
+	public String getGeneratedValue(BindingNode node) {
+		return this.constant;
 	}
 }

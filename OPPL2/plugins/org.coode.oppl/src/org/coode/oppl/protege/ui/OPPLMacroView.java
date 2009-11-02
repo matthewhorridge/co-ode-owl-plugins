@@ -48,9 +48,9 @@ import org.coode.oppl.protege.ProtegeOPPLFactory;
 import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.OWLObjectAbstractor;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
@@ -78,7 +78,7 @@ import org.semanticweb.owl.model.RemoveAxiom;
 public class OPPLMacroView extends AbstractOWLViewComponent implements
 		OWLOntologyChangeListener, ListDataListener, OPPLMacroListener {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -8368147957917061074L;
 	protected ActionList recordedActions;
@@ -151,10 +151,9 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 						String variableString = " " + v.toString();
 						VariableScope variableScope = v.getVariableScope();
 						if (variableScope != null) {
-							String scopeString = "[";
-							scopeString += variableScope.getDirection()
-									.toString();
-							scopeString += " "
+							String scopeString = "["
+									+ variableScope.getDirection().toString()
+									+ " "
 									+ OPPLMacroView.this
 											.getOWLModelManager()
 											.getRendering(
@@ -346,7 +345,7 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void updateActions() {
 		List<Variable> variables = this.entities.getVariables();

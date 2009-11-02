@@ -30,9 +30,9 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.PossibleValueExtractor;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.bindingtree.LeafBrusher;
@@ -48,7 +48,7 @@ import org.semanticweb.owl.model.OWLSubClassAxiom;
  */
 public class AssertedAxiomQuery extends AbstractAxiomQuery {
 	protected Set<OWLOntology> ontologies;
-	private ConstraintSystem constraintSystem;
+	private final ConstraintSystem constraintSystem;
 	private final Map<BindingNode, Set<OWLAxiom>> instantiatedAxioms = new HashMap<BindingNode, Set<OWLAxiom>>();
 
 	/**
@@ -151,7 +151,8 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 	 * @param variable
 	 * @param ontologyAxiom
 	 */
-	private void extractPossibleValues(Variable variable, OWLAxiom ontologyAxiom) {
+	private void extractPossibleValues(Variable variable,
+			OWLAxiom ontologyAxiom) {
 		variable.clearBindings();
 		PossibleValueExtractor possibleValueExtractor = new PossibleValueExtractor(
 				variable.getType());

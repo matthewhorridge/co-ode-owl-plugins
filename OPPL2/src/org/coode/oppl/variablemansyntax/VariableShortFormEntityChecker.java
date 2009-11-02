@@ -90,17 +90,16 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		public Set<CreatedAssignementTreeNode> getLeaves() {
 			Set<CreatedAssignementTreeNode> nodes = new HashSet<CreatedAssignementTreeNode>();
 			nodes.add(this);
-			boolean allLeaves = this.isLeaf();
+			boolean allLeaves = isLeaf();
 			while (!allLeaves) {
 				for (CreatedAssignementTreeNode generatedChild : new HashSet<CreatedAssignementTreeNode>(
 						nodes)) {
 					if (!generatedChild.isLeaf()) {
 						nodes.remove(generatedChild);
-						Set<CreatedAssignementTreeNode> generatedChildren = this
-								.generateChildren(generatedChild);
+						Set<CreatedAssignementTreeNode> generatedChildren = generateChildren(generatedChild);
 						nodes.addAll(generatedChildren);
 					}
-					allLeaves = this.allLeaves(nodes);
+					allLeaves = allLeaves(nodes);
 				}
 			}
 			return nodes;
@@ -183,10 +182,10 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 	}
 
 	private final ConstraintSystem constraintSystems;
-	private OWLEntityChecker simpleOWLEntityChecker;
-	private List<OWLOntologyChange> lastAdditions = new ArrayList<OWLOntologyChange>();
-	private Queue<Set<CreationAssignemnt>> assignementQueue = new LinkedList<Set<CreationAssignemnt>>();
-	private Map<String, OWLEntity> created = new HashMap<String, OWLEntity>();
+	private final OWLEntityChecker simpleOWLEntityChecker;
+	private final List<OWLOntologyChange> lastAdditions = new ArrayList<OWLOntologyChange>();
+	private final Queue<Set<CreationAssignemnt>> assignementQueue = new LinkedList<Set<CreationAssignemnt>>();
+	private final Map<String, OWLEntity> created = new HashMap<String, OWLEntity>();
 
 	/**
 	 * @param simpleOWLEntityChecker
@@ -207,12 +206,12 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 			if (createdEntity != null && createdEntity instanceof OWLClass) {
 				toReturn = (OWLClass) createdEntity;
 			} else if (createdEntity == null) {
-				CreationAssignemnt creationAssignemnt = this.fetch(name);
+				CreationAssignemnt creationAssignemnt = fetch(name);
 				if (creationAssignemnt != null
 						&& creationAssignemnt.getType().equals(
 								VariableType.CLASS)) {
 					try {
-						toReturn = (OWLClass) this.create(entityName,
+						toReturn = (OWLClass) create(entityName,
 								VariableType.CLASS).getOWLEntity();
 					} catch (OWLEntityCreationException e) {
 						e.printStackTrace();
@@ -222,7 +221,8 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		} else {
 			toReturn = this.simpleOWLEntityChecker.getOWLClass(name);
 			if (toReturn == null) {
-				Variable variable = this.constraintSystems.getVariable(name);
+				Variable variable = this.constraintSystems
+						.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(VariableType.CLASS)) {
 					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()
@@ -242,12 +242,12 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 					&& createdEntity instanceof OWLDataProperty) {
 				toReturn = (OWLDataProperty) createdEntity;
 			} else if (createdEntity == null) {
-				CreationAssignemnt creationAssignemnt = this.fetch(name);
+				CreationAssignemnt creationAssignemnt = fetch(name);
 				if (creationAssignemnt != null
 						&& creationAssignemnt.getType().equals(
 								VariableType.DATAPROPERTY)) {
 					try {
-						toReturn = (OWLDataProperty) this.create(entityName,
+						toReturn = (OWLDataProperty) create(entityName,
 								VariableType.DATAPROPERTY).getOWLEntity();
 					} catch (OWLEntityCreationException e) {
 						e.printStackTrace();
@@ -257,7 +257,8 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		} else {
 			toReturn = this.simpleOWLEntityChecker.getOWLDataProperty(name);
 			if (toReturn == null) {
-				Variable variable = this.constraintSystems.getVariable(name);
+				Variable variable = this.constraintSystems
+						.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(VariableType.DATAPROPERTY)) {
 					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()
@@ -277,12 +278,12 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 					&& createdEntity instanceof OWLObjectProperty) {
 				toReturn = (OWLObjectProperty) createdEntity;
 			} else if (createdEntity == null) {
-				CreationAssignemnt creationAssignemnt = this.fetch(name);
+				CreationAssignemnt creationAssignemnt = fetch(name);
 				if (creationAssignemnt != null
 						&& creationAssignemnt.getType().equals(
 								VariableType.OBJECTPROPERTY)) {
 					try {
-						toReturn = (OWLObjectProperty) this.create(entityName,
+						toReturn = (OWLObjectProperty) create(entityName,
 								VariableType.OBJECTPROPERTY).getOWLEntity();
 					} catch (OWLEntityCreationException e) {
 						e.printStackTrace();
@@ -292,7 +293,8 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		} else {
 			toReturn = this.simpleOWLEntityChecker.getOWLObjectProperty(name);
 			if (toReturn == null) {
-				Variable variable = this.constraintSystems.getVariable(name);
+				Variable variable = this.constraintSystems
+						.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(
 								VariableType.OBJECTPROPERTY)) {
@@ -312,12 +314,12 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 			if (createdEntity != null && createdEntity instanceof OWLIndividual) {
 				toReturn = (OWLIndividual) createdEntity;
 			} else if (createdEntity == null) {
-				CreationAssignemnt creationAssignemnt = this.fetch(name);
+				CreationAssignemnt creationAssignemnt = fetch(name);
 				if (creationAssignemnt != null
 						&& creationAssignemnt.getType().equals(
 								VariableType.INDIVIDUAL)) {
 					try {
-						toReturn = (OWLIndividual) this.create(entityName,
+						toReturn = (OWLIndividual) create(entityName,
 								VariableType.INDIVIDUAL).getOWLEntity();
 					} catch (OWLEntityCreationException e) {
 						e.printStackTrace();
@@ -327,7 +329,8 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		} else {
 			toReturn = this.simpleOWLEntityChecker.getOWLIndividual(name);
 			if (toReturn == null) {
-				Variable variable = this.constraintSystems.getVariable(name);
+				Variable variable = this.constraintSystems
+						.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(VariableType.INDIVIDUAL)) {
 					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()

@@ -33,6 +33,7 @@ import java.util.Set;
 import org.coode.oppl.ConstraintVisitor;
 import org.coode.oppl.InCollectionConstraint;
 import org.coode.oppl.InequalityConstraint;
+import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
@@ -144,9 +145,7 @@ final class PathNode {
 	}
 
 	PathNode(String name, PathNode parent) {
-		if (name == null) {
-			throw new IllegalArgumentException("The name cannot be null");
-		}
+		ArgCheck.checkNullArgument("The name", name);
 		this.name = name;
 		this.parent = parent;
 	}
@@ -159,10 +158,7 @@ final class PathNode {
 	}
 
 	PathNode addChild(String name1) {
-		if (name1 == null) {
-			throw new IllegalArgumentException(
-					"The name of the child cannot be null");
-		}
+		ArgCheck.checkNullArgument("The child name", name1);
 		Integer index = this.nameIndexesMap.get(name1);
 		if (index == null) {
 			index = 0;
@@ -222,9 +218,10 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 
 	private final class SpecializedOWLEntityVisitor2 implements
 			OWLEntityVisitor {
+		private static final String DIFFERENT = " != ";
 		private final String variableReference;
 
-		private SpecializedOWLEntityVisitor2(String variableReference) {
+		SpecializedOWLEntityVisitor2(String variableReference) {
 			this.variableReference = variableReference;
 		}
 
@@ -232,13 +229,16 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 			if (VariableXQueryBuilder.this.constraintSystem.isVariable(cls)) {
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(cls.getURI());
-				VariableXQueryBuilder.this.whereConditions
-						.add(this.variableReference + " != "
-								+ v.getName().replace('?', '$'));
+				VariableXQueryBuilder.this.whereConditions.add(diffReplace(v));
 			} else {
 				VariableXQueryBuilder.this.whereConditions
-						.add(this.variableReference + " != " + cls.getURI());
+						.add(this.variableReference + DIFFERENT + cls.getURI());
 			}
+		}
+
+		private String diffReplace(Variable v) {
+			return this.variableReference + DIFFERENT
+					+ v.getName().replace('?', '$');
 		}
 
 		public void visit(OWLObjectProperty property) {
@@ -246,12 +246,10 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 					.isVariable(property)) {
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(property.getURI());
-				VariableXQueryBuilder.this.whereConditions
-						.add(this.variableReference + " != "
-								+ v.getName().replace('?', '$'));
+				VariableXQueryBuilder.this.whereConditions.add(diffReplace(v));
 			} else {
 				VariableXQueryBuilder.this.whereConditions
-						.add(this.variableReference + " != "
+						.add(this.variableReference + DIFFERENT
 								+ property.getURI());
 			}
 		}
@@ -261,12 +259,10 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 					.isVariable(property)) {
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(property.getURI());
-				VariableXQueryBuilder.this.whereConditions
-						.add(this.variableReference + " != "
-								+ v.getName().replace('?', '$'));
+				VariableXQueryBuilder.this.whereConditions.add(diffReplace(v));
 			} else {
 				VariableXQueryBuilder.this.whereConditions
-						.add(this.variableReference + " != "
+						.add(this.variableReference + DIFFERENT
 								+ property.getURI());
 			}
 		}
@@ -276,12 +272,10 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 					.isVariable(individual)) {
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(individual.getURI());
-				VariableXQueryBuilder.this.whereConditions
-						.add(this.variableReference + " != "
-								+ v.getName().replace('?', '$'));
+				VariableXQueryBuilder.this.whereConditions.add(diffReplace(v));
 			} else {
 				VariableXQueryBuilder.this.whereConditions
-						.add(this.variableReference + " != "
+						.add(this.variableReference + DIFFERENT
 								+ individual.getURI());
 			}
 		}
@@ -291,10 +285,11 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	private final class SpecializedOWLEntityVisitor implements OWLEntityVisitor {
+		private static final String EQUALS = " = ";
 		private final StringWriter writer;
 		private final String variableReference;
 
-		private SpecializedOWLEntityVisitor(StringWriter writer,
+		SpecializedOWLEntityVisitor(StringWriter writer,
 				String variableReference) {
 			this.writer = writer;
 			this.variableReference = variableReference;
@@ -305,13 +300,17 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(cls.getURI());
 				this.writer.append(this.variableReference);
-				this.writer.append(" = ");
-				this.writer.append(v.getName().replace('?', '$'));
+				this.writer.append(EQUALS);
+				this.writer.append(replace(v));
 			} else {
 				this.writer.append(this.variableReference);
-				this.writer.append(" = ");
+				this.writer.append(EQUALS);
 				this.writer.append(cls.getURI().toString());
 			}
+		}
+
+		private String replace(Variable v) {
+			return v.getName().replace('?', '$');
 		}
 
 		public void visit(OWLObjectProperty property) {
@@ -320,11 +319,11 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(property.getURI());
 				this.writer.append(this.variableReference);
-				this.writer.append(" = ");
-				this.writer.append(v.getName().replace('?', '$'));
+				this.writer.append(EQUALS);
+				this.writer.append(replace(v));
 			} else {
 				this.writer.append(this.variableReference);
-				this.writer.append(" = ");
+				this.writer.append(EQUALS);
 				this.writer.append(property.getURI().toString());
 			}
 		}
@@ -335,11 +334,11 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(property.getURI());
 				this.writer.append(this.variableReference);
-				this.writer.append(" = ");
-				this.writer.append(v.getName().replace('?', '$'));
+				this.writer.append(EQUALS);
+				this.writer.append(replace(v));
 			} else {
 				this.writer.append(this.variableReference);
-				this.writer.append(" = ");
+				this.writer.append(EQUALS);
 				this.writer.append(property.getURI().toString());
 			}
 		}
@@ -350,11 +349,11 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(individual.getURI());
 				this.writer.append(this.variableReference);
-				this.writer.append(" = ");
-				this.writer.append(v.getName().replace('?', '$'));
+				this.writer.append(EQUALS);
+				this.writer.append(replace(v));
 			} else {
 				this.writer.append(this.variableReference);
-				this.writer.append(" = ");
+				this.writer.append(EQUALS);
 				this.writer.append(individual.getURI().toString());
 			}
 		}
@@ -367,8 +366,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 		private final String variableReference;
 		private final StringWriter writer;
 
-		private SpecializedOWLDataVisitor(String variableReference,
-				StringWriter writer) {
+		SpecializedOWLDataVisitor(String variableReference, StringWriter writer) {
 			this.variableReference = variableReference;
 			this.writer = writer;
 		}
