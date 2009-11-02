@@ -50,11 +50,11 @@ import org.semanticweb.owl.model.OWLException;
  */
 public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3477960268272607549L;
-	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
-	private ExpressionEditor<AbstractConstraint> constraintEditor;
+	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
+	private final ExpressionEditor<AbstractConstraint> constraintEditor;
 	private AbstractConstraint constraint;
 	protected final OWLEditorKit owlEditorKit;
 	protected final ConstraintSystem constraintSystem;

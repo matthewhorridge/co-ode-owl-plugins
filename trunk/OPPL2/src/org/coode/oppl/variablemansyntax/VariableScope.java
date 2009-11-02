@@ -28,7 +28,7 @@ import org.semanticweb.owl.model.OWLObject;
 
 /**
  * Represents a limitation in the range of values that can be assigned to a
- * {@link Variable} instance
+ * {@link GeneratedVariable} instance
  * 
  * 
  * @author Luigi Iannone

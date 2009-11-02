@@ -33,7 +33,7 @@ import org.semanticweb.owl.model.OWLPropertyExpression;
 import org.semanticweb.owl.model.OWLPropertyRange;
 
 /**
- * Represents a range limitations that could be added to a {@link Variable}
+ * Represents a range limitations that could be added to a {@link GeneratedVariable}
  * instance with OBJECTPROERTY or DATAPRPERTY {@link VariableType}, in
  * particular this restricts the possible values to the set of primitive object
  * properties or data properties that are super-properties of a given property

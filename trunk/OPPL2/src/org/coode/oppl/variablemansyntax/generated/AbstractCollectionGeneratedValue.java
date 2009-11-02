@@ -22,43 +22,30 @@
  */
 package org.coode.oppl.variablemansyntax.generated;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
-import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.Variable;
 
 /**
- * Represents a constant value. All the variables generated from this will have
- * a constant value in their bindings
- * 
- * 
  * @author Luigi Iannone
  * 
  */
-public class ConstantStringGeneratedValue implements GeneratedValue<String>,
-		GeneratedValues<String> {
-	private final String constant;
+public abstract class AbstractCollectionGeneratedValue<N> extends
+		VariableGeneratedValue<Collection<N>> implements
+		GeneratedValue<Collection<N>> {
+	private final ConstraintSystem constraintSystem;
 
-	public ConstantStringGeneratedValue(String constant) {
-		this.constant = constant;
+	public AbstractCollectionGeneratedValue(Variable variable,
+			Attribute attribute, ConstraintSystem constraintSystem) {
+		super(variable, attribute);
+		this.constraintSystem = constraintSystem;
 	}
 
 	/**
-	 * @see org.coode.oppl.variablemansyntax.generated.GeneratedValue#getGeneratedValues()
+	 * @return the constraintSystem
 	 */
-	public List<String> getGeneratedValues() {
-		// no need to return an unmodifiable list: the only element in the list
-		// is the string representing this constant, and that is immutable per
-		// se
-		return Arrays.asList(this.constant);
-	}
-
-	@Override
-	public String toString() {
-		return "\"" + this.constant + "\"";
-	}
-
-	public String getGeneratedValue(BindingNode node) {
-		return this.constant;
+	public ConstraintSystem getConstraintSystem() {
+		return this.constraintSystem;
 	}
 }

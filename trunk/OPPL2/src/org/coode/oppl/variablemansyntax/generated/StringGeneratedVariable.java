@@ -8,19 +8,16 @@ import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.semanticweb.owl.expression.OWLEntityChecker;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLIndividual;
+import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyChangeException;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
-public class StringGeneratedVariable extends GeneratedVariable<String> {
+public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 	private final OWLOntology ontology;
 
-	public StringGeneratedVariable(String name, VariableType type,
+	protected StringGeneratedVariable(String name, VariableType type,
 			GeneratedValue<String> value, OWLOntology ontology) {
 		super(name, type, value);
 		this.ontology = ontology;
@@ -28,90 +25,79 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 
 	@Override
 	protected OWLObject generateObject(String aValue) {
-		OWLObject value = null;
+		OWLObject toReturn = null;
 		OWLEntityChecker entityChecker = OPPLParser.getOPPLFactory()
 				.getOWLEntityChecker();
-		OWLOntologyManager ontologyManager = OPPLParser.getOPPLFactory()
-				.getOntologyManager();
-		OWLEntityFactory entityFactory = OPPLParser.getOPPLFactory()
-				.getOWLEntityFactory();
+		OWLEntityFactory ef = OPPLParser.getOPPLFactory().getOWLEntityFactory();
+		OWLDataFactory df = OPPLParser.getOPPLFactory().getOWLDataFactory();
 		switch (getType()) {
 			case CLASS:
 				try {
-					value = entityChecker.getOWLClass(aValue);
-					if (value == null) {
-						OWLEntityCreationSet<OWLClass> creationEntitySet = entityFactory
-								.createOWLClass(aValue, null);
-						value = creationEntitySet.getOWLEntity();
-						ontologyManager.applyChanges(creationEntitySet
-								.getOntologyChanges());
+					toReturn = entityChecker.getOWLClass(aValue);
+					if (toReturn == null) {
+						toReturn = createUpdates(ef
+								.createOWLClass(aValue, null));
 					}
 				} catch (OWLEntityCreationException e) {
-					value = OPPLParser.getOPPLFactory().getOWLDataFactory()
-							.getOWLClass(buildURI(aValue));
+					toReturn = df.getOWLClass(buildURI(aValue));
 				} catch (OWLOntologyChangeException e) {
 					throw new RuntimeException(e);
 				}
 				break;
 			case OBJECTPROPERTY:
 				try {
-					value = entityChecker.getOWLObjectProperty(aValue);
-					if (value == null) {
-						OWLEntityCreationSet<OWLObjectProperty> creationEntitySet = entityFactory
-								.createOWLObjectProperty(aValue, null);
-						value = creationEntitySet.getOWLEntity();
-						ontologyManager.applyChanges(creationEntitySet
-								.getOntologyChanges());
+					toReturn = entityChecker.getOWLObjectProperty(aValue);
+					if (toReturn == null) {
+						toReturn = createUpdates(ef.createOWLObjectProperty(
+								aValue, null));
 					}
 				} catch (OWLEntityCreationException e) {
-					value = OPPLParser.getOPPLFactory().getOWLDataFactory()
-							.getOWLObjectProperty(buildURI(aValue));
+					toReturn = df.getOWLObjectProperty(buildURI(aValue));
 				} catch (OWLOntologyChangeException e) {
 					throw new RuntimeException(e);
 				}
 				break;
 			case DATAPROPERTY:
 				try {
-					value = entityChecker.getOWLDataProperty(aValue);
-					if (value == null) {
-						OWLEntityCreationSet<OWLDataProperty> creationEntitySet = entityFactory
-								.createOWLDataProperty(aValue, null);
-						value = creationEntitySet.getOWLEntity();
-						ontologyManager.applyChanges(creationEntitySet
-								.getOntologyChanges());
+					toReturn = entityChecker.getOWLDataProperty(aValue);
+					if (toReturn == null) {
+						toReturn = createUpdates(ef.createOWLDataProperty(
+								aValue, null));
 					}
 				} catch (OWLEntityCreationException e) {
-					value = OPPLParser.getOPPLFactory().getOWLDataFactory()
-							.getOWLDataProperty(buildURI(aValue));
+					toReturn = df.getOWLDataProperty(buildURI(aValue));
 				} catch (OWLOntologyChangeException e) {
 					throw new RuntimeException(e);
 				}
 				break;
 			case INDIVIDUAL:
 				try {
-					value = entityChecker.getOWLIndividual(aValue);
-					if (value == null) {
-						OWLEntityCreationSet<OWLIndividual> creationEntitySet = entityFactory
-								.createOWLIndividual(aValue, null);
-						value = creationEntitySet.getOWLEntity();
-						ontologyManager.applyChanges(creationEntitySet
-								.getOntologyChanges());
+					toReturn = entityChecker.getOWLIndividual(aValue);
+					if (toReturn == null) {
+						toReturn = createUpdates(ef.createOWLIndividual(aValue,
+								null));
 					}
 				} catch (OWLEntityCreationException e) {
-					value = OPPLParser.getOPPLFactory().getOWLDataFactory()
-							.getOWLIndividual(buildURI(aValue));
+					toReturn = df.getOWLIndividual(buildURI(aValue));
 				} catch (OWLOntologyChangeException e) {
 					throw new RuntimeException(e);
 				}
 				break;
 			case CONSTANT:
-				value = OPPLParser.getOPPLFactory().getOWLDataFactory()
-						.getOWLTypedConstant(aValue);
-				//$FALL-THROUGH$
+				toReturn = df.getOWLTypedConstant(aValue);
+				break;
 			default:
 				break;
 		}
-		return value;
+		return toReturn;
+	}
+
+	private OWLObject createUpdates(
+			OWLEntityCreationSet<? extends OWLEntity> set)
+			throws OWLEntityCreationException, OWLOntologyChangeException {
+		OPPLParser.getOWLOntologyManager().applyChanges(
+				set.getOntologyChanges());
+		return set.getOWLEntity();
 	}
 
 	/**
@@ -119,7 +105,7 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 	 * @return
 	 */
 	private URI buildURI(String aValue) {
-		return URI.create(getOntology().getURI().toString() + "#" + aValue);
+		return URI.create(this.ontology.getURI().toString() + "#" + aValue);
 	}
 
 	public static StringGeneratedVariable buildGeneratedVariable(String name,
@@ -129,19 +115,10 @@ public class StringGeneratedVariable extends GeneratedVariable<String> {
 	}
 
 	@Override
-	protected GeneratedVariable<String> replace(GeneratedValue<String> value) {
-		return buildGeneratedVariable(getName(), getType(), value,
-				getOntology());
+	protected GeneratedVariable<String> replace(GeneratedValue<String> v) {
+		return buildGeneratedVariable(getName(), getType(), v, this.ontology);
 	}
 
-	/**
-	 * @return the ontology
-	 */
-	public OWLOntology getOntology() {
-		return this.ontology;
-	}
-
-	@Override
 	public String getOPPLFunction() {
 		return "create(" + getValue() + ")";
 	}

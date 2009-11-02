@@ -33,8 +33,8 @@ import org.semanticweb.owl.model.OWLPropertyExpression;
 import org.semanticweb.owl.model.OWLPropertyRange;
 
 /**
- * Represents a range limitations that could be added to a {@link Variable}
- * instance with OBJECTPROERTY or DATAPROPERTY {@link VariableType}
+ * Represents a range limitations that could be added to a {@link GeneratedVariable}
+ * instance with OBJECTPROpERTY or DATAPROPERTY {@link VariableType}
  * 
  * @author Luigi Iannone
  * 
@@ -43,8 +43,8 @@ import org.semanticweb.owl.model.OWLPropertyRange;
 public abstract class PropertyVariableScope<P extends OWLProperty<? extends OWLPropertyExpression, ? extends OWLPropertyRange>>
 		implements VariableScope {
 	static class Factory<P extends OWLProperty<? extends OWLPropertyExpression, ? extends OWLPropertyRange>> {
-		private Map<P, SuperPropertyVariableScope<P>> superPropertyScopes = new HashMap<P, SuperPropertyVariableScope<P>>();
-		private Map<P, SubPropertyVariableScope<P>> subPropertyScopes = new HashMap<P, SubPropertyVariableScope<P>>();
+		private final Map<P, SuperPropertyVariableScope<P>> superPropertyScopes = new HashMap<P, SuperPropertyVariableScope<P>>();
+		private final Map<P, SubPropertyVariableScope<P>> subPropertyScopes = new HashMap<P, SubPropertyVariableScope<P>>();
 
 		SuperPropertyVariableScope<P> buildSuperPropertyVariableScope(P property) {
 			SuperPropertyVariableScope<P> toReturn = this.superPropertyScopes
@@ -69,7 +69,7 @@ public abstract class PropertyVariableScope<P extends OWLProperty<? extends OWLP
 
 	private static Factory<OWLDataProperty> dataPropertyFactory = new Factory<OWLDataProperty>();
 	private static Factory<OWLObjectProperty> objectPropertyFactory = new Factory<OWLObjectProperty>();
-	private P property;
+	private final P property;
 
 	/**
 	 * @param property

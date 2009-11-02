@@ -29,9 +29,9 @@ import java.util.List;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.InputVariable;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
+import org.coode.oppl.visitors.InputVariableCollector;
 import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 
@@ -71,14 +71,13 @@ public class OPPLScriptImpl implements OPPLScript {
 	/**
 	 * @see org.coode.oppl.OPPLScript#getInputVariables()
 	 */
-	public List<InputVariable> getInputVariables() {
-		List<InputVariable> toReturn = new ArrayList<InputVariable>();
-		for (Variable variable : this.getVariables()) {
-			if (variable instanceof InputVariable) {
-				toReturn.add((InputVariable) variable);
-			}
+	public List<Variable> getInputVariables() {
+		InputVariableCollector visitor = new InputVariableCollector(
+				new ArrayList<Variable>());
+		for (Variable variable : getVariables()) {
+			variable.accept(visitor);
 		}
-		return toReturn;
+		return visitor.getCollectedVariables();
 	}
 
 	/**
@@ -103,20 +102,20 @@ public class OPPLScriptImpl implements OPPLScript {
 	}
 
 	public void accept(OPPLScriptVisitor visitor) {
-		for (Variable v : this.getVariables()) {
+		for (Variable v : getVariables()) {
 			visitor.visit(v);
 		}
-		visitor.visit(this.getQuery());
-		visitor.visitActions(this.getActions());
+		visitor.visit(getQuery());
+		visitor.visitActions(getActions());
 	}
 
 	public <P> P accept(OPPLScriptVisitorEx<P> visitor) {
 		P p = null;
-		for (Variable v : this.getVariables()) {
+		for (Variable v : getVariables()) {
 			p = visitor.visit(v, p);
 		}
-		p = visitor.visit(this.getQuery(), p);
-		p = visitor.visitActions(this.getActions(), p);
+		p = visitor.visit(getQuery(), p);
+		p = visitor.visitActions(getActions(), p);
 		return p;
 	}
 
@@ -124,17 +123,17 @@ public class OPPLScriptImpl implements OPPLScript {
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		boolean first = true;
-		for (Variable v : this.getVariables()) {
+		for (Variable v : getVariables()) {
 			String commaString = first ? "" : ", ";
 			first = false;
 			buffer.append(commaString);
 			buffer.append(v.toString());
 			VariableScope variableScope = v.getVariableScope();
 			if (variableScope != null) {
-				buffer.append("[");
+				buffer.append('[');
 				buffer.append(variableScope.getDirection().toString());
 				StringWriter writer = new StringWriter();
-				buffer.append(" ");
+				buffer.append(' ');
 				ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
 						writer);
 				renderer
@@ -142,17 +141,17 @@ public class OPPLScriptImpl implements OPPLScript {
 								this.constraintSystem));
 				variableScope.getScopingObject().accept(renderer);
 				buffer.append(writer.toString());
-				buffer.append("]");
+				buffer.append(']');
 			}
 		}
-		OPPLQuery opplQuery = this.getQuery();
+		OPPLQuery opplQuery = getQuery();
 		if (this.query != null) {
 			buffer.append(opplQuery.toString());
 		}
-		if (this.getActions().size() > 0) {
+		if (getActions().size() > 0) {
 			buffer.append(" BEGIN ");
 			first = true;
-			for (OWLAxiomChange action : this.getActions()) {
+			for (OWLAxiomChange action : getActions()) {
 				String commaString = first ? "" : ", ";
 				StringWriter writer = new StringWriter();
 				ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
@@ -176,32 +175,32 @@ public class OPPLScriptImpl implements OPPLScript {
 	public String render() {
 		StringBuffer buffer = new StringBuffer();
 		boolean first = true;
-		for (Variable v : this.getVariables()) {
+		for (Variable v : getVariables()) {
 			String commaString = first ? "" : ",\n ";
 			buffer.append(commaString);
 			first = false;
 			buffer.append(v.toString());
 			VariableScope variableScope = v.getVariableScope();
 			if (variableScope != null) {
-				buffer.append("[");
+				buffer.append('[');
 				buffer.append(variableScope.getDirection().toString());
-				buffer.append(" ");
+				buffer.append(' ');
 				ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
 						.getManchesterSyntaxRenderer(this.constraintSystem);
 				variableScope.getScopingObject().accept(renderer);
 				buffer.append(renderer.toString());
-				buffer.append("]");
+				buffer.append(']');
 			}
 		}
-		OPPLQuery opplQuery = this.getQuery();
-		buffer.append("\n");
+		OPPLQuery opplQuery = getQuery();
+		buffer.append('\n');
 		if (this.query != null) {
 			buffer.append(opplQuery.render());
 		}
-		if (this.getActions().size() > 0) {
+		if (getActions().size() > 0) {
 			buffer.append("BEGIN\n ");
 			first = true;
-			for (OWLAxiomChange action : this.getActions()) {
+			for (OWLAxiomChange action : getActions()) {
 				String commaString = first ? "" : ",\n ";
 				String actionString = action instanceof AddAxiom ? "\tADD "
 						: "\tREMOVE ";

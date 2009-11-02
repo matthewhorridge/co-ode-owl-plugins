@@ -31,6 +31,7 @@ import javax.swing.JPanel;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
+import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.validation.OPPLScriptValidator;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -178,9 +179,7 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 	 */
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		if (listener == null) {
-			throw new IllegalArgumentException("The listenr cannot be null");
-		}
+		ArgCheck.checkNullArgument("The listener", listener);
 		this.listeners.add(listener);
 	}
 

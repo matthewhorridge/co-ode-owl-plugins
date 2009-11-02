@@ -62,7 +62,7 @@ import org.semanticweb.owl.model.OWLObject;
 public class OWLObjectList extends MList implements ActionListener,
 		OPPLMacroStatusChange, ListDataListener {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 6844484022100475838L;
 
@@ -107,9 +107,9 @@ public class OWLObjectList extends MList implements ActionListener,
 		}
 	}
 
-	private ConstraintSystem constraintSystem;
-	private List<Variable> variables = new ArrayList<Variable>();
-	private List<OPPLMacroListener> listeners = new ArrayList<OPPLMacroListener>();
+	private final ConstraintSystem constraintSystem;
+	private final List<Variable> variables = new ArrayList<Variable>();
+	private final List<OPPLMacroListener> listeners = new ArrayList<OPPLMacroListener>();
 	private final OWLEditorKit owlEditorKit;
 
 	protected OWLObjectList(ConstraintSystem cs, OWLEditorKit owlEditorKit) {
@@ -150,7 +150,7 @@ public class OWLObjectList extends MList implements ActionListener,
 			jDialog.pack();
 			jDialog.setVisible(true);
 			Object value = variableList.getSelectedValue();
-			if (value != null && value instanceof VariableListItem) {
+			if (value instanceof VariableListItem) {
 				Variable selectedVariable = ((VariableListItem) value)
 						.getVariable();
 				try {
@@ -173,7 +173,7 @@ public class OWLObjectList extends MList implements ActionListener,
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void createVariable() {
 		Object[] selectedValues = getSelectedValues();
@@ -240,7 +240,8 @@ public class OWLObjectList extends MList implements ActionListener,
 		}
 	}
 
-	private void notifyAdded2Variable(Variable variable, OWLObject owlObject) {
+	private void notifyAdded2Variable(Variable variable,
+			OWLObject owlObject) {
 		for (OPPLMacroListener listener : this.listeners) {
 			listener.handleGeneralisedOWLObject(variable, owlObject);
 		}

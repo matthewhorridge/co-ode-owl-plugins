@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.coode.oppl.rendering.AbstractRenderer;
@@ -35,7 +34,6 @@ import org.semanticweb.owl.model.OWLObjectVisitor;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLRestriction;
 import org.semanticweb.owl.model.OWLUntypedConstant;
-import org.semanticweb.owl.vocab.OWLRestrictedDataRangeFacetVocabulary;
 
 /**
  * Author: Luigi Iannone<br>
@@ -52,13 +50,13 @@ import org.semanticweb.owl.vocab.OWLRestrictedDataRangeFacetVocabulary;
 public class VariableOWLObjectRenderer extends AbstractRenderer implements
 		OWLObjectVisitor, OWLObjectRenderer {
 	private StringBuilder buffer;
-	private Map<OWLRestrictedDataRangeFacetVocabulary, String> facetMap;
-	private Map<URI, Boolean> simpleRenderDatatypes;
+	// private Map<OWLRestrictedDataRangeFacetVocabulary, String> facetMap;
+	// private Map<URI, Boolean> simpleRenderDatatypes;
 	private OWLObject focusedObject;
-	private OWLModelManager owlModelManager;
-	private int lastNewLineIndex = 0;
-	private int currentIndex = 0;
-	private OWLDescriptionComparator comparator;
+	private final OWLModelManager owlModelManager;
+	// private int lastNewLineIndex = 0;
+	// private int currentIndex = 0;
+	private final OWLDescriptionComparator comparator;
 	private OWLEntityRenderer entityRenderer;
 
 	public VariableOWLObjectRenderer(OWLModelManager owlModelManager) {

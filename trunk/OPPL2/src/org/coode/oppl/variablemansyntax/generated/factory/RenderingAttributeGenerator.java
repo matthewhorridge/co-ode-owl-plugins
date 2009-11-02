@@ -8,14 +8,14 @@ import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.generated.VariableGeneratedValue.AttributeGenerator;
+import org.coode.oppl.variablemansyntax.generated.AttributeGenerator;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
 final class RenderingAttributeGenerator implements AttributeGenerator<String> {
 	private final OWLEntityRenderer entityRenderer;
 	private static RenderingAttributeGenerator instance = null;
-	private ConstraintSystem constraintSystem;
+	private final ConstraintSystem constraintSystem;
 
 	private RenderingAttributeGenerator(ConstraintSystem cs) {
 		assert cs != null;
@@ -24,7 +24,8 @@ final class RenderingAttributeGenerator implements AttributeGenerator<String> {
 				this.constraintSystem);
 	}
 
-	protected static RenderingAttributeGenerator getInstance(ConstraintSystem cs) {
+	protected synchronized static RenderingAttributeGenerator getInstance(
+			ConstraintSystem cs) {
 		if (instance == null) {
 			instance = new RenderingAttributeGenerator(cs);
 		}

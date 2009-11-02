@@ -104,7 +104,7 @@ public class VariableListItem implements MListItem, OPPLMacroStatusChange {
 		final VerifyingOptionPane optionPane = new VerifyingOptionPane(
 				scopeEditor) {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 7217535942418544769L;
 

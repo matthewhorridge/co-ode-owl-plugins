@@ -33,7 +33,7 @@ public class ShortFormVariableOWLEntityRenderer implements OWLEntityRenderer {
 	private static final SimpleShortFormProvider SHORT_FORM_PROVIDER = new SimpleShortFormProvider();
 
 	public String render(OWLEntity entity) {
-		Variable variable = this.getConstraintSystem().getVariable(
+		Variable variable = getConstraintSystem().getVariable(
 				entity.getURI());
 		return variable != null ? variable.getName() : SHORT_FORM_PROVIDER
 				.getShortForm(entity);

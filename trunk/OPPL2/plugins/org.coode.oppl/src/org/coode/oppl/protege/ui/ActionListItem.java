@@ -31,7 +31,7 @@ import org.semanticweb.owl.model.OWLAxiomChange;
  * 
  */
 public class ActionListItem implements MListItem {
-	private OWLAxiomChange axiomChange;
+	private final OWLAxiomChange axiomChange;
 	private final boolean isDeleteable;
 	private final boolean isEditable;
 
@@ -45,9 +45,6 @@ public class ActionListItem implements MListItem {
 		this.isEditable = isEditable;
 	}
 
-	/**
-	 * @see org.protege.editor.core.ui.list.MListItem#getTooltip()
-	 */
 	public String getTooltip() {
 		String addOrRemove = this.axiomChange instanceof AddAxiom ? "ADD "
 				: "REMOVE ";

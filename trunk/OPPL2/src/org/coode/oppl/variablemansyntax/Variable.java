@@ -30,10 +30,10 @@ import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLObject;
 
 /**
- * This interface represents a generic Variable. When possible developers should
- * implement either {@link InputVariable} or extend {@link GeneratedVariable} in
- * order to use {@link Variable.VariableVisitor}
+ * Any variable not generated implements this interface; generated variables
+ * implement Variable
  * 
+ * @see GeneratedVariable
  * 
  * @author Luigi Iannone
  * 

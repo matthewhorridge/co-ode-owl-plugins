@@ -37,9 +37,9 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
  * 
  */
 public class InequalityConstraint implements AbstractConstraint {
-	private Variable variable;
-	private OWLObject expression;
-	private ConstraintSystem constraintSystem;
+	private final Variable variable;
+	private final OWLObject expression;
+	private final ConstraintSystem constraintSystem;
 
 	/**
 	 * @param variable

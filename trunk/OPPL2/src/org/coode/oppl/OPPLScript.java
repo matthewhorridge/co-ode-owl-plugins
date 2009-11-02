@@ -25,7 +25,6 @@ package org.coode.oppl;
 import java.util.List;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.InputVariable;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLAxiomChange;
 
@@ -46,7 +45,7 @@ public interface OPPLScript {
 	/**
 	 * @return the List of the InputVariable elements
 	 */
-	public List<InputVariable> getInputVariables();
+	public List<Variable> getInputVariables();
 
 	/**
 	 * @return the ConstraintSystem used by this OPPLScript

@@ -47,7 +47,6 @@ public class ActionFactory {
 			OWLAxiom axiom, ConstraintSystem cs, OWLOntology ontology) {
 		Set<OWLAxiomChange> toReturn = new HashSet<OWLAxiomChange>();
 		Set<BindingNode> leaves = cs.getLeaves();
-		OWLAxiomChange axiomChange = null;
 		if (leaves != null) {
 			for (BindingNode bindingNode : leaves) {
 				PartialOWLObjectInstantiator instatiator = new PartialOWLObjectInstantiator(
@@ -56,29 +55,27 @@ public class ActionFactory {
 						.accept(instatiator);
 				switch (actionType) {
 					case ADD:
-						axiomChange = new AddAxiom(ontology, instantiatedAxiom);
+						toReturn.add(new AddAxiom(ontology, instantiatedAxiom));
 						break;
 					case REMOVE:
-						axiomChange = new RemoveAxiom(ontology,
-								instantiatedAxiom);
+						toReturn.add(new RemoveAxiom(ontology,
+								instantiatedAxiom));
 						break;
 					default:
 						break;
 				}
-				toReturn.add(axiomChange);
 			}
 		} else if (cs.getAxiomVariables(axiom).isEmpty()) {
 			switch (actionType) {
 				case ADD:
-					axiomChange = new AddAxiom(ontology, axiom);
+					toReturn.add(new AddAxiom(ontology, axiom));
 					break;
 				case REMOVE:
-					axiomChange = new RemoveAxiom(ontology, axiom);
+					toReturn.add(new RemoveAxiom(ontology, axiom));
 					break;
 				default:
 					break;
 			}
-			toReturn.add(axiomChange);
 		}
 		return new ArrayList<OWLAxiomChange>(toReturn);
 	}

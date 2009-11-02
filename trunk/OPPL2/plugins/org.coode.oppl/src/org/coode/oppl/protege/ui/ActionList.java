@@ -51,7 +51,7 @@ public class ActionList extends MList {
 	private final OWLEditorKit owlEditorKit;
 	private final boolean canAdd;
 
-	protected ActionList(OWLEditorKit owlEditorKit,
+	public ActionList(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem, boolean canAdd) {
 		this.owlEditorKit = owlEditorKit;
 		setModel(new ActionListModel(canAdd));
@@ -81,7 +81,7 @@ public class ActionList extends MList {
 	private static class ActionBorder implements Border {
 		private static final String REMOVE = "Remove";
 		private static final String ADD = "Add";
-		private OWLAxiomChange axiomChange;
+		private final OWLAxiomChange axiomChange;
 
 		ActionBorder(OWLAxiomChange axiomChange) {
 			this.axiomChange = axiomChange;
@@ -117,7 +117,7 @@ public class ActionList extends MList {
 				constraintSystem, new OWLCellRenderer(this.owlEditorKit)));
 	}
 
-	protected void clear() {
+	public void clear() {
 		setModel(new ActionListModel(this.canAdd));
 	}
 }

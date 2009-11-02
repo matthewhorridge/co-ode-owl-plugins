@@ -33,6 +33,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -70,17 +71,17 @@ public class OPPLCompleter {
 	private static final Logger LOGGER = Logger.getLogger(OPPLCompleter.class
 			.getName());
 	private static final int DEFAULT_MAX_ENTRIES = 100;
-	private OWLEditorKit owlEditorKit;
+	private final OWLEditorKit owlEditorKit;
 	protected JTextComponent textComponent;
-	private KeyListener keyListener;
-	private Set<String> wordDelimeters;
+	private final KeyListener keyListener;
+	private final Set<String> wordDelimeters;
 	// private AutoCompleterMatcher matcher;
-	private JList popupList;
+	private final JList popupList;
 	protected JWindow popupWindow;
 	private static final int POPUP_WIDTH = 350;
 	private static final int POPUP_HEIGHT = 300;
 	protected String lastTextUpdate = "*";
-	private int maxEntries = DEFAULT_MAX_ENTRIES;
+	private final int maxEntries = DEFAULT_MAX_ENTRIES;
 
 	public OPPLCompleter(OWLEditorKit owlEditorKit, JTextComponent tc,
 			OWLExpressionChecker checker) {
@@ -95,35 +96,21 @@ public class OPPLCompleter {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() != KeyEvent.VK_UP
-						&& e.getKeyCode() != KeyEvent.VK_DOWN) {
-					if (OPPLCompleter.this.popupWindow.isVisible()
-							&& !OPPLCompleter.this.lastTextUpdate
-									.equals(OPPLCompleter.this.textComponent
-											.getText())) {
-						OPPLCompleter.this.lastTextUpdate = OPPLCompleter.this.textComponent
-								.getText();
-						OPPLCompleter.this.updatePopup(OPPLCompleter.this
-								.getMatches());
-					}
+						&& e.getKeyCode() != KeyEvent.VK_DOWN
+						&& OPPLCompleter.this.popupWindow.isVisible()
+						&& !OPPLCompleter.this.lastTextUpdate
+								.equals(OPPLCompleter.this.textComponent
+										.getText())) {
+					OPPLCompleter.this.lastTextUpdate = OPPLCompleter.this.textComponent
+							.getText();
+					OPPLCompleter.this.updatePopup(OPPLCompleter.this
+							.getMatches());
 				}
 			}
 		};
 		this.textComponent.addKeyListener(this.keyListener);
-		this.wordDelimeters = new HashSet<String>();
-		this.wordDelimeters.add(" ");
-		this.wordDelimeters.add("\n");
-		this.wordDelimeters.add("[");
-		this.wordDelimeters.add("]");
-		this.wordDelimeters.add("{");
-		this.wordDelimeters.add("}");
-		this.wordDelimeters.add("(");
-		this.wordDelimeters.add(")");
-		this.wordDelimeters.add(",");
-		this.wordDelimeters.add("^");
-		this.wordDelimeters.add(":");
-		this.wordDelimeters.add("]");
-		this.wordDelimeters.add("[");
-		this.wordDelimeters.add(",");
+		this.wordDelimeters = new HashSet<String>(Arrays.asList(" ", "\n", "[",
+				"]", "{", "}", "(", ")", ",", "^", ":", "]", "[", ","));
 		for (VariableType variableType : EnumSet.allOf(VariableType.class)) {
 			this.wordDelimeters.add(variableType.toString());
 		}

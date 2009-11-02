@@ -38,9 +38,10 @@ import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.rendering.VariableOWLEntityRenderer;
+import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.ProtegeScopeVariableChecker;
 import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.ProtegeScopeVariableChecker;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.expression.OWLEntityChecker;
@@ -161,7 +162,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 						.preview(type, shortName, baseURI);
 				return this.convert(protegeCreationSet);
 			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e.getMessage());
+				throw new OWLEntityCreationException(e);
 			}
 		}
 
@@ -212,10 +213,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	 */
 	public org.coode.oppl.entity.OWLEntityRenderer getOWLEntityRenderer(
 			ConstraintSystem cs) {
-		if (cs == null) {
-			throw new IllegalArgumentException(
-					"The constraint system cannot be null");
-		}
+		ArgCheck.checkNullArgument("The constraint system", cs);
 		return new VariableOWLEntityRenderer(cs, this.entityRenderer);
 	}
 
@@ -280,10 +278,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	 */
 	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer(
 			ConstraintSystem cs) {
-		if (cs == null) {
-			throw new IllegalArgumentException(
-					"The constraint system cannot be null");
-		}
+		ArgCheck.checkNullArgument("The constraint system", cs);
 		return new ManchesterSyntaxRenderer(this.modelManager
 				.getOWLOntologyManager(), getOWLEntityRenderer(cs), cs);
 	}

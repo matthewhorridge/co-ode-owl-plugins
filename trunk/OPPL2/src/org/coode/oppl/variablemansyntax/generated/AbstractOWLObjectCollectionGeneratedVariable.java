@@ -37,10 +37,41 @@ import org.semanticweb.owl.model.OWLObjectUnionOf;
  * 
  */
 public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWLObject>
-		extends GeneratedVariable<Collection<P>> {
-	private static final class ConcreteImpl extends
+		extends AbstractGeneratedVariable<Collection<P>> {
+	private static final class DisjunctionImpl extends
 			AbstractOWLObjectCollectionGeneratedVariable<OWLClass> {
-		ConcreteImpl(String name, VariableType type,
+		DisjunctionImpl(String name, VariableType type,
+				GeneratedValue<Collection<OWLClass>> value,
+				OWLDataFactory dataFactory) {
+			super(name, type, value, dataFactory);
+		}
+
+		@Override
+		protected OWLObjectUnionOf generateObject(
+				Collection<OWLClass> generatedValue) {
+			return generatedValue == null ? null : getDataFactory()
+					.getOWLObjectUnionOf(new HashSet<OWLClass>(generatedValue));
+		}
+
+		@Override
+		public String toString() {
+			return getName() + ":" + getType() + " = " + this.getOPPLFunction();
+		}
+
+		@Override
+		protected AbstractGeneratedVariable<Collection<OWLClass>> replace(
+				GeneratedValue<Collection<OWLClass>> value1) {
+			return replaceValue(true, value1);
+		}
+
+		public String getOPPLFunction() {
+			return "createUnion(" + getValue().toString() + ")";
+		}
+	}
+
+	private static final class ConjunctionImpl extends
+			AbstractOWLObjectCollectionGeneratedVariable<OWLClass> {
+		ConjunctionImpl(String name, VariableType type,
 				GeneratedValue<Collection<OWLClass>> value,
 				OWLDataFactory dataFactory) {
 			super(name, type, value, dataFactory);
@@ -60,12 +91,11 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 		}
 
 		@Override
-		protected GeneratedVariable<Collection<OWLClass>> replace(
+		protected AbstractGeneratedVariable<Collection<OWLClass>> replace(
 				GeneratedValue<Collection<OWLClass>> value1) {
-			return this.replaceValue(false, value1);
+			return replaceValue(false, value1);
 		}
 
-		@Override
 		public String getOPPLFunction() {
 			return "createIntersection(" + getValue().toString() + ")";
 		}
@@ -83,44 +113,18 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 	@Override
 	protected abstract OWLObject generateObject(Collection<P> generatedValue);
 
-	public static GeneratedVariable<Collection<OWLClass>> getConjunction(
+	public static AbstractGeneratedVariable<Collection<OWLClass>> getConjunction(
 			String name, VariableType type,
 			GeneratedValue<Collection<OWLClass>> value,
 			OWLDataFactory dataFactory) {
-		return new ConcreteImpl(name, type, value, dataFactory);
+		return new ConjunctionImpl(name, type, value, dataFactory);
 	}
 
-	public static GeneratedVariable<Collection<OWLClass>> getDisjunction(
+	public static AbstractGeneratedVariable<Collection<OWLClass>> getDisjunction(
 			String name, VariableType type,
 			GeneratedValue<Collection<OWLClass>> value,
 			OWLDataFactory dataFactory) {
-		return new AbstractOWLObjectCollectionGeneratedVariable<OWLClass>(name,
-				type, value, dataFactory) {
-			@Override
-			protected OWLObjectUnionOf generateObject(
-					Collection<OWLClass> generatedValue) {
-				return generatedValue == null ? null : getDataFactory()
-						.getOWLObjectUnionOf(
-								new HashSet<OWLClass>(generatedValue));
-			}
-
-			@Override
-			public String toString() {
-				return getName() + ":" + getType() + " = "
-						+ this.getOPPLFunction();
-			}
-
-			@Override
-			protected GeneratedVariable<Collection<OWLClass>> replace(
-					GeneratedValue<Collection<OWLClass>> value1) {
-				return this.replaceValue(true, value1);
-			}
-
-			@Override
-			public String getOPPLFunction() {
-				return "createUnion(" + getValue().toString() + ")";
-			}
-		};
+		return new DisjunctionImpl(name, type, value, dataFactory);
 	}
 
 	/**
@@ -130,7 +134,7 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 		return this.dataFactory;
 	}
 
-	protected GeneratedVariable<Collection<OWLClass>> replaceValue(
+	protected AbstractGeneratedVariable<Collection<OWLClass>> replaceValue(
 			boolean isUnion, GeneratedValue<Collection<OWLClass>> value) {
 		return isUnion ? getDisjunction(getName(), getType(), value, this
 				.getDataFactory()) : getConjunction(getName(), getType(),

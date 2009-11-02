@@ -47,7 +47,7 @@ import org.semanticweb.owl.model.OWLException;
  */
 public abstract class OPPLScriptInstantiationEditor<P extends InstantiatedOPPLScript>
 		implements VerifiedInputEditor, InputVerificationStatusChangedListener {
-	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
+	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	protected ExpressionEditor<P> editor;
 	protected OWLEditorKit owlEditorKit;
 	protected JPanel mainPane = new JPanel(new BorderLayout());
@@ -60,7 +60,7 @@ public abstract class OPPLScriptInstantiationEditor<P extends InstantiatedOPPLSc
 		this.init();
 	}
 
-	protected final void init() {
+	protected void init() {
 		this.editor = this.getScriptExpressionEditor();
 		// will go away when the completer will be removed from the expression
 		// editor
@@ -73,7 +73,7 @@ public abstract class OPPLScriptInstantiationEditor<P extends InstantiatedOPPLSc
 	protected abstract ExpressionEditor<P> getScriptExpressionEditor();
 
 	/**
-	 * 
+	 *
 	 */
 	private void removeKeyListeners() {
 		KeyListener[] keyListeners = this.editor.getKeyListeners();

@@ -35,11 +35,11 @@ public class XQueryAxiomRenderer extends OWLXMLObjectRenderer {
 	@Override
 	public void visit(OWLClass desc) {
 		if (this.constraintSystem.isVariable(desc)) {
-			Variable variable = this.constraintSystem
-					.getVariable(desc.getURI());
+			Variable variable = this.constraintSystem.getVariable(desc
+					.getURI());
 			this.writer.writeStartElement(CLASS.getURI());
 			this.writer.writeNameAttribute(URI.create("("
-					+ this.getVariableReference(variable) + ")"));
+					+ getVariableReference(variable) + ")"));
 			this.writer.writeEndElement();
 		} else {
 			super.visit(desc);
@@ -62,7 +62,7 @@ public class XQueryAxiomRenderer extends OWLXMLObjectRenderer {
 			this.writer.writeStartElement(OWLXMLVocabulary.DATA_PROPERTY
 					.getURI());
 			this.writer.writeNameAttribute(URI.create("("
-					+ this.getVariableReference(variable) + ")"));
+					+ getVariableReference(variable) + ")"));
 			this.writer.writeEndElement();
 		} else {
 			super.visit(property);
@@ -76,11 +76,11 @@ public class XQueryAxiomRenderer extends OWLXMLObjectRenderer {
 	@Override
 	public void visit(OWLIndividual individual) {
 		if (this.constraintSystem.isVariable(individual)) {
-			Variable variable = this.constraintSystem.getVariable(individual
-					.getURI());
+			Variable variable = this.constraintSystem
+					.getVariable(individual.getURI());
 			this.writer.writeStartElement(OWLXMLVocabulary.INDIVIDUAL.getURI());
 			this.writer.writeNameAttribute(URI.create("("
-					+ this.getVariableReference(variable) + ")"));
+					+ getVariableReference(variable) + ")"));
 			this.writer.writeEndElement();
 		} else {
 			super.visit(individual);
@@ -99,7 +99,7 @@ public class XQueryAxiomRenderer extends OWLXMLObjectRenderer {
 			this.writer.writeStartElement(OWLXMLVocabulary.OBJECT_PROPERTY
 					.getURI());
 			this.writer.writeNameAttribute(URI.create("("
-					+ this.getVariableReference(variable) + ")"));
+					+ getVariableReference(variable) + ")"));
 			this.writer.writeEndElement();
 		} else {
 			super.visit(property);
@@ -117,8 +117,8 @@ public class XQueryAxiomRenderer extends OWLXMLObjectRenderer {
 					.getLiteral());
 			this.writer.writeStartElement(URI.create(Namespaces.OWL2XML
 					+ "Literal"));
-			this.writer.writeTextContent("("
-					+ this.getVariableReference(variable) + ")");
+			this.writer.writeTextContent("(" + getVariableReference(variable)
+					+ ")");
 			this.writer.writeEndElement();
 		} else {
 			super.visit(node);
@@ -136,8 +136,8 @@ public class XQueryAxiomRenderer extends OWLXMLObjectRenderer {
 					.getLiteral());
 			this.writer.writeStartElement(URI.create(Namespaces.OWL2XML
 					+ "Literal"));
-			this.writer.writeTextContent("("
-					+ this.getVariableReference(variable) + ")");
+			this.writer.writeTextContent("(" + getVariableReference(variable)
+					+ ")");
 			this.writer.writeEndElement();
 		} else {
 			super.visit(node);

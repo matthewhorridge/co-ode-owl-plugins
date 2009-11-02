@@ -33,7 +33,7 @@ import org.semanticweb.owl.util.SimpleURIShortFormProvider;
  * 
  */
 public class SimpleVariableShortFormProvider implements ShortFormProvider {
-	private SimpleURIShortFormProvider uriShortFormProvider = new SimpleURIShortFormProvider();
+	private final SimpleURIShortFormProvider uriShortFormProvider = new SimpleURIShortFormProvider();
 	protected ConstraintSystem constraintSystem;
 
 	/**
@@ -57,7 +57,8 @@ public class SimpleVariableShortFormProvider implements ShortFormProvider {
 		String toReturn = this.uriShortFormProvider.getShortForm(entity
 				.getURI());
 		if (this.constraintSystem != null) {
-			Variable v = this.constraintSystem.getVariable(entity.getURI());
+			Variable v = this.constraintSystem
+					.getVariable(entity.getURI());
 			if (v != null) {
 				toReturn = v.getName();
 			}

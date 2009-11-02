@@ -41,6 +41,8 @@ public class OWLObjectInstantiator extends AbstractOWLObjectInstantiator {
 	public OWLObject visit(OWLTypedConstant node) {
 		OWLConstant toReturn = node;
 		if (this.constraintSystem.isVariable(node)) {
+			// XXX the other OwlOBjectInstantiator uses getLiteral - is this the
+			// same?
 			Variable variable = this.constraintSystem.getVariable(node
 					.toString());
 			toReturn = (OWLConstant) this.bindingNode

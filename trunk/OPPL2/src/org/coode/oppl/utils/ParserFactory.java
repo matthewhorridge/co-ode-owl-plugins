@@ -39,14 +39,14 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 public class ParserFactory {
 	static OPPLParser parser = null;
 
-	public static OPPLParser initParser(String formulaBody,
+	public static synchronized OPPLParser initParser(String formulaBody,
 			OWLOntology ontology, OWLOntologyManager ontologyManager,
 			OWLReasoner reasoner) {
 		return initParser(formulaBody, ontology, ontologyManager, reasoner,
 				null);
 	}
 
-	public static OPPLParser initParser(String formulaBody,
+	public static synchronized OPPLParser initParser(String formulaBody,
 			OWLOntology ontology, OWLOntologyManager ontologyManager,
 			OWLReasoner reasoner, OPPLScriptValidator validator) {
 		if (parser == null) {

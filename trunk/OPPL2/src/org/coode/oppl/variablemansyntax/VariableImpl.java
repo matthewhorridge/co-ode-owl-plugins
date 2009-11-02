@@ -33,7 +33,7 @@ import org.semanticweb.owl.model.OWLObject;
  * @author Luigi Iannone
  * 
  */
-public final class VariableImpl implements InputVariable {
+public final class VariableImpl implements Variable {
 	protected String name;
 	protected VariableType type;
 	protected Set<OWLObject> possibleBindings = new HashSet<OWLObject>();
@@ -76,7 +76,7 @@ public final class VariableImpl implements InputVariable {
 
 	@Override
 	public String toString() {
-		return this.name + ":" + this.getType();
+		return this.name + ":" + getType();
 	}
 
 	public Set<OWLObject> getPossibleBindings() {
@@ -95,7 +95,7 @@ public final class VariableImpl implements InputVariable {
 
 	@Override
 	public int hashCode() {
-		return this.getName().hashCode();
+		return getName().hashCode();
 	}
 
 	public void clearBindings() {
@@ -116,9 +116,6 @@ public final class VariableImpl implements InputVariable {
 		return visitor.visit(this);
 	}
 
-	/**
-	 * @see org.coode.oppl.variablemansyntax.Variable#accept(org.coode.oppl.variablemansyntax.Variable.PlainVariableVisitor)
-	 */
 	public void accept(PlainVariableVisitor visitor) {
 		visitor.visit(this);
 	}

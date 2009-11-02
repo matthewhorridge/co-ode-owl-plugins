@@ -211,6 +211,27 @@ public class ExhaustingTestCase extends AbstractTestCase {
 		execute(result);
 	}
 
+	// public void testRegExp() {
+	// OPPLScript result = parse("?island:CLASS=Match(\"[iI]sland\");");
+	// expectedCorrect(result);
+	// execute(result);
+	// result = parse("?island:CLASS=Match(\"[iI]s*land\");");
+	// expectedCorrect(result);
+	// execute(result);
+	// result = parse("?island:CLASS=Match(\"[iI]s**land\");");
+	// assertNull("the reg expr is broken, should not be allowed", result);
+	// checkProperStackTrace("Encountered [iI]s**land", 22);
+	// }
+	public void testRegExpConstraints() {
+		String correct = "?island:CLASS SELECT ASSERTED ?island subClassOf Thing WHERE ?island Match";
+		OPPLScript result = parse(correct + " \"Island\";");
+		expectedCorrect(result);
+		execute(result);
+		result = parse(correct + " \"Is**land\";");
+		assertNull("the reg expr is broken, should not be allowed", result);
+		checkProperStackTrace("Encountered Is**land", correct.length());
+	}
+
 	public void testRobertsScripts1() {
 		String script = "?island:INDIVIDUAL[instanceOf Island],\n"
 				+ "?height:CONSTANT\n"

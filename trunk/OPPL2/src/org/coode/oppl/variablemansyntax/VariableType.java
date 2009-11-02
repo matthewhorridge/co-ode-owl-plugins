@@ -188,7 +188,7 @@ public enum VariableType implements OWLEntityVisitorEx<VariableType> {
 	}
 
 	static class CompatibilityChecker implements OWLEntityVisitorEx<Boolean> {
-		private VariableType variableType;
+		private final VariableType variableType;
 
 		/**
 		 * @param variableType

@@ -10,12 +10,12 @@ import java.util.Set;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.generated.AbstractCollectionGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.Attribute;
-import org.coode.oppl.variablemansyntax.generated.CollectionGeneratedValue;
 import org.semanticweb.owl.model.OWLObject;
 
 public class OWLObjectCollectionGeneratedValue extends
-		CollectionGeneratedValue<OWLObject> {
+		AbstractCollectionGeneratedValue<OWLObject> {
 	private final ConstraintSystem constraintSystem;
 
 	public OWLObjectCollectionGeneratedValue(Variable variable,
@@ -25,7 +25,6 @@ public class OWLObjectCollectionGeneratedValue extends
 		this.constraintSystem = constraintSystem2;
 	}
 
-	@Override
 	public Collection<OWLObject> getGeneratedValue(BindingNode node) {
 		Set<OWLObject> toReturn = null;
 		Set<BindingNode> leaves = this.constraintSystem.getLeaves();
@@ -42,8 +41,7 @@ public class OWLObjectCollectionGeneratedValue extends
 		return toReturn;
 	}
 
-	@Override
-	public List<Collection<OWLObject>> getGeneratedValues() {
+	public List<Collection<OWLObject>> computePossibleValues() {
 		List<Collection<OWLObject>> toReturn = new ArrayList<Collection<OWLObject>>();
 		Collection<OWLObject> generatedValue = getGeneratedValue(null);
 		if (generatedValue != null) {

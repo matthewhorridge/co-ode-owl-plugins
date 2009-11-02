@@ -121,7 +121,7 @@ public class OPPLSelectClauseList extends MList {
 
 	private class OPPLSelectListItemCellRederer implements ListCellRenderer {
 		private final DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
-		private VariableOWLCellRenderer variableAxiomRenderer = new VariableOWLCellRenderer(
+		private final VariableOWLCellRenderer variableAxiomRenderer = new VariableOWLCellRenderer(
 				OPPLSelectClauseList.this.owlEditorKit,
 				OPPLSelectClauseList.this.constraintSystem,
 				new OWLCellRenderer(OPPLSelectClauseList.this.owlEditorKit));

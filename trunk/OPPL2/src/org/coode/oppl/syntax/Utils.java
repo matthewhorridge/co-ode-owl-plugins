@@ -22,12 +22,16 @@
  */
 package org.coode.oppl.syntax;
 
+import java.util.Collections;
+
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.VariableExpressionGeneratedVariable;
 import org.semanticweb.owl.expression.ParserException;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
 /**
@@ -48,7 +52,17 @@ public class Utils {
 		return test;
 	}
 
-	protected static String readString(int... delimiterTokenKinds) {
+	public static ParserException buildException(String expression,
+			int beginningSubSection, int beginningSubSectionLine, Exception e) {
+		ParserException test = new ParserException(expression + "\n"
+				+ e.getMessage(), beginningSubSection, beginningSubSectionLine,
+				beginningSubSection, false, false, false, false, false,
+				Collections.EMPTY_SET);
+		return test;
+	}
+
+	protected static String readString(boolean spaceTokens,
+			int... delimiterTokenKinds) {
 		StringBuilder toReturn = new StringBuilder();
 		boolean found = false;
 		while (!found) {
@@ -59,14 +73,17 @@ public class Utils {
 			}
 			if (!found) {
 				toReturn.append(token.image);
-				toReturn.append(" ");
+				if (spaceTokens) {
+					toReturn.append(" ");
+				}
 				OPPLParser.getNextToken();
 			}
 		}
+		System.out.println();
 		return toReturn.toString();
 	}
 
-	protected static Variable parseVariableExpressionGeneratedVariable(
+	protected static GeneratedVariable<OWLObject> parseVariableExpressionGeneratedVariable(
 			String name, VariableType type, String string,
 			ConstraintSystem constraintSystem) throws ParserException {
 		VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(
@@ -90,11 +107,20 @@ public class Utils {
 				break;
 			default:
 				throw new IllegalArgumentException("Unsupported type: "
-						+ type.toString());
+						+ type.name());
 		}
 		VariableExpressionGeneratedVariable variableExpressionGeneratedVariable = new VariableExpressionGeneratedVariable(
 				name, owlObject, constraintSystem);
 		constraintSystem.importVariable(variableExpressionGeneratedVariable);
 		return variableExpressionGeneratedVariable;
+	}
+
+	protected static GeneratedVariable<OWLEntity> parseRegexpGeneratedVariable(
+			String name, VariableType type, String string,
+			ConstraintSystem constraintSystem) throws ParserException {
+		RegExpGeneratedVariable v = new RegExpGeneratedVariable(name, type,
+				constraintSystem, string);
+		constraintSystem.importVariable(v);
+		return v;
 	}
 }

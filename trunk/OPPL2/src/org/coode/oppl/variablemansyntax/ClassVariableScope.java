@@ -29,14 +29,14 @@ import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObject;
 
 /**
- * Represents a range limitations that could be added to a {@link Variable}
+ * Represents a range limitations that could be added to a {@link GeneratedVariable}
  * instance with CLASS {@link VariableType}
  * 
  * @author Luigi Iannone
  * 
  */
 public abstract class ClassVariableScope implements VariableScope {
-	private OWLDescription description;
+	private final OWLDescription description;
 	private static Map<OWLDescription, SuperClassVariableScope> superClassesScopes = new HashMap<OWLDescription, SuperClassVariableScope>();
 	private static Map<OWLDescription, SubClassVariableScope> subClassesScopes = new HashMap<OWLDescription, SubClassVariableScope>();
 

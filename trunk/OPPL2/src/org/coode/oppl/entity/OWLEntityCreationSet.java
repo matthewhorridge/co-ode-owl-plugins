@@ -19,8 +19,8 @@ import org.semanticweb.owl.model.OWLOntologyChange;
  * <br>
  */
 public class OWLEntityCreationSet<E extends OWLEntity> {
-	private E owlEntity;
-	private List<OWLOntologyChange> changes;
+	private final E owlEntity;
+	private final List<OWLOntologyChange> changes;
 
 	public OWLEntityCreationSet(E owlEntity,
 			List<? extends OWLOntologyChange> changes) {
@@ -30,15 +30,15 @@ public class OWLEntityCreationSet<E extends OWLEntity> {
 
 	public OWLEntityCreationSet(E owlEntity, OWLOntology ontology) {
 		this.owlEntity = owlEntity;
-		changes = new ArrayList<OWLOntologyChange>();
+		this.changes = new ArrayList<OWLOntologyChange>();
 		// changes.add(new AddEntity(ontology, owlEntity, null));
 	}
 
 	public E getOWLEntity() {
-		return owlEntity;
+		return this.owlEntity;
 	}
 
 	public List<? extends OWLOntologyChange> getOntologyChanges() {
-		return changes;
+		return this.changes;
 	}
 }

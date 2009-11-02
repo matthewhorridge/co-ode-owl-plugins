@@ -8,8 +8,8 @@ import org.semanticweb.owl.model.OWLAxiom;
  * 
  */
 public class OPPLSelectClauseListItem implements MListItem {
-	private boolean asserted;
-	private OWLAxiom axiom;
+	private final boolean asserted;
+	private final OWLAxiom axiom;
 
 	/**
 	 * @param asserted
@@ -24,7 +24,7 @@ public class OPPLSelectClauseListItem implements MListItem {
 	 * @see org.protege.editor.core.ui.list.MListItem#getTooltip()
 	 */
 	public String getTooltip() {
-		String isAsserted = this.isAsserted() ? "ASSERTED " : "";
+		String isAsserted = isAsserted() ? "ASSERTED " : "";
 		StringBuffer buffer = new StringBuffer(isAsserted);
 		return buffer.toString();
 	}

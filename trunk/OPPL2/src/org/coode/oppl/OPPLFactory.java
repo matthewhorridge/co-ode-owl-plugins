@@ -34,6 +34,7 @@ import org.coode.oppl.entity.OWLEntityRendererImpl;
 import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.rendering.VariableOWLEntityRenderer;
+import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
@@ -72,10 +73,9 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		 * @return
 		 */
 		private URI buildURI(String shortName) {
-			URI uri = getConstraintSystem().getOntology().getURI();
-			String baseURIString = uri.toString();
-			URI owlClassURI = URI.create(baseURIString + "#" + shortName);
-			return owlClassURI;
+			return URI.create(getConstraintSystem().getOntology().getURI()
+					.toString()
+					+ "#" + shortName);
 		}
 
 		public OWLEntityCreationSet<OWLClass> createOWLClass(String shortName,
@@ -191,11 +191,11 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		}
 	}
 
-	private OWLOntologyManager ontologyManager;
+	private final OWLOntologyManager ontologyManager;
 	protected ConstraintSystem constraintSystem;
 	private VariableScopeChecker variableScopeChecker = null;
-	private OWLReasoner reasoner = null;
-	private OWLOntology ontology;
+	private final OWLReasoner reasoner;
+	private final OWLOntology ontology;
 
 	/**
 	 * @param ontologyManager
@@ -235,10 +235,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	}
 
 	public OWLEntityRenderer getOWLEntityRenderer(ConstraintSystem cs) {
-		if (cs == null) {
-			throw new IllegalArgumentException(
-					"The constraint system cannot be null");
-		}
+		ArgCheck.checkNullArgument("The constraint system", cs);
 		OWLEntityRendererImpl defaultRenderer = new OWLEntityRendererImpl();
 		return new VariableOWLEntityRenderer(cs, defaultRenderer);
 	}
@@ -293,10 +290,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 
 	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer(
 			ConstraintSystem cs) {
-		if (cs == null) {
-			throw new IllegalArgumentException(
-					"The constraint system cannot be null");
-		}
+		ArgCheck.checkNullArgument("The constraint system", cs);
 		return new ManchesterSyntaxRenderer(this.ontologyManager,
 				getOWLEntityRenderer(cs), cs);
 	}

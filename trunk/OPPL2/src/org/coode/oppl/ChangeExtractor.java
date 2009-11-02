@@ -56,6 +56,14 @@ public class ChangeExtractor implements
 		this.considerImportClosure = considerImportClosure;
 	}
 
+	public OWLOntologyManager getOntologyManager() {
+		return this.ontologyManager;
+	}
+
+	public OWLOntology getOntology() {
+		return this.ontology;
+	}
+
 	public List<OWLAxiomChange> visit(OPPLQuery q, List<OWLAxiomChange> p) {
 		// if (q != null) {
 		// q.getConstraintSystem().reset();

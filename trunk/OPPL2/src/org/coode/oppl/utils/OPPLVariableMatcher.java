@@ -52,7 +52,8 @@ public class OPPLVariableMatcher {
 			boolean matchObjectProperties, boolean matchDataProperties,
 			boolean matchIndividuals, boolean matchConstants) {
 		Set<Variable> variables = constraintSystem.getVariables();
-		Set<Variable> toReturn = new HashSet<Variable>(variables.size());
+		Set<Variable> toReturn = new HashSet<Variable>(variables
+				.size());
 		for (Variable variable : variables) {
 			switch (variable.getType()) {
 				case CLASS:
@@ -81,6 +82,8 @@ public class OPPLVariableMatcher {
 					if (matchConstants && variable.getName().startsWith(name)) {
 						toReturn.add(variable);
 					}
+					break;
+				default:
 					break;
 			}
 		}

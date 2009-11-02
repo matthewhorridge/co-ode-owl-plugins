@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.coode.oppl.entity.OWLEntityRenderer;
+import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.protege.editor.owl.ui.renderer.OWLRendererPreferences;
@@ -59,7 +60,7 @@ import org.semanticweb.owl.util.URIShortFormProvider;
  */
 public class ManchesterSyntaxRenderer extends AbstractRenderer {
 	private final OWLOntologyManager ontologyManager;
-	private ConstraintSystem constraintSystem;
+	private final ConstraintSystem constraintSystem;
 
 	/**
 	 * Builds a renderer in Manchester OWL Syntax <b>non frame based</b>
@@ -76,18 +77,9 @@ public class ManchesterSyntaxRenderer extends AbstractRenderer {
 	 */
 	public ManchesterSyntaxRenderer(OWLOntologyManager ontologyManager,
 			OWLEntityRenderer entityRenderer, ConstraintSystem constraintSystem) {
-		if (ontologyManager == null) {
-			throw new IllegalArgumentException(
-					"The ontology manager cannot be null");
-		}
-		if (entityRenderer == null) {
-			throw new IllegalArgumentException(
-					"The entity renderer cannot be null");
-		}
-		if (constraintSystem == null) {
-			throw new IllegalArgumentException(
-					"The constraint system cannot be null");
-		}
+		ArgCheck.checkNullArgument("The ontology manager", ontologyManager);
+		ArgCheck.checkNullArgument("The entity renderer", entityRenderer);
+		ArgCheck.checkNullArgument("The constraint system", constraintSystem);
 		this.ontologyManager = ontologyManager;
 		this.entityRenderer = entityRenderer;
 		this.constraintSystem = constraintSystem;
@@ -237,9 +229,9 @@ public class ManchesterSyntaxRenderer extends AbstractRenderer {
 		for (Iterator<OWLDescription> it = node.getOperands().iterator(); it
 				.hasNext();) {
 			OWLDescription curOp = it.next();
-			this.writeOpenBracket(curOp);
+			writeOpenBracket(curOp);
 			curOp.accept(this);
-			this.writeCloseBracket(curOp);
+			writeCloseBracket(curOp);
 			if (it.hasNext()) {
 				write("\n");
 				insertIndent(indent);
@@ -250,7 +242,8 @@ public class ManchesterSyntaxRenderer extends AbstractRenderer {
 
 	public void visit(OWLUntypedConstant node) {
 		if (this.constraintSystem.isVariable(node)) {
-			Variable v = this.constraintSystem.getVariable(node.getLiteral());
+			Variable v = this.constraintSystem.getVariable(node
+					.getLiteral());
 			write(this.constraintSystem.render(v));
 		} else {
 			write("\"");

@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.ui.clsdescriptioneditor.ExpressionEditor;
@@ -23,6 +24,8 @@ public abstract class AbstractVariableEditor extends JPanel implements
 	protected ButtonGroup variableTypeButtonGroup;
 
 	public abstract void setVariable(Variable variable);
+
+	public abstract void setVariable(GeneratedVariable<?> variable);
 
 	protected abstract boolean check();
 
@@ -47,7 +50,7 @@ public abstract class AbstractVariableEditor extends JPanel implements
 		return this.variable;
 	}
 
-	protected abstract void dispose();
+	public abstract void dispose();
 
 	protected void clear() {
 		this.variableNameExpressionEditor.setText("");

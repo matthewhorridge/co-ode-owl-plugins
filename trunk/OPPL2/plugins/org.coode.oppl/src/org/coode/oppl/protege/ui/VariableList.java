@@ -45,7 +45,7 @@ import org.protege.editor.owl.OWLEditorKit;
 public class VariableList extends MList {
 	class VariableListCellRenderer extends DefaultListCellRenderer {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -6717057306871665492L;
 
@@ -57,7 +57,8 @@ public class VariableList extends MList {
 			JLabel label = (JLabel) super.getListCellRendererComponent(list,
 					value, index, isSelected, cellHasFocus);
 			if (value instanceof VariableListItem) {
-				Variable variable = ((VariableListItem) value).getVariable();
+				Variable variable = ((VariableListItem) value)
+						.getVariable();
 				VariableScope variableScope = variable.getVariableScope();
 				String variableScopeString = variableScope == null ? ""
 						: "["
@@ -88,7 +89,7 @@ public class VariableList extends MList {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 6135780833694887712L;
 	private final VariableListCellRenderer variableListCellRenderer = new VariableListCellRenderer();

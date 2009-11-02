@@ -28,6 +28,7 @@ import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.protege.editor.owl.OWLEditorKit;
@@ -51,10 +52,7 @@ public class BindingTreeRenderer extends OWLCellRenderer {
 
 	public BindingTreeRenderer(OWLEditorKit owlEditorKit, ConstraintSystem cs) {
 		super(owlEditorKit);
-		if (cs == null) {
-			throw new IllegalArgumentException(
-					"The constraint system cannot be null");
-		}
+		ArgCheck.checkNullArgument("The constraint system", cs);
 		this.constraintSystem = cs;
 	}
 

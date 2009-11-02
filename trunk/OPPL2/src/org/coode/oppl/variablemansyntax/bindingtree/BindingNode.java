@@ -30,7 +30,6 @@ import java.util.Set;
 import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.InputVariable;
 import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableVisitor;
@@ -47,7 +46,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 		public VariableInspector() {
 		}
 
-		public void visit(InputVariable v) {
+		public void visit(Variable v) {
 			BindingNode.this.unassignedVariables.add(v);
 		}
 
@@ -177,7 +176,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 		v.accept(new VariableInspector());
 	}
 
-	public OWLObject visit(InputVariable v) {
+	public OWLObject visit(Variable v) {
 		for (Assignment assignment : this.assignments) {
 			if (assignment.getAssignedVariable().equals(v)) {
 				return assignment.getAssignment();
@@ -187,16 +186,8 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	}
 
 	public OWLObject visit(GeneratedVariable<?> v) {
-		Iterator<Assignment> it = this.assignments.iterator();
-		boolean found = false;
-		OWLObject toReturn = null;
-		while (!found && it.hasNext()) {
-			Assignment assignment = it.next();
-			found = assignment.getAssignedVariable().getName().compareTo(
-					v.getName()) == 0;
-			toReturn = found ? assignment.getAssignment() : toReturn;
-		}
-		if (!found) {
+		OWLObject toReturn = visit((Variable) v);
+		if (toReturn == null) {
 			toReturn = v.getGeneratedOWLObject(this);
 		}
 		return toReturn;

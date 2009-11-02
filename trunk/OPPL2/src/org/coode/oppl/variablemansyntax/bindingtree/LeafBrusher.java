@@ -49,11 +49,10 @@ public class LeafBrusher implements BindingVisitor {
 						nodes)) {
 					if (!generatedChild.isLeaf()) {
 						nodes.remove(generatedChild);
-						Set<BindingNode> generatedChildren = this
-								.generateChildren(generatedChild);
+						Set<BindingNode> generatedChildren = generateChildren(generatedChild);
 						nodes.addAll(generatedChildren);
 					}
-					allLeaves = this.allLeaves(nodes);
+					allLeaves = allLeaves(nodes);
 				}
 			}
 			this.leaves = nodes;
@@ -86,7 +85,8 @@ public class LeafBrusher implements BindingVisitor {
 	private Set<BindingNode> generateChildren(BindingNode node) {
 		Set<BindingNode> toReturn = new HashSet<BindingNode>();
 		if (!node.isLeaf()) {
-			Set<Variable> unassignedVariables = node.getUnassignedVariables();
+			Set<Variable> unassignedVariables = node
+					.getUnassignedVariables();
 			for (Variable variable : unassignedVariables) {
 				Set<OWLObject> values = variable.getPossibleBindings();
 				for (OWLObject owlObject : values) {

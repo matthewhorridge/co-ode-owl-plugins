@@ -22,30 +22,15 @@
  */
 package org.coode.oppl.variablemansyntax.generated;
 
-import java.util.List;
-
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.generated.factory.AttributeFactory;
-import org.semanticweb.owl.model.OWLObject;
 
 /**
  * @author Luigi Iannone
  * 
  */
-public abstract class VariableGeneratedValue<N> implements GeneratedValue<N>,
-		GeneratedValues<N> {
-	public interface AttributeGenerator<N> {
-		/**
-		 * @author Luigi Iannone
-		 * 
-		 */
-		List<N> getValues(Variable aVariable);
-
-		N getValue(OWLObject object);
-	}
-
+public abstract class VariableGeneratedValue<N> implements GeneratedValue<N> {
 	private final Variable variable;
 	private final Attribute attribute;
 
@@ -57,10 +42,6 @@ public abstract class VariableGeneratedValue<N> implements GeneratedValue<N>,
 		this.variable = variable;
 		this.attribute = attribute;
 	}
-
-	public abstract List<N> getGeneratedValues();
-
-	public abstract N getGeneratedValue(BindingNode node);
 
 	@Override
 	public String toString() {
@@ -81,6 +62,7 @@ public abstract class VariableGeneratedValue<N> implements GeneratedValue<N>,
 		return this.variable;
 	}
 
+	// XXX bogus: why is v unused?
 	public VariableGeneratedValue<?> replaceVariable(Variable v,
 			ConstraintSystem constraintSystem) {
 		return AttributeFactory.getVariableGeneratedValue(this.attribute,
