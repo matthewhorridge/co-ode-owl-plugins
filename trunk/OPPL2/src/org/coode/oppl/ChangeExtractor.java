@@ -22,11 +22,13 @@
  */
 package org.coode.oppl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.AddAxiom;
+import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -65,22 +67,22 @@ public class ChangeExtractor implements
 	}
 
 	public List<OWLAxiomChange> visit(OPPLQuery q, List<OWLAxiomChange> p) {
-		// if (q != null) {
-		// q.getConstraintSystem().reset();
-		// List<OWLAxiom> axioms = q.getAssertedAxioms();
-		// for (OWLAxiom axiom : axioms) {
-		// q.getConstraintSystem().addAssertedAxiom(axiom);
-		// }
-		// axioms = q.getAxioms();
-		// for (OWLAxiom axiom : axioms) {
-		// q.getConstraintSystem().addAxiom(axiom);
-		// }
-		// for (AbstractConstraint c : q.getConstraints()) {
-		// q.getConstraintSystem().addConstraint(c);
-		// }
-		// }
-		// return null;
+		if (q != null) {
+			q.getConstraintSystem().reset();
+			List<OWLAxiom> axioms = q.getAssertedAxioms();
+			for (OWLAxiom axiom : axioms) {
+				q.getConstraintSystem().addAssertedAxiom(axiom);
+			}
+			axioms = q.getAxioms();
+			for (OWLAxiom axiom : axioms) {
+				q.getConstraintSystem().addAxiom(axiom);
+			}
+			for (AbstractConstraint c : q.getConstraints()) {
+				q.getConstraintSystem().addConstraint(c);
+			}
+		}
 		return p;
+		// return p;
 	}
 
 	public List<OWLAxiomChange> visit(Variable v, List<OWLAxiomChange> p) {
@@ -92,6 +94,9 @@ public class ChangeExtractor implements
 			List<OWLAxiomChange> p) {
 		for (OWLAxiomChange change : changes) {
 			boolean isAdd = change instanceof AddAxiom;
+			if (p == null) {
+				p = new ArrayList<OWLAxiomChange>();
+			}
 			ActionType action = isAdd ? ActionType.ADD : ActionType.REMOVE;
 			if (this.considerImportClosure && !isAdd) {
 				p.addAll(ActionFactory.createChanges(action, change.getAxiom(),

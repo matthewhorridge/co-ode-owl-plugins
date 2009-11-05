@@ -136,7 +136,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	 * @return the assignments
 	 */
 	public Set<Assignment> getAssignments() {
-		return this.assignments;
+		return new HashSet<Assignment>(this.assignments);
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	}
 
 	public Set<Variable> getUnassignedVariables() {
-		return this.unassignedVariables;
+		return new HashSet<Variable>(this.unassignedVariables);
 	}
 
 	/**
@@ -186,7 +186,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	}
 
 	public OWLObject visit(GeneratedVariable<?> v) {
-		OWLObject toReturn = visit((Variable) v);
+		OWLObject toReturn = this.visit((Variable) v);
 		if (toReturn == null) {
 			toReturn = v.getGeneratedOWLObject(this);
 		}

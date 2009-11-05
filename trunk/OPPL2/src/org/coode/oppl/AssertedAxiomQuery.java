@@ -27,12 +27,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
+import java.util.logging.Level;
 
+import org.coode.oppl.log.Logging;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.PossibleValueExtractor;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.bindingtree.LeafBrusher;
@@ -40,7 +41,6 @@ import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLSubClassAxiom;
 
 /**
  * @author Luigi Iannone
@@ -59,10 +59,6 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 		this.constraintSystem = cs;
 	}
 
-	public void visit(OWLSubClassAxiom axiom) {
-		match(axiom);
-	}
-
 	/**
 	 * @param axiom
 	 */
@@ -70,6 +66,8 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 	protected void match(OWLAxiom axiom) {
 		Set<Variable> axiomVariables = this.constraintSystem
 				.getAxiomVariables(axiom);
+		Logging.getQueryLogger().log(Level.FINE,
+				"Matching axiom " + axiom.toString());
 		Set<BindingNode> holdingAssignments = new HashSet<BindingNode>();
 		for (OWLOntology ontology : this.ontologies) {
 			for (OWLAxiom ontologyAxiom : ontology.getAxioms()) {
@@ -77,7 +75,7 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 					Set<BindingNode> leaves = null;
 					if (this.constraintSystem.getLeaves() == null) {
 						for (Variable variable : axiomVariables) {
-							extractPossibleValues(variable, ontologyAxiom);
+							this.extractPossibleValues(variable, ontologyAxiom);
 						}
 						BindingNode bindingNode = new BindingNode(
 								new HashSet<Assignment>(), axiomVariables);
@@ -97,7 +95,7 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 									.getAssignedVariables());
 							if (!unassignedVariables.isEmpty()) {
 								for (Variable variable : unassignedVariables) {
-									extractPossibleValues(variable,
+									this.extractPossibleValues(variable,
 											ontologyAxiom);
 								}
 								BindingNode bindingNode = new BindingNode(leaf
@@ -127,7 +125,9 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 									leaf, this.constraintSystem);
 							OWLAxiom instantiatedAxiom = (OWLAxiom) axiom
 									.accept(objectInstatiator);
-							if (locateAxiom(instantiatedAxiom)) {
+							if (this.locateAxiom(instantiatedAxiom)) {
+								Logging.getQueryLogger().log(Level.FINE,
+										instantiatedAxiom + " found ");
 								holdingAssignments.add(leaf);
 								Set<OWLAxiom> axioms = this.instantiatedAxioms
 										.get(leaf);
@@ -137,6 +137,8 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 								axioms.add(instantiatedAxiom);
 								this.instantiatedAxioms.put(leaf, axioms);
 							} else {
+								Logging.getQueryLogger().log(Level.FINEST,
+										instantiatedAxiom + " not found ");
 								this.instantiatedAxioms.remove(leaf);
 							}
 						}
@@ -151,18 +153,23 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 	 * @param variable
 	 * @param ontologyAxiom
 	 */
-	private void extractPossibleValues(Variable variable,
-			OWLAxiom ontologyAxiom) {
+	private void extractPossibleValues(Variable variable, OWLAxiom ontologyAxiom) {
 		variable.clearBindings();
 		PossibleValueExtractor possibleValueExtractor = new PossibleValueExtractor(
 				variable.getType());
 		Set<OWLObject> possibleValues = ontologyAxiom
 				.accept(possibleValueExtractor);
+		Logging.getQueryLogger().log(
+				Level.FINEST,
+				"variable " + variable + " possible values size "
+						+ possibleValues.size());
 		for (OWLObject object : possibleValues) {
 			try {
 				variable.addPossibleBinding(object);
+				Logging.getQueryLogger().log(Level.FINEST, object.toString());
 			} catch (OWLReasonerException e) {
-				Logger.getLogger(this.getClass().getName()).warning(
+				Logging.getQueryLogger().log(
+						Level.WARNING,
 						"Problem in adding value " + object + " for variable "
 								+ variable);
 			}
