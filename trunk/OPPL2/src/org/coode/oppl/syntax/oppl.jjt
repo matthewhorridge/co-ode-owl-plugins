@@ -680,7 +680,7 @@ OWLAxiom Clause(ConstraintSystem constraintSystem){
 		toReturn = parser.parseAxiom();
 
 	}catch(ParserException e){
-	throw new ParseException("OPPLParser.Clause() " + manSyntaxString, Utils.buildException(beginningSubSection, beginningSubSectionLine, e));
+	throw new ParseException("OPPLParser.Clause() " + manSyntaxString + "\t" + e.getMessage(), Utils.buildException(beginningSubSection, beginningSubSectionLine, e));
 	}
 return toReturn;
 }
