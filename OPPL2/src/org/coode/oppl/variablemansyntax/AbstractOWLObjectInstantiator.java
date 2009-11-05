@@ -121,8 +121,8 @@ abstract class AbstractOWLObjectInstantiator implements
 	public OWLDescription visit(OWLClass desc) {
 		OWLDescription toReturn = null;
 		if (this.constraintSystem.isVariable(desc)) {
-			Variable variable = this.constraintSystem.getVariable(desc
-					.getURI());
+			Variable variable = this.constraintSystem
+					.getVariable(desc.getURI());
 			OWLDescription assignmentValue = (OWLDescription) this.bindingNode
 					.getAssignmentValue(variable);
 			toReturn = assignmentValue == null ? desc : assignmentValue;
@@ -276,7 +276,7 @@ abstract class AbstractOWLObjectInstantiator implements
 
 	public OWLObject visit(OWLDifferentIndividualsAxiom axiom) {
 		Set<OWLIndividual> individuals = axiom.getIndividuals();
-		Set<OWLIndividual> instantiatedIndividuals = axiom.getIndividuals();
+		Set<OWLIndividual> instantiatedIndividuals = new HashSet<OWLIndividual>();
 		for (OWLIndividual individual : individuals) {
 			instantiatedIndividuals
 					.add((OWLIndividual) individual.accept(this));
@@ -389,8 +389,8 @@ abstract class AbstractOWLObjectInstantiator implements
 	public OWLObject visit(OWLIndividual individual) {
 		OWLIndividual toReturn = individual;
 		if (this.constraintSystem.isVariable(individual)) {
-			Variable variable = this.constraintSystem
-					.getVariable(individual.getURI());
+			Variable variable = this.constraintSystem.getVariable(individual
+					.getURI());
 			OWLIndividual assignmentValue = (OWLIndividual) this.bindingNode
 					.getAssignmentValue(variable);
 			toReturn = assignmentValue == null ? individual : assignmentValue;
@@ -625,7 +625,8 @@ abstract class AbstractOWLObjectInstantiator implements
 
 	public OWLObject visit(OWLSameIndividualsAxiom axiom) {
 		Set<OWLIndividual> individuals = axiom.getIndividuals();
-		Set<OWLIndividual> instantiatedIndividuals = axiom.getIndividuals();
+		Set<OWLIndividual> instantiatedIndividuals = new HashSet<OWLIndividual>(
+				axiom.getIndividuals().size());
 		for (OWLIndividual individual : individuals) {
 			instantiatedIndividuals
 					.add((OWLIndividual) individual.accept(this));

@@ -34,6 +34,7 @@ import org.semanticweb.owl.model.OWLObjectSubPropertyAxiom;
 import org.semanticweb.owl.model.OWLOntologyAnnotationAxiom;
 import org.semanticweb.owl.model.OWLReflexiveObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLSameIndividualsAxiom;
+import org.semanticweb.owl.model.OWLSubClassAxiom;
 import org.semanticweb.owl.model.OWLSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLTransitiveObjectPropertyAxiom;
 import org.semanticweb.owl.model.SWRLRule;
@@ -41,147 +42,151 @@ import org.semanticweb.owl.model.SWRLRule;
 abstract class AbstractAxiomQuery implements AxiomQuery {
 	protected abstract void match(OWLAxiom axiom);
 
+	public void visit(OWLSubClassAxiom axiom) {
+		this.match(axiom);
+	}
+
 	public void visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLAntiSymmetricObjectPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLReflexiveObjectPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLDisjointClassesAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLDataPropertyDomainAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLImportsDeclaration axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLAxiomAnnotationAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLObjectPropertyDomainAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLEquivalentObjectPropertiesAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLDifferentIndividualsAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLDisjointDataPropertiesAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLDisjointObjectPropertiesAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLObjectPropertyRangeAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLObjectPropertyAssertionAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLFunctionalObjectPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLObjectSubPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLDisjointUnionAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLDeclarationAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLEntityAnnotationAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLOntologyAnnotationAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLSymmetricObjectPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLDataPropertyRangeAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLFunctionalDataPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLEquivalentDataPropertiesAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLClassAssertionAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLEquivalentClassesAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLDataPropertyAssertionAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLTransitiveObjectPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLDataSubPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLSameIndividualsAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLObjectPropertyChainSubPropertyAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(OWLInverseObjectPropertiesAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	public void visit(SWRLRule rule) {
-		match(rule);
+		this.match(rule);
 	}
 }
