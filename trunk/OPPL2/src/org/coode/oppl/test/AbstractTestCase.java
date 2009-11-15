@@ -62,7 +62,7 @@ public abstract class AbstractTestCase extends TestCase {
 	protected void setUp() throws Exception {
 		// reload the ontology for each test;
 		// tests are independent of each other
-		init();
+		this.init();
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public abstract class AbstractTestCase extends TestCase {
 	protected OPPLScript parse(String script) {
 		try {
 			ParserFactory.initParser(script, this.ontology1,
-					this.ontologyManager, initDummyReasoner());
+					this.ontologyManager, this.initDummyReasoner());
 			return OPPLParser.Start();
 		} catch (Exception e) {
 			if (this.longStackTrace) {
@@ -108,7 +108,7 @@ public abstract class AbstractTestCase extends TestCase {
 	}
 
 	protected void checkProperStackTrace(String expected, int expectedIndex) {
-		String stackTrace = popStackTrace();
+		String stackTrace = this.popStackTrace();
 		if (stackTrace.contains(expected)) {
 			int lineStart = stackTrace.indexOf(expected);
 			int lineEnd = stackTrace.indexOf("\n", lineStart);
@@ -163,7 +163,7 @@ public abstract class AbstractTestCase extends TestCase {
 
 	protected void reportUnexpectedStacktrace(String stackTrace) {
 		// assertEquals(0, stackTrace.length());
-		if (!stackTrace.isEmpty()) {
+		if (stackTrace.length() != 0) {
 			System.out
 					.println("ExhaustingTestCase There should not have been a stacktrace!");
 			System.out.println(stackTrace);
@@ -171,7 +171,7 @@ public abstract class AbstractTestCase extends TestCase {
 	}
 
 	protected void expectedCorrect(OPPLScript result) {
-		reportUnexpectedStacktrace(popStackTrace());
+		this.reportUnexpectedStacktrace(this.popStackTrace());
 		assertNotNull(result);
 	}
 }

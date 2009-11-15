@@ -54,8 +54,8 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 		}
 	}
 
-	private final Set<Assignment> assignments;
-	protected final Set<Variable> unassignedVariables;
+	private final Set<Assignment> assignments = new HashSet<Assignment>();
+	protected final Set<Variable> unassignedVariables = new HashSet<Variable>();
 
 	/**
 	 * @param assignments
@@ -63,8 +63,8 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	 */
 	public BindingNode(Set<Assignment> assignments,
 			Set<Variable> unassignedVariables) {
-		this.assignments = assignments;
-		this.unassignedVariables = new HashSet<Variable>(unassignedVariables);
+		this.assignments.addAll(assignments);
+		this.unassignedVariables.addAll(unassignedVariables);
 	}
 
 	public void accept(BindingVisitor visitor) {

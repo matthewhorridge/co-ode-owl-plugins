@@ -78,14 +78,14 @@ public class OPPLQueryImpl implements OPPLQuery {
 	 * @return the axioms
 	 */
 	public List<OWLAxiom> getAxioms() {
-		return this.axioms;
+		return new ArrayList<OWLAxiom>(this.axioms);
 	}
 
 	/**
 	 * @return the assertedAxioms
 	 */
 	public List<OWLAxiom> getAssertedAxioms() {
-		return this.assertedAxioms;
+		return new ArrayList<OWLAxiom>(this.assertedAxioms);
 	}
 
 	public List<AbstractConstraint> getConstraints() {
@@ -96,7 +96,7 @@ public class OPPLQueryImpl implements OPPLQuery {
 	public String toString() {
 		StringBuffer buffer = new StringBuffer("SELECT ");
 		boolean first = true;
-		for (OWLAxiom axiom : getAssertedAxioms()) {
+		for (OWLAxiom axiom : this.getAssertedAxioms()) {
 			String commaString = first ? "ASSERTED " : "ASSERTED, ";
 			StringWriter writer = new StringWriter();
 			ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
@@ -108,7 +108,7 @@ public class OPPLQueryImpl implements OPPLQuery {
 			axiom.accept(renderer);
 			buffer.append(writer.toString());
 		}
-		for (OWLAxiom axiom : getAxioms()) {
+		for (OWLAxiom axiom : this.getAxioms()) {
 			String commaString = first ? "" : ", ";
 			StringWriter writer = new StringWriter();
 			ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
@@ -120,10 +120,10 @@ public class OPPLQueryImpl implements OPPLQuery {
 			axiom.accept(renderer);
 			buffer.append(writer.toString());
 		}
-		if (getConstraints().size() > 0) {
+		if (this.getConstraints().size() > 0) {
 			buffer.append(" WHERE ");
 			first = true;
-			for (AbstractConstraint c : getConstraints()) {
+			for (AbstractConstraint c : this.getConstraints()) {
 				String commaString = first ? "" : ", ";
 				buffer.append(commaString);
 				buffer.append(c.toString());
@@ -135,7 +135,7 @@ public class OPPLQueryImpl implements OPPLQuery {
 	public String render() {
 		StringBuffer buffer = new StringBuffer("SELECT ");
 		boolean first = true;
-		for (OWLAxiom axiom : getAssertedAxioms()) {
+		for (OWLAxiom axiom : this.getAssertedAxioms()) {
 			String commaString = first ? "ASSERTED " : ",\nASSERTED ";
 			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
 					.getManchesterSyntaxRenderer(this.constraintSystem);
@@ -145,7 +145,7 @@ public class OPPLQueryImpl implements OPPLQuery {
 			buffer.append(renderer.toString());
 			buffer.append('\n');
 		}
-		for (OWLAxiom axiom : getAxioms()) {
+		for (OWLAxiom axiom : this.getAxioms()) {
 			String commaString = first ? "" : ",\n ";
 			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
 					.getManchesterSyntaxRenderer(this.constraintSystem);
@@ -154,10 +154,10 @@ public class OPPLQueryImpl implements OPPLQuery {
 			axiom.accept(renderer);
 			buffer.append(renderer.toString());
 		}
-		if (getConstraints().size() > 0) {
+		if (this.getConstraints().size() > 0) {
 			buffer.append("\nWHERE ");
 			first = true;
-			for (AbstractConstraint c : getConstraints()) {
+			for (AbstractConstraint c : this.getConstraints()) {
 				String commaString = first ? "" : ", ";
 				first = false;
 				buffer.append(commaString);
