@@ -34,15 +34,24 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public final class VariableImpl implements Variable {
-	protected String name;
-	protected VariableType type;
+	private final String name;
+	private final VariableType type;
+	private final URI uri;
 	protected Set<OWLObject> possibleBindings = new HashSet<OWLObject>();
 	private VariableScope variableScope = null;
 	private VariableScopeChecker variableScopeChecker = null;
 
 	public VariableImpl(String name, VariableType type) {
+		if (name == null) {
+			throw new NullPointerException("The name cannot be null");
+		}
+		if (type == null) {
+			throw new NullPointerException("The type cannot be null");
+		}
 		this.name = name;
 		this.type = type;
+		String fragment = this.name.substring(this.name.indexOf('?') + 1);
+		this.uri = URI.create(ManchesterVariableSyntax.NAMESPACE + fragment);
 	}
 
 	public String getName() {
@@ -50,8 +59,9 @@ public final class VariableImpl implements Variable {
 	}
 
 	public URI getURI() {
-		String fragment = this.name.substring(this.name.indexOf('?') + 1);
-		return URI.create(ManchesterVariableSyntax.NAMESPACE + fragment);
+		// String fragment = this.name.substring(this.name.indexOf('?') + 1);
+		// return URI.create(ManchesterVariableSyntax.NAMESPACE + fragment);
+		return this.uri;
 	}
 
 	/**
@@ -76,7 +86,7 @@ public final class VariableImpl implements Variable {
 
 	@Override
 	public String toString() {
-		return this.name + ":" + getType();
+		return this.name + ":" + this.getType();
 	}
 
 	public Set<OWLObject> getPossibleBindings() {
@@ -95,7 +105,7 @@ public final class VariableImpl implements Variable {
 
 	@Override
 	public int hashCode() {
-		return getName().hashCode();
+		return this.getName().hashCode();
 	}
 
 	public void clearBindings() {

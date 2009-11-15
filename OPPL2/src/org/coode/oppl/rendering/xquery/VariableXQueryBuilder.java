@@ -130,7 +130,6 @@ import org.semanticweb.owl.model.SWRLObjectPropertyAtom;
 import org.semanticweb.owl.model.SWRLRule;
 import org.semanticweb.owl.model.SWRLSameAsAtom;
 
-@SuppressWarnings("unused")
 final class PathNode {
 	private final List<PathNode> children = new ArrayList<PathNode>();
 	private final String name;
@@ -192,7 +191,7 @@ final class PathNode {
 
 	@Override
 	public String toString() {
-		return getName();
+		return this.getName();
 	}
 
 	public String getPathToRoot() {
@@ -207,7 +206,6 @@ final class PathNode {
  * @author Luigi Iannone
  * 
  */
-@SuppressWarnings("unused")
 public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 		ConstraintVisitor {
 	public VariableXQueryBuilder(String axiomName,
@@ -229,7 +227,8 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 			if (VariableXQueryBuilder.this.constraintSystem.isVariable(cls)) {
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(cls.getURI());
-				VariableXQueryBuilder.this.whereConditions.add(diffReplace(v));
+				VariableXQueryBuilder.this.whereConditions.add(this
+						.diffReplace(v));
 			} else {
 				VariableXQueryBuilder.this.whereConditions
 						.add(this.variableReference + DIFFERENT + cls.getURI());
@@ -246,7 +245,8 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 					.isVariable(property)) {
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(property.getURI());
-				VariableXQueryBuilder.this.whereConditions.add(diffReplace(v));
+				VariableXQueryBuilder.this.whereConditions.add(this
+						.diffReplace(v));
 			} else {
 				VariableXQueryBuilder.this.whereConditions
 						.add(this.variableReference + DIFFERENT
@@ -259,7 +259,8 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 					.isVariable(property)) {
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(property.getURI());
-				VariableXQueryBuilder.this.whereConditions.add(diffReplace(v));
+				VariableXQueryBuilder.this.whereConditions.add(this
+						.diffReplace(v));
 			} else {
 				VariableXQueryBuilder.this.whereConditions
 						.add(this.variableReference + DIFFERENT
@@ -272,7 +273,8 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 					.isVariable(individual)) {
 				Variable v = VariableXQueryBuilder.this.constraintSystem
 						.getVariable(individual.getURI());
-				VariableXQueryBuilder.this.whereConditions.add(diffReplace(v));
+				VariableXQueryBuilder.this.whereConditions.add(this
+						.diffReplace(v));
 			} else {
 				VariableXQueryBuilder.this.whereConditions
 						.add(this.variableReference + DIFFERENT
@@ -301,7 +303,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 						.getVariable(cls.getURI());
 				this.writer.append(this.variableReference);
 				this.writer.append(EQUALS);
-				this.writer.append(replace(v));
+				this.writer.append(this.replace(v));
 			} else {
 				this.writer.append(this.variableReference);
 				this.writer.append(EQUALS);
@@ -320,7 +322,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 						.getVariable(property.getURI());
 				this.writer.append(this.variableReference);
 				this.writer.append(EQUALS);
-				this.writer.append(replace(v));
+				this.writer.append(this.replace(v));
 			} else {
 				this.writer.append(this.variableReference);
 				this.writer.append(EQUALS);
@@ -335,7 +337,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 						.getVariable(property.getURI());
 				this.writer.append(this.variableReference);
 				this.writer.append(EQUALS);
-				this.writer.append(replace(v));
+				this.writer.append(this.replace(v));
 			} else {
 				this.writer.append(this.variableReference);
 				this.writer.append(EQUALS);
@@ -350,7 +352,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 						.getVariable(individual.getURI());
 				this.writer.append(this.variableReference);
 				this.writer.append(EQUALS);
-				this.writer.append(replace(v));
+				this.writer.append(this.replace(v));
 			} else {
 				this.writer.append(this.variableReference);
 				this.writer.append(EQUALS);
@@ -1196,14 +1198,14 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	private void initialisePaths(OWLAxiom axiom) {
-		this.axiomPath = buildAxiomQuery(axiom);
+		this.axiomPath = this.buildAxiomQuery(axiom);
 		this.variablePaths.clear();
 		this.whereConditions.clear();
 		this.currentNode = new PathNode(this.axiomName, null);
 	}
 
 	public String visit(OWLSubClassAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getSubClass().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1212,7 +1214,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1223,19 +1225,19 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLAntiSymmetricObjectPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
 		return this.axiomPath;
 	}
 
 	public String visit(OWLReflexiveObjectPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
 		return this.axiomPath;
 	}
 
 	public String visit(OWLDisjointClassesAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		Set<OWLDescription> descriptions = axiom.getDescriptions();
 		for (OWLDescription description : descriptions) {
@@ -1246,7 +1248,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLDataPropertyDomainAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1263,7 +1265,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLObjectPropertyDomainAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1272,7 +1274,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLEquivalentObjectPropertiesAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		Set<OWLObjectPropertyExpression> properties = axiom.getProperties();
 		for (OWLObjectPropertyExpression objectPropertyExpression : properties) {
@@ -1283,7 +1285,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1294,7 +1296,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLDifferentIndividualsAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		Set<OWLIndividual> individuals = axiom.getIndividuals();
 		for (OWLIndividual individual : individuals) {
@@ -1305,7 +1307,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLDisjointDataPropertiesAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		Set<OWLDataPropertyExpression> properties = axiom.getProperties();
 		for (OWLDataPropertyExpression dataPropertyExpression : properties) {
@@ -1316,7 +1318,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLDisjointObjectPropertiesAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		Set<OWLObjectPropertyExpression> properties = axiom.getProperties();
 		for (OWLObjectPropertyExpression objectPropertyExpression : properties) {
@@ -1327,7 +1329,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLObjectPropertyRangeAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1336,7 +1338,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLObjectPropertyAssertionAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1347,13 +1349,13 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLFunctionalObjectPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
 		return this.axiomPath;
 	}
 
 	public String visit(OWLObjectSubPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getSubProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1362,7 +1364,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLDisjointUnionAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		Set<OWLDescription> descriptions = axiom.getDescriptions();
 		for (OWLDescription description : descriptions) {
@@ -1373,7 +1375,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLDeclarationAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		axiom.getEntity().accept(this.pathExtractor);
 		return this.axiomPath;
 	}
@@ -1387,13 +1389,13 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLSymmetricObjectPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
 		return this.axiomPath;
 	}
 
 	public String visit(OWLDataPropertyRangeAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1402,13 +1404,13 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLFunctionalDataPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
 		return this.axiomPath;
 	}
 
 	public String visit(OWLEquivalentDataPropertiesAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		Set<OWLDataPropertyExpression> properties = axiom.getProperties();
 		for (OWLDataPropertyExpression dataPropertyExpression : properties) {
@@ -1419,7 +1421,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLClassAssertionAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getDescription().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1428,7 +1430,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLEquivalentClassesAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		Set<OWLDescription> descriptions = axiom.getDescriptions();
 		for (OWLDescription description : descriptions) {
@@ -1439,7 +1441,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLDataPropertyAssertionAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1450,19 +1452,19 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLTransitiveObjectPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
 		return this.axiomPath;
 	}
 
 	public String visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
 		return this.axiomPath;
 	}
 
 	public String visit(OWLDataSubPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getSubProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;
@@ -1471,13 +1473,13 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		axiom.getProperty().accept(this.pathExtractor);
 		return this.axiomPath;
 	}
 
 	public String visit(OWLSameIndividualsAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		Set<OWLIndividual> individuals = axiom.getIndividuals();
 		for (OWLIndividual individual : individuals) {
@@ -1488,7 +1490,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLObjectPropertyChainSubPropertyAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getSuperProperty().accept(this.pathExtractor);
 		List<OWLObjectPropertyExpression> propertyChain = axiom
@@ -1501,7 +1503,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 	}
 
 	public String visit(OWLInverseObjectPropertiesAxiom axiom) {
-		initialisePaths(axiom);
+		this.initialisePaths(axiom);
 		PathNode axiomNode = this.currentNode;
 		axiom.getFirstProperty().accept(this.pathExtractor);
 		this.currentNode = axiomNode;

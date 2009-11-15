@@ -38,4 +38,8 @@ public class Logging {
 	public static final Logger getQueryLogger() {
 		return Logger.getLogger("org.coode.oppl.query");
 	}
+
+	public static final Logger getQueryTestLogging() {
+		return Logger.getLogger("org.coode.oppl.query.test");
+	}
 }

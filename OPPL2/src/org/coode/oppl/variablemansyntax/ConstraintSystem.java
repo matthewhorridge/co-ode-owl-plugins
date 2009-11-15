@@ -32,7 +32,8 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.coode.oppl.AbstractConstraint;
-import org.coode.oppl.AssertedAxiomQuery;
+import org.coode.oppl.AssertedAxiomMatchingQuery;
+import org.coode.oppl.AssertedTreeSearchAxiomQuery;
 import org.coode.oppl.AxiomQuery;
 import org.coode.oppl.ConstraintChecker;
 import org.coode.oppl.InferredAxiomQuery;
@@ -110,7 +111,64 @@ import org.semanticweb.owl.model.SWRLRule;
  * 
  */
 public class ConstraintSystem implements OWLAxiomVisitor {
-	private final Map<String, Variable> variables = new HashMap<String, Variable>();
+	private final static class VariableSet {
+		private final Map<String, Variable> map = new HashMap<String, Variable>();
+		private final Map<URI, Variable> urisMap = new HashMap<URI, Variable>();
+
+		public Variable get(String name) {
+			return this.map.get(name);
+		}
+
+		public Variable get(URI variableURI) {
+			return this.urisMap.get(variableURI);
+		}
+
+		public void store(Variable variable) {
+			this.map.put(variable.getName(), variable);
+			this.urisMap.put(variable.getURI(), variable);
+		}
+
+		public boolean containsVariableURI(URI variableURI) {
+			return this.urisMap.containsKey(variableURI);
+		}
+
+		public Set<Variable> getInputVariables() {
+			InputVariableCollector visitor = new InputVariableCollector();
+			for (Variable variable : this.map.values()) {
+				variable.accept(visitor);
+			}
+			return new HashSet<Variable>(visitor.getCollectedVariables());
+		}
+
+		public Set<Variable> getAllVariables() {
+			return new HashSet<Variable>(this.map.values());
+		}
+
+		public Set<GeneratedVariable<?>> getGeneratedVariables() {
+			GeneratedVariableCollector visitor = new GeneratedVariableCollector();
+			for (Variable v : this.map.values()) {
+				v.accept(visitor);
+			}
+			return new HashSet<GeneratedVariable<?>>(visitor
+					.getCollectedVariables());
+		}
+
+		public void remove(String name) {
+			Variable removed = this.map.remove(name);
+			if (removed != null) {
+				this.urisMap.remove(removed.getURI());
+			}
+		}
+
+		public void clear() {
+			this.map.clear();
+			this.urisMap.clear();
+		}
+	}
+
+	// private final Map<String, Variable> variables = new HashMap<String,
+	// Variable>();
+	private final VariableSet variables = new VariableSet();
 	private final OWLOntology ontology;
 	private final Set<OWLOntology> ontologies;
 	private final Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
@@ -141,7 +199,8 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 			throws OPPLException {
 		if (name.matches("\\?([\\p{Alnum}[-_]])+")) {
 			VariableImpl newVariable = new VariableImpl(name.trim(), type);
-			this.variables.put(name, newVariable);
+			// this.variables.put(name, newVariable);
+			this.variables.store(newVariable);
 			return newVariable;
 		} else {
 			throw new InvalidVariableNameException("Invalid name: " + name);
@@ -165,11 +224,21 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 					"Initial size: "
 							+ (this.leaves == null ? "empty" : this.leaves
 									.size()));
+			// AxiomQuery query = this.reasoner == null
+			// || this.reasoner instanceof NoOpReasoner ? new
+			// AssertedAxiomQuery(
+			// this.ontologies, this)
+			// : new InferredAxiomQuery(this.ontologies, this,
+			// this.dataFactory, this.reasoner);
 			AxiomQuery query = this.reasoner == null
-					|| this.reasoner instanceof NoOpReasoner ? new AssertedAxiomQuery(
+					|| this.reasoner instanceof NoOpReasoner ? new AssertedTreeSearchAxiomQuery(
 					this.ontologies, this)
 					: new InferredAxiomQuery(this.ontologies, this,
 							this.dataFactory, this.reasoner);
+			System.out.println("ConstraintSystem.updateBindings() "
+					+ query.getClass().getName());
+			Logging.getQueryTestLogging().log(Level.INFO,
+					"Used engine: " + query.getClass().getName());
 			axiom.accept(query);
 			Map<BindingNode, Set<OWLAxiom>> queryInstantiations = query
 					.getInstantiations();
@@ -220,7 +289,11 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 					"Initial size: "
 							+ (this.leaves == null ? "empty" : this.leaves
 									.size()));
-			AxiomQuery query = new AssertedAxiomQuery(this.ontologies, this);
+			// AxiomQuery query = new AssertedAxiomQuery(this.ontologies, this);
+			// AxiomQuery query = new AssertedTreeSearchAxiomQuery(
+			// this.ontologies, this);
+			AxiomQuery query = new AssertedAxiomMatchingQuery(this,
+					this.ontologies);
 			axiom.accept(query);
 			this.instantiatedAxioms.putAll(query.getInstantiations());
 			Logging.getQueryLogger().log(Level.INFO,
@@ -239,24 +312,26 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public boolean isVariableURI(URI uri) {
-		boolean found = false;
-		Iterator<Variable> it = this.variables.values().iterator();
-		while (!found && it.hasNext()) {
-			Variable variable = it.next();
-			found = uri.equals(variable.getURI());
-		}
-		return found;
+		// boolean found = false;
+		// Iterator<Variable> it = this.variables.values().iterator();
+		// while (!found && it.hasNext()) {
+		// Variable variable = it.next();
+		// found = uri.equals(variable.getURI());
+		// }
+		// return found;
+		return this.variables.containsVariableURI(uri);
 	}
 
 	public Variable getVariable(URI uri) {
-		boolean found = false;
-		Iterator<Variable> it = this.variables.values().iterator();
-		Variable variable = null;
-		while (!found && it.hasNext()) {
-			variable = it.next();
-			found = uri.equals(variable.getURI());
-		}
-		return found ? variable : null;
+		// boolean found = false;
+		// Iterator<Variable> it = this.variables.values().iterator();
+		// Variable variable = null;
+		// while (!found && it.hasNext()) {
+		// variable = it.next();
+		// found = uri.equals(variable.getURI());
+		// }
+		// return found ? variable : null;
+		return this.variables.get(uri);
 	}
 
 	public boolean isVariable(OWLDescription desc) {
@@ -456,11 +531,12 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public Set<Variable> getInputVariables() {
-		InputVariableCollector visitor = new InputVariableCollector();
-		for (Variable variable : this.variables.values()) {
-			variable.accept(visitor);
-		}
-		return new HashSet<Variable>(visitor.getCollectedVariables());
+		// InputVariableCollector visitor = new InputVariableCollector();
+		// for (Variable variable : this.variables.values()) {
+		// variable.accept(visitor);
+		// }
+		// return new HashSet<Variable>(visitor.getCollectedVariables());
+		return this.variables.getInputVariables();
 	}
 
 	public void removeBinding(BindingNode binding) {
@@ -537,15 +613,15 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 		this.reasoner = reasoner;
 	}
 
-	/**
-	 * @return the variables
-	 */
-	public Map<String, Variable> getVariableMap() {
-		return this.variables;
-	}
-
+	// /**
+	// * @return the variables
+	// */
+	// public Map<String, Variable> getVariableMap() {
+	// return this.variables;
+	// }
 	public Set<Variable> getVariables() {
-		return new HashSet<Variable>(this.variables.values());
+		// return new HashSet<Variable>(this.variables.values());
+		return this.variables.getAllVariables();
 	}
 
 	/**
@@ -573,7 +649,8 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 			VariableType type, GeneratedValue<String> value) {
 		AbstractGeneratedVariable<String> generatedVariable = StringGeneratedVariable
 				.buildGeneratedVariable(name, type, value, this.getOntology());
-		this.variables.put(name, generatedVariable);
+		// this.variables.put(name, generatedVariable);
+		this.variables.store(generatedVariable);
 		return generatedVariable;
 	}
 
@@ -585,12 +662,14 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public Set<GeneratedVariable<?>> getGeneratedVariables() {
-		GeneratedVariableCollector visitor = new GeneratedVariableCollector();
-		for (Variable v : this.variables.values()) {
-			v.accept(visitor);
-		}
-		return new HashSet<GeneratedVariable<?>>(visitor
-				.getCollectedVariables());
+		// GeneratedVariableCollector visitor = new
+		// GeneratedVariableCollector();
+		// for (Variable v : this.variables.values()) {
+		// v.accept(visitor);
+		// }
+		// return new HashSet<GeneratedVariable<?>>(visitor
+		// .getCollectedVariables());
+		return this.variables.getGeneratedVariables();
 	}
 
 	// /**
@@ -627,7 +706,8 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 		if (type.equals(VariableType.CLASS)) {
 			toReturn = AbstractOWLObjectCollectionGeneratedVariable
 					.getConjunction(name, type, collection, this.dataFactory);
-			this.variables.put(name, toReturn);
+			// this.variables.put(name, toReturn);
+			this.variables.store(toReturn);
 		} else {
 			throw new IllegalArgumentException("Incompatibile type "
 					+ type.name());
@@ -642,7 +722,8 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 		if (type.equals(VariableType.CLASS)) {
 			toReturn = AbstractOWLObjectCollectionGeneratedVariable
 					.getDisjunction(name, type, collection, this.dataFactory);
-			this.variables.put(name, toReturn);
+			// this.variables.put(name, toReturn);
+			this.variables.store(toReturn);
 		}
 		if (toReturn == null) {
 			throw new IllegalArgumentException("Incompatibile type "
@@ -656,7 +737,8 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 	}
 
 	public void importVariable(Variable v) {
-		this.variables.put(v.getName(), v);
+		// this.variables.put(v.getName(), v);
+		this.variables.store(v);
 	}
 
 	public void clearVariables() {

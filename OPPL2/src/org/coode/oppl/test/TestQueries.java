@@ -1,20 +1,28 @@
 package org.coode.oppl.test;
 
+import java.io.StringWriter;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import junit.framework.TestCase;
 
 import org.coode.oppl.ChangeExtractor;
+import org.coode.oppl.OPPLAbstractFactory;
+import org.coode.oppl.OPPLFactory;
 import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.exceptions.OPPLException;
+import org.coode.oppl.log.Logging;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.utils.VariableDetector;
+import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.Variable;
@@ -24,22 +32,27 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.bindingtree.LeafBrusher;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasonerException;
+import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyChangeException;
 import org.semanticweb.owl.model.OWLOntologyCreationException;
 import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owl.model.OWLSubClassAxiom;
+import org.semanticweb.owl.model.RemoveAxiom;
 
 public class TestQueries extends TestCase {
 	private enum DescriptionType {
 		// visit(OWLObjectSelfRestriction)
-		CLASS, OWLDATARESTRICTION, OWLDATAEXACTCARDINALITYRESTRICTION, OWLDATAMINCARDINALITYRESTRICTION, OWLDATAMAXCARDINALITYRESTRICTION, OWLDATASOMERESTRICTION, OWLDATAVALUERESTRICTION, OWLOBJECTALLRESTRICTION, OWLOBJECTCOMPLEMENTOF, OWLOBJECTEXACTCARDINALITYRESTRICTION, OWLOBJECTINTERSECTIONOF, OWLOBJECTMAXCARDINALITYRESTRCTION, OWLOBJECTMAXCARDINALITYRESTRICTION, OWLOBJECTMINCARDINALITYRESTRICTION, OWLOBJECTONEOF, OWLOBJECTSOMERESTRICTION, OWLOBJECTUNIONOF, OWLOBJECTVALUERESTRICTION
+		CLASS, OWLDATARESTRICTION, OWLDATAEXACTCARDINALITYRESTRICTION, OWLDATAMINCARDINALITYRESTRICTION, OWLDATAMAXCARDINALITYRESTRICTION, OWLDATASOMERESTRICTION, OWLDATAVALUERESTRICTION, OWLOBJECTALLRESTRICTION, OWLOBJECTCOMPLEMENTOF, OWLOBJECTEXACTCARDINALITYRESTRICTION, OWLOBJECTINTERSECTIONOF, OWLOBJECTEXACTCARDINALITYRESTRCTION, OWLOBJECTMAXCARDINALITYRESTRICTION, OWLOBJECTMINCARDINALITYRESTRICTION, OWLOBJECTONEOF, OWLOBJECTSOMERESTRICTION, OWLOBJECTUNIONOF, OWLOBJECTVALUERESTRICTION
 	}
 
-	private final int valuesCount = 10;
+	private final int valuesCount = 1;
 	private final static URI TEST_NS = URI
 			.create("http://www.co-ode.org/opp/test#");
 
@@ -50,8 +63,11 @@ public class TestQueries extends TestCase {
 
 	private void buildOntologyForQuery(OPPLScript opplScript,
 			OWLOntology testOntology, OWLOntologyManager manager) {
+		// Clear test ontology
+		this.clearOntology(testOntology, manager);
 		List<Variable> inputVariables = opplScript.getInputVariables();
 		for (Variable variable : inputVariables) {
+			variable.clearBindings();
 			this.generateValues(variable, manager);
 		}
 		BindingNode root = new BindingNode(new HashSet<Assignment>(),
@@ -78,10 +94,26 @@ public class TestQueries extends TestCase {
 		}
 	}
 
+	/**
+	 * @param testOntology
+	 * @param manager
+	 */
+	private void clearOntology(OWLOntology testOntology,
+			OWLOntologyManager manager) {
+		for (OWLAxiom axiom : testOntology.getAxioms()) {
+			try {
+				manager.applyChange(new RemoveAxiom(testOntology, axiom));
+			} catch (OWLOntologyChangeException e) {
+				e.printStackTrace();
+				fail(e.getMessage());
+			}
+		}
+	}
+
 	private void generateValues(Variable variable, OWLOntologyManager manager) {
 		int questionMarkIndex = variable.getName().indexOf('?');
 		String fragment = questionMarkIndex != -1 ? variable.getName()
-				.substring(questionMarkIndex) : variable.getName();
+				.substring(questionMarkIndex + 1) : variable.getName();
 		for (int i = 0; i < this.valuesCount; i++) {
 			try {
 				variable.addPossibleBinding(this.generateValue(fragment + "_"
@@ -119,6 +151,25 @@ public class TestQueries extends TestCase {
 	public void testTransitiveObjectPropertyQuery() {
 		String opplString = "?x:OBJECTPROPERTY SELECT ASSERTED Transitive ?x BEGIN ADD transitive ?x END;";
 		this.testQuery(opplString);
+	}
+
+	private void testQuery(String opplString) {
+		OWLOntologyManager ontologyManager = OWLManager
+				.createOWLOntologyManager();
+		OWLOntology testOntology;
+		try {
+			testOntology = ontologyManager.createOntology(TEST_NS);
+			ParserFactory.initParser(opplString, testOntology, ontologyManager,
+					null);
+			OPPLScript opplScript = OPPLParser.Start();
+			this.testQuery(opplScript, ontologyManager, testOntology);
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
 	}
 
 	public void testSymmetricObjectPropertyQuery() {
@@ -187,22 +238,22 @@ public class TestQueries extends TestCase {
 	}
 
 	public void testDataPropertyRangeQuery() {
-		String opplString = "?x:DATAPROPERTY SELECT ?x range int BEGIN ADD ?x range int END;";
+		String opplString = "?x:DATAPROPERTY SELECT ASSERTED ?x range int BEGIN ADD ?x range int END;";
 		this.testQuery(opplString);
 	}
 
 	public void testObjectPropertyDomainQuery() {
-		String opplString = "?x:OBJECTPROPERTY, ?y:CLASS SELECT ?x domain ?y BEGIN ADD ?x domain ?y END;";
+		String opplString = "?x:OBJECTPROPERTY, ?y:CLASS SELECT ASSERTED ?x domain ?y BEGIN ADD ?x domain ?y END;";
 		this.testQuery(opplString);
 	}
 
 	public void testObjectPropertyRangeQuery() {
-		String opplString = "?x:OBJECTPROPERTY, ?y:CLASS SELECT ?x range ?y BEGIN ADD ?x range ?y END;";
+		String opplString = "?x:OBJECTPROPERTY, ?y:CLASS SELECT ASSERTED ?x range ?y BEGIN ADD ?x range ?y END;";
 		this.testQuery(opplString);
 	}
 
 	public void testDataPropertyDomainQuery() {
-		String opplString = "?x:DATAPROPERTY, ?y:CLASS SELECT ?x domain ?y  BEGIN ADD ?x domain ?y END;";
+		String opplString = "?x:DATAPROPERTY, ?y:CLASS SELECT ASSERTED	?x domain ?y  BEGIN ADD ?x domain ?y END;";
 		this.testQuery(opplString);
 	}
 
@@ -241,6 +292,55 @@ public class TestQueries extends TestCase {
 		this.testQuery(opplString);
 	}
 
+	public void testComplexSubClassUnaryQueries() {
+		try {
+			OWLOntologyManager ontologyManager = OWLManager
+					.createOWLOntologyManager();
+			OWLDataFactory dataFactory = ontologyManager.getOWLDataFactory();
+			OWLOntology testOntology = ontologyManager.createOntology(TEST_NS);
+			OPPLParser.setOPPLFactory(new OPPLFactory(ontologyManager,
+					testOntology, null));
+			OPPLAbstractFactory opplFactory = OPPLParser.getOPPLFactory();
+			ConstraintSystem cs = opplFactory.createConstraintSystem();
+			Set<OWLDescription> subClasses = this.generateClasses(dataFactory,
+					0, cs);
+			Set<OWLDescription> superClasses = this.generateClasses(
+					dataFactory, 1, cs);
+			VariableExtractor variableExtractor = new VariableExtractor(cs);
+			int testSize = subClasses.size() * superClasses.size();
+			int i = 1;
+			for (OWLDescription subClass : subClasses) {
+				for (OWLDescription superClass : superClasses) {
+					OWLSubClassAxiom axiom = dataFactory.getOWLSubClassAxiom(
+							subClass, superClass);
+					Set<Variable> variables = axiom.accept(variableExtractor);
+					OPPLQuery query = opplFactory.buildNewQuery(cs);
+					query.addAssertedAxiom(axiom);
+					ArrayList<OWLAxiomChange> actions = new ArrayList<OWLAxiomChange>();
+					actions.add(new AddAxiom(testOntology, axiom));
+					OPPLScript opplScript = opplFactory.buildOPPLScript(cs,
+							new ArrayList<Variable>(variables), query, actions);
+					Logging.getQueryTestLogging().log(Level.INFO,
+							i++ + " out of " + testSize);
+					this.testQuery(opplScript, ontologyManager, testOntology);
+				}
+			}
+		} catch (OPPLException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
+	public void testBinarySubClassQuery() {
+		String opplString = "?x:CLASS,?y:CLASS, ?z:CLASS SELECT ASSERTED ?x subClassOf ?z, ASSERTED ?y subClassOf ?z BEGIN ADD ?x subClassOf ?y END;";
+		this.testQuery(opplString);
+		opplString = "?x:CLASS,?y:CLASS, ?z:CLASS SELECT ASSERTED ?x subClassOf ?y, ASSERTED ?x subClassOf ?z BEGIN ADD ?x subClassOf ?y END;";
+		this.testQuery(opplString);
+	}
+
 	public void testSubDataPropertyQuery() {
 		String opplString = "?x:DATAPROPERTY,?y:DATAPROPERTY SELECT ASSERTED ?x subPropertyOf ?y BEGIN ADD ?x subPropertyOf ?y END;";
 		this.testQuery(opplString);
@@ -251,37 +351,38 @@ public class TestQueries extends TestCase {
 		this.testQuery(opplString);
 	}
 
-	private void testQuery(String opplString) {
-		OWLOntologyManager ontologyManager = OWLManager
-				.createOWLOntologyManager();
-		try {
-			OWLOntology testOntology = ontologyManager.createOntology(TEST_NS);
-			ParserFactory.initParser(opplString, testOntology, ontologyManager,
-					null);
-			OPPLScript opplScript = OPPLParser.Start();
-			this.buildOntologyForQuery(opplScript, testOntology,
-					ontologyManager);
-			Set<OWLAxiom> results = this.getOPPLScriptCorrectResults(
-					ontologyManager, testOntology, opplScript);
-			double expected = Math.pow(this.valuesCount, opplScript
-					.getInputVariables().size());
-			assertTrue("Actual " + results.size() + " Expected " + expected,
-					results.size() == expected);
-		} catch (OWLOntologyCreationException e) {
-			fail(e.getMessage());
-		} catch (ParseException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
+	private void testQuery(OPPLScript opplScript,
+			OWLOntologyManager ontologyManager, OWLOntology testOntology) {
+		this.buildOntologyForQuery(opplScript, testOntology, ontologyManager);
+		Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
+				testOntology, opplScript);
+		StringWriter resultWriter = new StringWriter();
+		for (OWLAxiom owlAxiom : results) {
+			resultWriter.append(owlAxiom.toString());
+			resultWriter.append("\n");
+		}
+		OPPLQuery query = opplScript.getQuery();
+		List<OWLAxiom> queryAxioms = query.getAssertedAxioms();
+		queryAxioms.addAll(query.getAxioms());
+		double expected = 0;
+		VariableExtractor variableExtractor = new VariableExtractor(opplScript
+				.getConstraintSystem());
+		for (OWLAxiom owlAxiom : queryAxioms) {
+			Set<Variable> axiomVariables = owlAxiom.accept(variableExtractor);
+			expected += Math.pow(this.valuesCount, axiomVariables.size());
+		}
+		assertTrue("Query " + opplScript.render() + "\n" + " Actual "
+				+ results.size() + " Expected " + expected + "\n"
+				+ resultWriter.toString(), results.size() == expected);
+		VariableDetector variableDetector = new VariableDetector(opplScript
+				.getConstraintSystem());
+		for (OWLAxiom owlAxiom : results) {
+			assertFalse("Result with variable axiom " + owlAxiom, owlAxiom
+					.accept(variableDetector));
 		}
 	}
 
-	/**
-	 * @param manager
-	 * @param ontology
-	 * @param opplScript
-	 * @return
-	 */
-	private Set<OWLAxiom> getOPPLScriptCorrectResults(
+	private Set<OWLAxiom> getOPPLScriptResults(
 			final OWLOntologyManager manager, OWLOntology ontology,
 			final OPPLScript opplScript) {
 		ChangeExtractor changeExtractor = new ChangeExtractor(ontology,
@@ -305,19 +406,26 @@ public class TestQueries extends TestCase {
 	}
 
 	private Set<OWLDescription> generateClasses(OWLDataFactory dataFactory,
-			ConstraintSystem cs) throws OPPLException {
+			int counter, ConstraintSystem cs) throws OPPLException {
 		EnumSet<DescriptionType> descriptionTypes = EnumSet
 				.allOf(DescriptionType.class);
 		Set<OWLDescription> toReturn = new HashSet<OWLDescription>();
 		for (DescriptionType descriptionType : descriptionTypes) {
-			Variable classVariable = cs.createVariable("?aClass",
+			Variable classVariable = cs.createVariable("?aClass_" + counter,
 					VariableType.CLASS);
-			Variable dataPropertyVariable = cs.createVariable("?aProperty",
-					VariableType.DATAPROPERTY);
-			Variable objectPropertyVariable = cs.createVariable("?aProperty",
-					VariableType.OBJECTPROPERTY);
-			Variable constantVariable = cs.createVariable("?aConstant",
-					VariableType.CONSTANT);
+			Variable anotherClassVariable = cs.createVariable("?anotherClass_"
+					+ counter, VariableType.CLASS);
+			Variable dataPropertyVariable = cs.createVariable("?aDataProperty_"
+					+ counter, VariableType.DATAPROPERTY);
+			Variable objectPropertyVariable = cs
+					.createVariable("?anObjectProperty_" + counter,
+							VariableType.OBJECTPROPERTY);
+			Variable constantVariable = cs.createVariable("?aConstant_"
+					+ counter, VariableType.CONSTANT);
+			Variable anIndividualVariable = cs.createVariable("?anIndividual_"
+					+ counter, VariableType.INDIVIDUAL);
+			Variable anotherIndividualVariable = cs.createVariable(
+					"?anotherIndividual_" + counter, VariableType.INDIVIDUAL);
 			switch (descriptionType) {
 			case CLASS:
 				toReturn.add(dataFactory.getOWLClass(classVariable.getURI()));
@@ -359,10 +467,90 @@ public class TestQueries extends TestCase {
 										.getURI()), 2));
 				break;
 			case OWLOBJECTINTERSECTIONOF:
+				toReturn.add(dataFactory.getOWLObjectIntersectionOf(dataFactory
+						.getOWLClass(classVariable.getURI()), dataFactory
+						.getOWLClass(anotherClassVariable.getURI())));
+				break;
+			case OWLOBJECTEXACTCARDINALITYRESTRCTION:
+				toReturn.add(dataFactory
+						.getOWLObjectExactCardinalityRestriction(dataFactory
+								.getOWLObjectProperty(objectPropertyVariable
+										.getURI()), 4));
+				break;
+			case OWLOBJECTMINCARDINALITYRESTRICTION:
+				toReturn.add(dataFactory.getOWLObjectMinCardinalityRestriction(
+						dataFactory.getOWLObjectProperty(objectPropertyVariable
+								.getURI()), 4));
+				break;
+			case OWLOBJECTSOMERESTRICTION:
+				toReturn.add(dataFactory.getOWLObjectSomeRestriction(
+						dataFactory.getOWLObjectProperty(objectPropertyVariable
+								.getURI()), dataFactory
+								.getOWLClass(classVariable.getURI())));
+				break;
+			case OWLOBJECTONEOF:
+				toReturn.add(dataFactory.getOWLObjectOneOf(dataFactory
+						.getOWLIndividual(anIndividualVariable.getURI()),
+						dataFactory.getOWLIndividual(anotherIndividualVariable
+								.getURI())));
+				break;
+			case OWLOBJECTUNIONOF:
+				toReturn.add(dataFactory.getOWLObjectUnionOf(dataFactory
+						.getOWLClass(classVariable.getURI()), dataFactory
+						.getOWLClass(anotherClassVariable.getURI())));
+				break;
+			case OWLOBJECTVALUERESTRICTION:
+				toReturn.add(dataFactory.getOWLObjectValueRestriction(
+						dataFactory.getOWLObjectProperty(objectPropertyVariable
+								.getURI()),
+						dataFactory.getOWLIndividual(anIndividualVariable
+								.getURI())));
+				break;
+			case OWLOBJECTMAXCARDINALITYRESTRICTION:
+				toReturn.add(dataFactory.getOWLObjectMaxCardinalityRestriction(
+						dataFactory.getOWLObjectProperty(objectPropertyVariable
+								.getURI()), 4));
+				break;
 			default:
 				break;
 			}
 		}
 		return toReturn;
+	}
+
+	public void testDoublyMatchingEquivalentProperties() {
+		OWLOntologyManager ontologyManager = OWLManager
+				.createOWLOntologyManager();
+		OWLOntology testOntology;
+		try {
+			testOntology = ontologyManager.createOntology(TEST_NS);
+			OWLDataFactory dataFactory = ontologyManager.getOWLDataFactory();
+			OWLObjectProperty aProperty = dataFactory.getOWLObjectProperty(URI
+					.create(TEST_NS.toString() + "aProperty"));
+			OWLObjectProperty anotherProperty = dataFactory
+					.getOWLObjectProperty(URI.create(TEST_NS.toString()
+							+ "anotherProperty"));
+			ontologyManager.applyChange(new AddAxiom(testOntology, dataFactory
+					.getOWLEquivalentObjectPropertiesAxiom(aProperty,
+							anotherProperty)));
+			ParserFactory
+					.initParser(
+							"?x:OBJECTPROPERTY, ?y:OBJECTPROPERTY SELECT ASSERTED ?x equivalentTo ?y BEGIN ADD ?x equivalentTo ?y END;",
+							testOntology, ontologyManager, null);
+			OPPLScript opplScript = OPPLParser.Start();
+			Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
+					testOntology, opplScript);
+			assertTrue(results.size() == 1);
+			assertTrue(opplScript.getConstraintSystem().getLeaves().size() == 2);
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		} catch (OWLOntologyChangeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

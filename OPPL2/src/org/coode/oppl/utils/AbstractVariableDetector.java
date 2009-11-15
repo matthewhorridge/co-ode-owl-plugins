@@ -85,7 +85,6 @@ import org.semanticweb.owl.model.SWRLObjectPropertyAtom;
 import org.semanticweb.owl.model.SWRLRule;
 import org.semanticweb.owl.model.SWRLSameAsAtom;
 
-@SuppressWarnings("unused")
 public abstract class AbstractVariableDetector implements
 		OWLObjectVisitorEx<Boolean> {
 	protected ConstraintSystem constraintSystem;
