@@ -36,6 +36,7 @@ import org.semanticweb.owl.model.OWLAxiomVisitorEx;
 import org.semanticweb.owl.model.OWLClassAssertionAxiom;
 import org.semanticweb.owl.model.OWLDataPropertyAssertionAxiom;
 import org.semanticweb.owl.model.OWLDataPropertyDomainAxiom;
+import org.semanticweb.owl.model.OWLDataPropertyExpression;
 import org.semanticweb.owl.model.OWLDataPropertyRangeAxiom;
 import org.semanticweb.owl.model.OWLDataSubPropertyAxiom;
 import org.semanticweb.owl.model.OWLDeclarationAxiom;
@@ -52,6 +53,7 @@ import org.semanticweb.owl.model.OWLEquivalentObjectPropertiesAxiom;
 import org.semanticweb.owl.model.OWLFunctionalDataPropertyAxiom;
 import org.semanticweb.owl.model.OWLFunctionalObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLImportsDeclaration;
+import org.semanticweb.owl.model.OWLIndividual;
 import org.semanticweb.owl.model.OWLInverseFunctionalObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLInverseObjectPropertiesAxiom;
 import org.semanticweb.owl.model.OWLIrreflexiveObjectPropertyAxiom;
@@ -177,20 +179,25 @@ public class MatcherGenerator {
 					 */
 					public Set<? extends AxiomMatcher> visit(
 							final OWLDisjointClassesAxiom axiom) {
-						return Collections.singleton(new AxiomMatcher(
-								bindingNode, constraintSystem) {
-							@Override
-							public Boolean visit(
-									OWLDisjointClassesAxiom anotherAxiom) {
-								// Different equivalent orderings are not taken
-								// into
-								// account for
-								// the time being.
-								return this.matchDescriptionCollections(axiom
-										.getDescriptions(), anotherAxiom
-										.getDescriptions());
-							};
-						});
+						Set<OWLDescription> axiomDescriptions = axiom
+								.getDescriptions();
+						Set<List<OWLDescription>> allPermutations = CollectionPermutation
+								.getAllPermutations(axiomDescriptions);
+						Set<AxiomMatcher> toReturn = new HashSet<AxiomMatcher>(
+								allPermutations.size());
+						for (final List<OWLDescription> aPermutation : allPermutations) {
+							toReturn.add(new AxiomMatcher(new BindingNode(
+									bindingNode), constraintSystem) {
+								@Override
+								public Boolean visit(
+										OWLDisjointClassesAxiom anotherAxiom) {
+									return this.matchDescriptionCollections(
+											aPermutation, anotherAxiom
+													.getDescriptions());
+								}
+							});
+						}
+						return toReturn;
 					}
 
 					/**
@@ -282,10 +289,13 @@ public class MatcherGenerator {
 								.getProperties();
 						Set<List<OWLObjectPropertyExpression>> allPermutations = CollectionPermutation
 								.getAllPermutations(properties);
-						Set<? extends AxiomMatcher> toReturn = new HashSet<AxiomMatcher>(
+						Set<AxiomMatcher> toReturn = new HashSet<AxiomMatcher>(
 								allPermutations.size());
 						for (final List<OWLObjectPropertyExpression> aPermutation : allPermutations) {
-							new AxiomMatcher(bindingNode, constraintSystem) {
+							toReturn.add(new AxiomMatcher(new BindingNode(
+									bindingNode.getAssignments(), bindingNode
+											.getUnassignedVariables()),
+									constraintSystem) {
 								@Override
 								public Boolean visit(
 										OWLEquivalentObjectPropertiesAxiom anotherAxiom) {
@@ -293,7 +303,7 @@ public class MatcherGenerator {
 											aPermutation, anotherAxiom
 													.getProperties());
 								}
-							};
+							});
 						}
 						return toReturn;
 					}
@@ -337,16 +347,22 @@ public class MatcherGenerator {
 					 */
 					public Set<? extends AxiomMatcher> visit(
 							final OWLDifferentIndividualsAxiom axiom) {
-						return Collections.singleton(new AxiomMatcher(
-								bindingNode, constraintSystem) {
-							@Override
-							public Boolean visit(
-									OWLDifferentIndividualsAxiom anotherAxiom) {
-								return this.matchIndividualCollections(axiom
-										.getIndividuals(), anotherAxiom
-										.getIndividuals());
-							}
-						});
+						Set<List<OWLIndividual>> allPermutations = CollectionPermutation
+								.getAllPermutations(axiom.getIndividuals());
+						Set<AxiomMatcher> toReturn = new HashSet<AxiomMatcher>();
+						for (final List<OWLIndividual> aPermutation : allPermutations) {
+							toReturn.add(new AxiomMatcher(new BindingNode(
+									bindingNode), constraintSystem) {
+								@Override
+								public Boolean visit(
+										OWLDifferentIndividualsAxiom anotherAxiom) {
+									return this.matchIndividualCollections(
+											aPermutation, anotherAxiom
+													.getIndividuals());
+								}
+							});
+						}
+						return toReturn;
 					}
 
 					/**
@@ -356,16 +372,25 @@ public class MatcherGenerator {
 					 */
 					public Set<? extends AxiomMatcher> visit(
 							final OWLDisjointDataPropertiesAxiom axiom) {
-						return Collections.singleton(new AxiomMatcher(
-								bindingNode, constraintSystem) {
-							@Override
-							public Boolean visit(
-									OWLDisjointDataPropertiesAxiom anotherAxiom) {
-								return this.matchPropertyCollections(axiom
-										.getProperties(), anotherAxiom
-										.getProperties());
-							}
-						});
+						Set<OWLDataPropertyExpression> properties = axiom
+								.getProperties();
+						Set<List<OWLDataPropertyExpression>> allPermutations = CollectionPermutation
+								.getAllPermutations(properties);
+						Set<AxiomMatcher> toReturn = new HashSet<AxiomMatcher>(
+								allPermutations.size());
+						for (final List<OWLDataPropertyExpression> aPermutation : allPermutations) {
+							toReturn.add(new AxiomMatcher(new BindingNode(
+									bindingNode), constraintSystem) {
+								@Override
+								public Boolean visit(
+										OWLDisjointDataPropertiesAxiom anotherAxiom) {
+									return this.matchPropertyCollections(
+											aPermutation, anotherAxiom
+													.getProperties());
+								}
+							});
+						}
+						return toReturn;
 					}
 
 					/**
@@ -375,16 +400,27 @@ public class MatcherGenerator {
 					 */
 					public Set<? extends AxiomMatcher> visit(
 							final OWLDisjointObjectPropertiesAxiom axiom) {
-						return Collections.singleton(new AxiomMatcher(
-								bindingNode, constraintSystem) {
-							@Override
-							public Boolean visit(
-									OWLDisjointObjectPropertiesAxiom anotherAxiom) {
-								return this.matchPropertyCollections(axiom
-										.getProperties(), anotherAxiom
-										.getProperties());
-							}
-						});
+						Set<OWLObjectPropertyExpression> properties = axiom
+								.getProperties();
+						Set<List<OWLObjectPropertyExpression>> allPermutations = CollectionPermutation
+								.getAllPermutations(properties);
+						Set<AxiomMatcher> toReturn = new HashSet<AxiomMatcher>(
+								allPermutations.size());
+						for (final List<OWLObjectPropertyExpression> aPermutation : allPermutations) {
+							toReturn.add(new AxiomMatcher(new BindingNode(
+									bindingNode.getAssignments(), bindingNode
+											.getUnassignedVariables()),
+									constraintSystem) {
+								@Override
+								public Boolean visit(
+										OWLDisjointObjectPropertiesAxiom anotherAxiom) {
+									return this.matchPropertyCollections(
+											aPermutation, anotherAxiom
+													.getProperties());
+								}
+							});
+						}
+						return toReturn;
 					}
 
 					/**
@@ -603,16 +639,25 @@ public class MatcherGenerator {
 					 */
 					public Set<? extends AxiomMatcher> visit(
 							final OWLEquivalentDataPropertiesAxiom axiom) {
-						return Collections.singleton(new AxiomMatcher(
-								bindingNode, constraintSystem) {
-							@Override
-							public Boolean visit(
-									OWLEquivalentDataPropertiesAxiom anotherAxiom) {
-								return this.matchPropertyCollections(axiom
-										.getProperties(), anotherAxiom
-										.getProperties());
-							}
-						});
+						Set<OWLDataPropertyExpression> properties = axiom
+								.getProperties();
+						Set<List<OWLDataPropertyExpression>> allPermutations = CollectionPermutation
+								.getAllPermutations(properties);
+						Set<AxiomMatcher> toReturn = new HashSet<AxiomMatcher>(
+								allPermutations.size());
+						for (final List<OWLDataPropertyExpression> aPermutation : allPermutations) {
+							toReturn.add(new AxiomMatcher(new BindingNode(
+									bindingNode), constraintSystem) {
+								@Override
+								public Boolean visit(
+										OWLEquivalentDataPropertiesAxiom anotherAxiom) {
+									return this.matchPropertyCollections(
+											aPermutation, anotherAxiom
+													.getProperties());
+								}
+							});
+						}
+						return toReturn;
 					}
 
 					/**
@@ -655,8 +700,8 @@ public class MatcherGenerator {
 						Set<AxiomMatcher> toReturn = new HashSet<AxiomMatcher>(
 								allPermutations.size());
 						for (final List<OWLDescription> aPermutation : allPermutations) {
-							toReturn.add(new AxiomMatcher(bindingNode,
-									constraintSystem) {
+							toReturn.add(new AxiomMatcher(new BindingNode(
+									bindingNode), constraintSystem) {
 								@Override
 								public Boolean visit(
 										OWLEquivalentClassesAxiom anotherAxiom) {
@@ -788,16 +833,22 @@ public class MatcherGenerator {
 					 */
 					public Set<? extends AxiomMatcher> visit(
 							final OWLSameIndividualsAxiom axiom) {
-						return Collections.singleton(new AxiomMatcher(
-								bindingNode, constraintSystem) {
-							@Override
-							public Boolean visit(
-									OWLSameIndividualsAxiom anotherAxiom) {
-								return this.matchIndividualCollections(axiom
-										.getIndividuals(), anotherAxiom
-										.getIndividuals());
-							}
-						});
+						Set<List<OWLIndividual>> allPermutations = CollectionPermutation
+								.getAllPermutations(axiom.getIndividuals());
+						Set<AxiomMatcher> toReturn = new HashSet<AxiomMatcher>();
+						for (final List<OWLIndividual> aPermutation : allPermutations) {
+							toReturn.add(new AxiomMatcher(new BindingNode(
+									bindingNode), constraintSystem) {
+								@Override
+								public Boolean visit(
+										OWLSameIndividualsAxiom anotherAxiom) {
+									return this.matchIndividualCollections(
+											aPermutation, anotherAxiom
+													.getIndividuals());
+								}
+							});
+						}
+						return toReturn;
 					}
 
 					/**
