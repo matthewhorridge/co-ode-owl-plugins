@@ -55,7 +55,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	}
 
 	private final Set<Assignment> assignments = new HashSet<Assignment>();
-	protected final Set<Variable> unassignedVariables = new HashSet<Variable>();
+	private final Set<Variable> unassignedVariables = new HashSet<Variable>();
 
 	/**
 	 * @param assignments
@@ -65,6 +65,14 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 			Set<Variable> unassignedVariables) {
 		this.assignments.addAll(assignments);
 		this.unassignedVariables.addAll(unassignedVariables);
+	}
+
+	public BindingNode(BindingNode bindingNode) {
+		if (bindingNode == null) {
+			throw new NullPointerException("The biding node cannot be null");
+		}
+		this.assignments.addAll(bindingNode.getAssignments());
+		this.unassignedVariables.addAll(bindingNode.getAssignedVariables());
 	}
 
 	public void accept(BindingVisitor visitor) {
