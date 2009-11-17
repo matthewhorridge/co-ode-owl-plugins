@@ -23,6 +23,7 @@
 package org.coode.oppl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.coode.oppl.search.SearchTree;
 import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.model.OWLAxiom;
@@ -181,5 +183,24 @@ public class AssertedTreeSearchSingleAxiomQuery extends AbstractAxiomQuery {
 
 	public Set<OWLOntology> getOntologies() {
 		return new HashSet<OWLOntology>(this.ontologies);
+	}
+
+	private Collection<? extends OWLAxiom> filterAxioms(OWLAxiom toMatchAxiom,
+			Collection<? extends OWLAxiom> axioms) {
+		Set<OWLAxiom> toReturn = new HashSet<OWLAxiom>();
+		VariableExtractor variableExtractor = new VariableExtractor(this
+				.getConstraintSystem());
+		Set<Variable> variables = toMatchAxiom.accept(variableExtractor);
+		for (OWLAxiom candidate : axioms) {
+			if (candidate.getAxiomType().equals(toMatchAxiom.getAxiomType())) {
+				if (toMatchAxiom.getReferencedEntities().containsAll(
+						candidate.getReferencedEntities())) {
+					toReturn.add(candidate);
+				} else {
+					new HashSet<E>(candidate.getReferencedEntities());
+				}
+			}
+		}
+		return toReturn;
 	}
 }
