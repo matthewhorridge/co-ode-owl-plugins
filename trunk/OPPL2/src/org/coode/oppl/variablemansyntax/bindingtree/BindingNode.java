@@ -69,10 +69,10 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 
 	public BindingNode(BindingNode bindingNode) {
 		if (bindingNode == null) {
-			throw new NullPointerException("The biding node cannot be null");
+			throw new NullPointerException("The binding node cannot be null");
 		}
 		this.assignments.addAll(bindingNode.getAssignments());
-		this.unassignedVariables.addAll(bindingNode.getAssignedVariables());
+		this.unassignedVariables.addAll(bindingNode.getUnassignedVariables());
 	}
 
 	public void accept(BindingVisitor visitor) {

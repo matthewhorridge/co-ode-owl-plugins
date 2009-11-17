@@ -44,7 +44,7 @@ import org.semanticweb.owl.util.OWLDescriptionVisitorAdapter;
  * @author Luigi Iannone
  * 
  */
-public class OPPLOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearchNode> {
+public class OPPLAssertedOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearchNode> {
 	private final ConstraintSystem constraintSystem;
 	private final Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
 	private final Set<OWLClass> allClasses = new HashSet<OWLClass>();
@@ -53,7 +53,7 @@ public class OPPLOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearchNode> {
 	private final Set<OWLIndividual> allIndividuals = new HashSet<OWLIndividual>();
 	private final Set<OWLConstant> allConstants = new HashSet<OWLConstant>();
 
-	public OPPLOWLAxiomSearchTree(Collection<? extends OWLOntology> ontologies,
+	public OPPLAssertedOWLAxiomSearchTree(Collection<? extends OWLOntology> ontologies,
 			ConstraintSystem constraintSystem) {
 		if (ontologies == null) {
 			throw new NullPointerException(
@@ -72,7 +72,7 @@ public class OPPLOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearchNode> {
 	 * @param manager
 	 * @param constraintSystem
 	 */
-	public OPPLOWLAxiomSearchTree(OWLOntologyManager manager,
+	public OPPLAssertedOWLAxiomSearchTree(OWLOntologyManager manager,
 			ConstraintSystem constraintSystem) {
 		if (manager == null) {
 			throw new NullPointerException("The manager cannot be null");
@@ -252,10 +252,24 @@ public class OPPLOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearchNode> {
 
 	private void initAssignableValues() {
 		this.allClasses.addAll(this.getAllClasses());
+		Logging.getQueryLogger().log(Level.FINE,
+				"Possible class values " + this.allClasses.size());
 		this.allDataProperties.addAll(this.getAllDataProperties());
+		Logging.getQueryLogger().log(
+				Level.FINE,
+				"Possible data property values "
+						+ this.allDataProperties.size());
 		this.allObjectProperties.addAll(this.getObjectProperties());
+		Logging.getQueryLogger().log(
+				Level.FINE,
+				"Possible object property values "
+						+ this.allObjectProperties.size());
 		this.allIndividuals.addAll(this.getAllIndividuals());
+		Logging.getQueryLogger().log(Level.FINE,
+				"Possible individual  values " + this.allIndividuals.size());
 		this.allConstants.addAll(this.getAllConstants());
+		Logging.getQueryLogger().log(Level.FINE,
+				"Possible constant  values " + this.allConstants.size());
 	}
 
 	/**
@@ -290,7 +304,7 @@ public class OPPLOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearchNode> {
 			int leafIndex = 1;
 			for (BindingNode bindingNode : existingLeaves) {
 				Logging.getQueryTestLogging().log(
-						Level.FINE,
+						Level.FINER,
 						"Exhaustive search on leaf: " + leafIndex++
 								+ " out of " + existingLeaves.size());
 				PartialOWLObjectInstantiator partialObjectInstantiator = new PartialOWLObjectInstantiator(
