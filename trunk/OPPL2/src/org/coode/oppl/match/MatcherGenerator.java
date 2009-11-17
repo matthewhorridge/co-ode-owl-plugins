@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.coode.oppl.utils.CollectionPermutation;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
