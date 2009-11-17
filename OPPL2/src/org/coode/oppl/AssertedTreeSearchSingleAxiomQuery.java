@@ -28,9 +28,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
+import org.coode.oppl.log.Logging;
+import org.coode.oppl.search.OPPLAssertedSingleOWLAxiomSearchTree;
 import org.coode.oppl.search.OPPLOWLAxiomSearchNode;
-import org.coode.oppl.search.OPPLAssertedOWLAxiomSearchTree;
+import org.coode.oppl.search.SearchTree;
 import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
@@ -43,12 +46,13 @@ import org.semanticweb.owl.model.OWLOntology;
  * @author Luigi Iannone
  * 
  */
-public class AssertedTreeSearchAxiomQuery extends AbstractAxiomQuery {
+public class AssertedTreeSearchSingleAxiomQuery extends AbstractAxiomQuery {
+	private final Map<OWLAxiom, SearchTree<OPPLOWLAxiomSearchNode>> searchTrees = new HashMap<OWLAxiom, SearchTree<OPPLOWLAxiomSearchNode>>();
 	private final ConstraintSystem constraintSystem;
 	private final Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
 	private final Map<BindingNode, Set<OWLAxiom>> instantiations = new HashMap<BindingNode, Set<OWLAxiom>>();
 
-	public AssertedTreeSearchAxiomQuery(Set<OWLOntology> ontologies,
+	public AssertedTreeSearchSingleAxiomQuery(Set<OWLOntology> ontologies,
 			ConstraintSystem constraintSystem) {
 		if (ontologies == null) {
 			throw new NullPointerException(
@@ -65,14 +69,56 @@ public class AssertedTreeSearchAxiomQuery extends AbstractAxiomQuery {
 	@Override
 	protected void match(OWLAxiom axiom) {
 		this.clearInstantions();
-		OPPLAssertedOWLAxiomSearchTree searchTree = new OPPLAssertedOWLAxiomSearchTree(this
-				.getOntologies(), this.getConstraintSystem());
-		VariableExtractor variableExtractor = new VariableExtractor(this
-				.getConstraintSystem());
-		List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();
-		searchTree.exhaustiveSearchTree(new OPPLOWLAxiomSearchNode(axiom,
-				new BindingNode(new HashSet<Assignment>(), axiom
-						.accept(variableExtractor))), solutions);
+		Set<BindingNode> leaves = this.getConstraintSystem().getLeaves();
+		if (leaves == null) {
+			VariableExtractor variableExtractor = new VariableExtractor(this
+					.getConstraintSystem());
+			OPPLOWLAxiomSearchNode start = new OPPLOWLAxiomSearchNode(axiom,
+					new BindingNode(new HashSet<Assignment>(), axiom
+							.accept(variableExtractor)));
+			this.doMatch(start);
+		} else {
+			int i = 0;
+			for (BindingNode bindingNode : leaves) {
+				i++;
+				Logging.getQueryLogger().log(Level.FINER,
+						"Matching " + i + " out of " + leaves.size());
+				PartialOWLObjectInstantiator partialObjectInstantiator = new PartialOWLObjectInstantiator(
+						bindingNode, this.getConstraintSystem());
+				OWLAxiom newStartAxiom = (OWLAxiom) axiom
+						.accept(partialObjectInstantiator);
+				OPPLOWLAxiomSearchNode newStart = new OPPLOWLAxiomSearchNode(
+						newStartAxiom, bindingNode);
+				this.doMatch(newStart);
+			}
+		}
+		this.getConstraintSystem().setLeaves(
+				new HashSet<BindingNode>(this.getInstantiations().keySet()));
+	}
+
+	/**
+	 * @param axiom
+	 * @param start
+	 */
+	private void doMatch(OPPLOWLAxiomSearchNode start) {
+		for (OWLOntology ontology : this.getOntologies()) {
+			for (OWLAxiom targetAxiom : ontology.getAxioms()) {
+				if (start.getAxiom().getAxiomType().equals(
+						targetAxiom.getAxiomType())) {
+					List<List<OPPLOWLAxiomSearchNode>> solutions = this
+							.matchTargetAxiom(start, targetAxiom);
+					this.populateInstantiation(start.getAxiom(), solutions);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param start
+	 * @param solutions
+	 */
+	private void populateInstantiation(OWLAxiom axiom,
+			List<List<OPPLOWLAxiomSearchNode>> solutions) {
 		for (List<OPPLOWLAxiomSearchNode> path : solutions) {
 			OPPLOWLAxiomSearchNode searchLeaf = path.get(path.size() - 1);
 			BindingNode leaf = searchLeaf.getBinding();
@@ -86,6 +132,36 @@ public class AssertedTreeSearchAxiomQuery extends AbstractAxiomQuery {
 					.accept(partialOWLObjectInstantiator));
 			this.instantiations.put(leaf, leafInstantiations);
 		}
+	}
+
+	/**
+	 * @param axiom
+	 * @param targetAxiom
+	 * @param start
+	 */
+	private List<List<OPPLOWLAxiomSearchNode>> matchTargetAxiom(
+			OPPLOWLAxiomSearchNode start, OWLAxiom targetAxiom) {
+		SearchTree<OPPLOWLAxiomSearchNode> searchTree = this
+				.getSearchTree(targetAxiom);
+		List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();
+		searchTree.exhaustiveSearchTree(start, solutions);
+		return solutions;
+	}
+
+	/**
+	 * @param targetAxiom
+	 * @return
+	 */
+	private SearchTree<OPPLOWLAxiomSearchNode> getSearchTree(
+			OWLAxiom targetAxiom) {
+		SearchTree<OPPLOWLAxiomSearchNode> toReturn = this.searchTrees
+				.get(targetAxiom);
+		if (toReturn == null) {
+			toReturn = new OPPLAssertedSingleOWLAxiomSearchTree(targetAxiom,
+					this.getConstraintSystem());
+			this.searchTrees.put(targetAxiom, toReturn);
+		}
+		return toReturn;
 	}
 
 	private void clearInstantions() {

@@ -32,8 +32,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import org.coode.oppl.AbstractConstraint;
-import org.coode.oppl.AssertedAxiomMatchingQuery;
-import org.coode.oppl.AssertedTreeSearchAxiomQuery;
+import org.coode.oppl.AssertedTreeSearchSingleAxiomQuery;
 import org.coode.oppl.AxiomQuery;
 import org.coode.oppl.ConstraintChecker;
 import org.coode.oppl.InferredAxiomQuery;
@@ -230,8 +229,14 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 			// this.ontologies, this)
 			// : new InferredAxiomQuery(this.ontologies, this,
 			// this.dataFactory, this.reasoner);
+			// AxiomQuery query = this.reasoner == null
+			// || this.reasoner instanceof NoOpReasoner ? new
+			// AssertedTreeSearchAxiomQuery(
+			// this.ontologies, this)
+			// : new InferredAxiomQuery(this.ontologies, this,
+			// this.dataFactory, this.reasoner);
 			AxiomQuery query = this.reasoner == null
-					|| this.reasoner instanceof NoOpReasoner ? new AssertedTreeSearchAxiomQuery(
+					|| this.reasoner instanceof NoOpReasoner ? new AssertedTreeSearchSingleAxiomQuery(
 					this.ontologies, this)
 					: new InferredAxiomQuery(this.ontologies, this,
 							this.dataFactory, this.reasoner);
@@ -292,8 +297,10 @@ public class ConstraintSystem implements OWLAxiomVisitor {
 			// AxiomQuery query = new AssertedAxiomQuery(this.ontologies, this);
 			// AxiomQuery query = new AssertedTreeSearchAxiomQuery(
 			// this.ontologies, this);
-			AxiomQuery query = new AssertedAxiomMatchingQuery(this,
-					this.ontologies);
+			// AxiomQuery query = new AssertedAxiomMatchingQuery(this,
+			// this.ontologies);
+			AxiomQuery query = new AssertedTreeSearchSingleAxiomQuery(
+					this.ontologies, this);
 			axiom.accept(query);
 			this.instantiatedAxioms.putAll(query.getInstantiations());
 			Logging.getQueryLogger().log(Level.INFO,

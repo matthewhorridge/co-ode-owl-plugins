@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 import org.coode.oppl.ChangeExtractor;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.search.OPPLOWLAxiomSearchNode;
-import org.coode.oppl.search.OPPLOWLAxiomSearchTree;
+import org.coode.oppl.search.OPPLAssertedOWLAxiomSearchTree;
 import org.coode.oppl.search.OWLAxiomSearchTree;
 import org.coode.oppl.search.SearchTree;
 import org.coode.oppl.syntax.OPPLParser;
@@ -314,7 +314,7 @@ public class SearchTest extends TestCase {
 			OWLAxiom secondAxiom = iterator.next();
 			VariableExtractor variableExtractor = new VariableExtractor(
 					opplScript.getConstraintSystem());
-			OPPLOWLAxiomSearchTree searchTree = new OPPLOWLAxiomSearchTree(
+			OPPLAssertedOWLAxiomSearchTree searchTree = new OPPLAssertedOWLAxiomSearchTree(
 					manager, opplScript.getConstraintSystem());
 			List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();
 			boolean found = searchTree.exhaustiveSearchTree(
@@ -395,7 +395,7 @@ public class SearchTest extends TestCase {
 			OWLAxiom secondAxiom = iterator.next();
 			VariableExtractor variableExtractor = new VariableExtractor(
 					opplScript.getConstraintSystem());
-			OPPLOWLAxiomSearchTree searchTree = new OPPLOWLAxiomSearchTree(
+			OPPLAssertedOWLAxiomSearchTree searchTree = new OPPLAssertedOWLAxiomSearchTree(
 					manager, opplScript.getConstraintSystem());
 			List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();
 			boolean found = searchTree.exhaustiveSearchTree(
