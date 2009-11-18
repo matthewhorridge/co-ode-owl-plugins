@@ -40,13 +40,13 @@ public class OWLObjectInstantiator extends AbstractOWLObjectInstantiator {
 	@Override
 	public OWLObject visit(OWLTypedConstant node) {
 		OWLConstant toReturn = node;
-		if (this.constraintSystem.isVariable(node)) {
+		if (this.getConstraintSystem().isVariable(node)) {
 			// XXX the other OwlOBjectInstantiator uses getLiteral - is this the
 			// same?
-			Variable variable = this.constraintSystem.getVariable(node
-					.toString());
-			toReturn = (OWLConstant) this.bindingNode
-					.getAssignmentValue(variable);
+			Variable variable = this.getConstraintSystem().getVariable(
+					node.toString());
+			toReturn = (OWLConstant) this.getBindingNode().getAssignmentValue(
+					variable);
 		}
 		return toReturn;
 	}
@@ -54,11 +54,11 @@ public class OWLObjectInstantiator extends AbstractOWLObjectInstantiator {
 	@Override
 	public OWLObject visit(OWLUntypedConstant node) {
 		OWLConstant toReturn = node;
-		if (this.constraintSystem.isVariable(node)) {
-			Variable variable = this.constraintSystem.getVariable(node
-					.getLiteral());
-			toReturn = (OWLConstant) this.bindingNode
-					.getAssignmentValue(variable);
+		if (this.getConstraintSystem().isVariable(node)) {
+			Variable variable = this.getConstraintSystem().getVariable(
+					node.getLiteral());
+			toReturn = (OWLConstant) this.getBindingNode().getAssignmentValue(
+					variable);
 		}
 		return toReturn;
 	}

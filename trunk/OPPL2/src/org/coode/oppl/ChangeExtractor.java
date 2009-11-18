@@ -25,10 +25,10 @@ package org.coode.oppl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.AddAxiom;
-import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -68,25 +68,16 @@ public class ChangeExtractor implements
 
 	public List<OWLAxiomChange> visit(OPPLQuery q, List<OWLAxiomChange> p) {
 		if (q != null) {
-			q.getConstraintSystem().reset();
-			List<OWLAxiom> axioms = q.getAssertedAxioms();
-			for (OWLAxiom axiom : axioms) {
-				q.getConstraintSystem().addAssertedAxiom(axiom);
-			}
-			axioms = q.getAxioms();
-			for (OWLAxiom axiom : axioms) {
-				q.getConstraintSystem().addAxiom(axiom);
-			}
-			for (AbstractConstraint c : q.getConstraints()) {
-				q.getConstraintSystem().addConstraint(c);
+			try {
+				q.execute();
+			} catch (OPPLException e) {
+				e.printStackTrace();
 			}
 		}
 		return p;
-		// return p;
 	}
 
 	public List<OWLAxiomChange> visit(Variable v, List<OWLAxiomChange> p) {
-		// return null;
 		return p;
 	}
 

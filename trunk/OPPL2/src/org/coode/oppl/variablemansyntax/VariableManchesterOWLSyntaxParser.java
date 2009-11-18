@@ -144,7 +144,7 @@ public class VariableManchesterOWLSyntaxParser extends
 	private VariableShortFormEntityChecker owlEntityChecker;
 
 	public VariableManchesterOWLSyntaxParser(String s, ConstraintSystem cs) {
-		super(cs.getDataFactory(), s);
+		super(cs.getOntologyManager().getOWLDataFactory(), s);
 		this.constraintSystem = cs;
 		this.setOWLEntityChecker(OPPLParser.getOPPLFactory()
 				.getOWLEntityChecker());

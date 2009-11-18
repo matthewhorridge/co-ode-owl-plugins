@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.coode.oppl.search.OPPLOWLAxiomSearchNode;
 import org.coode.oppl.search.OPPLAssertedOWLAxiomSearchTree;
+import org.coode.oppl.search.OPPLOWLAxiomSearchNode;
 import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
@@ -65,8 +65,8 @@ public class AssertedTreeSearchAxiomQuery extends AbstractAxiomQuery {
 	@Override
 	protected void match(OWLAxiom axiom) {
 		this.clearInstantions();
-		OPPLAssertedOWLAxiomSearchTree searchTree = new OPPLAssertedOWLAxiomSearchTree(this
-				.getOntologies(), this.getConstraintSystem());
+		OPPLAssertedOWLAxiomSearchTree searchTree = new OPPLAssertedOWLAxiomSearchTree(
+				this.getConstraintSystem());
 		VariableExtractor variableExtractor = new VariableExtractor(this
 				.getConstraintSystem());
 		List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();

@@ -35,7 +35,6 @@ import org.semanticweb.owl.model.OWLNegativeDataPropertyAssertionAxiom;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.model.OWLSubClassAxiom;
 import org.semanticweb.owl.util.OWLAxiomVisitorAdapter;
 import org.semanticweb.owl.util.OWLDescriptionVisitorAdapter;
@@ -44,45 +43,20 @@ import org.semanticweb.owl.util.OWLDescriptionVisitorAdapter;
  * @author Luigi Iannone
  * 
  */
-public class OPPLAssertedOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearchNode> {
+public class OPPLAssertedOWLAxiomSearchTree extends
+		SearchTree<OPPLOWLAxiomSearchNode> {
 	private final ConstraintSystem constraintSystem;
-	private final Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
 	private final Set<OWLClass> allClasses = new HashSet<OWLClass>();
 	private final Set<OWLObjectProperty> allObjectProperties = new HashSet<OWLObjectProperty>();
 	private final Set<OWLDataProperty> allDataProperties = new HashSet<OWLDataProperty>();
 	private final Set<OWLIndividual> allIndividuals = new HashSet<OWLIndividual>();
 	private final Set<OWLConstant> allConstants = new HashSet<OWLConstant>();
 
-	public OPPLAssertedOWLAxiomSearchTree(Collection<? extends OWLOntology> ontologies,
-			ConstraintSystem constraintSystem) {
-		if (ontologies == null) {
-			throw new NullPointerException(
-					"The ontologies collection cannot be null");
-		}
+	public OPPLAssertedOWLAxiomSearchTree(ConstraintSystem constraintSystem) {
 		if (constraintSystem == null) {
 			throw new NullPointerException(
 					"The constraint system cannot be null");
 		}
-		this.constraintSystem = constraintSystem;
-		this.ontologies.addAll(ontologies);
-	}
-
-	// private final OWLOntologyManager manager;
-	/**
-	 * @param manager
-	 * @param constraintSystem
-	 */
-	public OPPLAssertedOWLAxiomSearchTree(OWLOntologyManager manager,
-			ConstraintSystem constraintSystem) {
-		if (manager == null) {
-			throw new NullPointerException("The manager cannot be null");
-		}
-		if (constraintSystem == null) {
-			throw new NullPointerException(
-					"The constraint system cannot be null");
-		}
-		// this.manager = manager;
-		this.ontologies.addAll(manager.getOntologies());
 		this.constraintSystem = constraintSystem;
 	}
 
@@ -138,7 +112,8 @@ public class OPPLAssertedOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearc
 	@Override
 	protected boolean goalReached(OPPLOWLAxiomSearchNode start) {
 		boolean found = false;
-		Iterator<OWLOntology> iterator = this.ontologies.iterator();
+		Iterator<OWLOntology> iterator = this.getConstraintSystem()
+				.getOntologyManager().getOntologies().iterator();
 		while (!found && iterator.hasNext()) {
 			OWLOntology ontology = iterator.next();
 			found = ontology.containsAxiom(start.getAxiom());
@@ -148,7 +123,8 @@ public class OPPLAssertedOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearc
 
 	private Collection<OWLClass> getAllClasses() {
 		Set<OWLClass> toReturn = new HashSet<OWLClass>();
-		for (OWLOntology owlOntology : this.ontologies) {
+		for (OWLOntology owlOntology : this.getConstraintSystem()
+				.getOntologyManager().getOntologies()) {
 			toReturn.addAll(owlOntology.getReferencedClasses());
 		}
 		return toReturn;
@@ -162,7 +138,8 @@ public class OPPLAssertedOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearc
 				toReturn.add(desc.getValue());
 			}
 		};
-		for (OWLOntology owlOntology : this.ontologies) {
+		for (OWLOntology owlOntology : this.getConstraintSystem()
+				.getOntologyManager().getOntologies()) {
 			for (OWLAxiom axiom : owlOntology.getAxioms()) {
 				axiom.accept(new OWLAxiomVisitorAdapter() {
 					@Override
@@ -210,7 +187,8 @@ public class OPPLAssertedOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearc
 
 	private Collection<OWLDataProperty> getAllDataProperties() {
 		Set<OWLDataProperty> toReturn = new HashSet<OWLDataProperty>();
-		for (OWLOntology owlOntology : this.ontologies) {
+		for (OWLOntology owlOntology : this.getConstraintSystem()
+				.getOntologyManager().getOntologies()) {
 			toReturn.addAll(owlOntology.getReferencedDataProperties());
 		}
 		return toReturn;
@@ -218,7 +196,8 @@ public class OPPLAssertedOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearc
 
 	private Collection<OWLIndividual> getAllIndividuals() {
 		Set<OWLIndividual> toReturn = new HashSet<OWLIndividual>();
-		for (OWLOntology owlOntology : this.ontologies) {
+		for (OWLOntology owlOntology : this.getConstraintSystem()
+				.getOntologyManager().getOntologies()) {
 			toReturn.addAll(owlOntology.getReferencedIndividuals());
 		}
 		return toReturn;
@@ -281,7 +260,8 @@ public class OPPLAssertedOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearc
 
 	private Collection<OWLObjectProperty> getObjectProperties() {
 		Set<OWLObjectProperty> toReturn = new HashSet<OWLObjectProperty>();
-		for (OWLOntology owlOntology : this.ontologies) {
+		for (OWLOntology owlOntology : this.getConstraintSystem()
+				.getOntologyManager().getOntologies()) {
 			toReturn.addAll(owlOntology.getReferencedObjectProperties());
 		}
 		return toReturn;
@@ -332,12 +312,5 @@ public class OPPLAssertedOWLAxiomSearchTree extends SearchTree<OPPLOWLAxiomSearc
 		}
 		this.constraintSystem.setLeaves(newLeaves);
 		return found;
-	}
-
-	/**
-	 * @return the ontologies
-	 */
-	public Set<OWLOntology> getOntologies() {
-		return new HashSet<OWLOntology>(this.ontologies);
 	}
 }

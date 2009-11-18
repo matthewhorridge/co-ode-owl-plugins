@@ -24,6 +24,7 @@ package org.coode.oppl;
 
 import java.util.List;
 
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.semanticweb.owl.model.OWLAxiom;
 
@@ -49,4 +50,6 @@ public interface OPPLQuery {
 	String render();
 
 	ConstraintSystem getConstraintSystem();
+
+	public void execute() throws OPPLException;
 }
