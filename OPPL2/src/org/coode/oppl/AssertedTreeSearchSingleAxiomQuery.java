@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,6 +36,7 @@ import org.coode.oppl.log.Logging;
 import org.coode.oppl.search.OPPLAssertedSingleOWLAxiomSearchTree;
 import org.coode.oppl.search.OPPLOWLAxiomSearchNode;
 import org.coode.oppl.search.SearchTree;
+import org.coode.oppl.utils.OWLObjectExtractor;
 import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
@@ -42,6 +44,7 @@ import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
 /**
@@ -53,6 +56,7 @@ public class AssertedTreeSearchSingleAxiomQuery extends AbstractAxiomQuery {
 	private final ConstraintSystem constraintSystem;
 	private final Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
 	private final Map<BindingNode, Set<OWLAxiom>> instantiations = new HashMap<BindingNode, Set<OWLAxiom>>();
+	private final Map<OWLAxiom, Collection<? extends OWLObject>> cache = new HashMap<OWLAxiom, Collection<? extends OWLObject>>();
 
 	public AssertedTreeSearchSingleAxiomQuery(Set<OWLOntology> ontologies,
 			ConstraintSystem constraintSystem) {
@@ -104,7 +108,8 @@ public class AssertedTreeSearchSingleAxiomQuery extends AbstractAxiomQuery {
 	 */
 	private void doMatch(OPPLOWLAxiomSearchNode start) {
 		for (OWLOntology ontology : this.getOntologies()) {
-			for (OWLAxiom targetAxiom : ontology.getAxioms()) {
+			for (OWLAxiom targetAxiom : this.filterAxioms(start.getAxiom(),
+					ontology.getAxioms())) {
 				if (start.getAxiom().getAxiomType().equals(
 						targetAxiom.getAxiomType())) {
 					List<List<OPPLOWLAxiomSearchNode>> solutions = this
@@ -191,15 +196,50 @@ public class AssertedTreeSearchSingleAxiomQuery extends AbstractAxiomQuery {
 		VariableExtractor variableExtractor = new VariableExtractor(this
 				.getConstraintSystem());
 		Set<Variable> variables = toMatchAxiom.accept(variableExtractor);
+		Collection<? extends OWLObject> toMatchAllOWLObjects = this
+				.extractOWLObjects(toMatchAxiom);
 		for (OWLAxiom candidate : axioms) {
 			if (candidate.getAxiomType().equals(toMatchAxiom.getAxiomType())) {
-				if (toMatchAxiom.getReferencedEntities().containsAll(
-						candidate.getReferencedEntities())) {
+				Collection<? extends OWLObject> candidateAllOWLObjects = this
+						.extractOWLObjects(candidate);
+				if (toMatchAllOWLObjects.containsAll(candidateAllOWLObjects)) {
 					toReturn.add(candidate);
 				} else {
-					new HashSet<E>(candidate.getReferencedEntities());
+					Set<OWLObject> difference = new HashSet<OWLObject>(
+							candidateAllOWLObjects);
+					difference.removeAll(toMatchAllOWLObjects);
+					Iterator<OWLObject> iterator = difference.iterator();
+					boolean found = false;
+					while (!found && iterator.hasNext()) {
+						OWLObject leftOutOWLObject = iterator.next();
+						Iterator<Variable> variableIterator = variables
+								.iterator();
+						boolean compatible = false;
+						while (!compatible && variableIterator.hasNext()) {
+							Variable variable = variableIterator.next();
+							compatible = variable.getType().isCompatibleWith(
+									leftOutOWLObject);
+						}
+						found = !compatible;
+					}
+					if (!found) {
+						toReturn.add(candidate);
+					}
 				}
 			}
+		}
+		return toReturn;
+	}
+
+	/**
+	 * @param axiom
+	 * @return
+	 */
+	private Collection<? extends OWLObject> extractOWLObjects(OWLAxiom axiom) {
+		Collection<? extends OWLObject> toReturn = this.cache.get(axiom);
+		if (toReturn == null) {
+			toReturn = OWLObjectExtractor.getAllOWLObjects(axiom);
+			this.cache.put(axiom, toReturn);
 		}
 		return toReturn;
 	}
