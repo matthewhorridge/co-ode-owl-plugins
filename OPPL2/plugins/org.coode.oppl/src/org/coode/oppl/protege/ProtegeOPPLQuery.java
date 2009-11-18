@@ -28,6 +28,7 @@ import java.util.List;
 import org.coode.oppl.AbstractConstraint;
 import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.SimpleVariableShortFormProvider;
+import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.protege.ui.VariableOWLObjectRenderer;
 import org.coode.oppl.protege.ui.rendering.ShortFormVariableOWLEntityRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
@@ -143,5 +144,13 @@ public class ProtegeOPPLQuery implements OPPLQuery {
 
 	public ConstraintSystem getConstraintSystem() {
 		return this.opplQuery.getConstraintSystem();
+	}
+
+	public void execute() {
+		try {
+			this.opplQuery.execute();
+		} catch (OPPLException e) {
+			e.printStackTrace();
+		}
 	}
 }

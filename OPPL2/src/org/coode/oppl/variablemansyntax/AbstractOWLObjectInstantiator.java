@@ -14,7 +14,6 @@ import org.semanticweb.owl.model.OWLConstantAnnotation;
 import org.semanticweb.owl.model.OWLDataAllRestriction;
 import org.semanticweb.owl.model.OWLDataComplementOf;
 import org.semanticweb.owl.model.OWLDataExactCardinalityRestriction;
-import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLDataMaxCardinalityRestriction;
 import org.semanticweb.owl.model.OWLDataMinCardinalityRestriction;
 import org.semanticweb.owl.model.OWLDataOneOf;
@@ -96,22 +95,27 @@ import org.semanticweb.owl.model.SWRLSameAsAtom;
 
 abstract class AbstractOWLObjectInstantiator implements
 		OWLObjectVisitorEx<OWLObject> {
-	protected final BindingNode bindingNode;
-	protected final ConstraintSystem constraintSystem;
-	private final OWLDataFactory df;
+	private final BindingNode bindingNode;
+	private final ConstraintSystem constraintSystem;
 
 	protected AbstractOWLObjectInstantiator(BindingNode bindingNode,
 			ConstraintSystem cs) {
+		if (bindingNode == null) {
+			throw new NullPointerException("The binding node cannot be null");
+		}
+		if (cs == null) {
+			throw new NullPointerException(
+					"The constraint system cannot be null");
+		}
 		this.bindingNode = bindingNode;
 		this.constraintSystem = cs;
-		this.df = this.constraintSystem.getDataFactory();
 	}
 
 	public OWLObject visit(OWLAntiSymmetricObjectPropertyAxiom axiom) {
 		OWLObjectPropertyExpression property = axiom.getProperty();
-		return this.df
-				.getOWLAntiSymmetricObjectPropertyAxiom((OWLObjectPropertyExpression) property
-						.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLAntiSymmetricObjectPropertyAxiom(
+						(OWLObjectPropertyExpression) property.accept(this));
 	}
 
 	public OWLObject visit(OWLAxiomAnnotationAxiom axiom) {
@@ -135,8 +139,10 @@ abstract class AbstractOWLObjectInstantiator implements
 	public OWLObject visit(OWLClassAssertionAxiom axiom) {
 		OWLDescription description = axiom.getDescription();
 		OWLIndividual individual = axiom.getIndividual();
-		return this.df.getOWLClassAssertionAxiom((OWLIndividual) individual
-				.accept(this), (OWLDescription) description.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLClassAssertionAxiom(
+						(OWLIndividual) individual.accept(this),
+						(OWLDescription) description.accept(this));
 	}
 
 	public OWLObject visit(OWLConstantAnnotation annotation) {
@@ -146,42 +152,47 @@ abstract class AbstractOWLObjectInstantiator implements
 	public OWLObject visit(OWLDataAllRestriction desc) {
 		OWLDataRange filler = desc.getFiller();
 		OWLDataPropertyExpression property = desc.getProperty();
-		return this.df.getOWLDataAllRestriction(
-				(OWLDataPropertyExpression) property.accept(this),
-				(OWLDataRange) filler.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataAllRestriction(
+						(OWLDataPropertyExpression) property.accept(this),
+						(OWLDataRange) filler.accept(this));
 	}
 
 	public OWLObject visit(OWLDataComplementOf node) {
 		OWLDataRange dataRange = node.getDataRange();
-		return this.df.getOWLDataComplementOf((OWLDataRange) dataRange
-				.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataComplementOf(
+						(OWLDataRange) dataRange.accept(this));
 	}
 
 	public OWLObject visit(OWLDataExactCardinalityRestriction desc) {
 		int cardinality = desc.getCardinality();
 		OWLDataRange filler = desc.getFiller();
 		OWLDataPropertyExpression property = desc.getProperty();
-		return this.df.getOWLDataExactCardinalityRestriction(
-				(OWLDataPropertyExpression) property.accept(this), cardinality,
-				(OWLDataRange) filler.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataExactCardinalityRestriction(
+						(OWLDataPropertyExpression) property.accept(this),
+						cardinality, (OWLDataRange) filler.accept(this));
 	}
 
 	public OWLObject visit(OWLDataMaxCardinalityRestriction desc) {
 		int cardinality = desc.getCardinality();
 		OWLDataRange filler = desc.getFiller();
 		OWLDataPropertyExpression property = desc.getProperty();
-		return this.df.getOWLDataMaxCardinalityRestriction(
-				(OWLDataPropertyExpression) property.accept(this), cardinality,
-				(OWLDataRange) filler.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataMaxCardinalityRestriction(
+						(OWLDataPropertyExpression) property.accept(this),
+						cardinality, (OWLDataRange) filler.accept(this));
 	}
 
 	public OWLObject visit(OWLDataMinCardinalityRestriction desc) {
 		int cardinality = desc.getCardinality();
 		OWLDataRange filler = desc.getFiller();
 		OWLDataPropertyExpression property = desc.getProperty();
-		return this.df.getOWLDataMinCardinalityRestriction(
-				(OWLDataPropertyExpression) property.accept(this), cardinality,
-				(OWLDataRange) filler.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataMinCardinalityRestriction(
+						(OWLDataPropertyExpression) property.accept(this),
+						cardinality, (OWLDataRange) filler.accept(this));
 	}
 
 	public OWLObject visit(OWLDataOneOf node) {
@@ -190,7 +201,8 @@ abstract class AbstractOWLObjectInstantiator implements
 		for (OWLConstant constant : values) {
 			instantiatedValues.add((OWLConstant) constant.accept(this));
 		}
-		return this.df.getOWLDataOneOf(instantiatedValues);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataOneOf(instantiatedValues);
 	}
 
 	public OWLObject visit(OWLDataProperty property) {
@@ -209,25 +221,29 @@ abstract class AbstractOWLObjectInstantiator implements
 		OWLIndividual subject = axiom.getSubject();
 		OWLDataPropertyExpression property = axiom.getProperty();
 		OWLConstant object = axiom.getObject();
-		return this.df.getOWLDataPropertyAssertionAxiom((OWLIndividual) subject
-				.accept(this), (OWLDataPropertyExpression) property
-				.accept(this), (OWLConstant) object.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataPropertyAssertionAxiom(
+						(OWLIndividual) subject.accept(this),
+						(OWLDataPropertyExpression) property.accept(this),
+						(OWLConstant) object.accept(this));
 	}
 
 	public OWLObject visit(OWLDataPropertyDomainAxiom axiom) {
 		OWLDescription domain = axiom.getDomain();
 		OWLDataPropertyExpression property = axiom.getProperty();
-		return this.df.getOWLDataPropertyDomainAxiom(
-				(OWLDataPropertyExpression) property.accept(this),
-				(OWLDescription) domain.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataPropertyDomainAxiom(
+						(OWLDataPropertyExpression) property.accept(this),
+						(OWLDescription) domain.accept(this));
 	}
 
 	public OWLObject visit(OWLDataPropertyRangeAxiom axiom) {
 		OWLDataPropertyExpression property = axiom.getProperty();
 		OWLDataRange range = axiom.getRange();
-		return this.df.getOWLDataPropertyRangeAxiom(
-				(OWLDataPropertyExpression) property.accept(this),
-				(OWLDataRange) range.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataPropertyRangeAxiom(
+						(OWLDataPropertyExpression) property.accept(this),
+						(OWLDataRange) range.accept(this));
 	}
 
 	public OWLObject visit(OWLDataRangeFacetRestriction node) {
@@ -238,24 +254,28 @@ abstract class AbstractOWLObjectInstantiator implements
 		OWLDataRange dataRange = node.getDataRange();
 		Set<OWLDataRangeFacetRestriction> facetRestrictions = node
 				.getFacetRestrictions();
-		return this.df.getOWLDataRangeRestriction((OWLDataRange) dataRange
-				.accept(this), facetRestrictions);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataRangeRestriction(
+						(OWLDataRange) dataRange.accept(this),
+						facetRestrictions);
 	}
 
 	public OWLObject visit(OWLDataSomeRestriction desc) {
 		OWLDataRange filler = desc.getFiller();
 		OWLDataPropertyExpression property = desc.getProperty();
-		return this.df.getOWLDataSomeRestriction(
-				(OWLDataPropertyExpression) property.accept(this),
-				(OWLDataRange) filler.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataSomeRestriction(
+						(OWLDataPropertyExpression) property.accept(this),
+						(OWLDataRange) filler.accept(this));
 	}
 
 	public OWLObject visit(OWLDataSubPropertyAxiom axiom) {
 		OWLDataPropertyExpression subProperty = axiom.getSubProperty();
 		OWLDataPropertyExpression superProperty = axiom.getSuperProperty();
-		return this.df.getOWLSubDataPropertyAxiom(
-				(OWLDataPropertyExpression) subProperty.accept(this),
-				(OWLDataPropertyExpression) superProperty.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLSubDataPropertyAxiom(
+						(OWLDataPropertyExpression) subProperty.accept(this),
+						(OWLDataPropertyExpression) superProperty.accept(this));
 	}
 
 	public OWLObject visit(OWLDataType node) {
@@ -265,9 +285,10 @@ abstract class AbstractOWLObjectInstantiator implements
 	public OWLObject visit(OWLDataValueRestriction desc) {
 		OWLDataPropertyExpression property = desc.getProperty();
 		OWLConstant value = desc.getValue();
-		return this.df.getOWLDataValueRestriction(
-				(OWLDataPropertyExpression) property.accept(this),
-				(OWLConstant) value.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDataValueRestriction(
+						(OWLDataPropertyExpression) property.accept(this),
+						(OWLConstant) value.accept(this));
 	}
 
 	public OWLObject visit(OWLDeclarationAxiom axiom) {
@@ -281,7 +302,9 @@ abstract class AbstractOWLObjectInstantiator implements
 			instantiatedIndividuals
 					.add((OWLIndividual) individual.accept(this));
 		}
-		return this.df.getOWLDifferentIndividualsAxiom(instantiatedIndividuals);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDifferentIndividualsAxiom(
+						instantiatedIndividuals);
 	}
 
 	public OWLObject visit(OWLDisjointClassesAxiom axiom) {
@@ -291,7 +314,9 @@ abstract class AbstractOWLObjectInstantiator implements
 			instatiatedDescriptions.add((OWLDescription) description
 					.accept(this));
 		}
-		return this.df.getOWLDisjointClassesAxiom(instatiatedDescriptions);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDisjointClassesAxiom(
+						instatiatedDescriptions);
 	}
 
 	public OWLObject visit(OWLDisjointDataPropertiesAxiom axiom) {
@@ -302,8 +327,9 @@ abstract class AbstractOWLObjectInstantiator implements
 					.add((OWLDataPropertyExpression) objectPropertyExpression
 							.accept(this));
 		}
-		return this.df
-				.getOWLDisjointDataPropertiesAxiom(instantiatedProperties);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDisjointDataPropertiesAxiom(
+						instantiatedProperties);
 	}
 
 	public OWLObject visit(OWLDisjointObjectPropertiesAxiom axiom) {
@@ -314,8 +340,9 @@ abstract class AbstractOWLObjectInstantiator implements
 					.add((OWLObjectPropertyExpression) objectPropertyExpression
 							.accept(this));
 		}
-		return this.df
-				.getOWLDisjointObjectPropertiesAxiom(instantiatedProperties);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDisjointObjectPropertiesAxiom(
+						instantiatedProperties);
 	}
 
 	public OWLObject visit(OWLDisjointUnionAxiom axiom) {
@@ -326,8 +353,10 @@ abstract class AbstractOWLObjectInstantiator implements
 			instantiatedDescriptions.add((OWLDescription) description
 					.accept(this));
 		}
-		return this.df.getOWLDisjointUnionAxiom((OWLClass) owlClass
-				.accept(this), instantiatedDescriptions);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLDisjointUnionAxiom(
+						(OWLClass) owlClass.accept(this),
+						instantiatedDescriptions);
 	}
 
 	public OWLObject visit(OWLEntityAnnotationAxiom axiom) {
@@ -341,7 +370,9 @@ abstract class AbstractOWLObjectInstantiator implements
 			instantiatedDescriptions.add((OWLDescription) description
 					.accept(this));
 		}
-		return this.df.getOWLEquivalentClassesAxiom(instantiatedDescriptions);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLEquivalentClassesAxiom(
+						instantiatedDescriptions);
 	}
 
 	public OWLObject visit(OWLEquivalentDataPropertiesAxiom axiom) {
@@ -352,8 +383,9 @@ abstract class AbstractOWLObjectInstantiator implements
 					.add((OWLDataPropertyExpression) dataPropertyExpression
 							.accept(this));
 		}
-		return this.df
-				.getOWLEquivalentDataPropertiesAxiom(instantiatedProperties);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLEquivalentDataPropertiesAxiom(
+						instantiatedProperties);
 	}
 
 	public OWLObject visit(OWLEquivalentObjectPropertiesAxiom axiom) {
@@ -364,22 +396,23 @@ abstract class AbstractOWLObjectInstantiator implements
 					.add((OWLObjectPropertyExpression) objectPropertyExpression
 							.accept(this));
 		}
-		return this.df
-				.getOWLEquivalentObjectPropertiesAxiom(instantiatedProperties);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLEquivalentObjectPropertiesAxiom(
+						instantiatedProperties);
 	}
 
 	public OWLObject visit(OWLFunctionalDataPropertyAxiom axiom) {
 		OWLDataPropertyExpression property = axiom.getProperty();
-		return this.df
-				.getOWLFunctionalDataPropertyAxiom((OWLDataPropertyExpression) property
-						.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLFunctionalDataPropertyAxiom(
+						(OWLDataPropertyExpression) property.accept(this));
 	}
 
 	public OWLObject visit(OWLFunctionalObjectPropertyAxiom axiom) {
 		OWLObjectPropertyExpression property = axiom.getProperty();
-		return this.df
-				.getOWLFunctionalObjectPropertyAxiom((OWLObjectPropertyExpression) property
-						.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLFunctionalObjectPropertyAxiom(
+						(OWLObjectPropertyExpression) property.accept(this));
 	}
 
 	public OWLObject visit(OWLImportsDeclaration axiom) {
@@ -400,34 +433,39 @@ abstract class AbstractOWLObjectInstantiator implements
 
 	public OWLObject visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
 		OWLObjectPropertyExpression property = axiom.getProperty();
-		return this.df
-				.getOWLInverseFunctionalObjectPropertyAxiom((OWLObjectPropertyExpression) property
-						.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory()
+				.getOWLInverseFunctionalObjectPropertyAxiom(
+						(OWLObjectPropertyExpression) property.accept(this));
 	}
 
 	public OWLObject visit(OWLInverseObjectPropertiesAxiom axiom) {
 		OWLObjectPropertyExpression firstProperty = axiom.getFirstProperty();
 		OWLObjectPropertyExpression secondProperty = axiom.getSecondProperty();
-		return this.df.getOWLInverseObjectPropertiesAxiom(
-				(OWLObjectPropertyExpression) firstProperty.accept(this),
-				(OWLObjectPropertyExpression) secondProperty.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLInverseObjectPropertiesAxiom(
+						(OWLObjectPropertyExpression) firstProperty
+								.accept(this),
+						(OWLObjectPropertyExpression) secondProperty
+								.accept(this));
 	}
 
 	public OWLObject visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
 		OWLObjectPropertyExpression property = axiom.getProperty();
-		return this.df
-				.getOWLIrreflexiveObjectPropertyAxiom((OWLObjectPropertyExpression) property
-						.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLIrreflexiveObjectPropertyAxiom(
+						(OWLObjectPropertyExpression) property.accept(this));
 	}
 
 	public OWLObject visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
 		OWLDataPropertyExpression property = axiom.getProperty();
 		OWLIndividual subject = axiom.getSubject();
 		OWLConstant object = axiom.getObject();
-		return this.df.getOWLNegativeDataPropertyAssertionAxiom(
-				(OWLIndividual) subject.accept(this),
-				(OWLDataPropertyExpression) property.accept(this),
-				(OWLConstant) object.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLNegativeDataPropertyAssertionAxiom(
+						(OWLIndividual) subject.accept(this),
+						(OWLDataPropertyExpression) property.accept(this),
+						(OWLConstant) object.accept(this));
 	}
 
 	public OWLObject visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
@@ -439,16 +477,20 @@ abstract class AbstractOWLObjectInstantiator implements
 		OWLObjectPropertyExpression instantiatedProperty = (OWLObjectPropertyExpression) property
 				.accept(this);
 		OWLIndividual instantiatedObject = (OWLIndividual) object.accept(this);
-		return this.df.getOWLNegativeObjectPropertyAssertionAxiom(
-				instantiatedSubject, instantiatedProperty, instantiatedObject);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory()
+				.getOWLNegativeObjectPropertyAssertionAxiom(
+						instantiatedSubject, instantiatedProperty,
+						instantiatedObject);
 	}
 
 	public OWLDescription visit(OWLObjectAllRestriction desc) {
 		OWLDescription filler = desc.getFiller();
 		OWLObjectPropertyExpression property = desc.getProperty();
-		return this.df.getOWLObjectAllRestriction(
-				(OWLObjectPropertyExpression) property.accept(this),
-				(OWLDescription) filler.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectAllRestriction(
+						(OWLObjectPropertyExpression) property.accept(this),
+						(OWLDescription) filler.accept(this));
 	}
 
 	public OWLObject visit(OWLObjectAnnotation annotation) {
@@ -457,17 +499,19 @@ abstract class AbstractOWLObjectInstantiator implements
 
 	public OWLDescription visit(OWLObjectComplementOf desc) {
 		OWLDescription operand = desc.getOperand();
-		return this.df.getOWLObjectComplementOf((OWLDescription) operand
-				.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectComplementOf(
+						(OWLDescription) operand.accept(this));
 	}
 
 	public OWLObject visit(OWLObjectExactCardinalityRestriction desc) {
 		int cardinality = desc.getCardinality();
 		OWLDescription filler = desc.getFiller();
 		OWLObjectPropertyExpression property = desc.getProperty();
-		return this.df.getOWLObjectExactCardinalityRestriction(
-				(OWLObjectPropertyExpression) property.accept(this),
-				cardinality, (OWLDescription) filler.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectExactCardinalityRestriction(
+						(OWLObjectPropertyExpression) property.accept(this),
+						cardinality, (OWLDescription) filler.accept(this));
 	}
 
 	public OWLDescription visit(OWLObjectIntersectionOf desc) {
@@ -476,25 +520,29 @@ abstract class AbstractOWLObjectInstantiator implements
 		for (OWLDescription description : operands) {
 			instantiatedOperands.add((OWLDescription) description.accept(this));
 		}
-		return this.df.getOWLObjectIntersectionOf(instantiatedOperands);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectIntersectionOf(
+						instantiatedOperands);
 	}
 
 	public OWLObject visit(OWLObjectMaxCardinalityRestriction desc) {
 		int cardinality = desc.getCardinality();
 		OWLDescription filler = desc.getFiller();
 		OWLObjectPropertyExpression property = desc.getProperty();
-		return this.df.getOWLObjectMaxCardinalityRestriction(
-				(OWLObjectPropertyExpression) property.accept(this),
-				cardinality, (OWLDescription) filler.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectMaxCardinalityRestriction(
+						(OWLObjectPropertyExpression) property.accept(this),
+						cardinality, (OWLDescription) filler.accept(this));
 	}
 
 	public OWLObject visit(OWLObjectMinCardinalityRestriction desc) {
 		int cardinality = desc.getCardinality();
 		OWLDescription filler = desc.getFiller();
 		OWLObjectPropertyExpression property = desc.getProperty();
-		return this.df.getOWLObjectMinCardinalityRestriction(
-				(OWLObjectPropertyExpression) property.accept(this),
-				cardinality, (OWLDescription) filler.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectMinCardinalityRestriction(
+						(OWLObjectPropertyExpression) property.accept(this),
+						cardinality, (OWLDescription) filler.accept(this));
 	}
 
 	public OWLObject visit(OWLObjectOneOf desc) {
@@ -504,7 +552,8 @@ abstract class AbstractOWLObjectInstantiator implements
 			instantiatedIndividuals
 					.add((OWLIndividual) individual.accept(this));
 		}
-		return this.df.getOWLObjectOneOf(instantiatedIndividuals);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectOneOf(instantiatedIndividuals);
 	}
 
 	public OWLObject visit(OWLObjectProperty property) {
@@ -523,10 +572,11 @@ abstract class AbstractOWLObjectInstantiator implements
 		OWLIndividual subject = axiom.getSubject();
 		OWLObjectPropertyExpression property = axiom.getProperty();
 		OWLIndividual object = axiom.getObject();
-		return this.df.getOWLObjectPropertyAssertionAxiom(
-				(OWLIndividual) subject.accept(this),
-				(OWLObjectPropertyExpression) property.accept(this),
-				(OWLIndividual) object.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectPropertyAssertionAxiom(
+						(OWLIndividual) subject.accept(this),
+						(OWLObjectPropertyExpression) property.accept(this),
+						(OWLIndividual) object.accept(this));
 	}
 
 	public OWLObject visit(OWLObjectPropertyChainSubPropertyAxiom axiom) {
@@ -540,55 +590,62 @@ abstract class AbstractOWLObjectInstantiator implements
 					.add((OWLObjectPropertyExpression) objectPropertyExpression
 							.accept(this));
 		}
-		return this.df.getOWLObjectPropertyChainSubPropertyAxiom(
-				instantiatedPropertyChain,
-				(OWLObjectPropertyExpression) superProperty.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectPropertyChainSubPropertyAxiom(
+						instantiatedPropertyChain,
+						(OWLObjectPropertyExpression) superProperty
+								.accept(this));
 	}
 
 	public OWLObject visit(OWLObjectPropertyDomainAxiom axiom) {
 		OWLDescription domain = axiom.getDomain();
 		OWLObjectPropertyExpression property = axiom.getProperty();
-		return this.df.getOWLObjectPropertyDomainAxiom(
-				(OWLObjectPropertyExpression) property.accept(this),
-				(OWLDescription) domain.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectPropertyDomainAxiom(
+						(OWLObjectPropertyExpression) property.accept(this),
+						(OWLDescription) domain.accept(this));
 	}
 
 	public OWLObject visit(OWLObjectPropertyInverse property) {
 		OWLObjectPropertyExpression inverse = property.getInverse();
-		return this.df
-				.getOWLObjectPropertyInverse((OWLObjectPropertyExpression) inverse
-						.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectPropertyInverse(
+						(OWLObjectPropertyExpression) inverse.accept(this));
 	}
 
 	public OWLObject visit(OWLObjectPropertyRangeAxiom axiom) {
 		OWLObjectPropertyExpression property = axiom.getProperty();
 		OWLDescription range = axiom.getRange();
-		return this.df.getOWLObjectPropertyRangeAxiom(
-				(OWLObjectPropertyExpression) property.accept(this),
-				(OWLDescription) range.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectPropertyRangeAxiom(
+						(OWLObjectPropertyExpression) property.accept(this),
+						(OWLDescription) range.accept(this));
 	}
 
 	public OWLObject visit(OWLObjectSelfRestriction desc) {
 		OWLObjectPropertyExpression property = desc.getProperty();
-		return this.df
-				.getOWLObjectSelfRestriction((OWLObjectPropertyExpression) property
-						.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectSelfRestriction(
+						(OWLObjectPropertyExpression) property.accept(this));
 	}
 
 	public OWLDescription visit(OWLObjectSomeRestriction desc) {
 		OWLDescription filler = desc.getFiller();
 		OWLObjectPropertyExpression property = desc.getProperty();
-		return this.df.getOWLObjectSomeRestriction(
-				(OWLObjectPropertyExpression) property.accept(this),
-				(OWLDescription) filler.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectSomeRestriction(
+						(OWLObjectPropertyExpression) property.accept(this),
+						(OWLDescription) filler.accept(this));
 	}
 
 	public OWLObject visit(OWLObjectSubPropertyAxiom axiom) {
 		OWLObjectPropertyExpression subProperty = axiom.getSubProperty();
 		OWLObjectPropertyExpression superProperty = axiom.getSuperProperty();
-		return this.df.getOWLSubObjectPropertyAxiom(
-				(OWLObjectPropertyExpression) subProperty.accept(this),
-				(OWLObjectPropertyExpression) superProperty.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLSubObjectPropertyAxiom(
+						(OWLObjectPropertyExpression) subProperty.accept(this),
+						(OWLObjectPropertyExpression) superProperty
+								.accept(this));
 	}
 
 	public OWLDescription visit(OWLObjectUnionOf desc) {
@@ -597,15 +654,17 @@ abstract class AbstractOWLObjectInstantiator implements
 		for (OWLDescription description : operands) {
 			instantiatedOperands.add((OWLDescription) description.accept(this));
 		}
-		return this.df.getOWLObjectUnionOf(instantiatedOperands);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectUnionOf(instantiatedOperands);
 	}
 
 	public OWLDescription visit(OWLObjectValueRestriction desc) {
 		OWLObjectPropertyExpression property = desc.getProperty();
 		OWLIndividual value = desc.getValue();
-		return this.df.getOWLObjectValueRestriction(
-				(OWLObjectPropertyExpression) property.accept(this),
-				(OWLIndividual) value.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLObjectValueRestriction(
+						(OWLObjectPropertyExpression) property.accept(this),
+						(OWLIndividual) value.accept(this));
 	}
 
 	public OWLObject visit(OWLOntology ontology) {
@@ -618,9 +677,9 @@ abstract class AbstractOWLObjectInstantiator implements
 
 	public OWLObject visit(OWLReflexiveObjectPropertyAxiom axiom) {
 		OWLObjectPropertyExpression property = axiom.getProperty();
-		return this.df
-				.getOWLReflexiveObjectPropertyAxiom((OWLObjectPropertyExpression) property
-						.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLReflexiveObjectPropertyAxiom(
+						(OWLObjectPropertyExpression) property.accept(this));
 	}
 
 	public OWLObject visit(OWLSameIndividualsAxiom axiom) {
@@ -631,7 +690,9 @@ abstract class AbstractOWLObjectInstantiator implements
 			instantiatedIndividuals
 					.add((OWLIndividual) individual.accept(this));
 		}
-		return this.df.getOWLSameIndividualsAxiom(instantiatedIndividuals);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLSameIndividualsAxiom(
+						instantiatedIndividuals);
 	}
 
 	public OWLObject visit(OWLSubClassAxiom axiom) {
@@ -639,21 +700,22 @@ abstract class AbstractOWLObjectInstantiator implements
 				.accept(this);
 		OWLDescription subClass = (OWLDescription) axiom.getSubClass().accept(
 				this);
-		return this.df.getOWLSubClassAxiom(subClass, superClass);
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLSubClassAxiom(subClass, superClass);
 	}
 
 	public OWLObject visit(OWLSymmetricObjectPropertyAxiom axiom) {
 		OWLObjectPropertyExpression property = axiom.getProperty();
-		return this.df
-				.getOWLSymmetricObjectPropertyAxiom((OWLObjectPropertyExpression) property
-						.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLSymmetricObjectPropertyAxiom(
+						(OWLObjectPropertyExpression) property.accept(this));
 	}
 
 	public OWLObject visit(OWLTransitiveObjectPropertyAxiom axiom) {
 		OWLObjectPropertyExpression property = axiom.getProperty();
-		return this.df
-				.getOWLTransitiveObjectPropertyAxiom((OWLObjectPropertyExpression) property
-						.accept(this));
+		return this.getConstraintSystem().getOntologyManager()
+				.getOWLDataFactory().getOWLTransitiveObjectPropertyAxiom(
+						(OWLObjectPropertyExpression) property.accept(this));
 	}
 
 	public abstract OWLObject visit(OWLTypedConstant node);
@@ -706,5 +768,19 @@ abstract class AbstractOWLObjectInstantiator implements
 
 	public OWLObject visit(SWRLSameAsAtom node) {
 		return node;
+	}
+
+	/**
+	 * @return the constraintSystem
+	 */
+	public ConstraintSystem getConstraintSystem() {
+		return this.constraintSystem;
+	}
+
+	/**
+	 * @return the bindingNode
+	 */
+	public BindingNode getBindingNode() {
+		return this.bindingNode;
 	}
 }

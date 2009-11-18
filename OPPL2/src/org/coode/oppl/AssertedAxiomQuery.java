@@ -47,15 +47,17 @@ import org.semanticweb.owl.model.OWLOntology;
  * 
  */
 public class AssertedAxiomQuery extends AbstractAxiomQuery {
-	protected Set<OWLOntology> ontologies;
 	private final ConstraintSystem constraintSystem;
 	private final Map<BindingNode, Set<OWLAxiom>> instantiatedAxioms = new HashMap<BindingNode, Set<OWLAxiom>>();
 
 	/**
 	 * @param ontologies
 	 */
-	public AssertedAxiomQuery(Set<OWLOntology> ontologies, ConstraintSystem cs) {
-		this.ontologies = ontologies;
+	public AssertedAxiomQuery(ConstraintSystem cs) {
+		if (cs == null) {
+			throw new NullPointerException(
+					"The constraint system cannot be null");
+		}
 		this.constraintSystem = cs;
 	}
 
@@ -69,7 +71,8 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 		Logging.getQueryLogger().log(Level.FINE,
 				"Matching axiom " + axiom.toString());
 		Set<BindingNode> holdingAssignments = new HashSet<BindingNode>();
-		for (OWLOntology ontology : this.ontologies) {
+		for (OWLOntology ontology : this.getConstraintSystem()
+				.getOntologyManager().getOntologies()) {
 			for (OWLAxiom ontologyAxiom : ontology.getAxioms()) {
 				if (ontologyAxiom.getClass().isAssignableFrom(axiom.getClass())) {
 					Set<BindingNode> leaves = null;
@@ -180,7 +183,8 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 	 * @param axiom
 	 */
 	private boolean locateAxiom(OWLAxiom axiom) {
-		Iterator<OWLOntology> it = this.ontologies.iterator();
+		Iterator<OWLOntology> it = this.getConstraintSystem()
+				.getOntologyManager().getOntologies().iterator();
 		boolean found = false;
 		OWLOntology ontology;
 		while (!found && it.hasNext()) {
@@ -196,5 +200,12 @@ public class AssertedAxiomQuery extends AbstractAxiomQuery {
 			toReturn.putAll(this.instantiatedAxioms);
 		}
 		return toReturn;
+	}
+
+	/**
+	 * @return the constraintSystem
+	 */
+	public ConstraintSystem getConstraintSystem() {
+		return this.constraintSystem;
 	}
 }

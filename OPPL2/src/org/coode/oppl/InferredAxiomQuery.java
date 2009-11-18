@@ -29,18 +29,16 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.OWLObjectInstantiator;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.bindingtree.LeafBrusher;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLSubClassAxiom;
 
 import com.clarkparsia.explanation.SatisfiabilityConverter;
@@ -50,25 +48,28 @@ import com.clarkparsia.explanation.SatisfiabilityConverter;
  * 
  */
 public class InferredAxiomQuery extends AbstractAxiomQuery {
-	private final Set<OWLOntology> ontologies;
 	private final ConstraintSystem constraintSystem;
-	private final OWLDataFactory dataFactory;
 	private final Map<BindingNode, Set<OWLAxiom>> instantiatedAxioms = new HashMap<BindingNode, Set<OWLAxiom>>();
 	private final OWLReasoner reasoner;
 
 	/**
 	 * @param ontologies
 	 */
-	public InferredAxiomQuery(Set<OWLOntology> ontologies, ConstraintSystem cs,
-			OWLDataFactory dataFactory, OWLReasoner reasoner) {
-		this.ontologies = ontologies;
+	public InferredAxiomQuery(ConstraintSystem cs, OWLReasoner reasoner) {
+		if (cs == null) {
+			throw new NullPointerException(
+					"The constraint system cannot be null");
+		}
+		if (reasoner == null) {
+			throw new NullPointerException("The reasoner cannot be null");
+		}
 		this.constraintSystem = cs;
-		this.dataFactory = dataFactory;
 		this.reasoner = reasoner;
 	}
 
+	@Override
 	public void visit(OWLSubClassAxiom axiom) {
-		match(axiom);
+		this.match(axiom);
 	}
 
 	/**
@@ -79,7 +80,7 @@ public class InferredAxiomQuery extends AbstractAxiomQuery {
 		Set<Variable> axiomVariables = this.constraintSystem
 				.getAxiomVariables(axiom);
 		for (Variable variable : axiomVariables) {
-			extractPossibleValues(variable);
+			this.extractPossibleValues(variable);
 		}
 		Set<BindingNode> preExistingLeaves = this.constraintSystem.getLeaves();
 		Set<BindingNode> leaves;
@@ -102,7 +103,7 @@ public class InferredAxiomQuery extends AbstractAxiomQuery {
 			OWLObjectInstantiator instantiator = new OWLObjectInstantiator(
 					leaf, this.constraintSystem);
 			OWLAxiom instatiatedAxiom = (OWLAxiom) axiom.accept(instantiator);
-			if (locateAxiom(instatiatedAxiom)) {
+			if (this.locateAxiom(instatiatedAxiom)) {
 				Set<OWLAxiom> axioms = this.instantiatedAxioms.get(leaf);
 				if (axioms == null) {
 					axioms = new HashSet<OWLAxiom>();
@@ -120,8 +121,8 @@ public class InferredAxiomQuery extends AbstractAxiomQuery {
 	 * @param axiom
 	 */
 	private boolean locateAxiom(OWLAxiom axiom) {
-		SatisfiabilityConverter converter = new SatisfiabilityConverter(
-				this.dataFactory);
+		SatisfiabilityConverter converter = new SatisfiabilityConverter(this
+				.getConstraintSystem().getOntologyManager().getOWLDataFactory());
 		OWLDescription conversion = converter.convert(axiom);
 		try {
 			if (!this.reasoner.isClassified()) {
@@ -140,7 +141,8 @@ public class InferredAxiomQuery extends AbstractAxiomQuery {
 	 */
 	private void extractPossibleValues(Variable variable) {
 		variable.clearBindings();
-		ValueExtractor valueExtractor = new ValueExtractor(this.ontologies);
+		ValueExtractor valueExtractor = new ValueExtractor(this
+				.getConstraintSystem().getOntologyManager().getOntologies());
 		Set<OWLObject> values;
 		values = variable.getType().accept(valueExtractor);
 		for (OWLObject object : values) {
@@ -160,5 +162,12 @@ public class InferredAxiomQuery extends AbstractAxiomQuery {
 			toReturn.putAll(this.instantiatedAxioms);
 		}
 		return toReturn;
+	}
+
+	/**
+	 * @return the constraintSystem
+	 */
+	public ConstraintSystem getConstraintSystem() {
+		return this.constraintSystem;
 	}
 }

@@ -16,8 +16,8 @@ import junit.framework.TestCase;
 
 import org.coode.oppl.ChangeExtractor;
 import org.coode.oppl.OPPLScript;
-import org.coode.oppl.search.OPPLOWLAxiomSearchNode;
 import org.coode.oppl.search.OPPLAssertedOWLAxiomSearchTree;
+import org.coode.oppl.search.OPPLOWLAxiomSearchNode;
 import org.coode.oppl.search.OWLAxiomSearchTree;
 import org.coode.oppl.search.SearchTree;
 import org.coode.oppl.syntax.OPPLParser;
@@ -315,13 +315,14 @@ public class SearchTest extends TestCase {
 			VariableExtractor variableExtractor = new VariableExtractor(
 					opplScript.getConstraintSystem());
 			OPPLAssertedOWLAxiomSearchTree searchTree = new OPPLAssertedOWLAxiomSearchTree(
-					manager, opplScript.getConstraintSystem());
+					opplScript.getConstraintSystem());
 			List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();
 			boolean found = searchTree.exhaustiveSearchTree(
 					new OPPLOWLAxiomSearchNode(firstAxiom, new BindingNode(
 							new HashSet<Assignment>(), firstAxiom
 									.accept(variableExtractor))), solutions);
 			Set<OWLAxiom> results = new HashSet<OWLAxiom>(solutions.size());
+			solutions.clear();
 			found = searchTree.exhaustiveSearchTree(new OPPLOWLAxiomSearchNode(
 					secondAxiom, new BindingNode(new HashSet<Assignment>(),
 							secondAxiom.accept(variableExtractor))), solutions);
@@ -396,13 +397,14 @@ public class SearchTest extends TestCase {
 			VariableExtractor variableExtractor = new VariableExtractor(
 					opplScript.getConstraintSystem());
 			OPPLAssertedOWLAxiomSearchTree searchTree = new OPPLAssertedOWLAxiomSearchTree(
-					manager, opplScript.getConstraintSystem());
+					opplScript.getConstraintSystem());
 			List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();
 			boolean found = searchTree.exhaustiveSearchTree(
 					new OPPLOWLAxiomSearchNode(firstAxiom, new BindingNode(
 							new HashSet<Assignment>(), firstAxiom
 									.accept(variableExtractor))), solutions);
 			Set<OWLAxiom> results = new HashSet<OWLAxiom>(solutions.size());
+			solutions.clear();
 			found = searchTree.exhaustiveSearchTree(new OPPLOWLAxiomSearchNode(
 					secondAxiom, new BindingNode(new HashSet<Assignment>(),
 							secondAxiom.accept(variableExtractor))), solutions);

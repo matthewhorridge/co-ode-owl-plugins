@@ -43,10 +43,10 @@ public class PartialOWLObjectInstantiator extends AbstractOWLObjectInstantiator 
 	@Override
 	public OWLObject visit(OWLTypedConstant node) {
 		OWLConstant toReturn = node;
-		if (this.constraintSystem.isVariable(node)) {
-			Variable variable = this.constraintSystem.getVariable(node
-					.getLiteral());
-			OWLConstant assignmentValue = (OWLConstant) this.bindingNode
+		if (this.getConstraintSystem().isVariable(node)) {
+			Variable variable = this.getConstraintSystem().getVariable(
+					node.getLiteral());
+			OWLConstant assignmentValue = (OWLConstant) this.getBindingNode()
 					.getAssignmentValue(variable);
 			toReturn = assignmentValue == null ? node : assignmentValue;
 		}
@@ -56,10 +56,10 @@ public class PartialOWLObjectInstantiator extends AbstractOWLObjectInstantiator 
 	@Override
 	public OWLObject visit(OWLUntypedConstant node) {
 		OWLConstant toReturn = node;
-		if (this.constraintSystem.isVariable(node)) {
-			Variable variable = this.constraintSystem.getVariable(node
-					.getLiteral());
-			OWLConstant assignmentValue = (OWLConstant) this.bindingNode
+		if (this.getConstraintSystem().isVariable(node)) {
+			Variable variable = this.getConstraintSystem().getVariable(
+					node.getLiteral());
+			OWLConstant assignmentValue = (OWLConstant) this.getBindingNode()
 					.getAssignmentValue(variable);
 			toReturn = assignmentValue == null ? node : assignmentValue;
 		}
