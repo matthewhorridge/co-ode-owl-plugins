@@ -293,4 +293,40 @@ public class SpecificQueriesTest extends TestCase {
 		}
 		return toReturn;
 	}
+
+	public void testConstraintsOnPizzaOntology() {
+		OWLOntologyManager ontologyManager = OWLManager
+				.createOWLOntologyManager();
+		try {
+			OWLOntology testOntology = ontologyManager
+					.loadOntology(URI
+							.create("http://www.co-ode.org/ontologies/pizza/2007/02/12/pizza.owl"));
+			String opplString = "?x:CLASS SELECT ASSERTED ?x subClassOf Pizza WHERE ?x!= NamedPizza BEGIN REMOVE ?x subClassOf NamedPizza END;";
+			ParserFactory.initParser(opplString, testOntology, ontologyManager,
+					null);
+			OPPLScript opplScript = OPPLParser.Start();
+			ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
+					.getConstraintSystem(), true);
+			List<OWLAxiomChange> changes = opplScript.accept(changeExtractor);
+			assertTrue("Expected empty changes list obtained, instead "
+					+ changes, changes.size() == 0);
+			Logging.getQueryTestLogging().log(Level.INFO,
+					"Changes count " + changes.size());
+			Set<BindingNode> leaves = this.getOPPLLeaves(opplScript);
+			assertTrue("Expected empty leaf set, obtained, instead "
+					+ leaves.toString(), leaves.isEmpty());
+			Set<OWLAxiom> instantiatedAxioms = this
+					.getOPPLScriptInstantiatedAxioms(opplScript);
+			assertTrue(
+					"Expected empty instantiated axiom set, obtained, instead "
+							+ instantiatedAxioms.toString(), instantiatedAxioms
+							.isEmpty());
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		} catch (ParseException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
 }

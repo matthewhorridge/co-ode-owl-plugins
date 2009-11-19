@@ -52,9 +52,9 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 	private static final long serialVersionUID = 3481576138019196471L;
 	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private final OWLEditorKit owlEditorKit;
-	protected final OPPLBuilder opplBuilder;
-	protected final OPPLTextEditor opplTextEditor;
-	protected OPPLScript opplScript;
+	private final OPPLBuilder opplBuilder;
+	private final OPPLTextEditor opplTextEditor;
+	private OPPLScript opplScript;
 
 	/**
 	 * @return the opplScript
@@ -69,7 +69,7 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 	 */
 	public void setOPPLScript(OPPLScript opplScript) {
 		this.opplBuilder.setOPPLScript(opplScript);
-		fireStateChanged();
+		this.fireStateChanged();
 	}
 
 	/**
@@ -106,8 +106,8 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 						OPPLEditor.this.handleChange();
 					}
 				});
-		addChangeListener(this);
-		initGUI();
+		this.addChangeListener(this);
+		this.initGUI();
 	}
 
 	public OPPLEditor(OWLEditorKit owlEditor) {
@@ -126,15 +126,15 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 	}
 
 	protected void handleChange() {
-		boolean newStatus = check();
-		notifyListeners(newStatus);
+		boolean newStatus = this.check();
+		this.notifyListeners(newStatus);
 	}
 
 	/**
 	 * @return
 	 */
 	private boolean check() {
-		return getOPPLScript() != null;
+		return this.getOPPLScript() != null;
 	}
 
 	/**
@@ -174,7 +174,7 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 	}
 
 	public void stateChanged(ChangeEvent changeEvent1) {
-		Component selectedComponent = getSelectedComponent();
+		Component selectedComponent = this.getSelectedComponent();
 		if (selectedComponent.equals(this.opplBuilder)
 				&& this.opplScript != null) {
 			this.opplBuilder.setOPPLScript(this.opplScript);
@@ -182,5 +182,10 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 				&& this.opplScript != null) {
 			this.opplTextEditor.setOPPLScript(this.opplScript);
 		}
+	}
+
+	public void dispose() {
+		this.opplBuilder.dispose();
+		this.opplTextEditor.dispose();
 	}
 }

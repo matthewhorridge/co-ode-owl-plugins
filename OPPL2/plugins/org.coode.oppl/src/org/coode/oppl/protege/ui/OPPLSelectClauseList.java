@@ -50,16 +50,23 @@ public class OPPLSelectClauseList extends MList {
 	 * 
 	 */
 	private static final long serialVersionUID = 3978563738563698974L;
-	protected final OWLEditorKit owlEditorKit;
-	protected ConstraintSystem constraintSystem;
+	private final OWLEditorKit owlEditorKit;
+	private ConstraintSystem constraintSystem;
 
 	public OPPLSelectClauseList(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
+		if (owlEditorKit == null) {
+			throw new NullPointerException("The editorKit cannot be null");
+		}
+		if (constraintSystem == null) {
+			throw new NullPointerException(
+					"The constraint system cannot be null");
+		}
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
-		DefaultListModel model = clearModel();
-		setModel(model);
-		setCellRenderer(new OPPLSelectListItemCellRederer());
+		DefaultListModel model = this.clearModel();
+		this.setModel(model);
+		this.setCellRenderer(new OPPLSelectListItemCellRederer());
 	}
 
 	/**
@@ -139,15 +146,15 @@ public class OPPLSelectClauseList extends MList {
 			if (value instanceof OPPLSelectClauseListItem) {
 				OPPLSelectClauseListItem item = (OPPLSelectClauseListItem) value;
 				toReturn = this.variableAxiomRenderer
-						.getListCellRendererComponent(list, item.getAxiom(),
-								index, isSelected, cellHasFocus);
+						.getListCellRendererComponent(list, item, index,
+								isSelected, cellHasFocus);
 			}
 			return toReturn;
 		}
 	}
 
 	public void clear() {
-		setModel(clearModel());
+		this.setModel(this.clearModel());
 	}
 
 	/**

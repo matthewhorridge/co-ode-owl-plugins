@@ -208,17 +208,17 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	 */
 	private static final long serialVersionUID = 1897093057453176659L;
 	private static final String OPPL_COMPUTATION_IN_PROGRESS_PLEASE_WAIT = "OPPL Computation in progress...please wait";
-	protected OPPLEditor editor;
+	private OPPLEditor editor;
 	private final ReasonerOPPLScriptValiator validator = new ReasonerOPPLScriptValiator();
-	protected JButton evaluate = new JButton("Evaluate");
-	protected JButton execute = new JButton("Execute");
-	protected ActionList affectedAxioms;
-	protected OWLLinkedObjectList instantiatedAxiomsList;
-	protected OPPLScript statementModel;
-	protected JDialog window;
-	protected JScrollPane affectedScrollPane;
-	protected JScrollPane instantiatedScrollPane;
-	protected JCheckBox considerImportClosureCheckBox = new JCheckBox(
+	private JButton evaluate = new JButton("Evaluate");
+	private JButton execute = new JButton("Execute");
+	private ActionList affectedAxioms;
+	private OWLLinkedObjectList instantiatedAxiomsList;
+	private OPPLScript statementModel;
+	private JDialog window;
+	private JScrollPane affectedScrollPane;
+	private JScrollPane instantiatedScrollPane;
+	private JCheckBox considerImportClosureCheckBox = new JCheckBox(
 			"When removing consider Active Ontology Imported Closure", false);
 	private DefaultTreeModel bindingTreeNodeModel = new DefaultTreeModel(
 			new DefaultMutableTreeNode("Bindings"));
@@ -228,6 +228,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	protected void disposeOWLView() {
 		this.getOWLEditorKit().getModelManager().removeListener(this);
 		this.editor.removeStatusChangedListener(this);
+		this.editor.dispose();
 	}
 
 	@Override
@@ -302,7 +303,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.evaluate.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				OPPLView.this.evaluate.setEnabled(false);
-				OPPLView.this.test();
+				OPPLView.this.evaluate();
 				OPPLChangeDetectorSwingWorker opplSwingWorker = new OPPLChangeDetectorSwingWorker();
 				OPPLView.this.window.pack();
 				SwingUtilities.invokeLater(new Runnable() {
@@ -337,7 +338,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 			public void actionPerformed(ActionEvent e) {
 				ActionListModel model = (ActionListModel) OPPLView.this.affectedAxioms
 						.getModel();
-				OPPLView.this.test();
+				OPPLView.this.evaluate();
 				OPPLView.this.window.pack();
 				List<OWLAxiomChange> changes = model.getOWLAxiomChanges();
 				OPPLExecutorSwingWorker executorSwingWorker = new OPPLExecutorSwingWorker(
@@ -361,7 +362,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.editor.addStatusChangedListener(this);
 	}
 
-	protected final void test() {
+	protected final void evaluate() {
 		JPanel panel = new JPanel(new BorderLayout(7, 7));
 		JProgressBar progressBar = new JProgressBar();
 		panel.add(progressBar, BorderLayout.SOUTH);

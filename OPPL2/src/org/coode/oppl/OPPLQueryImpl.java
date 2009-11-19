@@ -179,6 +179,7 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 			first = false;
 			axiom.accept(renderer);
 			buffer.append(renderer.toString());
+			buffer.append('\n');
 		}
 		if (this.getConstraints().size() > 0) {
 			buffer.append("\nWHERE ");
@@ -294,11 +295,9 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 
 	private void matchConstraint(AbstractConstraint c) {
 		assert c != null;
-		this.constraints.add(c);
-		if (this.getConstraintSystem().getLeaves() != null
-				&& !this.getConstraintSystem().getLeaves().isEmpty()) {
-			Iterator<BindingNode> it = this.getConstraintSystem().getLeaves()
-					.iterator();
+		Set<BindingNode> leaves = this.getConstraintSystem().getLeaves();
+		if (leaves != null && !leaves.isEmpty()) {
+			Iterator<BindingNode> it = leaves.iterator();
 			BindingNode leaf;
 			while (it.hasNext()) {
 				leaf = it.next();
@@ -307,6 +306,7 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 					it.remove();
 				}
 			}
+			this.getConstraintSystem().setLeaves(leaves);
 		}
 	}
 
