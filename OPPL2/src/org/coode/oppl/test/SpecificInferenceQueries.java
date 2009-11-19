@@ -4,11 +4,13 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 
 import junit.framework.TestCase;
 
 import org.coode.oppl.ChangeExtractor;
 import org.coode.oppl.OPPLScript;
+import org.coode.oppl.log.Logging;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.utils.ParserFactory;
@@ -16,6 +18,8 @@ import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasoner;
+import org.semanticweb.owl.inference.OWLReasonerAdapter;
+import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLClass;
@@ -29,11 +33,6 @@ import uk.ac.manchester.cs.factplusplus.protege.FaCTPlusPlusReasonerFactory;
 public class SpecificInferenceQueries extends TestCase {
 	private final static URI TEST_NS = URI
 			.create("http://www.co-ode.org/opp/test#");
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-	}
 
 	public void testTransitiveSubClassClosure() {
 		OWLOntologyManager ontologyManager = OWLManager
@@ -57,8 +56,8 @@ public class SpecificInferenceQueries extends TestCase {
 			ParserFactory.initParser(opplString, testOntology, ontologyManager,
 					reasoner);
 			OPPLScript opplScript = OPPLParser.Start();
-			ChangeExtractor changeExtractor = new ChangeExtractor(testOntology,
-					ontologyManager, opplScript.getConstraintSystem(), true);
+			ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
+					.getConstraintSystem(), true);
 			List<OWLAxiomChange> changes = opplScript.accept(changeExtractor);
 			assertTrue(changes.size() > 0);
 			Set<OWLAxiom> instantiatedAxioms = this
@@ -66,6 +65,13 @@ public class SpecificInferenceQueries extends TestCase {
 			assertTrue("Instantiated axioms: " + instantiatedAxioms.size()
 					+ " count does not match with the expected (3)",
 					instantiatedAxioms.size() == 3);
+			for (OWLAxiom axiom : instantiatedAxioms) {
+				Logging.getQueryTestLogging().log(Level.INFO, axiom.toString());
+			}
+			Set<OWLClass> subClasses = OWLReasonerAdapter
+					.flattenSetOfSets(reasoner.getDescendantClasses(c));
+			Logging.getQueryTestLogging()
+					.log(Level.INFO, subClasses.toString());
 		} catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
@@ -73,6 +79,9 @@ public class SpecificInferenceQueries extends TestCase {
 			e.printStackTrace();
 			fail(e.getMessage());
 		} catch (ParseException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		} catch (OWLReasonerException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}

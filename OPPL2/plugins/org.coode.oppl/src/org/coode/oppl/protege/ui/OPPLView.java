@@ -193,10 +193,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 
 		@Override
 		protected List<OWLAxiomChange> doInBackground() {
-			ChangeExtractor changeExtractor = new ChangeExtractor(OPPLView.this
-					.getOWLEditorKit().getModelManager().getActiveOntology(),
-					OPPLView.this.getOWLEditorKit().getModelManager()
-							.getOWLOntologyManager(),
+			ChangeExtractor changeExtractor = new ChangeExtractor(
 					OPPLView.this.statementModel.getConstraintSystem(),
 					OPPLView.this.considerImportClosureCheckBox.isSelected());
 			System.out.println(OPPLView.this.statementModel.toString());

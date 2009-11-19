@@ -52,9 +52,8 @@ public class SpecificQueriesTest extends TestCase {
 			ParserFactory.initParser(opplString, exportOntology,
 					ontologyManager, null);
 			OPPLScript opplScript = OPPLParser.Start();
-			ChangeExtractor changeExtractor = new ChangeExtractor(
-					exportOntology, ontologyManager, opplScript
-							.getConstraintSystem(), true);
+			ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
+					.getConstraintSystem(), true);
 			List<OWLAxiomChange> changes = opplScript.accept(changeExtractor);
 			assertTrue(changes.size() > 0);
 			Logging.getQueryTestLogging().log(Level.INFO,
@@ -122,9 +121,8 @@ public class SpecificQueriesTest extends TestCase {
 			ParserFactory.initParser(opplString, exportOntology,
 					ontologyManager, null);
 			OPPLScript opplScript = OPPLParser.Start();
-			ChangeExtractor changeExtractor = new ChangeExtractor(
-					exportOntology, ontologyManager, opplScript
-							.getConstraintSystem(), true);
+			ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
+					.getConstraintSystem(), true);
 			List<OWLAxiomChange> changes = opplScript.accept(changeExtractor);
 			assertTrue(changes.size() > 0);
 			Logging.getQueryTestLogging().log(Level.INFO,

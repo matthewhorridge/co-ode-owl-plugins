@@ -22,7 +22,7 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 public abstract class AbstractTestCase extends TestCase {
 	private static final int TOLERANCE = 3;
 	// ontology file for tests
-	private String ontologyPhysicalURI = "file:///"
+	protected String ontologyPhysicalURI = "file:///"
 			+ new File("../OPPL2/ontologies/test.owl").getAbsolutePath();
 	// ontology manager
 	private OWLOntologyManager ontologyManager = OWLManager
@@ -39,8 +39,7 @@ public abstract class AbstractTestCase extends TestCase {
 
 	protected void execute(OPPLScript script) {
 		try {
-			Executor exec = new Executor(this.ontology1, this.ontologyManager,
-					script.getConstraintSystem(), true);
+			Executor exec = new Executor(script.getConstraintSystem(), true);
 			exec.visitActions(script.getActions());
 		} catch (Exception e) {
 			e.printStackTrace();
