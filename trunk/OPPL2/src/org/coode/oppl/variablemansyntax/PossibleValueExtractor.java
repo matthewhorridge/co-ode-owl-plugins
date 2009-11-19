@@ -118,7 +118,6 @@ import org.semanticweb.owl.model.SWRLSameAsAtom;
  * @author Luigi Iannone
  * 
  */
-@SuppressWarnings("unused")
 public class PossibleValueExtractor implements
 		OWLObjectVisitorEx<Set<OWLObject>> {
 	protected VariableType variableType;
