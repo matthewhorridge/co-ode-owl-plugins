@@ -116,11 +116,6 @@ public class OPPLInferredOWLAxiomSearchTree extends
 				.getConstraintSystem().getOntologyManager().getOWLDataFactory());
 		OWLDescription conversion = converter.convert(start.getAxiom());
 		try {
-			Logging.getQueryTestLogging().log(
-					Level.INFO,
-					"Loaded ontologies "
-							+ this.getConstraintSystem().getReasoner()
-									.getLoadedOntologies());
 			return !this.getConstraintSystem().getReasoner().isSatisfiable(
 					conversion);
 		} catch (OWLReasonerException e) {

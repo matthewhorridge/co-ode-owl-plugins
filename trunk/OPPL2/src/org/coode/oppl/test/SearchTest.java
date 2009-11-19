@@ -354,8 +354,8 @@ public class SearchTest extends TestCase {
 	private Set<OWLAxiom> getOPPLScriptCorrectResults(
 			final OWLOntologyManager manager, OWLOntology ontology,
 			final OPPLScript opplScript) {
-		ChangeExtractor changeExtractor = new ChangeExtractor(ontology,
-				manager, opplScript.getConstraintSystem(), true);
+		ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
+				.getConstraintSystem(), true);
 		opplScript.accept(changeExtractor);
 		Set<BindingNode> checkLeaves = opplScript.getConstraintSystem()
 				.getLeaves();

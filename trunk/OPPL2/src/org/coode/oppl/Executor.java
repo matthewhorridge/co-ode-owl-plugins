@@ -28,26 +28,26 @@ import java.util.List;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLAxiomChange;
-import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyChangeException;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
  * 
  */
 public class Executor implements OPPLScriptVisitor {
-	private final OWLOntologyManager ontologyManager;
 	private final ChangeExtractor changeExtractor;
 
 	/**
 	 * @param ontologyManager
 	 */
-	public Executor(OWLOntology ontology, OWLOntologyManager ontologyManager,
-			ConstraintSystem constraintSystem, boolean considerImportClosure) {
-		this.ontologyManager = ontologyManager;
-		this.changeExtractor = new ChangeExtractor(ontology, ontologyManager,
-				constraintSystem, considerImportClosure);
+	public Executor(ConstraintSystem constraintSystem,
+			boolean considerImportClosure) {
+		if (constraintSystem == null) {
+			throw new NullPointerException(
+					"The constraint system cannot be null");
+		}
+		this.changeExtractor = new ChangeExtractor(constraintSystem,
+				considerImportClosure);
 	}
 
 	public void visit(Variable v) {
@@ -60,7 +60,8 @@ public class Executor implements OPPLScriptVisitor {
 		List<OWLAxiomChange> actions = new ArrayList<OWLAxiomChange>();
 		this.changeExtractor.visitActions(changes, actions);
 		try {
-			this.ontologyManager.applyChanges(actions);
+			this.changeExtractor.getConstraintSystem().getOntologyManager()
+					.applyChanges(actions);
 		} catch (OWLOntologyChangeException e) {
 			e.printStackTrace();
 		}

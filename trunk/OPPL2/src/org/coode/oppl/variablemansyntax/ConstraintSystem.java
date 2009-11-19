@@ -140,7 +140,7 @@ public class ConstraintSystem {
 			OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
 		this(ontology, ontologyManager);
 		this.reasoner = reasoner;
-		if (this.reasoner == null) {
+		if (this.reasoner != null) {
 			try {
 				this.reasoner.loadOntologies(this.getOntologyManager()
 						.getOntologies());
