@@ -40,8 +40,8 @@ import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
 import org.coode.oppl.rendering.VariableOWLEntityRenderer;
 import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.ProtegeScopeVariableChecker;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.expression.OWLEntityChecker;
@@ -173,8 +173,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 		}
 	}
 
-	protected OWLModelManager modelManager;
-	private ConstraintSystem constraintSystem;
+	private OWLModelManager modelManager;
 	private ProtegeScopeVariableChecker variableScopeVariableChecker = null;
 	private final ProtegeOWLEntityFactory entityFactory;
 	private final ProtegeOWLEntityRenderer entityRenderer;
@@ -185,6 +184,9 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	 * @param dataFactory
 	 */
 	public ProtegeOPPLFactory(OWLModelManager modelManager) {
+		if (modelManager == null) {
+			throw new NullPointerException("The model manager cannot be null");
+		}
 		this.modelManager = modelManager;
 		this.entityFactory = new ProtegeOWLEntityFactory();
 		this.entityRenderer = new ProtegeOWLEntityRenderer();
@@ -244,24 +246,21 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 				writer);
 		renderer
 				.setShortFormProvider(new ProtegeSimpleVariableShortFormProvider(
-						this.modelManager, getConstraintSystem()));
+						this.modelManager, this.getConstraintSystem()));
 		return renderer;
 	}
 
 	public ConstraintSystem createConstraintSystem() {
-		this.constraintSystem = new ConstraintSystem(this.modelManager
-				.getActiveOntology(),
+		return new ConstraintSystem(this.modelManager.getActiveOntology(),
 				this.modelManager.getOWLOntologyManager(), this.modelManager
 						.getReasoner());
-		return this.constraintSystem;
 	}
 
 	/**
 	 * @return the constraintSystem
 	 */
 	private ConstraintSystem getConstraintSystem() {
-		return this.constraintSystem == null ? createConstraintSystem()
-				: this.constraintSystem;
+		return this.createConstraintSystem();
 	}
 
 	/**
@@ -280,7 +279,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 			ConstraintSystem cs) {
 		ArgCheck.checkNullArgument("The constraint system", cs);
 		return new ManchesterSyntaxRenderer(this.modelManager
-				.getOWLOntologyManager(), getOWLEntityRenderer(cs), cs);
+				.getOWLOntologyManager(), this.getOWLEntityRenderer(cs), cs);
 	}
 
 	public OWLOntologyManager getOntologyManager() {

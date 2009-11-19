@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project name="oppl plugin" default="bundle" basedir="..">
-
+  <property file="${basedir}/plugins/build.properties" />
   <property name="src" location="${basedir}/org.coode.oppl/src"/>
   <property name="classes" location="${basedir}/bin"/>
   <property name="source" location="1.5"/>
@@ -14,7 +14,8 @@
 
   <target name="init">
     <echo message="---------------Building the Bundle-------------"/>
-
+  	<echo message="${basedir}/plugins/build.properties"/>
+  	<echo message="${dist}"/>
     <mkdir dir="${classes}"/>
   </target>
 

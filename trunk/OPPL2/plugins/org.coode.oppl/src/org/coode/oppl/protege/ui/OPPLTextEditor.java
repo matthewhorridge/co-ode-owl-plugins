@@ -39,6 +39,9 @@ import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.description.OWLExpressionParserException;
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.clsdescriptioneditor.ExpressionEditor;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
 import org.semanticweb.owl.model.OWLException;
@@ -49,7 +52,8 @@ import org.semanticweb.owl.model.OWLException;
  * @author Luigi Iannone
  * 
  */
-public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
+public class OPPLTextEditor extends JPanel implements VerifiedInputEditor,
+		OWLModelManagerListener {
 	/**
 	 *
 	 */
@@ -58,7 +62,7 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 	private final OWLEditorKit owlEditorKit;
 	private OPPLScript opplScript = null;
 	private final ExpressionEditor<OPPLScript> editor;
-	protected final OPPLScriptValidator validator;
+	private final OPPLScriptValidator validator;
 
 	/**
 	 * @return the opplScript
@@ -141,17 +145,18 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 						OPPLTextEditor.this.handleChange();
 					}
 				});
-		initGUI();
+		this.getOWLEditorKit().getModelManager().addListener(this);
+		this.initGUI();
 	}
 
 	private void initGUI() {
-		setLayout(new BorderLayout());
+		this.setLayout(new BorderLayout());
 		this.add(ComponentFactory.createScrollPane(this.editor));
 	}
 
 	protected void handleChange() {
-		boolean b = check();
-		notifyListeners(b);
+		boolean b = this.check();
+		this.notifyListeners(b);
 	}
 
 	private boolean check() {
@@ -200,5 +205,20 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor {
 	@Override
 	public String getName() {
 		return "OPPL Text Editor";
+	}
+
+	public void handleChange(OWLModelManagerChangeEvent event) {
+		EventType type = event.getType();
+		switch (type) {
+		case REASONER_CHANGED:
+			this.handleChange();
+			break;
+		default:
+			break;
+		}
+	}
+
+	public void dispose() {
+		this.getOWLEditorKit().getModelManager().removeListener(this);
 	}
 }
