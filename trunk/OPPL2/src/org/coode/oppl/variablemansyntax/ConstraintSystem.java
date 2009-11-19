@@ -141,12 +141,19 @@ public class ConstraintSystem {
 		this(ontology, ontologyManager);
 		this.reasoner = reasoner;
 		if (this.reasoner != null) {
-			try {
-				this.reasoner.loadOntologies(this.getOntologyManager()
-						.getOntologies());
-			} catch (OWLReasonerException e) {
-				e.printStackTrace();
-			}
+			this.loadReasoner();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void loadReasoner() {
+		try {
+			this.reasoner.loadOntologies(this.getOntologyManager()
+					.getOntologies());
+		} catch (OWLReasonerException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -245,6 +252,9 @@ public class ConstraintSystem {
 
 	public void setReasoner(OWLReasoner reasoner) {
 		this.reasoner = reasoner;
+		if (this.reasoner != null) {
+			this.loadReasoner();
+		}
 	}
 
 	public Set<Variable> getVariables() {
