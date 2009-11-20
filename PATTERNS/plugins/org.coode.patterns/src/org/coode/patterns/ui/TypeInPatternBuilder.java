@@ -58,7 +58,7 @@ public class TypeInPatternBuilder extends
 		OWLFrameSectionRowObjectEditor<PatternModel>, VerifiedInputEditor,
 		InputVerificationStatusChangedListener, PatternModelChangeListener {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -4071865934355642992L;
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
@@ -89,7 +89,7 @@ public class TypeInPatternBuilder extends
 
 					public String createObject(String text)
 							throws OWLExpressionParserException {
-						this.check(text);
+						check(text);
 						return this.lastName;
 					}
 				});
@@ -99,15 +99,17 @@ public class TypeInPatternBuilder extends
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
 					private void updateURI() {
 						URI anURI = null;
+						String localName = TypeInPatternBuilder.this.patternNameTextField
+								.getText();
 						try {
-							anURI = TypeInPatternBuilder.this.patternNameTextField
-									.getText().length() > 0 ? new URI(
-									PatternModel.NAMESPACE
-											+ TypeInPatternBuilder.this.patternNameTextField
-													.getText())
-									: null;
-						} catch (URISyntaxException e) {
-							anURI = null;
+							if (!localName.isEmpty()) {
+								try {
+									anURI = new URI(PatternModel.NAMESPACE
+											+ localName);
+								} catch (URISyntaxException e) {
+									anURI = null;
+								}
+							}
 						} finally {
 							if (TypeInPatternBuilder.this.patternModel != null) {
 								TypeInPatternBuilder.this.patternModel
@@ -118,7 +120,7 @@ public class TypeInPatternBuilder extends
 					}
 
 					public void verifiedStatusChanged(boolean newState) {
-						this.updateURI();
+						updateURI();
 					}
 				});
 		patternNamePanel.setBorder(ComponentFactory
@@ -127,7 +129,7 @@ public class TypeInPatternBuilder extends
 		this.patternModelEditor = new ExpressionEditor<ProtegePatternModel>(
 				this.owlEditorKit, new PatternModelExpressionChecker(
 						this.owlEditorKit));
-		this.removeKeyListeners();
+		removeKeyListeners();
 		this.patternModelEditor.setPreferredSize(new Dimension(50, 200));
 		JScrollPane opplStatementEditorPane = ComponentFactory
 				.createScrollPane(this.patternModelEditor);
@@ -148,7 +150,7 @@ public class TypeInPatternBuilder extends
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		this.notifyListener(listener);
+		notifyListener(listener);
 	}
 
 	/**
@@ -177,12 +179,12 @@ public class TypeInPatternBuilder extends
 				e.printStackTrace();
 			}
 		}
-		this.handleChange();
+		handleChange();
 	}
 
 	public void handleChange() {
 		for (InputVerificationStatusChangedListener listener : this.listeners) {
-			this.notifyListener(listener);
+			notifyListener(listener);
 		}
 	}
 
@@ -225,7 +227,7 @@ public class TypeInPatternBuilder extends
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void removeKeyListeners() {
 		KeyListener[] keyListeners = this.patternModelEditor.getKeyListeners();

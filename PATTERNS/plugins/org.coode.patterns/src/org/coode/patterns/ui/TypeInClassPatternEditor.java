@@ -46,7 +46,7 @@ import org.semanticweb.owl.model.OWLException;
 /**
  * @author Luigi Iannone
  * 
- * Jul 2, 2008
+ *         Jul 2, 2008
  */
 public class TypeInClassPatternEditor extends
 		AbstractOWLFrameSectionRowObjectEditor<InstantiatedPatternModel>

@@ -22,6 +22,7 @@
  */
 package org.coode.patterns.ui;
 
+import org.coode.patterns.AbstractPatternModelFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
 import org.semanticweb.owl.model.OWLClass;
@@ -31,12 +32,13 @@ import org.semanticweb.owl.model.OWLClass;
  * 
  */
 public class PatternClassFrame extends AbstractOWLFrame<OWLClass> {
-	public PatternClassFrame(OWLEditorKit owlEditorKit) {
+	public PatternClassFrame(OWLEditorKit owlEditorKit,
+			AbstractPatternModelFactory f) {
 		super(owlEditorKit.getModelManager().getOWLOntologyManager());
-		this.addSection(new PatternClassFrameSection(owlEditorKit, this));
+		this.addSection(new PatternClassFrameSection(owlEditorKit, this, f));
 		this.addSection(new PatternOWLEquivalentClassesAxiomFrameSection(
-				owlEditorKit, this));
+				owlEditorKit, this, f));
 		this.addSection(new PatternOWLSubCLassAxiomFrameSection(owlEditorKit,
-				this));
+				this, f));
 	}
 }

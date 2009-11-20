@@ -77,7 +77,7 @@ public class PatternExtractor implements
 			String[] split = nsUtil.split(annotation.getAnnotationURI()
 					.toString(), null);
 			if (split != null && split.length == 2
-					&& split[0].compareTo(PatternModel.NAMESPACE) == 0) {
+					&& split[0].equals(PatternModel.NAMESPACE)) {
 				String value = annotation.getAnnotationValue().getLiteral();
 				String patternName = split[1];
 				PatternParser parser = this.initParser(value);
@@ -86,7 +86,8 @@ public class PatternExtractor implements
 					toReturn = parser.Start();
 					toReturn.setUri(annotation.getAnnotationURI());
 				} catch (ParseException e) {
-					e.printStackTrace();
+					System.out.println(value);
+					e.printStackTrace(System.out);
 				}
 			}
 		}
@@ -105,13 +106,18 @@ public class PatternExtractor implements
 
 	protected Set<String> getVisitedPatternNames() {
 		Set<String> toReturn = new HashSet<String>();
+		NamespaceUtil nsUtil = new NamespaceUtil();
+		String[] split = new String[2];
 		for (OWLConstantAnnotation patternAnnotation : this.visited) {
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			String[] split = nsUtil.split(patternAnnotation.getAnnotationURI()
-					.toString(), null);
-			if (split != null
-					&& split[0].compareTo(PatternModel.NAMESPACE) == 0) {
-				toReturn.add(split[1]);
+			if (split == null) {
+				split = new String[2];
+			}
+			String uri = patternAnnotation.getAnnotationURI().toString();
+			if (uri != null) {
+				split = nsUtil.split(uri, split);
+				if (split != null && split[0].equals(PatternModel.NAMESPACE)) {
+					toReturn.add(split[1]);
+				}
 			}
 		}
 		return toReturn;

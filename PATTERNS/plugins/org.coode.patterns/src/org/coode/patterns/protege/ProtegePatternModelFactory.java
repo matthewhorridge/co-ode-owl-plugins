@@ -30,6 +30,7 @@ import java.util.Set;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.protege.ProtegeSimpleVariableShortFormProvider;
 import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.patterns.AbstractPatternModelFactory;
@@ -53,12 +54,27 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
  */
 public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 	private final OWLModelManager modelManager;
+	private OPPLParser parser;
+
+	public OPPLParser getOPPLParser() {
+		return this.parser;
+	}
+
+	public void setOPPLParser(OPPLParser parser) {
+		this.parser = parser;
+	}
 
 	/**
 	 * @param modelManager
 	 */
-	public ProtegePatternModelFactory(OWLModelManager modelManager) {
+	public ProtegePatternModelFactory(OWLModelManager modelManager,
+			String script) {
 		this.modelManager = modelManager;
+		initOPPLParser(script);
+	}
+
+	public ProtegePatternModelFactory(OWLModelManager modelManager) {
+		this(modelManager, ";");
 	}
 
 	public PatternModel createPatternModel(OPPLScript opplScript)
@@ -66,7 +82,7 @@ public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 		if (opplScript.getActions().isEmpty()) {
 			throw new UnsuitableOPPLScriptException(opplScript);
 		} else {
-			return new ProtegePatternModel(opplScript, this.modelManager);
+			return new ProtegePatternModel(opplScript, this.modelManager, this);
 		}
 	}
 
@@ -92,11 +108,11 @@ public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 		return new PatternConstraintSystem(this.modelManager
 				.getActiveOntology(),
 				this.modelManager.getOWLOntologyManager(), this.modelManager
-						.getReasoner());
+						.getReasoner(), this);
 	}
 
 	public void initOPPLParser(String string) {
-		org.coode.oppl.utils.ProtegeParserFactory.initParser(string,
+		this.parser = ProtegeParserFactory.initParser(string,
 				this.modelManager, PatternModel.getScriptValidator());
 	}
 
@@ -121,7 +137,7 @@ public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 		} else if (actions.isEmpty()) {
 			throw new EmptyActionListException();
 		} else {
-			OPPLScript opplScript = OPPLParser
+			OPPLScript opplScript = this.parser
 					.getOPPLFactory()
 					.buildOPPLScript(constraintSystem, variables, null, actions);
 			PatternModel patternModel = this.createPatternModel(opplScript);

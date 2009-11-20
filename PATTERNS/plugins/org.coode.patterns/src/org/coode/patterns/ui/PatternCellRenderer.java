@@ -32,10 +32,11 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 
+import org.coode.oppl.utils.ArgCheck;
+import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.PatternExtractor;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.PatternOPPLScript;
-import org.coode.patterns.syntax.PatternParser;
 import org.coode.patterns.utils.Utils;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
@@ -55,12 +56,13 @@ import org.semanticweb.owl.model.OWLSubClassAxiom;
 public class PatternCellRenderer implements ListCellRenderer {
 	private OWLEditorKit owlEditorKit;
 	private final OWLCellRenderer owlCellRenderer;
+	private AbstractPatternModelFactory factory;
 
-	public PatternCellRenderer(OWLEditorKit owlEditorKit) {
-		if (owlEditorKit == null) {
-			throw new NullPointerException("The OWL Editor Kit cannot be null");
-		}
+	public PatternCellRenderer(OWLEditorKit owlEditorKit,
+			AbstractPatternModelFactory f) {
+		ArgCheck.checkNullArgument("The OWL Editor Kit", owlEditorKit);
 		this.owlEditorKit = owlEditorKit;
+		this.factory = f;
 		this.owlCellRenderer = new OWLCellRenderer(this.owlEditorKit);
 		this.owlCellRenderer.setHighlightKeywords(true);
 		this.owlCellRenderer.setWrap(true);
@@ -69,8 +71,7 @@ public class PatternCellRenderer implements ListCellRenderer {
 	public Component getListCellRendererComponent(JList list, Object value,
 			int index, boolean isSelected, boolean cellHasFocus) {
 		JPanel toReturn = new JPanel(new FlowLayout());
-		PatternExtractor patternExtractor = PatternParser
-				.getPatternModelFactory().getPatternExtractor();
+		PatternExtractor patternExtractor = this.factory.getPatternExtractor();
 		if (value instanceof PatternClassFrameSectionRow) {
 			JLabel valueRendering = new JLabel();
 			OWLAnnotationAxiom<? extends OWLObject> annotationAxAnnotation = ((PatternClassFrameSectionRow) value)

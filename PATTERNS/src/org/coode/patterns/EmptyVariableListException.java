@@ -25,7 +25,7 @@ package org.coode.patterns;
 /**
  * @author Luigi Iannone
  * 
- * Nov 25, 2008
+ *         Nov 25, 2008
  */
 public class EmptyVariableListException extends PatternException {
 	/**

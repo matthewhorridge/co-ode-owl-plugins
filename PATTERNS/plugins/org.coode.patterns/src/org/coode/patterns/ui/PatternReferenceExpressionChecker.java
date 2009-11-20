@@ -24,10 +24,10 @@ package org.coode.patterns.ui;
 
 import java.util.Iterator;
 
+import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.InstantiatedPatternModel;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.PatternReferenceNotFoundException;
-import org.coode.patterns.syntax.PatternParser;
 import org.coode.patterns.utils.Utils;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.description.OWLExpressionParserException;
@@ -37,18 +37,21 @@ import org.semanticweb.owl.model.OWLOntology;
 /**
  * @author Luigi Iannone
  * 
- * Nov 17, 2008
+ *         Nov 17, 2008
  */
 public class PatternReferenceExpressionChecker implements
 		OWLExpressionChecker<InstantiatedPatternModel> {
 	private OWLEditorKit owlEditorKit;
 	private InstantiatedPatternModel instantiatedPatternModel = null;
+	private AbstractPatternModelFactory factory;
 
 	/**
 	 * @param owlEditorKit
 	 */
-	public PatternReferenceExpressionChecker(OWLEditorKit owlEditorKit) {
+	public PatternReferenceExpressionChecker(OWLEditorKit owlEditorKit,
+			AbstractPatternModelFactory factory) {
 		this.owlEditorKit = owlEditorKit;
+		this.factory = factory;
 	}
 
 	/**
@@ -62,13 +65,12 @@ public class PatternReferenceExpressionChecker implements
 		PatternModel patternModel = null;
 		while (!found && it.hasNext()) {
 			OWLOntology ontology = it.next();
-			patternModel = Utils.find(text, ontology);
+			patternModel = Utils.find(text, ontology, this.factory);
 			found = patternModel != null;
 		}
 		if (found) {
-			this.instantiatedPatternModel = PatternParser
-					.getPatternModelFactory().createInstantiatedPatternModel(
-							patternModel);
+			this.instantiatedPatternModel = this.factory
+					.createInstantiatedPatternModel(patternModel);
 		} else {
 			throw new OWLExpressionParserException(
 					new PatternReferenceNotFoundException(
@@ -83,7 +85,7 @@ public class PatternReferenceExpressionChecker implements
 	 */
 	public InstantiatedPatternModel createObject(String text)
 			throws OWLExpressionParserException {
-		this.check(text);
+		check(text);
 		return this.instantiatedPatternModel;
 	}
 }

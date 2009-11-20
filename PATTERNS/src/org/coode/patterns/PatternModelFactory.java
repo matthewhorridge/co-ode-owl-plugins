@@ -47,14 +47,21 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
 public class PatternModelFactory implements AbstractPatternModelFactory {
 	private OWLOntologyManager ontologyManager;
 	private OWLOntology ontology;
+	private OPPLParser opplParser;
 
 	/**
 	 * @param ontologyManager
 	 */
 	public PatternModelFactory(OWLOntology ontology,
-			OWLOntologyManager ontologyManager) {
+			OWLOntologyManager ontologyManager, String script) {
 		this.ontologyManager = ontologyManager;
 		this.ontology = ontology;
+		initOPPLParser(script);
+	}
+
+	public PatternModelFactory(OWLOntology ontology,
+			OWLOntologyManager ontologyManager) {
+		this(ontology, ontologyManager, ";");
 	}
 
 	public PatternModel createPatternModel(OPPLScript opplScript)
@@ -62,7 +69,7 @@ public class PatternModelFactory implements AbstractPatternModelFactory {
 		if (opplScript.getActions().isEmpty()) {
 			throw new UnsuitableOPPLScriptException(opplScript);
 		} else {
-			return new PatternModel(opplScript, this.ontologyManager);
+			return new PatternModel(opplScript, this.ontologyManager, this);
 		}
 	}
 
@@ -83,12 +90,13 @@ public class PatternModelFactory implements AbstractPatternModelFactory {
 
 	public PatternConstraintSystem createConstraintSystem() {
 		return new PatternConstraintSystem(new ConstraintSystem(this.ontology,
-				this.ontologyManager), this.ontologyManager);
+				this.ontologyManager), this.ontologyManager, this);
 	}
 
 	public void initOPPLParser(String string) {
-		org.coode.oppl.utils.ParserFactory.initParser(string, this.ontology,
-				this.ontologyManager, null, PatternModel.getScriptValidator());
+		this.opplParser = org.coode.oppl.utils.ParserFactory.initParser(string,
+				this.ontology, this.ontologyManager, null, PatternModel
+						.getScriptValidator());
 	}
 
 	public ManchesterOWLSyntaxObjectRenderer getRenderer(
@@ -116,7 +124,7 @@ public class PatternModelFactory implements AbstractPatternModelFactory {
 		} else if (actions.isEmpty()) {
 			throw new EmptyActionListException();
 		} else {
-			OPPLScript opplScript = OPPLParser
+			OPPLScript opplScript = this.opplParser
 					.getOPPLFactory()
 					.buildOPPLScript(constraintSystem, variables, null, actions);
 			try {
@@ -142,5 +150,13 @@ public class PatternModelFactory implements AbstractPatternModelFactory {
 	 */
 	public OWLOntology getOntology() {
 		return this.ontology;
+	}
+
+	public OPPLParser getOPPLParser() {
+		return this.opplParser;
+	}
+
+	public void setOPPLParser(OPPLParser parser) {
+		this.opplParser = parser;
 	}
 }

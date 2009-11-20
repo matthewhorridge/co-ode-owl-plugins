@@ -25,6 +25,7 @@ package org.coode.patterns.protege;
 import java.util.StringTokenizer;
 
 import org.coode.oppl.OPPLScript;
+import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.UnsuitableOPPLScriptException;
 import org.protege.editor.owl.model.OWLModelManager;
@@ -47,21 +48,22 @@ public class ProtegePatternModel extends PatternModel {
 	 * @throws UnsuitableOPPLScriptException
 	 */
 	public ProtegePatternModel(OPPLScript opplScript,
-			OWLModelManager modelManager) throws UnsuitableOPPLScriptException {
-		super(opplScript, modelManager.getOWLOntologyManager());
+			OWLModelManager modelManager, AbstractPatternModelFactory f)
+			throws UnsuitableOPPLScriptException {
+		super(opplScript, modelManager.getOWLOntologyManager(), f);
 		this.modelManager = modelManager;
 	}
 
 	@Override
 	public String toString() {
 		String renderedString = super.toString();
-		String toReturn = "";
+		StringBuilder toReturn = new StringBuilder();
 		StringTokenizer tokenizer = new StringTokenizer(renderedString,
 				" \n\t,[()];", true);
 		while (tokenizer.hasMoreTokens()) {
-			toReturn += this.unRender(tokenizer.nextToken());
+			toReturn.append(unRender(tokenizer.nextToken()));
 		}
-		return toReturn;
+		return toReturn.toString();
 	}
 
 	private String unRender(String chunk) {
@@ -71,9 +73,11 @@ public class ProtegePatternModel extends PatternModel {
 			BidirectionalShortFormProvider bidirectionalShortFormProvider = new BidirectionalShortFormProviderAdapter(
 					this.modelManager.getOntologies(),
 					new SimpleShortFormProvider());
-			toReturn = bidirectionalShortFormProvider.getShortForm(object) != null ? bidirectionalShortFormProvider
-					.getShortForm(object)
-					: toReturn;
+			String shortForm = bidirectionalShortFormProvider
+					.getShortForm(object);
+			if (shortForm != null) {
+				toReturn = shortForm;
+			}
 		}
 		return toReturn;
 	}

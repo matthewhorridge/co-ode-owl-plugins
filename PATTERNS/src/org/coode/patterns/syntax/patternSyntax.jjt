@@ -6,11 +6,11 @@ options {
   JDK_VERSION = "1.5";
   MULTI = true;
   NODE_PREFIX = "Pattern";
-  
+
   STATIC = false;
 }
- 
-PARSER_BEGIN(PatternParser) 
+
+PARSER_BEGIN(PatternParser)
 package org.coode.patterns.syntax;
 
 import java.io.BufferedReader;
@@ -57,17 +57,16 @@ import org.coode.patterns.PatternConstant;
 
 
 public class PatternParser {
-	
-private static OWLOntologyManager owlOntologyManager;
+	private OWLOntologyManager owlOntologyManager;
 	//private static PatternConstraintSystem constraintSystem;
-	private static OWLReasoner reasoner;
-	private  static AbstractPatternModelFactory modelFactory;
+	private OWLReasoner reasoner;
+	private AbstractPatternModelFactory modelFactory;
 	private String unresolvedString ="";
 	private List<PatternOPPLScript> dependencies = new ArrayList<PatternOPPLScript>();
 	private Set<String> visited= new HashSet<String>();
 	//Unchecked on purpose as it must contain both OWLObject instances and String
 	private List completions = new ArrayList();
-	
+
 	public List getCompletions(){
 		return this.completions;
 	}
@@ -77,96 +76,73 @@ private static OWLOntologyManager owlOntologyManager;
 		visited.add(patternName);
 	}
 
-	public static void setPatternModelFactory(AbstractPatternModelFactory modelFactory){
-		PatternParser.modelFactory = modelFactory;
-	} 
-	
-	public static AbstractPatternModelFactory getPatternModelFactory(){
+	public void setPatternModelFactory(AbstractPatternModelFactory mf){
+		modelFactory = mf;
+	}
+
+	public AbstractPatternModelFactory getPatternModelFactory(){
 		return modelFactory;
 	}
-	
-	public static OWLReasoner getReasoner(){
-		return reasoner;	
-	}
-	
-	
 
-	
-	public static  OWLDataFactory getOWLDataFactory(){
+	public OWLReasoner getReasoner(){
+		return reasoner;
+	}
+
+	public OWLDataFactory getOWLDataFactory(){
 		return owlOntologyManager.getOWLDataFactory();
 	}
-	
-	public static OWLOntologyManager getOWLOntologyManager(){
+
+	public OWLOntologyManager getOWLOntologyManager(){
 		return owlOntologyManager;
 	}
 
- 
-
-	public PatternParser(java.io.InputStream in, OWLOntologyManager owlOntologyManager, OWLReasoner reasoner){
+	public PatternParser(java.io.InputStream in, OWLOntologyManager m, OWLReasoner r){
 		this(in);
-		PatternParser.owlOntologyManager = owlOntologyManager;		
-		PatternParser.reasoner = reasoner;
+		owlOntologyManager = m;
+		reasoner = r;
 	}
-   
-  
 
-
-
-   	public  void ReInit(Reader reader,
-			OWLOntologyManager ontologyManager,  OWLReasoner reasoner) {
+   	public void ReInit(Reader reader, OWLOntologyManager m,  OWLReasoner r) {
 		ReInit(reader);
-		PatternParser.owlOntologyManager  = ontologyManager;
-		PatternParser.reasoner = reasoner;
+		owlOntologyManager  = m;
+		reasoner = r;
 	}
-   
-   	public PatternParser(Reader reader, OWLOntologyManager ontologyManager
-			) {
+
+   	public PatternParser(Reader reader, OWLOntologyManager m) {
 		this(reader);
-		owlOntologyManager = ontologyManager;
-		
-	} 	
-	
-	public PatternParser(Reader reader, OWLOntologyManager ontologyManager,
-			 OWLReasoner reasoner) {
-		this(reader,ontologyManager);
-		PatternParser.reasoner = reasoner;
+		owlOntologyManager = m;
 	}
-	
-	public static void initOPPLParser(String s, OWLOntology ontology){
-		org.coode.oppl.utils.ParserFactory.initParser(s,ontology, getOWLOntologyManager(),null);
-		
+
+	public PatternParser(Reader reader, OWLOntologyManager m, OWLReasoner r) {
+		this(reader,m);
+		reasoner = r;
 	}
-	
-	public static void initProtegeOPPLParser(String s, OWLModelManager modelManager){
-		
-		org.coode.oppl.utils.ProtegeParserFactory.initParser(s, modelManager);
-		
-	} 	
-	
-	
+
+	public void initOPPLParser(String s, OWLOntology o){
+		modelFactory.setOPPLParser(org.coode.oppl.utils.ParserFactory.initParser(s, o, owlOntologyManager, null));
+	}
+
+	public void initProtegeOPPLParser(String s, OWLModelManager modelManager){
+		modelFactory.setOPPLParser(org.coode.oppl.utils.ProtegeParserFactory.initParser(s, modelManager, null));
+	}
+
+
 	public void setVisited(Set<String> visitedPatternNames) {
 		this.visited = visitedPatternNames;
 	}
-	
-	
-	
+
   public static void main(String args[]) {
   	String ontologyURIString = args[0];
   	OWLOntologyManager ontologyManager = OWLManager.createOWLOntologyManager();
-  	  try {
-			OWLOntology ontology = ontologyManager.loadOntology(URI.create(ontologyURIString));
-		 
-    System.out.println("Reading from  standard input...");
-    System.out.print("Enter an expression: ");
-     
-    
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					System.in));
-			String line = reader.readLine();
-			PatternParser parser = ParserFactory.initParser(line,ontology,
-					ontologyManager);
-      parser.Start();
-      System.out.println("Thank you.");
+  	try {
+		OWLOntology ontology = ontologyManager.loadOntology(URI.create(ontologyURIString));
+    	System.out.println("Reading from  standard input...");
+    	System.out.print("Enter an expression: ");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		String line = reader.readLine();
+		PatternParser parser = ParserFactory.initParser(line, ontology, ontologyManager);
+		parser.Start();
+		System.out.println("Thank you.");
     } catch (Exception e) {
       System.out.println("Oops.");
       e.printStackTrace();
@@ -213,7 +189,6 @@ TOKEN : /*VARIABLE NAMES*/
 	<VARIABLENAME: "?"<IDENTIFIER>>
 	|<VARIABLETYPE: "CLASS" | "OBJECTPROPERTY" | "DATAPROPERTY" | "INDIVIDUAL" | "CONSTANT">
 	|<PATTERNREFERENCEVARIABLE: <VARIABLENAME><OPENPARENTHESYS>(<IDENTIFIER>(<COMMA><IDENTIFIER>))*<CLOSEDPARENTHESYS>>
-		
 }
 
 TOKEN : /*RETURN*/
@@ -225,14 +200,13 @@ TOKEN : /* IDENTIFIERS */
 {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
 | <CREATEDIDENTIFIER: "!"<IDENTIFIER>>
-|  < #LETTER: ["_","a"-"z","A"-"Z"] >
+|  < #LETTER: ["_","-","a"-"z","A"-"Z"] >
 |  < #DIGIT: ["0"-"9"] >
 }
 
 
 TOKEN: /*PUNCTUATION*/
 {
-	
 	<COMMA:",">
 	| <SEMICOLON: ";">
 	| <COLON: ":">
@@ -245,24 +219,15 @@ TOKEN: /*PUNCTUATION*/
 	| <OPENCURLYBRACKETS: "{">
 	| <CLOSEDCURLYBRACKETS: "}">
 	| <OPENSQUAREBRACKETS: "[">
-	| <CLOSEDSQUAREBRACKETS: "]">	
-	| <HYPHEN: "-">
+	| <CLOSEDSQUAREBRACKETS: "]">
 	| <EQUALS:"=">
-	
 }
-
-
-
-
-
 
 TOKEN : /* PATTERN CONSTANTS*/
 {
-	
 	<THISCLASS: "$thisClass">
 	|<DOLLAR: "$">
 	/*|<PATTERNREFERENCE: "$"<IDENTIFIER>> */
-	
 }
 
 TOKEN:
@@ -270,50 +235,45 @@ TOKEN:
 	<CREATESYMBOL: "!">
 }
 
- 
-PatternOPPLScript Start():{OPPLScript opplStatement;String rendering=null;InstantiatedPatternModel instantiatedPatternModel=null; Variable returnVariable=null;}
+PatternOPPLScript Start():{
+OPPLScript opplStatement;
+String rendering=null;
+InstantiatedPatternModel instantiatedPatternModel=null;
+Variable returnVariable=null;}
 {
-	instantiatedPatternModel =patternInstantiation(){
-	for (PatternOPPLScript dependency : this.dependencies) {
-					instantiatedPatternModel.addDependency(dependency);
-	}
-	instantiatedPatternModel.setUnresolvedOPPLStatement(unresolvedString);
-  	return instantiatedPatternModel;
-  }
-|	
- 	opplStatement = OPPLPatternStatement(getPatternModelFactory().createConstraintSystem()) rendering = Rendering(opplStatement.getConstraintSystem())(<SEMICOLON> returnVariable= returnClause((PatternConstraintSystem)opplStatement.getConstraintSystem()))? 
-  { 
-  	PatternModel toReturn = modelFactory.createPatternModel(opplStatement);
-				
-           
-			
-			toReturn.setUnresolvedOPPLStatement(unresolvedString);
-			toReturn.setRendering(rendering);
-			for (PatternOPPLScript dependency : this.dependencies) {
-            	toReturn.addDependency(dependency);
-        	}
-			toReturn.setReturnVariable(returnVariable);
-  	return toReturn; 
-  }
-   
+	instantiatedPatternModel = patternInstantiation()
+		{
+		for (PatternOPPLScript dependency : this.dependencies) {
+			instantiatedPatternModel.addDependency(dependency);
+		}
+		instantiatedPatternModel.setUnresolvedOPPLStatement(unresolvedString);
+  		return instantiatedPatternModel;
+  		}
+| 	opplStatement = OPPLPatternStatement(modelFactory.createConstraintSystem())
+	rendering = Rendering(opplStatement.getConstraintSystem())
+	(<SEMICOLON> returnVariable = returnClause((PatternConstraintSystem)opplStatement.getConstraintSystem()))?
+		{
+		PatternModel toReturn = modelFactory.createPatternModel(opplStatement);
+		toReturn.setUnresolvedOPPLStatement(unresolvedString);
+		toReturn.setRendering(rendering);
+		for (PatternOPPLScript dependency : this.dependencies) {
+           	toReturn.addDependency(dependency);
+        }
+		toReturn.setReturnVariable(returnVariable);
+  		return toReturn;
+  		}
 }
 
 
 Variable returnClause(PatternConstraintSystem constraintSystem) #void:{Token t=null;}
 {
 	LOOKAHEAD(2)
-	<RETURN> t = <VARIABLENAME>{
+	<RETURN> t = <VARIABLENAME>
+		{
 		Variable v = constraintSystem.getVariable(t.image);
-		if(v!=null){
-			return v;
-		}else{
-			throw new ParseException("Undefined Varibale"+ t.image);
+		if(v!=null){return v;}else{throw new ParseException("Undefined Variable "+ t.image);}
 		}
-	}
-	|<RETURN> t = <THISCLASS>{
-		return constraintSystem.getThisClassVariable();
-		
-	} 
+	|<RETURN> t = <THISCLASS>{return constraintSystem.getThisClassVariable();}
 }
 
 InstantiatedPatternModel patternInstantiation() #void:{Token t;List<List<String>> args;PatternSignature signature = null;}
@@ -333,84 +293,67 @@ InstantiatedPatternModel patternInstantiation() #void:{Token t;List<List<String>
 	}
 	<OPENPARENTHESYS>{
 		try{
-			signature = new PatternSignature(t.image, getOWLOntologyManager());
-		}catch (PatternException e) {			
-			throw new ParseException(e.getMessage());
+			signature = new PatternSignature(t.image, getOWLOntologyManager(), this.modelFactory);
+		}catch (PatternException e) {
+			throw new ParseException(e.getMessage(), e);
 		}
-	} args=argList(signature)<CLOSEDPARENTHESYS>{		
-					try {
-						this.completions.clear();
-						InstantiatedPatternModel resolvedPattern = signature.getPattern().getConstraintSystem().resolvePatternInstantiation(t.image,owlOntologyManager,this.visited,this.dependencies, args
-						                                .toArray(new List[args.size()]));
-						                                unresolvedString = "$"+t.image+"(";
-						                                boolean first = true;
-						                                for(List<String> anArgument: args){
-						                                	if(!first){
-						                                		unresolvedString+=", ";
-						                                	}else{
-						                                		first = false;
-						                                	}
-						                                	if(anArgument.size()==1){
-						                                		unresolvedString+=anArgument.iterator().next();
-						                                	}else{
-						                                		boolean firstSubArg= true;
-						                                		unresolvedString+="{";
-						                                		for(String subArg: anArgument){
-						                                			unresolvedString+=firstSubArg?subArg:", "+subArg;
-						                                			firstSubArg=firstSubArg?false:firstSubArg;
-						                                		}
-						                                		unresolvedString+="}";
-						                                	}
-						                                	
-						                                }
-						                                unresolvedString+=")";
-						                                return resolvedPattern;
-					} catch (PatternException e) {
-						
-						throw new ParseException(e.getMessage());
+	}
+	args=argList(signature)<CLOSEDPARENTHESYS>
+		{
+		try {
+			this.completions.clear();
+			InstantiatedPatternModel resolvedPattern =
+				signature.getPattern().getConstraintSystem().resolvePatternInstantiation(
+					t.image,
+					owlOntologyManager,
+					this.visited,
+					this.dependencies,
+					args.toArray(new List[args.size()]));
+			unresolvedString = "$"+t.image+"(";
+			boolean first = true;
+			for(List<String> anArgument: args){
+				if(!first){unresolvedString+=", ";}else{first = false;}
+				if(anArgument.size()==1){
+					unresolvedString+=anArgument.iterator().next();
+				}else{
+					boolean firstSubArg= true;
+					unresolvedString+="{";
+					for(String subArg: anArgument){
+						unresolvedString+=firstSubArg?subArg:", "+subArg;
+						firstSubArg=firstSubArg?false:firstSubArg;
 					}
-					
-	}	
+					unresolvedString+="}";
+				}
+			}
+			unresolvedString+=")";
+			return resolvedPattern;
+		} catch (PatternException e) {throw new ParseException(e.getMessage(), e);}
+	}
 }
 
 JAVACODE
 OPPLScript OPPLPatternStatement(PatternConstraintSystem constraintSystem){
-	String string="";
-	
-	unresolvedString ="";
-		Token t;
-	while(true){
-		t = getToken(1);
-		if (t.kind == EOF){
-			
-			
-			break;
-		}else{
-				
-				string += resolvedString(constraintSystem, true)+" ";
-				if(t.kind == END){
-					break;
-				}
-			
+	StringBuilder stringbuilder = new StringBuilder();
+	this.unresolvedString = "";
+	Token t;
+	while (true) {
+		t = this.getToken(1);
+		if (t.kind == EOF) {break;}
+		else {
+			stringbuilder.append(this.resolvedString(constraintSystem, true));
+			stringbuilder.append(" ");
+			if (t.kind == END) {break;}
 		}
 	}
-	
-	getPatternModelFactory().initOPPLParser(string);	
-	try{
-		OPPLScript toReturn = OPPLParser.parse(constraintSystem);
-		
-		return toReturn;
-	} catch (Exception e) {
-		throw new ParseException(e.getMessage());
+	String string = stringbuilder.toString().replace("BEGIN", "\nBEGIN\n").replace("END;", "\nEND;");
+	//System.out.println("PatternParser.OPPLPatternStatement() to execute:\n"+string+"\n");
+	this.modelFactory.initOPPLParser(string);
+	try {
+		return this.modelFactory.getOPPLParser().parse(constraintSystem);
+	} catch (org.coode.oppl.syntax.ParseException e) {
+		throw new ParseException("The compiled OPPL script is not syntactically correct:\n" + "Compiled pattern: \n" + string + "\nerror message: \"" + e.getMessage() + "\"", e);
 	}
 }
-
-
-
-
-
-
-
 
 JAVACODE
 String Rendering(ConstraintSystem constraintSystem)
@@ -442,7 +385,6 @@ String resolvedString(PatternConstraintSystem constraintSystem, boolean writeUnr
 	Token t=null;String resolvedPattern=null;
 	String variableDefinition=null;}
 {
-	
 	variableDefinition=variableReference(constraintSystem){
 		if(writeUnresolved){
 			unresolvedString+=variableDefinition+" ";
@@ -457,9 +399,9 @@ String resolvedString(PatternConstraintSystem constraintSystem, boolean writeUnr
 			unresolvedString += t.image+" ";
 		}
 		 return new PatternConstant<OWLClass>(
-				PatternConstraintSystem.THIS_CLASS_VARIABLE_NAME, VariableType.CLASS, constraintSystem.getDataFactory()).getName();
+				PatternConstraintSystem.THIS_CLASS_VARIABLE_NAME, VariableType.CLASS, constraintSystem.getOntologyManager().getOWLDataFactory()).getName();
 	}
-	
+
 	| t = <ACTIONTOKENS>{
 		if(writeUnresolved){
 			unresolvedString += t.image+" ";
@@ -509,13 +451,13 @@ String resolvedString(PatternConstraintSystem constraintSystem, boolean writeUnr
 	| t=<CLOSEDPARENTHESYS>{
 		if(writeUnresolved){
 			unresolvedString += t.image+" ";
-		}	
+		}
 		return t.image;
 	}
 	| t=<INTEGER_LITERAL>{
 		if(writeUnresolved){
 			unresolvedString += t.image+" ";
-		}	
+		}
 		return t.image;
 	}
 	| t=<SEMICOLON>{
@@ -542,17 +484,17 @@ String resolvedString(PatternConstraintSystem constraintSystem, boolean writeUnr
 		}
 		return  t.image;
 	}
-	
+
 }
 
 
 String variableReference(PatternConstraintSystem constraintSystem) #void:{
-	Token variableNameToken; 
-	Token variableType; 
+	Token variableNameToken;
+	Token variableType;
 	Token directionToken = null;
 	Token scopeToken=null;
-	String scopeString=""; 
-	Token opplFunctionName=null; 
+	String scopeString="";
+	Token opplFunctionName=null;
 	String opplFunctionArgs="";
 	String variableExpression="";
 	String opplFunction="";
@@ -564,24 +506,23 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 	}<CLOSEDSQUAREBRACKETS>{
 		return variableNameToken.image+":"+variableType.image+"["+directionToken.image+" "+scopeString.trim()+"]";
 	}
-	|	
+	|
 	LOOKAHEAD(4)
 	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> opplFunction = opplFunction(variableNameToken.image, variableType.image, constraintSystem)
 	{
-		
 		return variableNameToken.image+":"+variableType.image+" = "+opplFunction;
 	}
 	|
 	LOOKAHEAD(3)
 	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE>{
 		try{
-			Variable v =constraintSystem.createVariable(variableNameToken.image,VariableType.getVariableType(variableType.image));
+			Variable v =constraintSystem.createVariable(variableNameToken.image,VariableType.valueOfIgnoreCase(variableType.image));
 			return v.toString();
 		}catch(Exception e){
-			throw new ParseException(e.getMessage());
+			throw new ParseException(e.getMessage(), e);
 		}
 	}
-	 
+
 	| variableNameToken=<VARIABLENAME>{
 		return variableNameToken.image;
 	}
@@ -591,7 +532,7 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 String opplFunction(String variableNameString, String variableTypeString, PatternConstraintSystem constraintSystem) #void:{
 	Token opplFunctionNameToken;
 	String variableExpression;
-	String opplFunctionArgs;	
+	String opplFunctionArgs;
 	}
 {
 	LOOKAHEAD(1)
@@ -620,46 +561,41 @@ String resolveInnerPattern(PatternConstraintSystem constraintSystem) #void:{Toke
 {
 	<DOLLAR> t = <IDENTIFIER><OPENPARENTHESYS>{
 		try{
-			signature = new PatternSignature(t.image, getOWLOntologyManager());
-		}catch (PatternException e) {			
-			throw new ParseException(e.getMessage());
-		}
+			signature = new PatternSignature(t.image, getOWLOntologyManager(), this.modelFactory);
+		}catch (PatternException e) {throw new ParseException(e.getMessage(), e);}
 	}
-	 args=argList(signature) <CLOSEDPARENTHESYS>{
+	args=argList(signature) <CLOSEDPARENTHESYS>
+		{
 		String resolvedPattern;
-					try {
-						unresolvedString+="$"+t.image+"(";
-						boolean first = true;
-						for(List<String> anArgument: args){
-							if(!first){
-								unresolvedString+=", ";
-							}else{
-								first = false;
-							}
-							if(anArgument.size()==1){
-                            		unresolvedString+=anArgument.iterator().next();
-                        	}else{
-                        		boolean firstSubArg= true;
-                        		unresolvedString+="{";
-                        		for(String subArg: anArgument){
-                        			unresolvedString+=firstSubArg?subArg:", "+subArg;
-                        			firstSubArg=firstSubArg?false:firstSubArg;
-                        		}
-                        		unresolvedString+="}";
-                        	}
-						}
-						unresolvedString+=") ";
-                        String patternName = t.image;
-                        //visited.add(patternName);
-						resolvedPattern = constraintSystem.resolvePattern(patternName,owlOntologyManager,this.visited,this.dependencies, args
-                                                                                .toArray(new List[args.size()]));
-						
-					} catch (PatternException e) {
-						
-						throw new ParseException(e.getMessage());
+		try {
+			unresolvedString+="$"+t.image+"(";
+			boolean first = true;
+			for(List<String> anArgument: args){
+				if(!first){unresolvedString+=", ";}else{first = false;}
+				if(anArgument.size()==1){
+					unresolvedString+=anArgument.iterator().next();
+				}else{
+					boolean firstSubArg= true;
+					unresolvedString+="{";
+					for(String subArg: anArgument){
+						unresolvedString+=firstSubArg?subArg:", "+subArg;
+						firstSubArg=firstSubArg?false:firstSubArg;
 					}
-					return resolvedPattern;
-	}	
+				unresolvedString+="}";
+			}
+		}
+		unresolvedString+=") ";
+		String patternName = t.image;
+		//visited.add(patternName);
+		resolvedPattern = constraintSystem.resolvePattern(
+				patternName,
+				owlOntologyManager,
+				this.visited,
+				this.dependencies,
+				args.toArray(new List[args.size()]));
+	} catch (PatternException e) {throw new ParseException(e.getMessage(), e);}
+	return resolvedPattern;
+	}
 }
 
 List<List<String>> argList(PatternSignature signature) #void:{List<List<String>> toReturn = new ArrayList<List<String>>();List<String> anArgument=null; int i=0;}
@@ -668,32 +604,34 @@ List<List<String>> argList(PatternSignature signature) #void:{List<List<String>>
 		this.completions.clear();
 		try{
 			this.completions.addAll(signature.getPossibleValues(i));
-		}catch(Exception e){
-			throw new ParseException(e.getMessage());
-		}
+		}catch(Exception e){throw new ParseException(e.getMessage(), e);}
 	}
-	(anArgument =arg(i, signature){
-		i++;
-		toReturn.add(anArgument);
-		if(completions.size()==1 && anArgument.size() ==1 && completions.iterator().next().toString().compareTo(anArgument.iterator().next())==0){
-			this.completions.clear();
-			if(i>= signature.size()){
-				this.completions.add(")");
-			}else{
-				this.completions.add(",");
+	(anArgument =arg(i, signature)
+		{
+			i++;
+			toReturn.add(anArgument);
+			if(completions.size()==1 &&
+				anArgument.size() ==1 &&
+				completions.iterator().next().toString().equals(anArgument.iterator().next())){
+				this.completions.clear();
+				if(i>= signature.size()){
+					this.completions.add(")");
+				}else{
+					this.completions.add(",");
+				}
 			}
 		}
-	}(<COMMA> {
+	(<COMMA> {
 		this.completions.clear();
 		try{
 			this.completions.addAll(signature.getPossibleValues(i));
-		}catch(Exception e){
-			throw new ParseException(e.getMessage());
-		}
-	} anArgument =arg(i, signature){
+		}catch(Exception e){throw new ParseException(e.getMessage(), e);}}
+	anArgument =arg(i, signature){
 		i++;
 		toReturn.add(anArgument);
-		if(completions.size()==1 && anArgument.size() ==1 && completions.iterator().next().toString().compareTo(anArgument.iterator().next())==0){
+		if(completions.size()==1
+			&& anArgument.size() == 1
+			&& completions.iterator().next().toString().equals(anArgument.iterator().next())){
 			this.completions.clear();
 			if(i>= signature.size()){
 				this.completions.add(")");
@@ -711,9 +649,7 @@ List<String> arg(int i, PatternSignature signature) #void:{String t=null;List<St
 		try{
 			this.completions.clear();
 			this.completions.addAll(signature.getPossibleValues(i, t));
-		}catch(Exception e){
-			throw new ParseException(e.getMessage());
-		}
+		}catch(Exception e){throw new ParseException(e.getMessage(), e);}
 		toReturn.add(t);
 		return toReturn;
 	}
@@ -742,10 +678,8 @@ String argToken(int i, PatternSignature signature) #void :{Token t;}
 	| <CREATESYMBOL> t = <IDENTIFIER>{
 		String toCreate=t.image;
 		try{
-			return PatternParserUtils.create(toCreate, i, signature);
-		}catch(Exception e){
-			throw new ParseException(e.getMessage());
-		}
+			return PatternParserUtils.create(getOWLOntologyManager(), toCreate, i, signature, modelFactory.getOPPLParser().getOPPLFactory());
+		}catch(Exception e){throw new ParseException(e.getMessage(), e);}
 	}
 }
 

@@ -34,7 +34,7 @@ import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
 /**
  * @author Luigi Iannone
  * 
- * Jun 25, 2008
+ *         Jun 25, 2008
  */
 public class PatternModelExpressionChecker implements
 		OWLExpressionChecker<ProtegePatternModel> {
@@ -50,7 +50,7 @@ public class PatternModelExpressionChecker implements
 	 */
 	public void check(String text) throws OWLExpressionParserException {
 		this.lastCreatedObject = null;
-		PatternParser parser = ParserFactory.initParser(text, this.owlEditorKit
+		PatternParser parser = ParserFactory.initProtegeParser(text, this.owlEditorKit
 				.getModelManager());
 		try {
 			this.lastCreatedObject = (ProtegePatternModel) parser.Start();

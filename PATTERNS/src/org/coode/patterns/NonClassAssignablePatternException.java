@@ -25,7 +25,7 @@ package org.coode.patterns;
 /**
  * @author Luigi Iannone
  * 
- * Sep 17, 2008
+ *         Sep 17, 2008
  */
 public class NonClassAssignablePatternException extends PatternException {
 	/**

@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.coode.oppl.OPPLScript;
-import org.coode.patterns.syntax.PatternParser;
 import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLAnnotation;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
@@ -90,16 +89,8 @@ import org.semanticweb.owl.model.SWRLRule;
  *         Jul 3, 2008
  */
 public class PatternManager implements OWLOntologyChangeListener {
-	static class AdditionManager implements OWLAxiomVisitor {
-		private OWLOntologyManager ontologyManager;
-		private OWLOntology ontology;
-
-		public AdditionManager(OWLOntology ontology,
-				OWLOntologyManager ontologyManager) {
-			this.ontologyManager = ontologyManager;
-			this.ontology = ontology;
-		}
-
+	@SuppressWarnings("unused")
+	static abstract class AbstractEmptyManager {
 		public void visit(OWLSubClassAxiom axiom) {
 		}
 
@@ -158,31 +149,6 @@ public class PatternManager implements OWLOntologyChangeListener {
 		}
 
 		public void visit(OWLDeclarationAxiom axiom) {
-		}
-
-		public void visit(OWLEntityAnnotationAxiom axiom) {
-			PatternExtractor patternExtractor = PatternParser
-					.getPatternModelFactory().getPatternExtractor();
-			OWLAnnotation<? extends OWLObject> annotation = axiom
-					.getAnnotation();
-			OPPLScript patternModel = annotation.accept(patternExtractor);
-			OWLEntity subject = axiom.getSubject();
-			if (patternModel != null && subject instanceof OWLClass
-					&& patternModel instanceof InstantiatedPatternModel) {
-				PatternOPPLScript opplStatement = ((InstantiatedPatternModel) patternModel)
-						.getInstantiatedPattern();
-				ClassPatternExecutor patternExecutor = new ClassPatternExecutor(
-						(OWLClass) subject,
-						(InstantiatedPatternModel) patternModel, this.ontology,
-						this.ontologyManager, annotation.getAnnotationURI());
-				List<OWLAxiomChange> changes = opplStatement
-						.accept(patternExecutor);
-				try {
-					this.ontologyManager.applyChanges(changes);
-				} catch (OWLOntologyChangeException e) {
-					throw new RuntimeException(e);
-				}
-			}
 		}
 
 		public void visit(OWLOntologyAnnotationAxiom axiom) {
@@ -234,79 +200,63 @@ public class PatternManager implements OWLOntologyChangeListener {
 		}
 	}
 
-	static class DeletionManager implements OWLAxiomVisitor {
+	static class AdditionManager extends AbstractEmptyManager implements
+			OWLAxiomVisitor {
+		private OWLOntologyManager ontologyManager;
+		private OWLOntology ontology;
+		private final AbstractPatternModelFactory factory;
+
+		public AdditionManager(OWLOntology ontology,
+				OWLOntologyManager ontologyManager,
+				AbstractPatternModelFactory f) {
+			this.ontologyManager = ontologyManager;
+			this.ontology = ontology;
+			this.factory = f;
+		}
+
+		public void visit(OWLEntityAnnotationAxiom axiom) {
+			PatternExtractor patternExtractor = this.factory
+					.getPatternExtractor();
+			OWLAnnotation<? extends OWLObject> annotation = axiom
+					.getAnnotation();
+			OPPLScript patternModel = annotation.accept(patternExtractor);
+			OWLEntity subject = axiom.getSubject();
+			if (patternModel != null && subject instanceof OWLClass
+					&& patternModel instanceof InstantiatedPatternModel) {
+				PatternOPPLScript opplStatement = ((InstantiatedPatternModel) patternModel)
+						.getInstantiatedPattern();
+				ClassPatternExecutor patternExecutor = new ClassPatternExecutor(
+						(OWLClass) subject,
+						(InstantiatedPatternModel) patternModel, this.ontology,
+						this.ontologyManager, annotation.getAnnotationURI());
+				List<OWLAxiomChange> changes = opplStatement
+						.accept(patternExecutor);
+				try {
+					this.ontologyManager.applyChanges(changes);
+				} catch (OWLOntologyChangeException e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+	}
+
+	static class DeletionManager extends AbstractEmptyManager implements
+			OWLAxiomVisitor {
 		private final OWLOntologyManager ontologyManager;
+		private final AbstractPatternModelFactory factory;
 
 		/**
 		 * @param ontologyManager
 		 */
-		public DeletionManager(OWLOntologyManager ontologyManager) {
+		public DeletionManager(OWLOntologyManager ontologyManager,
+				AbstractPatternModelFactory f) {
 			this.ontologyManager = ontologyManager;
-		}
-
-		public void visit(OWLSubClassAxiom axiom) {
-		}
-
-		public void visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
-		}
-
-		public void visit(OWLAntiSymmetricObjectPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLReflexiveObjectPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLDisjointClassesAxiom axiom) {
-		}
-
-		public void visit(OWLDataPropertyDomainAxiom axiom) {
-		}
-
-		public void visit(OWLImportsDeclaration axiom) {
-		}
-
-		public void visit(OWLAxiomAnnotationAxiom axiom) {
-		}
-
-		public void visit(OWLObjectPropertyDomainAxiom axiom) {
-		}
-
-		public void visit(OWLEquivalentObjectPropertiesAxiom axiom) {
-		}
-
-		public void visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
-		}
-
-		public void visit(OWLDifferentIndividualsAxiom axiom) {
-		}
-
-		public void visit(OWLDisjointDataPropertiesAxiom axiom) {
-		}
-
-		public void visit(OWLDisjointObjectPropertiesAxiom axiom) {
-		}
-
-		public void visit(OWLObjectPropertyRangeAxiom axiom) {
-		}
-
-		public void visit(OWLObjectPropertyAssertionAxiom axiom) {
-		}
-
-		public void visit(OWLFunctionalObjectPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLObjectSubPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLDisjointUnionAxiom axiom) {
-		}
-
-		public void visit(OWLDeclarationAxiom axiom) {
+			this.factory = f;
 		}
 
 		public void visit(OWLEntityAnnotationAxiom axiom) {
-			PatternExtractor patternExtractor = PatternParser
-					.getPatternModelFactory().getPatternExtractor();
+			PatternExtractor patternExtractor = this.factory
+					.getPatternExtractor();
 			// System.out.println("Parsing " + axiom);
 			OWLAnnotation<? extends OWLObject> annotation = axiom
 					.getAnnotation();
@@ -329,8 +279,7 @@ public class PatternManager implements OWLOntologyChangeListener {
 									.getLiteral();
 							URI annotationURI = axiomAnnotationAxiom
 									.getAnnotation().getAnnotationURI();
-							if (value.compareTo(patternModel.getUri()
-									.toString()) == 0
+							if (value.equals(patternModel.getUri().toString())
 									&& annotationURI
 											.equals(URI
 													.create(PatternModel.NAMESPACE
@@ -348,61 +297,20 @@ public class PatternManager implements OWLOntologyChangeListener {
 				}
 			}
 		}
-
-		public void visit(OWLOntologyAnnotationAxiom axiom) {
-		}
-
-		public void visit(OWLSymmetricObjectPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLDataPropertyRangeAxiom axiom) {
-		}
-
-		public void visit(OWLFunctionalDataPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLEquivalentDataPropertiesAxiom axiom) {
-		}
-
-		public void visit(OWLClassAssertionAxiom axiom) {
-		}
-
-		public void visit(OWLEquivalentClassesAxiom axiom) {
-		}
-
-		public void visit(OWLDataPropertyAssertionAxiom axiom) {
-		}
-
-		public void visit(OWLTransitiveObjectPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLDataSubPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLSameIndividualsAxiom axiom) {
-		}
-
-		public void visit(OWLObjectPropertyChainSubPropertyAxiom axiom) {
-		}
-
-		public void visit(OWLInverseObjectPropertiesAxiom axiom) {
-		}
-
-		public void visit(SWRLRule rule) {
-		}
 	}
 
 	private static Map<OWLOntologyManager, PatternManager> instances = new HashMap<OWLOntologyManager, PatternManager>();
 	private final OWLOntologyManager ontologyManager;
+	private final AbstractPatternModelFactory factory;
 
-	PatternManager(OWLOntologyManager ontologyManager) {
+	PatternManager(OWLOntologyManager ontologyManager,
+			AbstractPatternModelFactory f) {
 		this.ontologyManager = ontologyManager;
+		this.factory = f;
+	}
+
+	public AbstractPatternModelFactory getFactory() {
+		return this.factory;
 	}
 
 	/**
@@ -419,10 +327,11 @@ public class PatternManager implements OWLOntologyChangeListener {
 				OWLAxiomVisitor visitor;
 				if (axiomChange instanceof AddAxiom) {
 					visitor = new AdditionManager(ontology,
-							this.ontologyManager);
+							this.ontologyManager, this.factory);
 					axiom.accept(visitor);
 				} else if (axiomChange instanceof RemoveAxiom) {
-					visitor = new DeletionManager(this.ontologyManager);
+					visitor = new DeletionManager(this.ontologyManager,
+							this.factory);
 					axiom.accept(visitor);
 				}
 			}
@@ -433,10 +342,10 @@ public class PatternManager implements OWLOntologyChangeListener {
 	 * @return the instance
 	 */
 	public static synchronized PatternManager getInstance(
-			OWLOntologyManager ontologyManager) {
+			OWLOntologyManager ontologyManager, AbstractPatternModelFactory f) {
 		PatternManager patternManager = instances.get(ontologyManager);
 		if (patternManager == null) {
-			patternManager = new PatternManager(ontologyManager);
+			patternManager = new PatternManager(ontologyManager, f);
 			instances.put(ontologyManager, patternManager);
 		}
 		return patternManager;

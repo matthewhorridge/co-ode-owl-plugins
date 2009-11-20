@@ -22,16 +22,13 @@
  */
 package org.coode.patterns.utils;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 
-import org.coode.oppl.protege.ProtegeOPPLFactory;
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.patterns.PatternModelFactory;
 import org.coode.patterns.protege.ProtegePatternModelFactory;
 import org.coode.patterns.syntax.PatternParser;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
@@ -40,42 +37,52 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  * 
  */
 public class ParserFactory {
-	static PatternParser parser = null;
-
+	// static PatternParser parser = null;
 	public static PatternParser initParser(String formulaBody,
 			OWLOntology ontology, OWLOntologyManager ontologyManager) {
-		parser = new PatternParser(new StringReader(formulaBody),
-				ontologyManager, null);
-		PatternParser.setPatternModelFactory(new PatternModelFactory(ontology,
-				ontologyManager));
-		return parser;
+		return initParser(formulaBody, ontology, ontologyManager, null);
 	}
 
 	public static PatternParser initParser(String formulaBody,
-			OWLModelManager manager) {
-		parser = new PatternParser(new StringReader(formulaBody), manager
-				.getOWLOntologyManager(), manager.getReasoner());
-		PatternParser.setPatternModelFactory(new ProtegePatternModelFactory(
-				manager));
-		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager));
+			OWLOntology ontology, OWLOntologyManager ontologyManager,
+			OWLReasoner r) {
+		PatternParser parser = new PatternParser(new StringReader(formulaBody),
+				ontologyManager, r);
+		parser.setPatternModelFactory(new PatternModelFactory(ontology,
+				ontologyManager, formulaBody));
 		return parser;
 	}
 
-	public static PatternParser initParser(InputStream formulaBody,
+	public static PatternParser initProtegeParser(String formulaBody,
 			OWLModelManager manager) {
-		parser = new PatternParser(formulaBody,
+		PatternParser parser = new PatternParser(new StringReader(formulaBody),
 				manager.getOWLOntologyManager(), manager.getReasoner());
-		PatternParser.setPatternModelFactory(new ProtegePatternModelFactory(
-				manager));
-		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager));
+		parser.setPatternModelFactory(new ProtegePatternModelFactory(manager,
+				formulaBody));
 		return parser;
 	}
 
-	public static PatternParser initParser(InputStream in,
-			OWLOntology ontology, OWLOntologyManager manager) {
-		parser = new PatternParser(new InputStreamReader(in), manager, null);
-		PatternParser.setPatternModelFactory(new PatternModelFactory(ontology,
-				manager));
+	public static PatternParser reinitParser(String formulaBody,
+			PatternParser inputParser) {
+		PatternParser parser = new PatternParser(new StringReader(formulaBody),
+				inputParser.getOWLOntologyManager(), inputParser.getReasoner());
+		parser.setPatternModelFactory(inputParser.getPatternModelFactory());
 		return parser;
 	}
+	// public static PatternParser initParser(InputStream formulaBody,
+	// OWLModelManager manager) {
+	// parser = new PatternParser(formulaBody,
+	// manager.getOWLOntologyManager(), manager.getReasoner());
+	// parser.setPatternModelFactory(new ProtegePatternModelFactory(manager));
+	// OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(manager));
+	// return parser;
+	// }
+	// public static PatternParser initParser(InputStream in,
+	// OWLOntology ontology, OWLOntologyManager manager) {
+	// parser = new PatternParser(new InputStreamReader(in), manager, null);
+	// parser
+	// .setPatternModelFactory(new PatternModelFactory(ontology,
+	// manager));
+	// return parser;
+	// }
 }

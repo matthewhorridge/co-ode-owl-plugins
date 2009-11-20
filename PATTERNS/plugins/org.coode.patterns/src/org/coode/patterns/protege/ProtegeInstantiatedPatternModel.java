@@ -24,6 +24,7 @@ package org.coode.patterns.protege;
 
 import java.util.Set;
 
+import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.patterns.InstantiatedPatternModel;
@@ -39,6 +40,7 @@ import org.semanticweb.owl.model.OWLObject;
  */
 public class ProtegeInstantiatedPatternModel extends InstantiatedPatternModel {
 	protected OWLModelManager modelManager;
+	protected OPPLParser parser;
 
 	public ProtegeInstantiatedPatternModel(PatternModel patternModel) {
 		super(patternModel);
@@ -50,11 +52,12 @@ public class ProtegeInstantiatedPatternModel extends InstantiatedPatternModel {
 	}
 
 	protected void initOPPLParser(String s) {
-		ProtegeParserFactory.initParser(s, this.modelManager);
+		this.parser = ProtegeParserFactory.initParser(s, this.modelManager,
+				null);
 	}
 
 	protected PatternParser initParser(String s) {
-		return org.coode.patterns.utils.ParserFactory.initParser(s,
+		return org.coode.patterns.utils.ParserFactory.initProtegeParser(s,
 				this.modelManager);
 	}
 
@@ -65,41 +68,42 @@ public class ProtegeInstantiatedPatternModel extends InstantiatedPatternModel {
 
 	@Override
 	public String render() {
-		String toReturn = "$" + this.getInstantiatedPatternLocalName();
+		StringBuilder toReturn = new StringBuilder("$"
+				+ getInstantiatedPatternLocalName() + "(");
 		boolean first = true;
-		toReturn += "(";
-		for (Variable variable : this.getInputVariables()) {
+		for (Variable variable : getInputVariables()) {
 			if (!first) {
-				toReturn += ", ";
+				toReturn.append(", ");
 			} else {
 				first = false;
 			}
-			Set<OWLObject> instantiationsValues = this
-					.getInstantiations(variable);
+			Set<OWLObject> instantiationsValues = getInstantiations(variable);
 			if (instantiationsValues != null && !instantiationsValues.isEmpty()) {
 				if (instantiationsValues.size() == 1) {
 					OWLObject instantiation = instantiationsValues.iterator()
 							.next();
-					toReturn += this.modelManager.getRendering(instantiation);
+					toReturn.append(this.modelManager
+							.getRendering(instantiation));
 				} else {
 					boolean firstInstantiation = true;
-					toReturn += "{";
+					toReturn.append("{");
 					for (OWLObject instantiation : instantiationsValues) {
 						String instantiationRendering = this.modelManager
 								.getRendering(instantiation);
-						toReturn += firstInstantiation ? instantiationRendering
-								: ", " + instantiationRendering;
+						toReturn
+								.append(firstInstantiation ? instantiationRendering
+										: ", " + instantiationRendering);
 						firstInstantiation = firstInstantiation ? false
 								: firstInstantiation;
 					}
-					toReturn += "}";
+					toReturn.append("}");
 				}
 			} else {
-				toReturn += variable.getName();
+				toReturn.append(variable.getName());
 			}
 		}
-		toReturn += ")";
-		return toReturn;
+		toReturn.append(")");
+		return toReturn.toString();
 	}
 	// @Override
 	// public String getRendering() {

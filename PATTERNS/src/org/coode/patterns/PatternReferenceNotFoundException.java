@@ -25,7 +25,7 @@ package org.coode.patterns;
 /**
  * @author Luigi Iannone
  * 
- * Jun 25, 2008
+ *         Jun 25, 2008
  */
 public class PatternReferenceNotFoundException extends PatternException {
 	/**

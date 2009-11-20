@@ -37,13 +37,13 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
+import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.InstantiatedPatternModel;
 import org.coode.patterns.NonClassPatternExecutor;
 import org.coode.patterns.PatternExtractor;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.PatternOPPLScript;
 import org.coode.patterns.protege.ProtegePatternExtractor;
-import org.coode.patterns.syntax.PatternParser;
 import org.protege.editor.core.ui.list.MListButton;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifyingOptionPane;
@@ -76,15 +76,18 @@ public class PatternOntologyFrameSectionRow
 	private PatternModel patternModel;
 	private boolean canEdit = true;
 	private boolean canDelete = true;
+	private final AbstractPatternModelFactory factory;
 
 	protected PatternOntologyFrameSectionRow(
 			OWLEditorKit owlEditorKit,
 			OWLFrameSection<OWLOntology, OWLOntologyAnnotationAxiom, PatternModel> section,
 			OWLOntology ontology, OWLOntology rootObject,
-			OWLOntologyAnnotationAxiom axiom, boolean canEdit, boolean canDelete) {
+			OWLOntologyAnnotationAxiom axiom, boolean canEdit,
+			boolean canDelete, AbstractPatternModelFactory f) {
 		super(owlEditorKit, section, ontology, rootObject, axiom);
-		PatternExtractor patternExtractor = new ProtegePatternExtractor(this
-				.getOWLModelManager());
+		this.factory = f;
+		PatternExtractor patternExtractor = new ProtegePatternExtractor(
+				getOWLModelManager());
 		OWLAnnotation<? extends OWLObject> annotation = axiom.getAnnotation();
 		this.patternModel = (PatternModel) annotation.accept(patternExtractor);
 		this.canEdit = canEdit;
@@ -115,15 +118,14 @@ public class PatternOntologyFrameSectionRow
 
 	@Override
 	protected OWLOntologyAnnotationAxiom createAxiom(PatternModel editedObject) {
-		OWLDataFactory dataFactory = this.getOWLDataFactory();
+		OWLDataFactory dataFactory = getOWLDataFactory();
 		OWLConstant constant = dataFactory.getOWLTypedConstant(editedObject
 				.toString());
 		URI annotationURI = editedObject.getUri();
 		OWLConstantAnnotation annotation = dataFactory
 				.getOWLConstantAnnotation(annotationURI, constant);
-		OWLOntologyAnnotationAxiom axiom = this
-				.getOWLDataFactory()
-				.getOWLOntologyAnnotationAxiom(this.getRootObject(), annotation);
+		OWLOntologyAnnotationAxiom axiom = getOWLDataFactory()
+				.getOWLOntologyAnnotationAxiom(getRootObject(), annotation);
 		return axiom;
 	}
 
@@ -132,7 +134,8 @@ public class PatternOntologyFrameSectionRow
 		// PatternBuilder builder = new PatternBuilder(this.getOWLEditorKit());
 		// builder.setPatternModel(this.patternModel);
 		// return builder;
-		PatternEditor editor = new PatternEditor(this.getOWLEditorKit());
+		PatternEditor editor = new PatternEditor(getOWLEditorKit(),
+				this.factory);
 		editor.setPatternModel(this.patternModel);
 		return editor;
 	}
@@ -143,7 +146,7 @@ public class PatternOntologyFrameSectionRow
 
 	@Override
 	public List<? extends OWLOntologyChange> getDeletionChanges() {
-		Set<OWLOntology> ontologies = this.getOWLEditorKit().getModelManager()
+		Set<OWLOntology> ontologies = getOWLEditorKit().getModelManager()
 				.getOntologies();
 		List<PatternOPPLScript> dependingPatterns = new ArrayList<PatternOPPLScript>(
 				this.patternModel.getDependingPatterns(ontologies));
@@ -171,8 +174,8 @@ public class PatternOntologyFrameSectionRow
 		// System.out.println(this.patternModel.getPatternLocalName()
 		// + " dependencies " + dependingPatterns);
 		for (PatternOPPLScript patternModel : dependingPatterns) {
-			for (OWLOntology ontology : this.getOWLEditorKit()
-					.getModelManager().getOntologies()) {
+			for (OWLOntology ontology : getOWLEditorKit().getModelManager()
+					.getOntologies()) {
 				Set<? extends OWLAxiom> dependingAxioms = patternModel
 						.getOWLAxioms(ontology);
 				for (OWLAxiom dependingAxiom : dependingAxioms) {
@@ -192,12 +195,12 @@ public class PatternOntologyFrameSectionRow
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		this.showInstantiationEditorDialog();
+		showInstantiationEditorDialog();
 	}
 
 	private void showInstantiationEditorDialog() {
 		final PatternInstantiationEditor editor = new PatternInstantiationEditor(
-				this.getOWLEditorKit());
+				getOWLEditorKit(), this.factory);
 		final JComponent editorComponent = editor.getEditorComponent();
 		final VerifyingOptionPane optionPane = new VerifyingOptionPane(editor
 				.getEditorComponent());
@@ -206,19 +209,18 @@ public class PatternOntologyFrameSectionRow
 				optionPane.setOKEnabled(verified);
 			}
 		};
-		InstantiatedPatternModel instantiatedPatternModel = PatternParser
-				.getPatternModelFactory().createInstantiatedPatternModel(
-						this.patternModel);
+		InstantiatedPatternModel instantiatedPatternModel = this.factory
+				.createInstantiatedPatternModel(this.patternModel);
 		editor.setInstantiatedPatternModel(instantiatedPatternModel);
 		editor.addStatusChangedListener(verificationListener);
-		final JDialog dlg = optionPane.createDialog(this.getOWLEditorKit()
+		final JDialog dlg = optionPane.createDialog(getOWLEditorKit()
 				.getWorkspace(), null);
 		// The editor shouldn't be modal (or should it?)
 		dlg.setModal(false);
 		dlg.setTitle(this.patternModel.getName());
 		dlg.setResizable(true);
 		dlg.pack();
-		dlg.setLocationRelativeTo(this.getOWLEditorKit().getWorkspace());
+		dlg.setLocationRelativeTo(getOWLEditorKit().getWorkspace());
 		dlg.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentHidden(ComponentEvent e) {
@@ -237,16 +239,16 @@ public class PatternOntologyFrameSectionRow
 
 	protected void handleInstantiation(PatternInstantiationEditor editor) {
 		NonClassPatternExecutor patternExecutor = new NonClassPatternExecutor(
-				editor.getEditedObject(), this.getOWLEditorKit()
-						.getModelManager().getActiveOntology(), this
-						.getOWLEditorKit().getModelManager()
-						.getOWLOntologyManager(), this.patternModel.getUri());
+				editor.getEditedObject(), getOWLEditorKit().getModelManager()
+						.getActiveOntology(), getOWLEditorKit()
+						.getModelManager().getOWLOntologyManager(),
+				this.patternModel.getUri());
 		List<OWLAxiomChange> changes = this.patternModel
 				.accept(patternExecutor);
 		for (OWLAxiomChange change : changes) {
 			try {
-				this.getOWLEditorKit().getModelManager()
-						.getOWLOntologyManager().applyChange(change);
+				getOWLEditorKit().getModelManager().getOWLOntologyManager()
+						.applyChange(change);
 			} catch (OWLOntologyChangeException e) {
 				e.printStackTrace();
 			}

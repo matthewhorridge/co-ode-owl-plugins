@@ -31,12 +31,10 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
-import org.coode.oppl.protege.ProtegeOPPLFactory;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.PatternManager;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.protege.ProtegePatternModelFactory;
-import org.coode.patterns.syntax.PatternParser;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.ui.frame.OWLFrameSectionRow;
 import org.protege.editor.owl.ui.framelist.OWLFrameList2;
@@ -51,11 +49,12 @@ import org.semanticweb.owl.model.OWLOntologyChange;
  */
 public class PatternOntologyView extends AbstractActiveOntologyViewComponent {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -8110091764534100865L;
 	private OWLFrameList2<OWLOntology> list;
 	private PatternManager patternManager;
+	private AbstractPatternModelFactory factory;
 
 	/**
 	 * @see org.protege.editor.owl.ui.view.AbstractActiveOntologyViewComponent#disposeOntologyView()
@@ -66,8 +65,8 @@ public class PatternOntologyView extends AbstractActiveOntologyViewComponent {
 			this.list.dispose();
 		}
 		if (this.patternManager != null) {
-			this.getOWLEditorKit().getModelManager()
-					.removeOntologyChangeListener(this.patternManager);
+			getOWLEditorKit().getModelManager().removeOntologyChangeListener(
+					this.patternManager);
 		}
 	}
 
@@ -76,24 +75,20 @@ public class PatternOntologyView extends AbstractActiveOntologyViewComponent {
 	 */
 	@Override
 	protected void initialiseOntologyView() throws Exception {
-		this.setLayout(new BorderLayout());
-		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(this
-				.getOWLModelManager()));
-		this.list = new OWLFrameList2<OWLOntology>(this.getOWLEditorKit(),
-				new PatternOntologyFrame(this.getOWLEditorKit(), true, true,
-						true)) {
-			/**
-			 * 
-			 */
+		this.factory = new ProtegePatternModelFactory(getOWLModelManager());
+		setLayout(new BorderLayout());
+		this.list = new OWLFrameList2<OWLOntology>(getOWLEditorKit(),
+				new PatternOntologyFrame(getOWLEditorKit(), true, true, true,
+						this.factory)) {
 			private static final long serialVersionUID = 4280726052980983935L;
 
 			@Override
 			public void handleDelete() {
-				int[] selIndices = this.getSelectedIndices();
+				int[] selIndices = getSelectedIndices();
 				List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 				for (int selIndex : selIndices) {
-					Object val = this.getModel().getElementAt(selIndex);
-					if (val instanceof OWLFrameSectionRow) {
+					Object val = getModel().getElementAt(selIndex);
+					if (val instanceof OWLFrameSectionRow<?, ?, ?>) {
 						OWLFrameSectionRow<?, ?, ?> row = (OWLFrameSectionRow<?, ?, ?>) val;
 						changes
 								.addAll(changes.size(), row
@@ -123,16 +118,16 @@ public class PatternOntologyView extends AbstractActiveOntologyViewComponent {
 				return toReturn;
 			}
 		};
-		this.list.setRootObject(this.getOWLEditorKit().getModelManager()
+		this.list.setRootObject(getOWLEditorKit().getModelManager()
 				.getActiveOntology());
-		this.list.setCellRenderer(new PatternCellRenderer(this
-				.getOWLEditorKit()));
+		this.list.setCellRenderer(new PatternCellRenderer(getOWLEditorKit(),
+				this.factory));
 		JScrollPane listPane = ComponentFactory.createScrollPane(this.list);
-		PatternParser.setPatternModelFactory(new ProtegePatternModelFactory(
-				this.getOWLModelManager()));
-		this.patternManager = PatternManager.getInstance(this.getOWLEditorKit()
-				.getModelManager().getOWLOntologyManager());
-		this.getOWLEditorKit().getModelManager().addOntologyChangeListener(
+		// PatternParser.setPatternModelFactory(new ProtegePatternModelFactory(
+		// this.getOWLModelManager()));
+		this.patternManager = PatternManager.getInstance(getOWLEditorKit()
+				.getModelManager().getOWLOntologyManager(), this.factory);
+		getOWLEditorKit().getModelManager().addOntologyChangeListener(
 				this.patternManager);
 		this.add(listPane);
 	}
