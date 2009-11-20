@@ -11,7 +11,6 @@ import org.coode.oppl.OPPLScript;
 import org.coode.oppl.OPPLScriptVisitor;
 import org.coode.oppl.OPPLScriptVisitorEx;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.InputVariable;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.lint.LintException;
@@ -48,8 +47,8 @@ public class OPPLLintScriptImpl extends OPPLLintScript {
 	@Override
 	public List<OWLAxiomChange> getChanges(OWLOntology ontology,
 			OWLOntologyManager ontologyManager) {
-		ChangeExtractor changeExtractor = new ChangeExtractor(ontology,
-				ontologyManager, this.opplScript.getConstraintSystem(), true);
+		ChangeExtractor changeExtractor = new ChangeExtractor(this.opplScript
+				.getConstraintSystem(), true);
 		List<OWLAxiomChange> changes = this.opplScript.accept(changeExtractor);
 		return changes;
 	}
@@ -85,7 +84,7 @@ public class OPPLLintScriptImpl extends OPPLLintScript {
 		return this.opplScript.getConstraintSystem();
 	}
 
-	public List<InputVariable> getInputVariables() {
+	public List<Variable> getInputVariables() {
 		return this.opplScript.getInputVariables();
 	}
 

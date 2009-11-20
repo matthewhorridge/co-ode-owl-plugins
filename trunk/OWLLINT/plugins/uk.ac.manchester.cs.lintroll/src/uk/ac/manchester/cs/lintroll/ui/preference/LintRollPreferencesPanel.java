@@ -187,20 +187,9 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 	// final OPPLLintEditor editor = new OPPLLintEditor(
 	// LintRollPreferencesPanel.this.getOWLEditorKit());
 	// final JComponent editorComponent = editor.getEditorComponent();
-	// final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-	// editorComponent) {
-	// /**
-	// *
-	// */
-	// private static final long serialVersionUID = -4226856195992115262L;
-	//
-	// @Override
-	// public void selectInitialValue() {
-	// // This is overridden so that the option pane dialog default
-	// // button
-	// // doesn't get the focus.
-	// }
-	// };
+	// final VerifyingOptionPane optionPane = new
+	// NoDefaultFocusVerifyingOptionPane(
+	// editorComponent) ;
 	// final InputVerificationStatusChangedListener verificationListener = new
 	// InputVerificationStatusChangedListener() {
 	// public void verifiedStatusChanged(boolean verified) {
@@ -247,7 +236,7 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 	// }
 	private class OntologyOPPLLintList extends OWLFrameList2<OWLOntology> {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -3942212059423895646L;
 
@@ -291,7 +280,7 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 4639367272089721763L;
 	private Map<JCheckBox, Lint> map = new HashMap<JCheckBox, Lint>();
