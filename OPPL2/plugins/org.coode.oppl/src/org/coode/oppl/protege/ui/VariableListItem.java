@@ -32,7 +32,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
 import org.coode.oppl.exceptions.OPPLException;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
 import org.coode.oppl.variablemansyntax.VariableType;
@@ -145,7 +145,8 @@ public class VariableListItem implements MListItem, OPPLMacroStatusChange {
 								.getVariableScope();
 						try {
 							VariableListItem.this.variable.setVariableScope(
-									variableScope, OPPLParser.getOPPLFactory()
+									variableScope, ParserFactory.getInstance()
+											.getOPPLFactory()
 											.getVariableScopeChecker());
 						} catch (OPPLException e1) {
 							throw new RuntimeException(e1);

@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.coode.oppl.entity.OWLEntityRenderer;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.ManchesterVariableSyntax;
 import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
@@ -39,8 +39,8 @@ public class RegExpGeneratedVariable implements GeneratedVariable<OWLEntity> {
 	public static Set<OWLEntity> getMatches(String exp, ConstraintSystem cs) {
 		Set<OWLEntity> toReturn = new HashSet<OWLEntity>();
 		Pattern regExpression = Pattern.compile(exp);
-		OWLEntityRenderer entityRenderer = OPPLParser.getOPPLFactory()
-				.getOWLEntityRenderer(cs);
+		OWLEntityRenderer entityRenderer = ParserFactory.getInstance()
+				.getOPPLFactory().getOWLEntityRenderer(cs);
 		for (OWLEntity e : cs.getOntology().getReferencedEntities()) {
 			String toMatch = entityRenderer.render(e);
 			if (regExpression.matcher(toMatch).find()) {

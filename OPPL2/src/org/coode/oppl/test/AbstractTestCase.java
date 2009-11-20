@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 import junit.framework.TestCase;
 import net.sf.saxon.exslt.Math;
@@ -12,23 +16,54 @@ import org.coode.oppl.Executor;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.ParserFactory;
+import org.mindswap.pellet.owlapi.PelletReasonerFactory;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
+import org.semanticweb.owl.inference.OWLReasonerFactory;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyCreationException;
 import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owl.model.OWLOntologyURIMapper;
+import org.semanticweb.owl.util.AutoURIMapper;
 
 public abstract class AbstractTestCase extends TestCase {
 	private static final int TOLERANCE = 3;
 	// ontology file for tests
-	protected String ontologyPhysicalURI = "file:///"
-			+ new File("../OPPL2/ontologies/test.owl").getAbsolutePath();
+	private static String baseURI = "file:///"
+			+ new File("../OPPL2/ontologies/").getAbsolutePath() + "/";
 	// ontology manager
-	private OWLOntologyManager ontologyManager = OWLManager
+	private static OWLOntologyManager ontologyManager = OWLManager
 			.createOWLOntologyManager();
 	// ontology for tests
-	private OWLOntology ontology1;
+	private OWLOntologyURIMapper siemensmapper = new AutoURIMapper(new File(
+			"../OPPL2/ontologies/"), true);
+	private static Map<String, OWLOntology> cache = new HashMap<String, OWLOntology>();
+
+	public AbstractTestCase() {
+		ontologyManager.addURIMapper(this.siemensmapper);
+	}
+
+	public OWLOntologyManager getOntologyManager() {
+		return ontologyManager;
+	}
+
+	public OWLOntology getOntology(String name) {
+		try {
+			if (cache.containsKey(name)) {
+				return cache.get(name);
+			}
+			OWLOntology o = ontologyManager.loadOntologyFromPhysicalURI(URI
+					.create(baseURI + name));
+			cache.put(name, o);
+			return o;
+		} catch (OWLOntologyCreationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	// last generated exception; used to check that the exception being raised
 	// is the one being expected
 	private StringWriter lastStackTrace = new StringWriter();
@@ -42,19 +77,13 @@ public abstract class AbstractTestCase extends TestCase {
 			Executor exec = new Executor(script.getConstraintSystem(), true);
 			exec.visitActions(script.getActions());
 		} catch (Exception e) {
-			e.printStackTrace();
+			this.log(e);
 		}
 	}
 
 	private void init() {
-		try {
-			this.ontology1 = this.ontologyManager.loadOntology(URI
-					.create(this.ontologyPhysicalURI));
-			ParserFactory.initParser(";", this.ontology1, this.ontologyManager,
-					null);
-		} catch (OWLOntologyCreationException e) {
-			e.printStackTrace();
-		}
+		ParserFactory.initParser(";", this.getOntology("test.owl"),
+				ontologyManager, null);
 	}
 
 	@Override
@@ -71,30 +100,37 @@ public abstract class AbstractTestCase extends TestCase {
 		super.tearDown();
 	}
 
-	private String popStackTrace() {
+	protected String popStackTrace() {
 		String toReturn = this.lastStackTrace.toString();
 		this.lastStackTrace = new StringWriter();
 		this.p = new PrintWriter(this.lastStackTrace);
 		return toReturn;
 	}
 
-	// private OWLReasoner initReasoner() throws OWLReasonerException {
-	// OWLReasonerFactory reasonerFactory = new PelletReasonerFactory();
-	// OWLReasoner reasoner = reasonerFactory
-	// .createReasoner(this.ontologyManager);
-	// reasoner.loadOntologies(Collections.singleton(this.ontology1));
-	// reasoner.classify();
-	// return reasoner;
-	// }
-	private OWLReasoner initDummyReasoner() throws OWLReasonerException {
+	protected OWLReasoner initReasoner(OWLOntology... ontologies)
+			throws OWLReasonerException {
+		OWLReasonerFactory reasonerFactory = new PelletReasonerFactory();
+		OWLReasoner reasoner = reasonerFactory.createReasoner(ontologyManager);
+		reasoner.loadOntologies(new HashSet<OWLOntology>(Arrays
+				.asList(ontologies)));
+		reasoner.classify();
+		return reasoner;
+	}
+
+	protected OWLReasoner initDummyReasoner() throws OWLReasonerException {
 		return null;
 	}
 
+	private static OWLReasoner testReasoner = null;
+
 	protected OPPLScript parse(String script) {
 		try {
-			ParserFactory.initParser(script, this.ontology1,
-					this.ontologyManager, this.initDummyReasoner());
-			return OPPLParser.Start();
+			if (testReasoner == null) {
+				testReasoner = this.initReasoner(this.getOntology("test.owl"));
+			}
+			OPPLParser parser = ParserFactory.initParser(script, this
+					.getOntology("test.owl"), ontologyManager, testReasoner);
+			return parser.Start();
 		} catch (Exception e) {
 			if (this.longStackTrace) {
 				e.printStackTrace(this.p);
@@ -104,6 +140,15 @@ public abstract class AbstractTestCase extends TestCase {
 			this.p.flush();
 		}
 		return null;
+	}
+
+	protected void log(Exception e) {
+		if (this.longStackTrace) {
+			e.printStackTrace(this.p);
+		} else {
+			this.p.print(e.getMessage().replace("\n", "\t"));
+		}
+		this.p.flush();
 	}
 
 	protected void checkProperStackTrace(String expected, int expectedIndex) {
@@ -162,7 +207,7 @@ public abstract class AbstractTestCase extends TestCase {
 
 	protected void reportUnexpectedStacktrace(String stackTrace) {
 		// assertEquals(0, stackTrace.length());
-		if (stackTrace.length() != 0) {
+		if (!stackTrace.isEmpty()) {
 			System.out
 					.println("ExhaustingTestCase There should not have been a stacktrace!");
 			System.out.println(stackTrace);

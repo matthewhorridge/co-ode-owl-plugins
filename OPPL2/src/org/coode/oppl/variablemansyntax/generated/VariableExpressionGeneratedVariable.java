@@ -4,8 +4,8 @@
 package org.coode.oppl.variablemansyntax.generated;
 
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.ArgCheck;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.semanticweb.owl.model.OWLObject;
@@ -51,8 +51,8 @@ public class VariableExpressionGeneratedVariable extends
 	}
 
 	public String getOPPLFunction() {
-		ManchesterSyntaxRenderer manchesterSyntaxRenderer = OPPLParser
-				.getOPPLFactory().getManchesterSyntaxRenderer(
+		ManchesterSyntaxRenderer manchesterSyntaxRenderer = ParserFactory
+				.getInstance().getOPPLFactory().getManchesterSyntaxRenderer(
 						this.constraintSystem);
 		this.owlObject.accept(manchesterSyntaxRenderer);
 		return manchesterSyntaxRenderer.toString();
@@ -60,7 +60,8 @@ public class VariableExpressionGeneratedVariable extends
 
 	@Override
 	protected GeneratedVariable<OWLObject> replace(
-			GeneratedValue<OWLObject> value) {
+			GeneratedValue<OWLObject> unusedValue) {
+		// TODO check that the unused parameter is legit
 		return this;
 	}
 }

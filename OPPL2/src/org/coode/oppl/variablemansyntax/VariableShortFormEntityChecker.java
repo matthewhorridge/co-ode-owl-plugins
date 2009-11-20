@@ -23,7 +23,6 @@
 package org.coode.oppl.variablemansyntax;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,7 +34,7 @@ import java.util.Set;
 
 import org.coode.oppl.entity.OWLEntityCreationException;
 import org.coode.oppl.entity.OWLEntityCreationSet;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataProperty;
@@ -90,16 +89,17 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		public Set<CreatedAssignementTreeNode> getLeaves() {
 			Set<CreatedAssignementTreeNode> nodes = new HashSet<CreatedAssignementTreeNode>();
 			nodes.add(this);
-			boolean allLeaves = isLeaf();
+			boolean allLeaves = this.isLeaf();
 			while (!allLeaves) {
 				for (CreatedAssignementTreeNode generatedChild : new HashSet<CreatedAssignementTreeNode>(
 						nodes)) {
 					if (!generatedChild.isLeaf()) {
 						nodes.remove(generatedChild);
-						Set<CreatedAssignementTreeNode> generatedChildren = generateChildren(generatedChild);
+						Set<CreatedAssignementTreeNode> generatedChildren = this
+								.generateChildren(generatedChild);
 						nodes.addAll(generatedChildren);
 					}
-					allLeaves = allLeaves(nodes);
+					allLeaves = this.allLeaves(nodes);
 				}
 			}
 			return nodes;
@@ -111,9 +111,7 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 			if (!node.isLeaf()) {
 				Set<String> unassignedElements = node.unassigned;
 				for (String element : unassignedElements) {
-					EnumSet<VariableType> values = EnumSet
-							.allOf(VariableType.class);
-					for (VariableType owlObject : values) {
+					for (VariableType owlObject : VariableType.values()) {
 						Set<String> childUnassignedElements = new HashSet<String>(
 								unassignedElements);
 						childUnassignedElements.remove(element);
@@ -206,12 +204,12 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 			if (createdEntity != null && createdEntity instanceof OWLClass) {
 				toReturn = (OWLClass) createdEntity;
 			} else if (createdEntity == null) {
-				CreationAssignemnt creationAssignemnt = fetch(name);
+				CreationAssignemnt creationAssignemnt = this.fetch(name);
 				if (creationAssignemnt != null
 						&& creationAssignemnt.getType().equals(
 								VariableType.CLASS)) {
 					try {
-						toReturn = (OWLClass) create(entityName,
+						toReturn = (OWLClass) this.create(entityName,
 								VariableType.CLASS).getOWLEntity();
 					} catch (OWLEntityCreationException e) {
 						e.printStackTrace();
@@ -221,12 +219,11 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		} else {
 			toReturn = this.simpleOWLEntityChecker.getOWLClass(name);
 			if (toReturn == null) {
-				Variable variable = this.constraintSystems
-						.getVariable(name);
+				Variable variable = this.constraintSystems.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(VariableType.CLASS)) {
-					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()
-							.getOWLClass(variable.getURI());
+					toReturn = ParserFactory.getInstance().getOPPLFactory()
+							.getOWLDataFactory().getOWLClass(variable.getURI());
 				}
 			}
 		}
@@ -242,12 +239,12 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 					&& createdEntity instanceof OWLDataProperty) {
 				toReturn = (OWLDataProperty) createdEntity;
 			} else if (createdEntity == null) {
-				CreationAssignemnt creationAssignemnt = fetch(name);
+				CreationAssignemnt creationAssignemnt = this.fetch(name);
 				if (creationAssignemnt != null
 						&& creationAssignemnt.getType().equals(
 								VariableType.DATAPROPERTY)) {
 					try {
-						toReturn = (OWLDataProperty) create(entityName,
+						toReturn = (OWLDataProperty) this.create(entityName,
 								VariableType.DATAPROPERTY).getOWLEntity();
 					} catch (OWLEntityCreationException e) {
 						e.printStackTrace();
@@ -257,12 +254,12 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		} else {
 			toReturn = this.simpleOWLEntityChecker.getOWLDataProperty(name);
 			if (toReturn == null) {
-				Variable variable = this.constraintSystems
-						.getVariable(name);
+				Variable variable = this.constraintSystems.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(VariableType.DATAPROPERTY)) {
-					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()
-							.getOWLDataProperty(variable.getURI());
+					toReturn = ParserFactory.getInstance().getOPPLFactory()
+							.getOWLDataFactory().getOWLDataProperty(
+									variable.getURI());
 				}
 			}
 		}
@@ -278,12 +275,12 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 					&& createdEntity instanceof OWLObjectProperty) {
 				toReturn = (OWLObjectProperty) createdEntity;
 			} else if (createdEntity == null) {
-				CreationAssignemnt creationAssignemnt = fetch(name);
+				CreationAssignemnt creationAssignemnt = this.fetch(name);
 				if (creationAssignemnt != null
 						&& creationAssignemnt.getType().equals(
 								VariableType.OBJECTPROPERTY)) {
 					try {
-						toReturn = (OWLObjectProperty) create(entityName,
+						toReturn = (OWLObjectProperty) this.create(entityName,
 								VariableType.OBJECTPROPERTY).getOWLEntity();
 					} catch (OWLEntityCreationException e) {
 						e.printStackTrace();
@@ -293,13 +290,13 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		} else {
 			toReturn = this.simpleOWLEntityChecker.getOWLObjectProperty(name);
 			if (toReturn == null) {
-				Variable variable = this.constraintSystems
-						.getVariable(name);
+				Variable variable = this.constraintSystems.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(
 								VariableType.OBJECTPROPERTY)) {
-					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()
-							.getOWLObjectProperty(variable.getURI());
+					toReturn = ParserFactory.getInstance().getOPPLFactory()
+							.getOWLDataFactory().getOWLObjectProperty(
+									variable.getURI());
 				}
 			}
 		}
@@ -314,12 +311,12 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 			if (createdEntity != null && createdEntity instanceof OWLIndividual) {
 				toReturn = (OWLIndividual) createdEntity;
 			} else if (createdEntity == null) {
-				CreationAssignemnt creationAssignemnt = fetch(name);
+				CreationAssignemnt creationAssignemnt = this.fetch(name);
 				if (creationAssignemnt != null
 						&& creationAssignemnt.getType().equals(
 								VariableType.INDIVIDUAL)) {
 					try {
-						toReturn = (OWLIndividual) create(entityName,
+						toReturn = (OWLIndividual) this.create(entityName,
 								VariableType.INDIVIDUAL).getOWLEntity();
 					} catch (OWLEntityCreationException e) {
 						e.printStackTrace();
@@ -329,12 +326,12 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		} else {
 			toReturn = this.simpleOWLEntityChecker.getOWLIndividual(name);
 			if (toReturn == null) {
-				Variable variable = this.constraintSystems
-						.getVariable(name);
+				Variable variable = this.constraintSystems.getVariable(name);
 				if (variable != null
 						&& variable.getType().equals(VariableType.INDIVIDUAL)) {
-					toReturn = OPPLParser.getOPPLFactory().getOWLDataFactory()
-							.getOWLIndividual(variable.getURI());
+					toReturn = ParserFactory.getInstance().getOPPLFactory()
+							.getOWLDataFactory().getOWLIndividual(
+									variable.getURI());
 				}
 			}
 		}
@@ -344,8 +341,8 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 	public void applyAdditions() {
 		try {
 			if (this.lastAdditions != null && !this.lastAdditions.isEmpty()) {
-				OPPLParser.getOWLOntologyManager().applyChanges(
-						this.lastAdditions);
+				ParserFactory.getInstance().getOWLOntologyManager()
+						.applyChanges(this.lastAdditions);
 			}
 		} catch (OWLOntologyChangeException e) {
 			e.printStackTrace();
@@ -364,7 +361,7 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 		CreationAssignemnt toReturn = null;
 		while (!found && it.hasNext()) {
 			creationAssignement = it.next();
-			found = creationAssignement.getName().compareTo(name) == 0;
+			found = creationAssignement.getName().equals(name);
 		}
 		toReturn = found ? creationAssignement : null;
 		return toReturn;
@@ -390,8 +387,8 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 				break;
 		}
 		OWLEntityCreationSet<? extends OWLEntity> toReturn = null;
-		org.coode.oppl.entity.OWLEntityFactory owlEntityFactory = OPPLParser
-				.getOPPLFactory().getOWLEntityFactory();
+		org.coode.oppl.entity.OWLEntityFactory owlEntityFactory = ParserFactory
+				.getInstance().getOPPLFactory().getOWLEntityFactory();
 		if (clazz != null) {
 			toReturn = owlEntityFactory.createOWLEntity(clazz, shortName, null);
 			this.created.put(shortName, toReturn.getOWLEntity());

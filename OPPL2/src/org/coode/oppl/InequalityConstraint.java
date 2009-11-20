@@ -25,7 +25,7 @@ package org.coode.oppl;
 import java.io.StringWriter;
 
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLObject;
@@ -98,8 +98,9 @@ public class InequalityConstraint implements AbstractConstraint {
 		// writer);
 		// renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
 		// this.constraintSystem));
-		ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
-				.getManchesterSyntaxRenderer(this.constraintSystem);
+		ManchesterSyntaxRenderer renderer = ParserFactory.getInstance()
+				.getOPPLFactory().getManchesterSyntaxRenderer(
+						this.constraintSystem);
 		this.expression.accept(renderer);
 		return this.variable.getName() + " != " + renderer.toString();
 	}

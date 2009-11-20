@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.coode.oppl.entity.OWLEntityRenderer;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.generated.AttributeGenerator;
@@ -20,8 +20,8 @@ final class RenderingAttributeGenerator implements AttributeGenerator<String> {
 	private RenderingAttributeGenerator(ConstraintSystem cs) {
 		assert cs != null;
 		this.constraintSystem = cs;
-		this.entityRenderer = OPPLParser.getOPPLFactory().getOWLEntityRenderer(
-				this.constraintSystem);
+		this.entityRenderer = ParserFactory.getInstance().getOPPLFactory()
+				.getOWLEntityRenderer(this.constraintSystem);
 	}
 
 	protected synchronized static RenderingAttributeGenerator getInstance(

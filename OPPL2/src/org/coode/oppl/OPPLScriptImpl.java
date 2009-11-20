@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
@@ -185,8 +185,9 @@ public class OPPLScriptImpl implements OPPLScript {
 				buffer.append('[');
 				buffer.append(variableScope.getDirection().toString());
 				buffer.append(' ');
-				ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
-						.getManchesterSyntaxRenderer(this.constraintSystem);
+				ManchesterSyntaxRenderer renderer = ParserFactory.getInstance()
+						.getOPPLFactory().getManchesterSyntaxRenderer(
+								this.constraintSystem);
 				variableScope.getScopingObject().accept(renderer);
 				buffer.append(renderer.toString());
 				buffer.append(']');
@@ -204,8 +205,9 @@ public class OPPLScriptImpl implements OPPLScript {
 				String commaString = first ? "" : ",\n ";
 				String actionString = action instanceof AddAxiom ? "\tADD "
 						: "\tREMOVE ";
-				ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
-						.getManchesterSyntaxRenderer(this.constraintSystem);
+				ManchesterSyntaxRenderer renderer = ParserFactory.getInstance()
+						.getOPPLFactory().getManchesterSyntaxRenderer(
+								this.constraintSystem);
 				buffer.append(commaString);
 				first = false;
 				buffer.append(actionString);

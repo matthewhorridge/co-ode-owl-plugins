@@ -36,7 +36,7 @@ import org.coode.manchesterowlsyntax.ManchesterOWLSyntax;
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxTokenizer;
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxTokenizer.Token;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.expression.ParserException;
 import org.semanticweb.owl.model.AxiomType;
@@ -146,7 +146,7 @@ public class VariableManchesterOWLSyntaxParser extends
 	public VariableManchesterOWLSyntaxParser(String s, ConstraintSystem cs) {
 		super(cs.getOntologyManager().getOWLDataFactory(), s);
 		this.constraintSystem = cs;
-		this.setOWLEntityChecker(OPPLParser.getOPPLFactory()
+		this.setOWLEntityChecker(ParserFactory.getInstance().getOPPLFactory()
 				.getOWLEntityChecker());
 		// super.setOWLEntityChecker(this.owlEntityChecker);
 		this.setupTokenAximoTypeMap();

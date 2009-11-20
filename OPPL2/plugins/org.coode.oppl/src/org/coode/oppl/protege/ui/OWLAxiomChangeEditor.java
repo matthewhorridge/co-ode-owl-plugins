@@ -52,7 +52,7 @@ import org.semanticweb.owl.model.RemoveAxiom;
  */
 public class OWLAxiomChangeEditor extends JPanel implements VerifiedInputEditor {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 6494430323392010587L;
 	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
@@ -114,7 +114,7 @@ public class OWLAxiomChangeEditor extends JPanel implements VerifiedInputEditor 
 			String action = this.radioButtonActionMap.get(selectedButton);
 			OWLOntology activeOntology = this.owlEditorKit.getOWLModelManager()
 					.getActiveOntology();
-			this.owlAxiomChange = action.compareTo("ADD") == 0 ? new AddAxiom(
+			this.owlAxiomChange = action.equals("ADD") ? new AddAxiom(
 					activeOntology, axiom) : new RemoveAxiom(activeOntology,
 					axiom);
 		}

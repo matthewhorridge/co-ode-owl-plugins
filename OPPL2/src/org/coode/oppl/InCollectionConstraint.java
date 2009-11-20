@@ -25,7 +25,7 @@ package org.coode.oppl;
 import java.util.Collection;
 
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLEntity;
@@ -49,8 +49,8 @@ public class InCollectionConstraint<P extends OWLObject> implements
 	 * @param collection
 	 * @param constraintSystem
 	 */
-	public InCollectionConstraint(Variable variable,
-			Collection<P> collection, ConstraintSystem constraintSystem) {
+	public InCollectionConstraint(Variable variable, Collection<P> collection,
+			ConstraintSystem constraintSystem) {
 		this.variable = variable;
 		this.collection = collection;
 		this.constraintSystem = constraintSystem;
@@ -131,8 +131,9 @@ public class InCollectionConstraint<P extends OWLObject> implements
 			comma = !first ? ", " : "";
 			first = false;
 			buffer.append(comma);
-			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
-					.getManchesterSyntaxRenderer(this.constraintSystem);
+			ManchesterSyntaxRenderer renderer = ParserFactory.getInstance()
+					.getOPPLFactory().getManchesterSyntaxRenderer(
+							this.constraintSystem);
 			p.accept(renderer);
 			buffer.append(renderer.toString());
 		}

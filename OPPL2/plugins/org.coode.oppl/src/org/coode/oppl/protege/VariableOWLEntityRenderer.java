@@ -23,7 +23,7 @@
 package org.coode.oppl.protege;
 
 import org.coode.oppl.entity.OWLEntityRenderer;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.OWLEntity;
@@ -33,8 +33,8 @@ public class VariableOWLEntityRenderer implements OWLEntityRenderer {
 	private final OWLModelManager modelManager;
 
 	public String render(OWLEntity entity) {
-		OWLEntityRenderer entityRenderer = OPPLParser.getOPPLFactory()
-				.getOWLEntityRenderer(this.constraintSystem);
+		OWLEntityRenderer entityRenderer = ParserFactory.getInstance()
+				.getOPPLFactory().getOWLEntityRenderer(this.constraintSystem);
 		return entityRenderer.render(entity);
 	}
 

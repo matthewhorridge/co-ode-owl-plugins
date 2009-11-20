@@ -22,7 +22,7 @@
  */
 package org.coode.oppl.variablemansyntax;
 
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.semanticweb.owl.expression.ParserException;
 import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLObject;
@@ -38,8 +38,8 @@ public class ExpressionParser implements VariableTypeVisitorEx<OWLObject> {
 	public ExpressionParser(String string, ConstraintSystem cs,
 			OWLDataFactory dataFactory, OWLOntologyManager ontologyManager) {
 		this.parser = new VariableManchesterOWLSyntaxParser(string, cs);
-		this.parser.setOWLEntityChecker(OPPLParser.getOPPLFactory()
-				.getOWLEntityChecker());
+		this.parser.setOWLEntityChecker(ParserFactory.getInstance()
+				.getOPPLFactory().getOWLEntityChecker());
 	}
 
 	/**

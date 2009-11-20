@@ -55,7 +55,7 @@ import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.OPPLScriptVisitorEx;
 import org.coode.oppl.protege.ui.rendering.BindingTreeRenderer;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
@@ -235,7 +235,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	protected void initialiseOWLView() {
 		this.setLayout(new BorderLayout());
 		JPanel statementPanel = new JPanel(new BorderLayout());
-		ProtegeParserFactory.initParser("", this.getOWLModelManager());
+		ProtegeParserFactory.initParser("", this.getOWLModelManager(), null);
 		this.affectedAxioms = new ActionList(this.getOWLEditorKit(),
 				new ConstraintSystem(this.getOWLEditorKit().getModelManager()
 						.getActiveOntology(), this.getOWLEditorKit()
@@ -462,8 +462,8 @@ public class OPPLView extends AbstractOWLViewComponent implements
 
 	public void handleChange(OWLModelManagerChangeEvent event) {
 		if (event.getType().equals(EventType.REASONER_CHANGED)) {
-			OPPLParser.setReasoner(this.getOWLEditorKit().getModelManager()
-					.getReasoner());
+			ParserFactory.getInstance().setReasoner(
+					this.getOWLEditorKit().getModelManager().getReasoner());
 			// try {
 			// this.statementModel = this.opplStatementExpressionEditor
 			// .createObject();

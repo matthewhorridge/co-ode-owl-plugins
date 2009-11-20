@@ -30,9 +30,9 @@ import java.util.Set;
 import javax.swing.JPanel;
 
 import org.coode.oppl.AbstractConstraint;
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.syntax.TokenMgrError;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -144,10 +144,12 @@ public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor 
 						this.lastCheckedObject = null;
 						ProtegeParserFactory.initParser(text,
 								OPPLConstraintEditor.this.owlEditorKit
-										.getModelManager());
+										.getModelManager(), null);
 						try {
-							this.lastCheckedObject = OPPLParser
-									.Constraint(OPPLConstraintEditor.this.constraintSystem);
+							this.lastCheckedObject = ParserFactory
+									.getInstance()
+									.Constraint(
+											OPPLConstraintEditor.this.constraintSystem);
 						} catch (ParseException e) {
 							this.lastCheckedObject = null;
 							throw new OWLExpressionParserException(e);

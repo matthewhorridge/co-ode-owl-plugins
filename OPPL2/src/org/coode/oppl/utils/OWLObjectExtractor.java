@@ -136,7 +136,7 @@ public class OWLObjectExtractor {
 	}
 
 	public static Collection<? extends OWLConstant> getAllOWLConstants(
-			OWLAxiom axiom) {
+			OWLAxiom axiomToVisit) {
 		final Set<OWLConstant> toReturn = new HashSet<OWLConstant>();
 		final OWLDescriptionVisitor constantExtractor = new OWLDescriptionVisitorAdapter() {
 			@Override
@@ -144,7 +144,7 @@ public class OWLObjectExtractor {
 				toReturn.add(desc.getValue());
 			}
 		};
-		axiom.accept(new OWLAxiomVisitorAdapter() {
+		axiomToVisit.accept(new OWLAxiomVisitorAdapter() {
 			@Override
 			public void visit(OWLClassAssertionAxiom axiom) {
 				axiom.getDescription().accept(constantExtractor);

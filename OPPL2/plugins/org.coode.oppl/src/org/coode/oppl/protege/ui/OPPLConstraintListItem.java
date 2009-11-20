@@ -51,22 +51,8 @@ public class OPPLConstraintListItem implements MListItem {
 	// final OPPLConstraintEditor editor = new OPPLConstraintEditor(
 	// this.owlEditorKit, this.constraintSystem);
 	// editor.setConstraint(this.getConstraint());
-	// final VerifyingOptionPane optionPane = new VerifyingOptionPane(editor) {
-	// /**
-	// *
-	// */
-	// private static final long serialVersionUID = 7816306100172449202L;
-	//
-	// /**
-	// *
-	// */
-	// @Override
-	// public void selectInitialValue() {
-	// // This is overridden so that the option pane dialog default
-	// // button
-	// // doesn't get the focus.
-	// }
-	// };
+	// final VerifyingOptionPane optionPane = new
+	// NoDefaultFocusVerifyingOptionPane(editor);
 	// final InputVerificationStatusChangedListener verificationListener = new
 	// InputVerificationStatusChangedListener() {
 	// public void verifiedStatusChanged(boolean verified) {

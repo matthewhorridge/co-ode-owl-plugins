@@ -34,7 +34,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -111,7 +110,7 @@ public class OPPLCompleter {
 		this.textComponent.addKeyListener(this.keyListener);
 		this.wordDelimeters = new HashSet<String>(Arrays.asList(" ", "\n", "[",
 				"]", "{", "}", "(", ")", ",", "^", ":", "]", "[", ","));
-		for (VariableType variableType : EnumSet.allOf(VariableType.class)) {
+		for (VariableType variableType : VariableType.values()) {
 			this.wordDelimeters.add(variableType.toString());
 		}
 		// this.matcher = new AutoCompleterMatcherImpl(owlEditorKit
@@ -129,7 +128,7 @@ public class OPPLCompleter {
 			}
 		});
 		this.popupList.setRequestFocusEnabled(false);
-		createPopupWindow();
+		this.createPopupWindow();
 		this.textComponent.addHierarchyListener(new HierarchyListener() {
 			/**
 			 * Called when the hierarchy has been changed. To discern the actual
@@ -149,36 +148,36 @@ public class OPPLCompleter {
 	protected void processKeyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE && e.isControlDown()) {
 			// Show popup
-			performAutoCompletion();
+			this.performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_TAB) {
 			e.consume();
-			performAutoCompletion();
+			this.performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			if (this.popupWindow.isVisible()) {
 				// Hide popup
 				e.consume();
-				hidePopup();
+				this.hidePopup();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if (this.popupWindow.isVisible()) {
 				// Complete
 				e.consume();
-				completeWithPopupSelection();
+				this.completeWithPopupSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			if (this.popupWindow.isVisible()) {
 				e.consume();
-				incrementSelection();
+				this.incrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 			if (this.popupWindow.isVisible()) {
 				e.consume();
-				decrementSelection();
+				this.decrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			hidePopup();
+			this.hidePopup();
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			hidePopup();
+			this.hidePopup();
 		}
 	}
 
@@ -186,25 +185,25 @@ public class OPPLCompleter {
 		if (this.popupWindow.isVisible()) {
 			Object selObject = this.popupList.getSelectedValue();
 			if (selObject != null) {
-				insertWord(getInsertText(selObject));
-				hidePopup();
+				this.insertWord(this.getInsertText(selObject));
+				this.hidePopup();
 			}
 		}
 	}
 
 	protected List getMatches() {
-		ProtegeParserFactory.initParser(this.textComponent.getText(),
-				this.owlEditorKit.getModelManager());
+		OPPLParser parser = ProtegeParserFactory.initParser(this.textComponent
+				.getText(), this.owlEditorKit.getModelManager(), null);
 		List completions;
 		try {
-			OPPLParser.Start();
+			parser.Start();
 		} catch (ParseException e) {
 		} catch (TokenMgrError e) {
 		} finally {
-			completions = OPPLParser.getCompletions();
+			completions = parser.getCompletions();
 		}
 		List toReturn = new ArrayList(completions);
-		String wordToComplete = getWordToComplete();
+		String wordToComplete = this.getWordToComplete();
 		if (wordToComplete.length() > 0) {
 			for (Object object : completions) {
 				if (!object.toString().trim().startsWith(wordToComplete)) {
@@ -226,21 +225,21 @@ public class OPPLCompleter {
 	}
 
 	private void performAutoCompletion() {
-		List matches = getMatches();
+		List matches = this.getMatches();
 		if (matches.size() == 1) {
 			// Don't show popup
-			insertWord(getInsertText(matches.iterator().next()));
+			this.insertWord(this.getInsertText(matches.iterator().next()));
 		} else if (matches.size() > 1) {
 			// Show popup
 			this.lastTextUpdate = this.textComponent.getText();
-			showPopup();
-			updatePopup(matches);
+			this.showPopup();
+			this.updatePopup(matches);
 		}
 	}
 
 	private void insertWord(String word) {
 		try {
-			int index = getWordIndex();
+			int index = this.getWordIndex();
 			int caretIndex = this.textComponent.getCaretPosition();
 			this.textComponent.getDocument().remove(index, caretIndex - index);
 			this.textComponent.getDocument().insertString(index, word, null);
@@ -251,12 +250,12 @@ public class OPPLCompleter {
 
 	private void showPopup() {
 		if (this.popupWindow == null) {
-			createPopupWindow();
+			this.createPopupWindow();
 		}
 		if (!this.popupWindow.isVisible()) {
 			this.popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
 			try {
-				int wordIndex = getWordIndex();
+				int wordIndex = this.getWordIndex();
 				if (wordIndex < 0) {
 					wordIndex = 0;
 				}
@@ -366,7 +365,7 @@ public class OPPLCompleter {
 
 	private String getWordToComplete() {
 		try {
-			int index = getWordIndex();
+			int index = this.getWordIndex();
 			int caretIndex = this.textComponent.getCaretPosition();
 			String toReturn = this.textComponent.getDocument().getText(index,
 					caretIndex - index);

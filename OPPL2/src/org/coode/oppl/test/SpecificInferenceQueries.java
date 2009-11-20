@@ -11,7 +11,6 @@ import junit.framework.TestCase;
 import org.coode.oppl.ChangeExtractor;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.log.Logging;
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
@@ -53,9 +52,8 @@ public class SpecificInferenceQueries extends TestCase {
 			String opplString = "?x:CLASS SELECT  ?x subClassOf C BEGIN ADD ?x subClassOf A END;";
 			FaCTPlusPlusReasonerFactory factory = new FaCTPlusPlusReasonerFactory();
 			OWLReasoner reasoner = factory.createReasoner(ontologyManager);
-			ParserFactory.initParser(opplString, testOntology, ontologyManager,
-					reasoner);
-			OPPLScript opplScript = OPPLParser.Start();
+			OPPLScript opplScript = ParserFactory.initParser(opplString,
+					testOntology, ontologyManager, reasoner).Start();
 			ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
 					.getConstraintSystem(), true);
 			List<OWLAxiomChange> changes = opplScript.accept(changeExtractor);

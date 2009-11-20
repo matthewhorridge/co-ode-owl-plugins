@@ -59,12 +59,11 @@ public class VariableManchesterSyntaxExpressionChecker implements
 	 */
 	public void check(String text) throws OWLExpressionParserException {
 		this.lastCheckedObject = null;
-		initParser(text);
+		OPPLParser parser = initParser(text);
 		try {
-			OPPLScript statementModel = OPPLParser.Start();
+			OPPLScript statementModel = parser.Start();
 			if (this.reasoner == null || this.reasoner instanceof NoOpReasoner) {
-				List<Variable> variables = statementModel
-						.getInputVariables();
+				List<Variable> variables = statementModel.getInputVariables();
 				for (Variable v : variables) {
 					if (v.getVariableScope() != null) {
 						throw new OWLExpressionParserException(

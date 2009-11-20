@@ -29,7 +29,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyListener;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +42,7 @@ import javax.swing.JToolBar;
 
 import org.coode.oppl.exceptions.InvalidVariableNameException;
 import org.coode.oppl.exceptions.OPPLException;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
@@ -72,24 +71,14 @@ public class VariableEditor extends AbstractVariableEditor {
 
 		public void actionPerformed(ActionEvent e) {
 			VariableType variableType = VariableEditor.this.jRadioButtonTypeMap
-					.get(findSelectedButton());
+					.get(VariableEditor.this.findSelectedButton());
 			final ScopeEditor scopeEditor = ScopeEditor.getTypeScopeEditor(
 					variableType, VariableEditor.this.owlEditorKit);
 			if (this.useScope) {
 				scopeEditor.setScope(VariableEditor.this.lastVariableScope);
 			}
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					scopeEditor) {
-				private static final long serialVersionUID = 7217535942418544769L;
-
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog
-					// default
-					// button
-					// doesn't get the focus.
-				}
-			};
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					scopeEditor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
@@ -112,7 +101,7 @@ public class VariableEditor extends AbstractVariableEditor {
 					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
 						VariableEditor.this.lastVariableScope = scopeEditor
 								.getVariableScope();
-						handleChange();
+						VariableEditor.this.handleChange();
 					}
 					if (ActionListener1.this.useScope) {
 						VariableEditor.this.deleteScopeButton.setEnabled(true);
@@ -133,15 +122,12 @@ public class VariableEditor extends AbstractVariableEditor {
 		public void actionPerformed(ActionEvent e) {
 			VariableEditor.this.lastVariableScope = null;
 			VariableEditor.this.createScopeButton.setEnabled(true);
-			handleChange();
+			VariableEditor.this.handleChange();
 		}
 	}
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 8899160597858126563L;
-	private static Map<VariableType, String> typeLabelStringMap;
+	// private static Map<VariableType, String> typeLabelStringMap;
 	protected final OWLEditorKit owlEditorKit;
 	private final ConstraintSystem constraintSystem;
 	protected final Map<JRadioButton, VariableType> jRadioButtonTypeMap = new HashMap<JRadioButton, VariableType>();
@@ -150,17 +136,17 @@ public class VariableEditor extends AbstractVariableEditor {
 	protected JButton createScopeButton = new JButton("Create");
 	protected JButton editScopeButton = new JButton("Edit");
 	protected JButton deleteScopeButton = new JButton("Clear");
-	static {
-		typeLabelStringMap = new HashMap<VariableType, String>();
-		EnumSet<VariableType> types = EnumSet.allOf(VariableType.class);
-		for (VariableType variableType : types) {
-			typeLabelStringMap.put(variableType, variableType.name());
-		}
-	}
 
+	// static {
+	// typeLabelStringMap = new HashMap<VariableType, String>();
+	// EnumSet<VariableType> types = EnumSet.allOf(VariableType.class);
+	// for (VariableType variableType : types) {
+	// typeLabelStringMap.put(variableType, variableType.name());
+	// }
+	// }
 	public VariableEditor(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
-		setLayout(new BorderLayout());
+		this.setLayout(new BorderLayout());
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
 		this.variableNameExpressionEditor = new ExpressionEditor<String>(
@@ -204,11 +190,10 @@ public class VariableEditor extends AbstractVariableEditor {
 		variableNamePanel.add(this.variableNameExpressionEditor);
 		this.add(variableNamePanel, BorderLayout.NORTH);
 		this.variableTypeButtonGroup = new ButtonGroup();
-		EnumSet<VariableType> types = EnumSet.allOf(VariableType.class);
-		JPanel variableTypePanel = new JPanel(new GridLayout(0, types.size()));
-		for (VariableType variableType : types) {
-			JRadioButton typeRadioButton = new JRadioButton(typeLabelStringMap
-					.get(variableType));
+		JPanel variableTypePanel = new JPanel(new GridLayout(0, VariableType
+				.values().length));
+		for (VariableType variableType : VariableType.values()) {
+			JRadioButton typeRadioButton = new JRadioButton(variableType.name());
 			typeRadioButton.addActionListener(new ChangeTypeActionListener());
 			this.variableTypeButtonGroup.add(typeRadioButton);
 			variableTypePanel.add(typeRadioButton);
@@ -245,30 +230,30 @@ public class VariableEditor extends AbstractVariableEditor {
 	}
 
 	protected void handleChange() {
-		JRadioButton selectedJRadioButton = findSelectedButton();
+		JRadioButton selectedJRadioButton = this.findSelectedButton();
 		VariableType type = this.jRadioButtonTypeMap.get(selectedJRadioButton);
-		if (check()) {
+		if (this.check()) {
 			try {
 				String variableName = this.variableNameExpressionEditor
 						.createObject();
-				updateVariable(variableName, type);
-				updateTypeScope(type);
-				notifyListeners();
+				this.updateVariable(variableName, type);
+				this.updateTypeScope(type);
+				this.notifyListeners();
 			} catch (OPPLException e) {
-				notifyListeners();
+				this.notifyListeners();
 				throw new RuntimeException(e);
 			} catch (OWLExpressionParserException e) {
-				notifyListeners();
+				this.notifyListeners();
 				throw new RuntimeException(e);
 			} catch (OWLException e) {
-				notifyListeners();
+				this.notifyListeners();
 				throw new RuntimeException(e);
 			}
 		} else {
-			updateTypeScope(type);
-			notifyListeners();
+			this.updateTypeScope(type);
+			this.notifyListeners();
 		}
-		setupButtonsEnabling();
+		this.setupButtonsEnabling();
 	}
 
 	private void setupButtonsEnabling() {
@@ -282,10 +267,10 @@ public class VariableEditor extends AbstractVariableEditor {
 	 */
 	private void updateTypeScope(VariableType type) {
 		if (this.lastVariableScope != null && type != null) {
-			findSelectedButton();
-			JRadioButton radioButton = findSelectedButton();
+			this.findSelectedButton();
+			JRadioButton radioButton = this.findSelectedButton();
 			if (radioButton != null) {
-				radioButton.setText(typeLabelStringMap.get(type)
+				radioButton.setText(type.name()
 						+ "["
 						+ this.lastVariableScope.getDirection()
 						+ " "
@@ -296,8 +281,8 @@ public class VariableEditor extends AbstractVariableEditor {
 		} else {
 			for (JRadioButton typeRadioButton : this.jRadioButtonTypeMap
 					.keySet()) {
-				typeRadioButton.setText(typeLabelStringMap
-						.get(this.jRadioButtonTypeMap.get(typeRadioButton)));
+				typeRadioButton.setText(this.jRadioButtonTypeMap.get(
+						typeRadioButton).name());
 			}
 		}
 	}
@@ -307,8 +292,8 @@ public class VariableEditor extends AbstractVariableEditor {
 		try {
 			boolean toReturn = true;
 			this.variableNameExpressionEditor.createObject();
-			Object selectedValue = this.jRadioButtonTypeMap
-					.get(findSelectedButton());
+			Object selectedValue = this.jRadioButtonTypeMap.get(this
+					.findSelectedButton());
 			toReturn = selectedValue instanceof VariableType;
 			return toReturn;
 		} catch (OWLExpressionParserException e) {
@@ -331,18 +316,19 @@ public class VariableEditor extends AbstractVariableEditor {
 		this.variable = this.constraintSystem
 				.createVariable(variableName, type);
 		if (this.lastVariableScope != null) {
-			this.variable.setVariableScope(this.lastVariableScope, OPPLParser
-					.getOPPLFactory().getVariableScopeChecker());
+			this.variable.setVariableScope(this.lastVariableScope,
+					ParserFactory.getInstance().getOPPLFactory()
+							.getVariableScopeChecker());
 		}
 	}
 
 	@Override
 	public void setVariable(Variable v) {
-		clear();
+		this.clear();
 		this.lastVariableScope = v.getVariableScope();
 		this.variableNameExpressionEditor.setText(v.getName());
 		this.typeJRadioButonMap.get(v.getType()).setSelected(true);
-		updateTypeScope(v.getType());
+		this.updateTypeScope(v.getType());
 	}
 
 	@Override
