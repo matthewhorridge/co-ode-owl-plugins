@@ -69,6 +69,7 @@ public class VariableEditor extends AbstractVariableEditor {
 			this.useScope = scope;
 		}
 
+		@SuppressWarnings("unused")
 		public void actionPerformed(ActionEvent e) {
 			VariableType variableType = VariableEditor.this.jRadioButtonTypeMap
 					.get(VariableEditor.this.findSelectedButton());
@@ -119,6 +120,7 @@ public class VariableEditor extends AbstractVariableEditor {
 		public ChangeTypeActionListener() {
 		}
 
+		@SuppressWarnings("unused")
 		public void actionPerformed(ActionEvent e) {
 			VariableEditor.this.lastVariableScope = null;
 			VariableEditor.this.createScopeButton.setEnabled(true);
@@ -212,6 +214,7 @@ public class VariableEditor extends AbstractVariableEditor {
 		this.createScopeButton.addActionListener(new ActionListener1(false));
 		this.editScopeButton.addActionListener(new ActionListener1(true));
 		this.deleteScopeButton.addActionListener(new ActionListener() {
+			@SuppressWarnings("unused")
 			public void actionPerformed(ActionEvent e) {
 				VariableEditor.this.lastVariableScope = null;
 				VariableEditor.this.createScopeButton.setEnabled(true);
@@ -337,6 +340,7 @@ public class VariableEditor extends AbstractVariableEditor {
 	}
 
 	@Override
+	@SuppressWarnings("unused")
 	public void setVariable(GeneratedVariable<?> variable) {
 		throw new RuntimeException(
 				"GeneratedVariables not allowed on a regular VariableEditor!");

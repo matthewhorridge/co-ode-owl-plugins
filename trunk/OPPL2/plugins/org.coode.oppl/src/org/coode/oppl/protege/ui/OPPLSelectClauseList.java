@@ -47,7 +47,7 @@ import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
  */
 public class OPPLSelectClauseList extends MList {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 3978563738563698974L;
 	private final OWLEditorKit owlEditorKit;
@@ -115,6 +115,7 @@ public class OPPLSelectClauseList extends MList {
 			return false;
 		}
 
+		@SuppressWarnings("unused")
 		public void paintBorder(Component c, Graphics g, int x, int y,
 				int width, int height) {
 			Color oldColor = g.getColor();
@@ -129,9 +130,9 @@ public class OPPLSelectClauseList extends MList {
 	private class OPPLSelectListItemCellRederer implements ListCellRenderer {
 		private final DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
 		private final VariableOWLCellRenderer variableAxiomRenderer = new VariableOWLCellRenderer(
-				OPPLSelectClauseList.this.owlEditorKit,
-				OPPLSelectClauseList.this.constraintSystem,
-				new OWLCellRenderer(OPPLSelectClauseList.this.owlEditorKit));
+				OPPLSelectClauseList.this.getOwlEditorKit(),
+				OPPLSelectClauseList.this.getConstraintSystem(),
+				new OWLCellRenderer(OPPLSelectClauseList.this.getOwlEditorKit()));
 
 		public OPPLSelectListItemCellRederer() {
 			this.variableAxiomRenderer.setHighlightKeywords(true);

@@ -61,7 +61,7 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
  * @author Luigi Iannone
  * 
  */
-public class ProtegeOPPLFactory implements OPPLAbstractFactory {
+public final class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	/**
 	 * Adapter between {@code org.coode.oppl.entity.OWLEntityRenderer} and
 	 * {@code org.protege.editor.owl.ui.renderer.OWLEntityRenderer}
@@ -173,7 +173,7 @@ public class ProtegeOPPLFactory implements OPPLAbstractFactory {
 		}
 	}
 
-	private OWLModelManager modelManager;
+	protected OWLModelManager modelManager;
 	private ProtegeScopeVariableChecker variableScopeVariableChecker = null;
 	private final ProtegeOWLEntityFactory entityFactory;
 	private final ProtegeOWLEntityRenderer entityRenderer;

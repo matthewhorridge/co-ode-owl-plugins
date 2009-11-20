@@ -52,17 +52,14 @@ import org.semanticweb.owl.model.OWLException;
  * @author Luigi Iannone
  * 
  */
-public class OPPLTextEditor extends JPanel implements VerifiedInputEditor,
-		OWLModelManagerListener {
-	/**
-	 *
-	 */
+public final class OPPLTextEditor extends JPanel implements
+		VerifiedInputEditor, OWLModelManagerListener {
 	private static final long serialVersionUID = -5171397595615341059L;
 	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private final OWLEditorKit owlEditorKit;
 	private OPPLScript opplScript = null;
 	private final ExpressionEditor<OPPLScript> editor;
-	private final OPPLScriptValidator validator;
+	protected final OPPLScriptValidator validator;
 
 	/**
 	 * @return the opplScript
@@ -141,6 +138,7 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor,
 				});
 		this.editor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
+					@SuppressWarnings("unused")
 					public void verifiedStatusChanged(boolean newState) {
 						OPPLTextEditor.this.handleChange();
 					}

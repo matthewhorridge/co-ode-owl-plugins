@@ -83,15 +83,15 @@ import org.semanticweb.owl.model.OWLOntologyChangeListener;
  * @author Luigi Iannone
  * 
  */
-public class OPPLView extends AbstractOWLViewComponent implements
+public final class OPPLView extends AbstractOWLViewComponent implements
 		InputVerificationStatusChangedListener, OWLOntologyChangeListener,
 		OWLModelManagerListener {
 	private final class ReasonerOPPLScriptValiator implements
 			OPPLScriptValidator {
+		@SuppressWarnings("unused")
 		private final class ScriptVisitor implements
 				OPPLScriptVisitorEx<Boolean> {
 			public ScriptVisitor() {
-				// TODO Auto-generated constructor stub
 			}
 
 			public Boolean visitActions(List<OWLAxiomChange> changes, Boolean p) {
@@ -208,17 +208,17 @@ public class OPPLView extends AbstractOWLViewComponent implements
 	 */
 	private static final long serialVersionUID = 1897093057453176659L;
 	private static final String OPPL_COMPUTATION_IN_PROGRESS_PLEASE_WAIT = "OPPL Computation in progress...please wait";
-	private OPPLEditor editor;
+	protected OPPLEditor editor;
 	private final ReasonerOPPLScriptValiator validator = new ReasonerOPPLScriptValiator();
-	private JButton evaluate = new JButton("Evaluate");
-	private JButton execute = new JButton("Execute");
-	private ActionList affectedAxioms;
-	private OWLLinkedObjectList instantiatedAxiomsList;
-	private OPPLScript statementModel;
-	private JDialog window;
-	private JScrollPane affectedScrollPane;
-	private JScrollPane instantiatedScrollPane;
-	private JCheckBox considerImportClosureCheckBox = new JCheckBox(
+	protected JButton evaluate = new JButton("Evaluate");
+	protected JButton execute = new JButton("Execute");
+	protected ActionList affectedAxioms;
+	protected OWLLinkedObjectList instantiatedAxiomsList;
+	protected OPPLScript statementModel;
+	protected JDialog window;
+	protected JScrollPane affectedScrollPane;
+	protected JScrollPane instantiatedScrollPane;
+	protected JCheckBox considerImportClosureCheckBox = new JCheckBox(
 			"When removing consider Active Ontology Imported Closure", false);
 	private DefaultTreeModel bindingTreeNodeModel = new DefaultTreeModel(
 			new DefaultMutableTreeNode("Bindings"));
@@ -249,6 +249,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		cellRenderer.setHighlightKeywords(true);
 		this.considerImportClosureCheckBox
 				.addActionListener(new ActionListener() {
+					@SuppressWarnings("unused")
 					public void actionPerformed(ActionEvent e) {
 						((DefaultListModel) OPPLView.this.instantiatedAxiomsList
 								.getModel()).clear();
@@ -301,6 +302,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		this.evaluate.setEnabled(false);
 		this.execute.setEnabled(false);
 		this.evaluate.addActionListener(new ActionListener() {
+			@SuppressWarnings("unused")
 			public void actionPerformed(ActionEvent e) {
 				OPPLView.this.evaluate.setEnabled(false);
 				OPPLView.this.evaluate();
@@ -316,18 +318,21 @@ public class OPPLView extends AbstractOWLViewComponent implements
 		});
 		this.affectedAxioms.getModel().addListDataListener(
 				new ListDataListener() {
+					@SuppressWarnings("unused")
 					public void contentsChanged(ListDataEvent e) {
 						OPPLView.this.execute
 								.setEnabled(OPPLView.this.affectedAxioms
 										.getModel().getSize() > 0);
 					}
 
+					@SuppressWarnings("unused")
 					public void intervalAdded(ListDataEvent e) {
 						OPPLView.this.execute
 								.setEnabled(OPPLView.this.affectedAxioms
 										.getModel().getSize() > 0);
 					}
 
+					@SuppressWarnings("unused")
 					public void intervalRemoved(ListDataEvent e) {
 						OPPLView.this.execute
 								.setEnabled(OPPLView.this.affectedAxioms
@@ -335,6 +340,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 					}
 				});
 		this.execute.addActionListener(new ActionListener() {
+			@SuppressWarnings("unused")
 			public void actionPerformed(ActionEvent e) {
 				ActionListModel model = (ActionListModel) OPPLView.this.affectedAxioms
 						.getModel();
@@ -407,6 +413,7 @@ public class OPPLView extends AbstractOWLViewComponent implements
 
 	public void ontologiesChanged(List<? extends OWLOntologyChange> changes)
 			throws OWLException {
+		// TODO if the changes size is zero, is this needed?
 		ActionListModel model = (ActionListModel) OPPLView.this.affectedAxioms
 				.getModel();
 		model.clear();

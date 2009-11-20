@@ -87,10 +87,10 @@ public class VariableListItem implements MListItem, OPPLMacroStatusChange {
 	 * @see org.protege.editor.core.ui.list.MListItem#handleDelete()
 	 */
 	public boolean handleDelete() {
-		notifyListeners(getVariable());
-		for (OPPLMacroListener l : new ArrayList<OPPLMacroListener>(
-				getListeners())) {
-			removeOPPLMacroListener(l);
+		this.notifyListeners(this.getVariable());
+		for (OPPLMacroListener l : new ArrayList<OPPLMacroListener>(this
+				.getListeners())) {
+			this.removeOPPLMacroListener(l);
 		}
 		return true;
 	}
@@ -138,6 +138,7 @@ public class VariableListItem implements MListItem, OPPLMacroStatusChange {
 			dlg.setLocationRelativeTo(this.owlEditorKit.getWorkspace());
 			dlg.addComponentListener(new ComponentAdapter() {
 				@Override
+				@SuppressWarnings("unused")
 				public void componentHidden(ComponentEvent e) {
 					Object retVal = optionPane.getValue();
 					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
