@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * @author Luigi Iannone
  * 
- * Jun 27, 2008
+ *         Jun 27, 2008
  */
 public class NonResovableArgumentsException extends PatternException {
 	public NonResovableArgumentsException(String patternName,

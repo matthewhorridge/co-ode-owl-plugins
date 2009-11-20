@@ -27,7 +27,7 @@ import org.coode.oppl.variablemansyntax.Variable;
 /**
  * @author Luigi Iannone
  * 
- * Jun 25, 2008
+ *         Jun 25, 2008
  */
 public class IncompatibleArgumentException extends PatternException {
 	/**

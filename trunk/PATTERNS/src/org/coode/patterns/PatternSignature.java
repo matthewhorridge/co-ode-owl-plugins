@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.coode.oppl.exceptions.OPPLException;
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.coode.oppl.variablemansyntax.VariableType;
@@ -51,18 +50,20 @@ public class PatternSignature {
 	private String name;
 	private OWLOntologyManager ontologyManager;
 	private final PatternModel pattern;
+	private final AbstractPatternModelFactory factory;
 
 	/**
 	 * @param name
 	 */
-	public PatternSignature(String name, OWLOntologyManager ontologyManger)
-			throws PatternException {
+	public PatternSignature(String name, OWLOntologyManager ontologyManger,
+			AbstractPatternModelFactory factory) throws PatternException {
 		this.name = name;
+		this.factory = factory;
 		this.ontologyManager = ontologyManger;
 		Set<String> existingPatternNames = Utils
 				.getExistingPatternNames(ontologyManger);
 		if (existingPatternNames.contains(name)) {
-			this.pattern = Utils.find(name, ontologyManger);
+			this.pattern = Utils.find(name, ontologyManger, factory);
 		} else {
 			throw new PatternReferenceNotFoundException(name);
 		}
@@ -81,8 +82,8 @@ public class PatternSignature {
 		List<OWLObject> toReturn = new ArrayList<OWLObject>();
 		Variable variable = this.pattern.getInputVariables().get(i);
 		VariableType variableType = getIthVariableType(i);
-		VariableScopeChecker variableScopeChecker = OPPLParser.getOPPLFactory()
-				.getVariableScopeChecker();
+		VariableScopeChecker variableScopeChecker = this.factory
+				.getOPPLParser().getOPPLFactory().getVariableScopeChecker();
 		Set<OWLOntology> ontologies = this.ontologyManager.getOntologies();
 		switch (variableType) {
 			case CLASS:

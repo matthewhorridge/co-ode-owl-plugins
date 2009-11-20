@@ -61,6 +61,7 @@ import org.coode.oppl.protege.ui.ActionListModel;
 import org.coode.oppl.protege.ui.GeneratedVariableEditor;
 import org.coode.oppl.protege.ui.GeneratedVariableSectionHeader;
 import org.coode.oppl.protege.ui.InputVariableSectionHeader;
+import org.coode.oppl.protege.ui.NoDefaultFocusVerifyingOptionPane;
 import org.coode.oppl.protege.ui.OWLAxiomChangeEditor;
 import org.coode.oppl.protege.ui.VariableEditor;
 import org.coode.oppl.protege.ui.VariableList;
@@ -70,13 +71,13 @@ import org.coode.oppl.protege.ui.message.MessageListCellRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.EmptyActionListException;
 import org.coode.patterns.EmptyVariableListException;
 import org.coode.patterns.PatternConstraintSystem;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.PatternModelChangeListener;
 import org.coode.patterns.UnsuitableOPPLScriptException;
-import org.coode.patterns.syntax.PatternParser;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
@@ -102,8 +103,11 @@ public class PatternBuilder extends
 		private final List<OWLAxiomChange> actions = new ArrayList<OWLAxiomChange>();
 		private Variable returnVariable = null;
 		private String modelRendering = "";
-		private PatternConstraintSystem constraintSystem = PatternParser
-				.getPatternModelFactory().createConstraintSystem();
+		private PatternConstraintSystem constraintSystem;
+
+		public PatternBuilderModel(AbstractPatternModelFactory factory) {
+			this.constraintSystem = factory.createConstraintSystem();
+		}
 
 		/**
 		 * @return the name
@@ -121,7 +125,7 @@ public class PatternBuilder extends
 					|| !this.name.equals(name);
 			if (changed) {
 				this.name = name;
-				notifyBuilder();
+				this.notifyBuilder();
 			}
 		}
 
@@ -142,7 +146,7 @@ public class PatternBuilder extends
 					|| !this.returnVariable.equals(returnVariable);
 			if (changed) {
 				this.returnVariable = returnVariable;
-				notifyBuilder();
+				this.notifyBuilder();
 			}
 		}
 
@@ -157,16 +161,16 @@ public class PatternBuilder extends
 			boolean modified = this.variables.add(v);
 			if (modified) {
 				this.constraintSystem.importVariable(v);
-				notifyBuilder();
+				this.notifyBuilder();
 			}
 		}
 
 		public void removeVariable(Variable v) {
 			boolean modified = this.variables.remove(v);
 			if (modified) {
-				purgeActions(v);
+				this.purgeActions(v);
 				this.constraintSystem.removeVariable(v);
-				notifyBuilder();
+				this.notifyBuilder();
 			}
 		}
 
@@ -180,14 +184,14 @@ public class PatternBuilder extends
 		public void addAction(OWLAxiomChange action) {
 			boolean modified = this.actions.add(action);
 			if (modified) {
-				notifyBuilder();
+				this.notifyBuilder();
 			}
 		}
 
 		public void removeAction(OWLAxiomChange action) {
 			boolean modified = this.actions.remove(action);
 			if (modified) {
-				notifyBuilder();
+				this.notifyBuilder();
 			}
 		}
 
@@ -213,7 +217,7 @@ public class PatternBuilder extends
 				String token = tokenizer.nextToken();
 				if (token.startsWith("?")) {
 					String variableName = token.trim();
-					found = !existsVariable(variableName);
+					found = !this.existsVariable(variableName);
 					if (found) {
 						PatternBuilder.this.errorListModel
 								.addElement(new Error("Invalid variable name "
@@ -228,7 +232,7 @@ public class PatternBuilder extends
 			boolean found = false;
 			Iterator<Variable> it = this.variables.iterator();
 			while (!found && it.hasNext()) {
-				found = it.next().getName().compareTo(variableName) == 0;
+				found = it.next().getName().equals(variableName);
 			}
 			return found;
 		}
@@ -245,16 +249,17 @@ public class PatternBuilder extends
 		 *            the rendering to set
 		 */
 		public void setRendering(String rendering) {
+			// XXX this.modelRendering == null is smelly
 			boolean changed = this.modelRendering == null && rendering != null
-					|| this.modelRendering.compareTo(rendering) != 0;
+					|| !this.modelRendering.equals(rendering);
 			if (changed) {
 				this.modelRendering = rendering;
-				notifyBuilder();
+				this.notifyBuilder();
 			}
 		}
 
 		public void notifyBuilder() {
-			handleChange();
+			PatternBuilder.this.handleChange();
 		}
 
 		public void importPatternModel(PatternModel patternModel) {
@@ -266,7 +271,7 @@ public class PatternBuilder extends
 			this.actions.addAll(patternModel.getActions());
 			this.modelRendering = patternModel.getRendering();
 			this.returnVariable = patternModel.getReturnVariable();
-			notifyBuilder();
+			this.notifyBuilder();
 		}
 
 		public void reset() {
@@ -275,13 +280,13 @@ public class PatternBuilder extends
 			this.actions.clear();
 			this.returnVariable = null;
 			this.modelRendering = "";
-			notifyBuilder();
+			this.notifyBuilder();
 		}
 
 		/**
 		 * @return the constraintSystem
 		 */
-		public final PatternConstraintSystem getConstraintSystem() {
+		public PatternConstraintSystem getConstraintSystem() {
 			return this.constraintSystem;
 		}
 
@@ -305,17 +310,45 @@ public class PatternBuilder extends
 			boolean modified = this.variables.remove(oldVariable);
 			if (modified) {
 				if (oldVariable.getType() != newVariable.getType()) {
-					purgeActions(oldVariable);
+					this.purgeActions(oldVariable);
 				}
 				this.variables.add(newVariable);
 				this.constraintSystem.removeVariable(oldVariable);
 				this.constraintSystem.importVariable(newVariable);
-				notifyBuilder();
+				this.notifyBuilder();
 			}
 		}
 	}
 
 	private class PatternBuilderActionList extends ActionList {
+		final class SpecializedComponentAdapter extends ComponentAdapter {
+			private final VerifyingOptionPane optionPane;
+			private final InputVerificationStatusChangedListener verificationListener;
+			private final OWLAxiomChangeEditor actionEditor;
+
+			SpecializedComponentAdapter(
+					VerifyingOptionPane optionPane,
+					InputVerificationStatusChangedListener verificationListener,
+					OWLAxiomChangeEditor actionEditor) {
+				this.optionPane = optionPane;
+				this.verificationListener = verificationListener;
+				this.actionEditor = actionEditor;
+			}
+
+			@Override
+			public void componentHidden(ComponentEvent e) {
+				Object retVal = this.optionPane.getValue();
+				if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
+					OWLAxiomChange action = this.actionEditor
+							.getOwlAxiomChange();
+					PatternBuilder.this.patternBuilderModel.addAction(action);
+				}
+				this.actionEditor
+						.removeStatusChangedListener(this.verificationListener);
+				this.actionEditor.dispose();
+			}
+		}
+
 		public PatternBuilderActionList() {
 			super(PatternBuilder.this.owlEditorKit,
 					PatternBuilder.this.patternBuilderModel
@@ -328,23 +361,8 @@ public class PatternBuilder extends
 					PatternBuilder.this.owlEditorKit,
 					PatternBuilder.this.patternBuilderModel
 							.getConstraintSystem());
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					actionEditor) {
-				/**
-				 *
-				 */
-				private static final long serialVersionUID = 7816306100172449202L;
-
-				/**
-				 *
-				 */
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					actionEditor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
@@ -360,27 +378,14 @@ public class PatternBuilder extends
 			dlg.pack();
 			dlg.setLocationRelativeTo(PatternBuilder.this.owlEditorKit
 					.getWorkspace());
-			dlg.addComponentListener(new ComponentAdapter() {
-				@Override
-				public void componentHidden(ComponentEvent e) {
-					Object retVal = optionPane.getValue();
-					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
-						OWLAxiomChange action = actionEditor
-								.getOwlAxiomChange();
-						PatternBuilder.this.patternBuilderModel
-								.addAction(action);
-					}
-					actionEditor
-							.removeStatusChangedListener(verificationListener);
-					actionEditor.dispose();
-				}
-			});
+			dlg.addComponentListener(new SpecializedComponentAdapter(
+					optionPane, verificationListener, actionEditor));
 			dlg.setVisible(true);
 		}
 
 		@Override
 		protected void handleDelete() {
-			Object selectedValue = getSelectedValue();
+			Object selectedValue = this.getSelectedValue();
 			if (PatternBuilderActionListItem.class
 					.isAssignableFrom(selectedValue.getClass())) {
 				PatternBuilderActionListItem item = (PatternBuilderActionListItem) selectedValue;
@@ -407,24 +412,9 @@ public class PatternBuilder extends
 					.getConstraintSystem();
 			final OWLAxiomChangeEditor actionEditor = new OWLAxiomChangeEditor(
 					PatternBuilder.this.owlEditorKit, cs);
-			actionEditor.setOWLAxiomChange(getAxiomChange());
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					actionEditor) {
-				/**
-				 *
-				 */
-				private static final long serialVersionUID = 7816306100172449202L;
-
-				/**
-				 *
-				 */
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
+			actionEditor.setOWLAxiomChange(this.getAxiomChange());
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					actionEditor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
@@ -453,7 +443,7 @@ public class PatternBuilder extends
 								.getSelectedValue());
 						model.addElement(new PatternBuilderActionListItem(
 								action, true, true));
-						handleChange();
+						PatternBuilder.this.handleChange();
 					}
 					actionEditor
 							.removeStatusChangedListener(verificationListener);
@@ -473,7 +463,8 @@ public class PatternBuilder extends
 
 		@Override
 		protected void handleAdd() {
-			final AbstractVariableEditor variableEditor = getSelectedValue() instanceof InputVariableSectionHeader ? new VariableEditor(
+			final AbstractVariableEditor variableEditor = this
+					.getSelectedValue() instanceof InputVariableSectionHeader ? new VariableEditor(
 					PatternBuilder.this.owlEditorKit,
 					PatternBuilder.this.patternBuilderModel
 							.getConstraintSystem())
@@ -481,20 +472,8 @@ public class PatternBuilder extends
 							PatternBuilder.this.owlEditorKit,
 							PatternBuilder.this.patternBuilderModel
 									.getConstraintSystem());
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					variableEditor) {
-				/**
-				 *
-				 */
-				private static final long serialVersionUID = 7217535942418544769L;
-
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					variableEditor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
@@ -529,7 +508,7 @@ public class PatternBuilder extends
 
 		@Override
 		protected void handleDelete() {
-			Object selectedValue = getSelectedValue();
+			Object selectedValue = this.getSelectedValue();
 			if (PatternBuilderVariableListItem.class
 					.isAssignableFrom(selectedValue.getClass())) {
 				PatternBuilderVariableListItem item = (PatternBuilderVariableListItem) selectedValue;
@@ -541,22 +520,19 @@ public class PatternBuilder extends
 		public PatternVariableList(OWLEditorKit owlEditorKit) {
 			super(owlEditorKit, PatternBuilder.this.patternBuilderModel
 					.getConstraintSystem());
-			((DefaultListModel) getModel())
+			((DefaultListModel) this.getModel())
 					.addElement(new InputVariableSectionHeader());
-			((DefaultListModel) getModel())
+			((DefaultListModel) this.getModel())
 					.addElement(new GeneratedVariableSectionHeader());
-			getModel().addListDataListener(this);
+			this.getModel().addListDataListener(this);
 		}
 
 		public void contentsChanged(ListDataEvent e) {
-			updatePatternModel();
+			this.updatePatternModel();
 		}
 
-		/**
-		 *
-		 */
 		private void updatePatternModel() {
-			ListModel model = getModel();
+			ListModel model = this.getModel();
 			for (int i = 0; i < model.getSize(); i++) {
 				Object element = model.getElementAt(i);
 				if (element instanceof PatternBuilderVariableListItem) {
@@ -573,19 +549,19 @@ public class PatternBuilder extends
 		}
 
 		public void clear() {
-			((DefaultListModel) getModel()).clear();
-			((DefaultListModel) getModel())
+			((DefaultListModel) this.getModel()).clear();
+			((DefaultListModel) this.getModel())
 					.addElement(new InputVariableSectionHeader());
-			((DefaultListModel) getModel())
+			((DefaultListModel) this.getModel())
 					.addElement(new GeneratedVariableSectionHeader());
 		}
 
 		public void intervalAdded(ListDataEvent e) {
-			updatePatternModel();
+			this.updatePatternModel();
 		}
 
 		public void intervalRemoved(ListDataEvent e) {
-			updatePatternModel();
+			this.updatePatternModel();
 		}
 
 		/**
@@ -633,7 +609,7 @@ public class PatternBuilder extends
 		 */
 		@Override
 		public String getTooltip() {
-			return getVariable().toString();
+			return this.getVariable().toString();
 		}
 
 		/**
@@ -643,21 +619,12 @@ public class PatternBuilder extends
 		public void handleEdit() {
 			ConstraintSystem cs = PatternBuilder.this.patternBuilderModel
 					.getConstraintSystem();
-			final AbstractVariableEditor variableEditor = getVariable() instanceof GeneratedVariable<?> ? new GeneratedVariableEditor(
+			final AbstractVariableEditor variableEditor = this.getVariable() instanceof GeneratedVariable<?> ? new GeneratedVariableEditor(
 					PatternBuilder.this.owlEditorKit, cs)
 					: new VariableEditor(PatternBuilder.this.owlEditorKit, cs);
-			variableEditor.setVariable(getVariable());
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					variableEditor) {
-				private static final long serialVersionUID = 7816306100172449202L;
-
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
+			variableEditor.setVariable(this.getVariable());
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					variableEditor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
@@ -693,7 +660,7 @@ public class PatternBuilder extends
 					variableEditor
 							.removeStatusChangedListener(verificationListener);
 					variableEditor.dispose();
-					handleChange();
+					PatternBuilder.this.handleChange();
 				}
 			});
 			dlg.setVisible(true);
@@ -705,26 +672,30 @@ public class PatternBuilder extends
 	 */
 	private static final long serialVersionUID = -4071865934355642992L;
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
-	private OWLEditorKit owlEditorKit;
-	private PatternModel patternModel = null;
+	protected OWLEditorKit owlEditorKit;
+	protected PatternModel patternModel = null;
 	private JPanel mainPanel = new JPanel();
 	private PatternVariableList variableList;
 	private ActionList actionList;
 	// private ExpressionEditor<String> nameEditor;
-	private final JTextField nameEditor = new JTextField();
-	private JTextField rendering = new JTextField();
+	protected final JTextField nameEditor = new JTextField();
+	protected JTextField rendering = new JTextField();
 	private JCheckBox allowReturnValueCheckBox;
 	private final DefaultComboBoxModel returnValueListModel = new DefaultComboBoxModel();
 	private final JComboBox returnValuesComboBox = new JComboBox(
 			this.returnValueListModel);
 	// private PatternConstraintSystem constraintSystem = PatternParser
 	// .getPatternModelFactory().createConstraintSystem();
-	private PatternBuilderModel patternBuilderModel = new PatternBuilderModel();
+	protected final PatternBuilderModel patternBuilderModel;
 	private final JPanel errorPanel = new JPanel(new BorderLayout());
-	private final DefaultListModel errorListModel = new DefaultListModel();
+	protected final DefaultListModel errorListModel = new DefaultListModel();
 	private final JList errorList = new JList(this.errorListModel);
+	private final AbstractPatternModelFactory factory;
 
-	public PatternBuilder(OWLEditorKit owlEditorKit) {
+	public PatternBuilder(OWLEditorKit owlEditorKit,
+			AbstractPatternModelFactory f) {
+		this.factory = f;
+		this.patternBuilderModel = new PatternBuilderModel(this.factory);
 		this.mainPanel.setLayout(new BorderLayout());
 		this.mainPanel.setName("Pattern Builder");
 		this.errorPanel.setBorder(ComponentFactory
@@ -759,7 +730,7 @@ public class PatternBuilder extends
 		patternNamePanel.setBorder(ComponentFactory
 				.createTitledBorder("Pattern name"));
 		builderPanel.add(patternNamePanel, BorderLayout.NORTH);
-		removeKeyListeners();
+		this.removeKeyListeners();
 		JPanel patternBodyPanel = new JPanel(new BorderLayout());
 		this.variableList = new PatternVariableList(this.owlEditorKit);
 		this.actionList = new PatternBuilderActionList();
@@ -840,12 +811,12 @@ public class PatternBuilder extends
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		notifyListener(listener, this.patternBuilderModel.check());
+		this.notifyListener(listener, this.patternBuilderModel.check());
 	}
 
 	private void updateGUI() {
 		String name = this.patternBuilderModel.getName();
-		if (name.compareTo(this.nameEditor.getText()) != 0) {
+		if (!name.equals(this.nameEditor.getText())) {
 			this.nameEditor.setText(name);
 		}
 		List<Variable> variables = this.patternBuilderModel.getVariables();
@@ -878,8 +849,8 @@ public class PatternBuilder extends
 				this.returnValuesComboBox.setSelectedItem(item);
 			}
 		}
-		if (this.rendering.getText().compareTo(
-				this.patternBuilderModel.getRendering()) != 0) {
+		if (!this.rendering.getText().equals(
+				this.patternBuilderModel.getRendering())) {
 			this.rendering.setText(this.patternBuilderModel.getRendering());
 		}
 		this.mainPanel.revalidate();
@@ -906,11 +877,10 @@ public class PatternBuilder extends
 			List<OWLAxiomChange> actions = this.patternBuilderModel
 					.getActions();
 			try {
-				this.patternModel = PatternParser.getPatternModelFactory()
-						.createPatternModel(this.nameEditor.getText(),
-								variables, actions, null,
-								this.rendering.getText(),
-								this.patternBuilderModel.getConstraintSystem());
+				this.patternModel = this.factory.createPatternModel(
+						this.nameEditor.getText(), variables, actions, null,
+						this.rendering.getText(), this.patternBuilderModel
+								.getConstraintSystem());
 				if (this.allowReturnValueCheckBox.isSelected()) {
 					this.patternModel
 							.setReturnVariable(((VariableListItem) this.returnValuesComboBox
@@ -931,8 +901,8 @@ public class PatternBuilder extends
 			this.patternModel = null;
 		}
 		this.errorPanel.setVisible(!this.errorListModel.isEmpty());
-		updateGUI();
-		notifyListeners(newState);
+		this.updateGUI();
+		this.notifyListeners(newState);
 	}
 
 	/**
@@ -940,7 +910,7 @@ public class PatternBuilder extends
 	 */
 	private void notifyListeners(boolean newState) {
 		for (InputVerificationStatusChangedListener listener : this.listeners) {
-			notifyListener(listener, newState);
+			this.notifyListener(listener, newState);
 		}
 	}
 
@@ -972,7 +942,7 @@ public class PatternBuilder extends
 	 *            the patternModel to set
 	 */
 	public void setPatternModel(PatternModel patternModel) {
-		clear();
+		this.clear();
 		this.patternBuilderModel.importPatternModel(patternModel);
 	}
 

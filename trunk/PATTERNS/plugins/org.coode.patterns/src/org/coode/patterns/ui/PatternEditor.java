@@ -32,6 +32,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import org.coode.oppl.utils.ArgCheck;
+import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.PatternModel;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
@@ -48,12 +50,13 @@ public class PatternEditor extends
 		VerifiedInputEditor, ChangeListener {
 	private final JTabbedPane mainPanel = new JTabbedPane();
 	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
-	private final PatternBuilder patternBuilder;
+	protected final PatternBuilder patternBuilder;
 	private final TypeInPatternBuilder patternTextEditor;
-	private PatternModel patternModel = null;
+	protected PatternModel patternModel = null;
 
-	public PatternEditor(OWLEditorKit owlEditorKit) {
-		this.patternBuilder = new PatternBuilder(owlEditorKit);
+	public PatternEditor(OWLEditorKit owlEditorKit,
+			AbstractPatternModelFactory f) {
+		this.patternBuilder = new PatternBuilder(owlEditorKit, f);
 		this.patternTextEditor = new TypeInPatternBuilder(owlEditorKit);
 		this.patternBuilder
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
@@ -78,12 +81,12 @@ public class PatternEditor extends
 					}
 				});
 		this.mainPanel.addChangeListener(this);
-		this.initGUI();
+		initGUI();
 	}
 
 	protected void handleChange() {
 		boolean newState = this.patternModel != null;
-		this.notifyListeners(newState);
+		notifyListeners(newState);
 	}
 
 	private void notifyListeners(boolean newState) {
@@ -93,7 +96,7 @@ public class PatternEditor extends
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void initGUI() {
 		this.mainPanel.add(this.patternBuilder.getEditorComponent());
@@ -107,9 +110,7 @@ public class PatternEditor extends
 	 */
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		if (listener == null) {
-			throw new NullPointerException("The listener cannot be null");
-		}
+		ArgCheck.checkNullArgument("The listener", listener);
 		listener.verifiedStatusChanged(this.patternModel != null);
 		this.listeners.add(listener);
 	}

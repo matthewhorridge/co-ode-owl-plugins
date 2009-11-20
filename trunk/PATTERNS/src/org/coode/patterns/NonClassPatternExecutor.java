@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.coode.oppl.ActionType;
 import org.coode.oppl.ChangeExtractor;
@@ -44,32 +45,35 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 public class NonClassPatternExecutor extends ChangeExtractor {
 	private InstantiatedPatternModel instantiatedPatternModel;
 	private URI annotationURI;
+	private OWLOntology ontology;
+	private OWLOntologyManager ontologyManager;
 
 	public NonClassPatternExecutor(
 			InstantiatedPatternModel instantiatedPatternModel,
 			OWLOntology ontology, OWLOntologyManager ontologyManager,
 			URI annotationURI) {
-		super(ontology, ontologyManager, instantiatedPatternModel
-				.getConstraintSystem(), true);
+		super(instantiatedPatternModel.getConstraintSystem(), true);
 		this.instantiatedPatternModel = instantiatedPatternModel;
 		this.annotationURI = annotationURI;
+		this.ontology = ontology;
+		this.ontologyManager = ontologyManager;
 	}
 
 	@Override
 	public List<OWLAxiomChange> visitActions(List<OWLAxiomChange> changes,
-			List<OWLAxiomChange> p) {
-		p = new ArrayList<OWLAxiomChange>(changes.size());
+			List<OWLAxiomChange> p1) {
+		Set<OWLAxiomChange> p = new HashSet<OWLAxiomChange>(changes.size());
 		for (OWLAxiomChange axiomChange : changes) {
 			ActionType actionType = axiomChange instanceof AddAxiom ? ActionType.ADD
 					: ActionType.REMOVE;
 			OWLAxiom axiom = axiomChange.getAxiom();
 			Collection<? extends OWLAxiomChange> createdChanges = PatternActionFactory
 					.createChange(actionType, axiom,
-							this.instantiatedPatternModel, this
-									.getOntologyManager().getOWLDataFactory(),
-							this.annotationURI, this.getOntology());
+							this.instantiatedPatternModel, this.ontologyManager
+									.getOWLDataFactory(), this.annotationURI,
+							this.ontology);
 			p.addAll(createdChanges);
 		}
-		return new ArrayList<OWLAxiomChange>(new HashSet<OWLAxiomChange>(p));
+		return new ArrayList<OWLAxiomChange>(p);
 	}
 }

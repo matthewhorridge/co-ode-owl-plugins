@@ -22,16 +22,18 @@
  */
 package org.coode.patterns.syntax;
 
+import org.coode.oppl.OPPLAbstractFactory;
 import org.coode.oppl.entity.OWLEntityCreationException;
 import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityFactory;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.patterns.PatternException;
 import org.coode.patterns.PatternSignature;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLOntologyChangeException;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -39,54 +41,53 @@ import org.semanticweb.owl.model.OWLOntologyChangeException;
  *         Sep 29, 2008
  */
 public class PatternParserUtils {
-	public static String create(String toCreate, int i,
-			PatternSignature signature) throws PatternException,
-			OWLEntityCreationException, OWLOntologyChangeException {
+	public static String create(OWLOntologyManager manager, String toCreate,
+			int i, PatternSignature signature, OPPLAbstractFactory factory)
+			throws PatternException, OWLEntityCreationException,
+			OWLOntologyChangeException {
 		VariableType ithVariableType = signature.getIthVariableType(i);
-		OWLEntityFactory entityFactory = OPPLParser.getOPPLFactory()
-				.getOWLEntityFactory();
+		OWLEntityFactory entityFactory = factory.getOWLEntityFactory();
 		OWLEntity createdEntity = null;
-		OWLEntityChecker entityChecker = OPPLParser.getOPPLFactory()
-				.getOWLEntityChecker();
+		OWLEntityChecker entityChecker = factory.getOWLEntityChecker();
 		OWLEntityCreationSet<? extends OWLEntity> owlCreationSet = null;
 		switch (ithVariableType) {
-		case CLASS:
-			createdEntity = entityChecker.getOWLClass(toCreate);
-			if (createdEntity == null) {
-				owlCreationSet = entityFactory.createOWLClass(toCreate, null);
-			}
-			break;
-		case OBJECTPROPERTY:
-			createdEntity = entityChecker.getOWLObjectProperty(toCreate);
-			if (createdEntity == null) {
-				owlCreationSet = entityFactory.createOWLObjectProperty(
-						toCreate, null);
-			}
-			break;
-		case DATAPROPERTY:
-			createdEntity = entityChecker.getOWLDataProperty(toCreate);
-			if (createdEntity == null) {
-				owlCreationSet = entityFactory.createOWLDataProperty(toCreate,
-						null);
-			}
-			break;
-		case INDIVIDUAL:
-			createdEntity = entityChecker.getOWLIndividual(toCreate);
-			if (createdEntity == null) {
-				owlCreationSet = entityFactory.createOWLIndividual(toCreate,
-						null);
-			}
-			break;
-		default:
-			break;
+			case CLASS:
+				createdEntity = entityChecker.getOWLClass(toCreate);
+				if (createdEntity == null) {
+					owlCreationSet = entityFactory.createOWLClass(toCreate,
+							null);
+				}
+				break;
+			case OBJECTPROPERTY:
+				createdEntity = entityChecker.getOWLObjectProperty(toCreate);
+				if (createdEntity == null) {
+					owlCreationSet = entityFactory.createOWLObjectProperty(
+							toCreate, null);
+				}
+				break;
+			case DATAPROPERTY:
+				createdEntity = entityChecker.getOWLDataProperty(toCreate);
+				if (createdEntity == null) {
+					owlCreationSet = entityFactory.createOWLDataProperty(
+							toCreate, null);
+				}
+				break;
+			case INDIVIDUAL:
+				createdEntity = entityChecker.getOWLIndividual(toCreate);
+				if (createdEntity == null) {
+					owlCreationSet = entityFactory.createOWLIndividual(
+							toCreate, null);
+				}
+				break;
+			default:
+				break;
 		}
 		if (owlCreationSet != null) {
-			PatternParser.getOWLOntologyManager().applyChanges(
-					owlCreationSet.getOntologyChanges());
+			manager.applyChanges(owlCreationSet.getOntologyChanges());
 			createdEntity = owlCreationSet.getOWLEntity();
 		}
-		return createdEntity != null ? OPPLParser.getOPPLFactory()
-				.getOWLEntityRenderer(
+		return createdEntity != null ? ParserFactory.getInstance()
+				.getOPPLFactory().getOWLEntityRenderer(
 						signature.getPattern().getConstraintSystem()).render(
 						createdEntity) : null;
 	}

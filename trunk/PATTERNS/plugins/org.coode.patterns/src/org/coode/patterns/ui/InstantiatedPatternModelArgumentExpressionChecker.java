@@ -31,7 +31,7 @@ import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
 /**
  * @author Luigi Iannone
  * 
- * Sep 18, 2008
+ *         Sep 18, 2008
  */
 public class InstantiatedPatternModelArgumentExpressionChecker implements
 		OWLExpressionChecker<InstantiatedPatternModel> {

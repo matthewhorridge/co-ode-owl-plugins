@@ -25,7 +25,7 @@ package org.coode.patterns;
 /**
  * @author Luigi Iannone
  * 
- * Jun 16, 2008
+ *         Jun 16, 2008
  */
 public interface PatternModelChangeListener {
 	void handleChange();

@@ -25,7 +25,7 @@ package org.coode.patterns;
 /**
  * @author Luigi Iannone
  * 
- * Jul 15, 2008
+ *         Jul 15, 2008
  */
 public class ArgumentIndexOutOfBoundsException extends PatternException {
 	/**

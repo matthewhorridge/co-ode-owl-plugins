@@ -38,7 +38,7 @@ import org.semanticweb.owl.model.OWLOntology;
  * 
  * @author Luigi Iannone
  * 
- * Sep 25, 2008
+ *         Sep 25, 2008
  */
 public interface PatternOPPLScript extends OPPLScript {
 	/**

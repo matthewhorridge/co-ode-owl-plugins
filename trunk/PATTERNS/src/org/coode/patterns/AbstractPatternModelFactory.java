@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.coode.oppl.OPPLScript;
+import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.OWLAxiomChange;
@@ -107,6 +108,10 @@ public interface AbstractPatternModelFactory {
 	 * @param constraintSystem
 	 */
 	void initOPPLParser(String string);
+
+	OPPLParser getOPPLParser();
+
+	void setOPPLParser(OPPLParser parser);
 
 	ManchesterOWLSyntaxObjectRenderer getRenderer(
 			PatternConstraintSystem patternConstraintSystem, StringWriter writer);

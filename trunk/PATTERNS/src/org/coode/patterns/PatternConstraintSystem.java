@@ -39,6 +39,7 @@ import org.coode.oppl.variablemansyntax.generated.AbstractCollectionGeneratedVal
 import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.semanticweb.owl.inference.OWLReasoner;
+import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -54,12 +55,34 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	private Map<String, GeneratedVariable<?>> specialVariables = new HashMap<String, GeneratedVariable<?>>();
 	private final ConstraintSystem constraintSystem;
 	private Map<String, String> specialVariableRenderings = new HashMap<String, String>();
+	private final AbstractPatternModelFactory factory;
 
 	public PatternConstraintSystem(ConstraintSystem cs,
-			OWLOntologyManager ontologyManager) {
-		super(cs.getOntology(), ontologyManager, cs.getReasoner());
+			OWLOntologyManager ontologyManager, AbstractPatternModelFactory f) {
+		super(cs.getOntology(), ontologyManager);
+		try {
+			this.setReasoner(cs.getReasoner());
+		} catch (OWLReasonerException e) {
+			e.printStackTrace();
+		}
 		this.constraintSystem = cs;
-		init();
+		this.factory = f;
+		this.init();
+	}
+
+	// public PatternConstraintSystem(OWLOntology ontology,
+	// OWLOntologyManager ontologyManager) {
+	// this(new ConstraintSystem(ontology, ontologyManager), ontologyManager);
+	// }
+	/**
+	 * @param ontologyManager
+	 * @param reasoner
+	 */
+	public PatternConstraintSystem(OWLOntology ontology,
+			OWLOntologyManager ontologyManager, OWLReasoner reasoner,
+			AbstractPatternModelFactory f) {
+		this(new ConstraintSystem(ontology, ontologyManager, reasoner),
+				ontologyManager, f);
 	}
 
 	@Override
@@ -68,31 +91,12 @@ public class PatternConstraintSystem extends ConstraintSystem {
 		return this.constraintSystem.createVariable(name, type);
 	}
 
-	/**
-	 * @param ontologyManager
-	 * @param reasoner
-	 */
-	public PatternConstraintSystem(OWLOntology ontology,
-			OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
-		super(ontology, ontologyManager, reasoner);
-		this.constraintSystem = new ConstraintSystem(ontology, ontologyManager,
-				reasoner);
-		init();
-	}
-
 	private void init() {
 		PatternConstant<OWLClass> patternConstant = new PatternConstant<OWLClass>(
 				THIS_CLASS_VARIABLE_NAME, VariableType.CLASS,
-				this.constraintSystem.getDataFactory());
-		createSpecialVariable(patternConstant.getName(),
+				this.constraintSystem.getOntologyManager().getOWLDataFactory());
+		this.createSpecialVariable(patternConstant.getName(),
 				THIS_CLASS_VARIABLE_CONSTANT_SYMBOL, patternConstant);
-	}
-
-	public PatternConstraintSystem(OWLOntology ontology,
-			OWLOntologyManager ontologyManager) {
-		super(ontology, ontologyManager);
-		this.constraintSystem = new ConstraintSystem(ontology, ontologyManager);
-		init();
 	}
 
 	public Variable getThisClassVariable() {
@@ -110,11 +114,11 @@ public class PatternConstraintSystem extends ConstraintSystem {
 			while (!found && it.hasNext()) {
 				String referenceName = it.next();
 				specialVariable = this.specialVariables.get(referenceName);
-				found = referenceName.compareTo(name) == 0
+				found = referenceName.equals(name)
 						|| this.specialVariableRenderings.get(specialVariable
 								.getName()) != null
 						&& this.specialVariableRenderings.get(
-								specialVariable.getName()).compareTo(name) == 0;
+								specialVariable.getName()).equals(name);
 			}
 			if (found) {
 				variable = specialVariable;
@@ -127,7 +131,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	public Variable getVariable(URI uri) {
 		Variable variable = this.constraintSystem.getVariable(uri);
 		if (variable == null) {
-			variable = getSpecialVariable(uri);
+			variable = this.getSpecialVariable(uri);
 		}
 		return variable;
 	}
@@ -196,13 +200,13 @@ public class PatternConstraintSystem extends ConstraintSystem {
 		PatternReferenceGeneratedVariable patternReferenceGeneratedVariable = new PatternReferenceGeneratedVariable(
 				variableType, PatternReferenceGeneratedVariable
 						.getPatternReferenceGeneratedValue(patternReference));
-		createSpecialVariable(patternReferenceGeneratedVariable.getName(),
+		this.createSpecialVariable(patternReferenceGeneratedVariable.getName(),
 				patternReference.toString(), patternReferenceGeneratedVariable);
 		List<Variable> referenceVariables = patternReference
 				.getExtractedPattern().getVariables();
 		for (Variable variable : referenceVariables) {
 			if (variable instanceof GeneratedVariable<?>) {
-				importVariable(variable);
+				this.importVariable(variable);
 			}
 		}
 		return patternReferenceGeneratedVariable.getName();
@@ -219,7 +223,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	}
 
 	public void instantiateThisClass(PatternConstant<OWLClass> patternConstant) {
-		createSpecialVariable(patternConstant.getName(),
+		this.createSpecialVariable(patternConstant.getName(),
 				THIS_CLASS_VARIABLE_CONSTANT_SYMBOL, patternConstant);
 	}
 
@@ -286,6 +290,10 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	@Override
 	public void clearVariables() {
 		this.constraintSystem.clearVariables();
-		init();
+		this.init();
+	}
+
+	public AbstractPatternModelFactory getPatternModelFactory() {
+		return this.factory;
 	}
 }

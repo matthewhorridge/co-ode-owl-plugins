@@ -24,6 +24,7 @@ package org.coode.patterns;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -33,7 +34,6 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.generated.AbstractGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
-import org.coode.patterns.syntax.PatternParser;
 import org.semanticweb.owl.model.OWLObject;
 
 import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
@@ -81,15 +81,13 @@ public class PatternReferenceGeneratedVariable extends
 						.getAssignmentValue(inputVariable);
 				if (assignmentValue != null) {
 					StringWriter writer = new StringWriter();
-					ManchesterOWLSyntaxObjectRenderer renderer = PatternParser
-							.getPatternModelFactory().getRenderer(
-									constraintSystem, writer);
+					ManchesterOWLSyntaxObjectRenderer renderer = this.patternReference
+							.getConstraintSystem().getPatternModelFactory()
+							.getRenderer(constraintSystem, writer);
 					assignmentValue.accept(renderer);
-					newArguments.add(new ArrayList<String>(Collections
-							.singleton(writer.toString())));
+					newArguments.add(Arrays.asList(writer.toString()));
 				} else {
-					newArguments.add(new ArrayList<String>(Collections
-							.singleton(inputVariable.getName())));
+					newArguments.add(Arrays.asList(inputVariable.getName()));
 				}
 			}
 			try {

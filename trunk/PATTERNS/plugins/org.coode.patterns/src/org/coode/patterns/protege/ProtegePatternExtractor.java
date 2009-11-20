@@ -33,7 +33,7 @@ import org.semanticweb.owl.model.OWLConstantAnnotation;
 /**
  * @author Luigi Iannone
  * 
- * Jun 9, 2008
+ *         Jun 9, 2008
  */
 public class ProtegePatternExtractor extends PatternExtractor {
 	private OWLModelManager owlModelManager;
@@ -53,11 +53,11 @@ public class ProtegePatternExtractor extends PatternExtractor {
 
 	@Override
 	protected PatternParser initParser(String value) {
-		PatternParser parser = ParserFactory.initParser(value,
+		PatternParser parser = ParserFactory.initProtegeParser(value,
 				this.owlModelManager);
-		parser.setVisited(this.getVisitedPatternNames());
-		PatternParser.setPatternModelFactory(new ProtegePatternModelFactory(
-				this.owlModelManager));
+		parser.setVisited(getVisitedPatternNames());
+		// parser.setPatternModelFactory(new ProtegePatternModelFactory(
+		// this.owlModelManager));
 		return parser;
 	}
 }

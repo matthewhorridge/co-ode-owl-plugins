@@ -29,10 +29,10 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
+import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.PatternManager;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.protege.ProtegePatternModelFactory;
-import org.coode.patterns.syntax.PatternParser;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.ui.framelist.OWLFrameList2;
 import org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent;
@@ -47,7 +47,7 @@ public class ClassPatternView extends AbstractOWLClassViewComponent {
 	private JScrollPane listPane = null;
 	private PatternManager patternManager;
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 4660000035200458342L;
 
@@ -56,11 +56,13 @@ public class ClassPatternView extends AbstractOWLClassViewComponent {
 	 */
 	@Override
 	public void initialiseClassView() throws Exception {
-		this.setLayout(new BorderLayout());
-		this.list = new OWLFrameList2<OWLClass>(this.getOWLEditorKit(),
-				new PatternClassFrame(this.getOWLEditorKit())) {
+		setLayout(new BorderLayout());
+		AbstractPatternModelFactory f = new ProtegePatternModelFactory(
+				getOWLModelManager());
+		this.list = new OWLFrameList2<OWLClass>(getOWLEditorKit(),
+				new PatternClassFrame(getOWLEditorKit(), f)) {
 			/**
-			* 
+			*
 			*/
 			private static final long serialVersionUID = 1068899822314449303L;
 
@@ -100,14 +102,14 @@ public class ClassPatternView extends AbstractOWLClassViewComponent {
 				return toReturn;
 			}
 		};
-		this.list.setCellRenderer(new PatternCellRenderer(this
-				.getOWLEditorKit()));
+		this.list
+				.setCellRenderer(new PatternCellRenderer(getOWLEditorKit(), f));
 		this.listPane = ComponentFactory.createScrollPane(this.list);
-		PatternParser.setPatternModelFactory(new ProtegePatternModelFactory(
-				this.getOWLModelManager()));
-		this.patternManager = PatternManager.getInstance(this.getOWLEditorKit()
-				.getModelManager().getOWLOntologyManager());
-		this.getOWLEditorKit().getModelManager().addOntologyChangeListener(
+		// PatternParser.setPatternModelFactory(new ProtegePatternModelFactory(
+		// this.getOWLModelManager()));
+		this.patternManager = PatternManager.getInstance(getOWLEditorKit()
+				.getModelManager().getOWLOntologyManager(), f);
+		getOWLEditorKit().getModelManager().addOntologyChangeListener(
 				this.patternManager);
 		this.add(this.listPane);
 	}
@@ -121,8 +123,8 @@ public class ClassPatternView extends AbstractOWLClassViewComponent {
 			this.list.dispose();
 		}
 		if (this.patternManager != null) {
-			this.getOWLEditorKit().getModelManager()
-					.removeOntologyChangeListener(this.patternManager);
+			getOWLEditorKit().getModelManager().removeOntologyChangeListener(
+					this.patternManager);
 		}
 	}
 
