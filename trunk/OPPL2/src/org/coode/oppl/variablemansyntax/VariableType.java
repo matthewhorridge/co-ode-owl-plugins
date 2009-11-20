@@ -22,8 +22,8 @@
  */
 package org.coode.oppl.variablemansyntax;
 
+import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.VariableScopes.Direction;
@@ -45,67 +45,44 @@ import org.semanticweb.owl.model.OWLOntology;
  */
 @SuppressWarnings("unused")
 public enum VariableType implements OWLEntityVisitorEx<VariableType> {
-	CLASS("CLASS") {
-		@Override
-		public EnumSet<Direction> getAllowedDirections() {
-			return EnumSet.of(Direction.SUBCLASSOF, Direction.SUBCLASSOF);
-		}
-
+	CLASS("CLASS", EnumSet.of(Direction.SUBCLASSOF, Direction.SUPERCLASSOF)) {
 		@Override
 		public Set<OWLClass> getReferencedValues(OWLOntology ontology) {
 			return ontology.getReferencedClasses();
 		}
 	},
-	DATAPROPERTY("DATAPROPERTY") {
-		@Override
-		public EnumSet<Direction> getAllowedDirections() {
-			return EnumSet.of(Direction.SUBPROPERTYOF,
-					Direction.SUPERPROPERTYOF);
-		}
-
+	DATAPROPERTY("DATAPROPERTY", EnumSet.of(Direction.SUBPROPERTYOF,
+			Direction.SUPERPROPERTYOF)) {
 		@Override
 		public Set<OWLDataProperty> getReferencedValues(OWLOntology ontology) {
 			return ontology.getReferencedDataProperties();
 		}
 	},
-	OBJECTPROPERTY("OBJECTPROPERTY") {
-		@Override
-		public EnumSet<Direction> getAllowedDirections() {
-			return EnumSet.of(Direction.SUBPROPERTYOF,
-					Direction.SUPERPROPERTYOF);
-		}
-
+	OBJECTPROPERTY("OBJECTPROPERTY", EnumSet.of(Direction.SUBPROPERTYOF,
+			Direction.SUPERPROPERTYOF)) {
 		@Override
 		public Set<OWLObjectProperty> getReferencedValues(OWLOntology ontology) {
 			return ontology.getReferencedObjectProperties();
 		}
 	},
-	INDIVIDUAL("INDIVIDUAL") {
-		@Override
-		public EnumSet<Direction> getAllowedDirections() {
-			return EnumSet.of(Direction.INSTANCEOF);
-		}
-
+	INDIVIDUAL("INDIVIDUAL", EnumSet.of(Direction.INSTANCEOF)) {
 		@Override
 		public Set<OWLIndividual> getReferencedValues(OWLOntology ontology) {
 			return ontology.getReferencedIndividuals();
 		}
 	},
-	CONSTANT("CONSTANT") {
-		@Override
-		public EnumSet<Direction> getAllowedDirections() {
-			return EnumSet.noneOf(Direction.class);
-		}
-
+	CONSTANT("CONSTANT", EnumSet.noneOf(Direction.class)) {
 		@Override
 		public Set<OWLConstant> getReferencedValues(OWLOntology ontology) {
-			return new HashSet<OWLConstant>();
+			return Collections.emptySet();
 		}
 	};
-	private String rendering;
+	private final String rendering;
+	private final EnumSet<Direction> allowedDirections;
 
-	private VariableType(String rendering) {
+	private VariableType(String rendering, EnumSet<Direction> directions) {
 		this.rendering = rendering;
+		this.allowedDirections = directions;
 	}
 
 	@Override
@@ -113,7 +90,9 @@ public enum VariableType implements OWLEntityVisitorEx<VariableType> {
 		return this.rendering;
 	}
 
-	public abstract EnumSet<Direction> getAllowedDirections();
+	public EnumSet<Direction> getAllowedDirections() {
+		return this.allowedDirections;
+	}
 
 	public abstract Set<? extends OWLObject> getReferencedValues(
 			OWLOntology ontology);
@@ -122,20 +101,28 @@ public enum VariableType implements OWLEntityVisitorEx<VariableType> {
 		return visitor.visit(this);
 	}
 
-	public static VariableType getVariableType(String rendering) {
-		VariableType toReturn = null;
-		if (rendering.equals(CLASS.rendering)) {
-			toReturn = CLASS;
-		} else if (rendering.equals(OBJECTPROPERTY.rendering)) {
-			toReturn = OBJECTPROPERTY;
-		} else if (rendering.equals(DATAPROPERTY.rendering)) {
-			toReturn = DATAPROPERTY;
-		} else if (rendering.equals(INDIVIDUAL.rendering)) {
-			toReturn = INDIVIDUAL;
-		} else if (rendering.equals(CONSTANT.rendering)) {
-			toReturn = CONSTANT;
+	// public static VariableType getVariableType(String rendering) {
+	// VariableType toReturn = null;
+	// if (rendering.equals(CLASS.rendering)) {
+	// toReturn = CLASS;
+	// } else if (rendering.equals(OBJECTPROPERTY.rendering)) {
+	// toReturn = OBJECTPROPERTY;
+	// } else if (rendering.equals(DATAPROPERTY.rendering)) {
+	// toReturn = DATAPROPERTY;
+	// } else if (rendering.equals(INDIVIDUAL.rendering)) {
+	// toReturn = INDIVIDUAL;
+	// } else if (rendering.equals(CONSTANT.rendering)) {
+	// toReturn = CONSTANT;
+	// }
+	// return toReturn;
+	// }
+	public static VariableType valueOfIgnoreCase(String s) {
+		for (VariableType t : values()) {
+			if (t.rendering.equalsIgnoreCase(s.trim())) {
+				return t;
+			}
 		}
-		return toReturn;
+		return null;
 	}
 
 	public boolean isCompatibleWith(OWLObject o) {
@@ -149,7 +136,7 @@ public enum VariableType implements OWLEntityVisitorEx<VariableType> {
 	}
 
 	protected boolean isCompatibleWith(OWLConstant constant) {
-		return equals(CONSTANT);
+		return this.equals(CONSTANT);
 	}
 
 	public VariableType visit(OWLClass owlClass) {

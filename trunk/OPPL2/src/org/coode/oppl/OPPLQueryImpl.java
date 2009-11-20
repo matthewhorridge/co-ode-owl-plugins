@@ -33,7 +33,7 @@ import java.util.logging.Level;
 import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.log.Logging;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.protege.editor.owl.model.inference.NoOpReasoner;
@@ -163,8 +163,9 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 		boolean first = true;
 		for (OWLAxiom axiom : this.getAssertedAxioms()) {
 			String commaString = first ? "ASSERTED " : ",\nASSERTED ";
-			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
-					.getManchesterSyntaxRenderer(this.constraintSystem);
+			ManchesterSyntaxRenderer renderer = ParserFactory.getInstance()
+					.getOPPLFactory().getManchesterSyntaxRenderer(
+							this.constraintSystem);
 			buffer.append(commaString);
 			first = false;
 			axiom.accept(renderer);
@@ -173,8 +174,9 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 		}
 		for (OWLAxiom axiom : this.getAxioms()) {
 			String commaString = first ? "" : ",\n ";
-			ManchesterSyntaxRenderer renderer = OPPLParser.getOPPLFactory()
-					.getManchesterSyntaxRenderer(this.constraintSystem);
+			ManchesterSyntaxRenderer renderer = ParserFactory.getInstance()
+					.getOPPLFactory().getManchesterSyntaxRenderer(
+							this.constraintSystem);
 			buffer.append(commaString);
 			first = false;
 			axiom.accept(renderer);
@@ -280,12 +282,10 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 	 */
 	private void doExecute() throws OWLReasonerException {
 		this.getConstraintSystem().reset();
-		List<OWLAxiom> axioms = this.getAssertedAxioms();
-		for (OWLAxiom axiom : axioms) {
+		for (OWLAxiom axiom : this.getAssertedAxioms()) {
 			this.matchAssertedAxiom(axiom);
 		}
-		axioms = this.getAxioms();
-		for (OWLAxiom axiom : axioms) {
+		for (OWLAxiom axiom : this.getAxioms()) {
 			this.matchAxiom(axiom);
 		}
 		for (AbstractConstraint c : this.getConstraints()) {

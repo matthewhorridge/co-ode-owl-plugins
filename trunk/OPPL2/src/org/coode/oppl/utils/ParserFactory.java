@@ -54,12 +54,16 @@ public class ParserFactory {
 			parser = new OPPLParser(new StringReader(formulaBody),
 					ontologyManager, ontology, reasoner);
 		} else {
-			OPPLParser.ReInit(new StringReader(formulaBody), ontologyManager,
+			parser.ReInit(new StringReader(formulaBody), ontologyManager,
 					ontology, reasoner);
 		}
-		OPPLParser.setOPPLFactory(new OPPLFactory(ontologyManager, ontology,
+		parser.setOPPLFactory(new OPPLFactory(ontologyManager, ontology,
 				reasoner));
-		OPPLParser.setOPPLScriptValidator(validator);
+		parser.setOPPLScriptValidator(validator);
+		return parser;
+	}
+
+	public static synchronized OPPLParser getInstance() {
 		return parser;
 	}
 }

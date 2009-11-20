@@ -49,23 +49,24 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 		@Override
 		protected OWLObjectUnionOf generateObject(
 				Collection<OWLClass> generatedValue) {
-			return generatedValue == null ? null : getDataFactory()
+			return generatedValue == null ? null : this.getDataFactory()
 					.getOWLObjectUnionOf(new HashSet<OWLClass>(generatedValue));
 		}
 
 		@Override
 		public String toString() {
-			return getName() + ":" + getType() + " = " + this.getOPPLFunction();
+			return this.getName() + ":" + this.getType() + " = "
+					+ this.getOPPLFunction();
 		}
 
 		@Override
 		protected AbstractGeneratedVariable<Collection<OWLClass>> replace(
 				GeneratedValue<Collection<OWLClass>> value1) {
-			return replaceValue(true, value1);
+			return this.replaceValue(true, value1);
 		}
 
 		public String getOPPLFunction() {
-			return "createUnion(" + getValue().toString() + ")";
+			return "createUnion(" + this.getValue().toString() + ")";
 		}
 	}
 
@@ -80,24 +81,25 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 		@Override
 		protected OWLObjectIntersectionOf generateObject(
 				Collection<OWLClass> generatedValue) {
-			return generatedValue == null ? null : getDataFactory()
+			return generatedValue == null ? null : this.getDataFactory()
 					.getOWLObjectIntersectionOf(
 							new HashSet<OWLClass>(generatedValue));
 		}
 
 		@Override
 		public String toString() {
-			return getName() + ":" + getType() + " = " + this.getOPPLFunction();
+			return this.getName() + ":" + this.getType() + " = "
+					+ this.getOPPLFunction();
 		}
 
 		@Override
 		protected AbstractGeneratedVariable<Collection<OWLClass>> replace(
 				GeneratedValue<Collection<OWLClass>> value1) {
-			return replaceValue(false, value1);
+			return this.replaceValue(false, value1);
 		}
 
 		public String getOPPLFunction() {
-			return "createIntersection(" + getValue().toString() + ")";
+			return "createIntersection(" + this.getValue().toString() + ")";
 		}
 	}
 
@@ -135,9 +137,12 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 	}
 
 	protected AbstractGeneratedVariable<Collection<OWLClass>> replaceValue(
-			boolean isUnion, GeneratedValue<Collection<OWLClass>> value) {
-		return isUnion ? getDisjunction(getName(), getType(), value, this
-				.getDataFactory()) : getConjunction(getName(), getType(),
-				value, this.getDataFactory());
+			boolean isUnion, GeneratedValue<Collection<OWLClass>> v) {
+		if (isUnion) {
+			return getDisjunction(this.getName(), this.getType(), v,
+					this.dataFactory);
+		}
+		return getConjunction(this.getName(), this.getType(), v,
+				this.dataFactory);
 	}
 }

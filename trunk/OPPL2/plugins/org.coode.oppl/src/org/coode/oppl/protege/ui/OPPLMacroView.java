@@ -46,11 +46,11 @@ import javax.swing.event.ListDataListener;
 
 import org.coode.oppl.protege.ProtegeOPPLFactory;
 import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.OWLObjectAbstractor;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
@@ -98,7 +98,8 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 		this.constraintSystem = new ConstraintSystem(getOWLModelManager()
 				.getActiveOntology(), getOWLModelManager()
 				.getOWLOntologyManager());
-		OPPLParser.setOPPLFactory(new ProtegeOPPLFactory(getOWLModelManager()));
+		ParserFactory.getInstance().setOPPLFactory(
+				new ProtegeOPPLFactory(getOWLModelManager()));
 		setLayout(new BorderLayout());
 		this.recordedActions = new ActionList(getOWLEditorKit(),
 				this.constraintSystem, false);

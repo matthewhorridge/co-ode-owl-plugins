@@ -13,7 +13,6 @@ import junit.framework.TestCase;
 import org.coode.oppl.ChangeExtractor;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.log.Logging;
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
@@ -49,9 +48,8 @@ public class SpecificQueriesTest extends TestCase {
 					.loadOntology(new PhysicalURIInputSource(skeletonURI));
 			OWLOntology exportOntology = ontologyManager
 					.loadOntology(new PhysicalURIInputSource(exportURI));
-			ParserFactory.initParser(opplString, exportOntology,
-					ontologyManager, null);
-			OPPLScript opplScript = OPPLParser.Start();
+			OPPLScript opplScript = this.parsescript(opplString,
+					ontologyManager, exportOntology);
 			ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
 					.getConstraintSystem(), true);
 			List<OWLAxiomChange> changes = opplScript.accept(changeExtractor);
@@ -86,6 +84,14 @@ public class SpecificQueriesTest extends TestCase {
 		}
 	}
 
+	private OPPLScript parsescript(String opplString,
+			OWLOntologyManager ontologyManager, OWLOntology exportOntology)
+			throws ParseException {
+		OPPLScript opplScript = ParserFactory.initParser(opplString,
+				exportOntology, ontologyManager, null).Start();
+		return opplScript;
+	}
+
 	private Set<BindingNode> getMBTExportRedundantContentComponentLeaves(
 			Variable x, OWLOntologyManager manager) {
 		Set<BindingNode> toReturn = new HashSet<BindingNode>();
@@ -118,9 +124,8 @@ public class SpecificQueriesTest extends TestCase {
 					.loadOntology(new PhysicalURIInputSource(skeletonURI));
 			OWLOntology exportOntology = ontologyManager
 					.loadOntology(new PhysicalURIInputSource(exportURI));
-			ParserFactory.initParser(opplString, exportOntology,
-					ontologyManager, null);
-			OPPLScript opplScript = OPPLParser.Start();
+			OPPLScript opplScript = this.parsescript(opplString,
+					ontologyManager, exportOntology);
 			ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
 					.getConstraintSystem(), true);
 			List<OWLAxiomChange> changes = opplScript.accept(changeExtractor);
@@ -302,9 +307,8 @@ public class SpecificQueriesTest extends TestCase {
 					.loadOntology(URI
 							.create("http://www.co-ode.org/ontologies/pizza/2007/02/12/pizza.owl"));
 			String opplString = "?x:CLASS SELECT ASSERTED ?x subClassOf Pizza WHERE ?x!= NamedPizza BEGIN REMOVE ?x subClassOf NamedPizza END;";
-			ParserFactory.initParser(opplString, testOntology, ontologyManager,
-					null);
-			OPPLScript opplScript = OPPLParser.Start();
+			OPPLScript opplScript = this.parsescript(opplString,
+					ontologyManager, testOntology);
 			ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
 					.getConstraintSystem(), true);
 			List<OWLAxiomChange> changes = opplScript.accept(changeExtractor);

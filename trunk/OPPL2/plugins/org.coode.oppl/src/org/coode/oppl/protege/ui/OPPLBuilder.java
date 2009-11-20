@@ -28,8 +28,8 @@ import org.coode.oppl.OPPLScript;
 import org.coode.oppl.protege.ui.message.Error;
 import org.coode.oppl.protege.ui.message.MessageListCellRenderer;
 import org.coode.oppl.protege.ui.rendering.VariableOWLCellRenderer;
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.NamedVariableDetector;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
@@ -53,10 +53,10 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 		OWLModelManagerListener {
 	private class OPPLConstraintList extends MList {
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 4366866288573896156L;
-		private final OWLEditorKit owlEditorKit;
+		private final OWLEditorKit owlKit;
 		private final ConstraintSystem constraintSystem;
 		private final MListSectionHeader HEADER = new MListSectionHeader() {
 			public String getName() {
@@ -81,7 +81,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 				throw new NullPointerException(
 						"The constraint system cannot be null");
 			}
-			this.owlEditorKit = owlEditorKit;
+			this.owlKit = owlEditorKit;
 			this.constraintSystem = constraintSystem;
 			this.clear();
 		}
@@ -92,41 +92,25 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 				OPPLConstraintListItem item = (OPPLConstraintListItem) this
 						.getSelectedValue();
 				final OPPLConstraintEditor editor = new OPPLConstraintEditor(
-						this.owlEditorKit, this.constraintSystem);
+						this.owlKit, this.constraintSystem);
 				final AbstractConstraint oldConstraint = item.getConstraint();
 				editor.setConstraint(oldConstraint);
-				final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-						editor) {
-					/**
-				 *
-				 */
-					private static final long serialVersionUID = 7816306100172449202L;
-
-					/**
-				 *
-				 */
-					@Override
-					public void selectInitialValue() {
-						// This is overridden so that the option pane dialog
-						// default
-						// button
-						// doesn't get the focus.
-					}
-				};
+				final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+						editor);
 				final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 					public void verifiedStatusChanged(boolean verified) {
 						optionPane.setOKEnabled(verified);
 					}
 				};
 				editor.addStatusChangedListener(verificationListener);
-				final JDialog dlg = optionPane.createDialog(this.owlEditorKit
+				final JDialog dlg = optionPane.createDialog(this.owlKit
 						.getWorkspace(), null);
 				// The editor shouldn't be modal (or should it?)
 				dlg.setModal(true);
 				dlg.setTitle("Constraint editor");
 				dlg.setResizable(true);
 				dlg.pack();
-				dlg.setLocationRelativeTo(this.owlEditorKit.getWorkspace());
+				dlg.setLocationRelativeTo(this.owlKit.getWorkspace());
 				dlg.addComponentListener(new ComponentAdapter() {
 					@Override
 					public void componentHidden(ComponentEvent e) {
@@ -164,38 +148,23 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 		@Override
 		protected void handleAdd() {
 			final OPPLConstraintEditor editor = new OPPLConstraintEditor(
-					this.owlEditorKit, this.constraintSystem);
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					editor) {
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = 7816306100172449202L;
-
-				/**
-				 * 
-				 */
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
+					this.owlKit, this.constraintSystem);
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					editor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
 				}
 			};
 			editor.addStatusChangedListener(verificationListener);
-			final JDialog dlg = optionPane.createDialog(this.owlEditorKit
+			final JDialog dlg = optionPane.createDialog(this.owlKit
 					.getWorkspace(), null);
 			// The editor shouldn't be modal (or should it?)
 			dlg.setModal(true);
 			dlg.setTitle("Constraint editor");
 			dlg.setResizable(true);
 			dlg.pack();
-			dlg.setLocationRelativeTo(this.owlEditorKit.getWorkspace());
+			dlg.setLocationRelativeTo(this.owlKit.getWorkspace());
 			dlg.addComponentListener(new ComponentAdapter() {
 				@Override
 				public void componentHidden(ComponentEvent e) {
@@ -236,18 +205,8 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 				final OPPLSelectClauseEditor editor = new OPPLSelectClauseEditor(
 						this.getOwlEditorKit(), this.getConstraintSystem());
 				editor.setSelectListItem(item);
-				final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-						editor) {
-					private static final long serialVersionUID = 7816306100172449202L;
-
-					@Override
-					public void selectInitialValue() {
-						// This is overridden so that the option pane dialog
-						// default
-						// button
-						// doesn't get the focus.
-					}
-				};
+				final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+						editor);
 				final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 					public void verifiedStatusChanged(boolean verified) {
 						optionPane.setOKEnabled(verified);
@@ -316,24 +275,8 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 		protected void handleAdd() {
 			final OPPLSelectClauseEditor editor = new OPPLSelectClauseEditor(
 					this.getOwlEditorKit(), this.getConstraintSystem());
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					editor) {
-				/**
-				 *
-				 */
-				private static final long serialVersionUID = 7816306100172449202L;
-
-				/**
-				 *
-				 */
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog
-					// default
-					// button
-					// doesn't get the focus.
-				}
-			};
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					editor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
@@ -422,8 +365,8 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 		private final List<OWLAxiom> assertedQueryAxioms = new ArrayList<OWLAxiom>();
 		private final List<OWLAxiom> plainQueryAxioms = new ArrayList<OWLAxiom>();
 		private final List<AbstractConstraint> constraints = new ArrayList<AbstractConstraint>();
-		private final ConstraintSystem constraintSystem = OPPLParser
-				.getOPPLFactory().createConstraintSystem();
+		private final ConstraintSystem constraintSystem = ParserFactory
+				.getInstance().getOPPLFactory().createConstraintSystem();
 		private final List<Variable> variables = new ArrayList<Variable>();
 
 		protected void addAction(OWLAxiomChange action) {
@@ -449,8 +392,8 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 			boolean enoughActions = !this.actions.isEmpty();
 			boolean areThereMinimalElements = enoughVariables
 					&& (enoughQueries || enoughActions);
-			OPPLScript builtOPPLScript = OPPLParser.getOPPLFactory()
-					.buildOPPLScript(this.constraintSystem,
+			OPPLScript builtOPPLScript = ParserFactory.getInstance()
+					.getOPPLFactory().buildOPPLScript(this.constraintSystem,
 							this.getVariables(), this.getOPPLQuery(),
 							this.getActions());
 			if (!enoughVariables) {
@@ -474,8 +417,8 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 		}
 
 		protected OPPLQuery getOPPLQuery() {
-			OPPLQuery query = OPPLParser.getOPPLFactory().buildNewQuery(
-					this.getConstraintSystem());
+			OPPLQuery query = ParserFactory.getInstance().getOPPLFactory()
+					.buildNewQuery(this.getConstraintSystem());
 			for (OWLAxiom axiom : this.getAssertedQueryAxioms()) {
 				query.addAssertedAxiom(axiom);
 			}
@@ -701,23 +644,8 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 			final OWLAxiomChangeEditor actionEditor = new OWLAxiomChangeEditor(
 					OPPLBuilder.this.owlEditorKit,
 					OPPLBuilder.this.opplBuilderModel.getConstraintSystem());
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					actionEditor) {
-				/**
-				 *
-				 */
-				private static final long serialVersionUID = 7816306100172449202L;
-
-				/**
-				 *
-				 */
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					actionEditor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
@@ -787,23 +715,8 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 					OPPLBuilder.this.owlEditorKit,
 					OPPLBuilder.this.opplBuilderModel.getConstraintSystem());
 			actionEditor.setOWLAxiomChange(this.getAxiomChange());
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					actionEditor) {
-				/**
-				 *
-				 */
-				private static final long serialVersionUID = 7816306100172449202L;
-
-				/**
-				 *
-				 */
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					actionEditor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
@@ -871,35 +784,25 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 			ConstraintSystem cs = OPPLBuilder.this.opplBuilderModel
 					.getConstraintSystem();
 			final AbstractVariableEditor variableEditor = this.getVariable() instanceof GeneratedVariable<?> ? new GeneratedVariableEditor(
-					OPPLBuilder.this.owlEditorKit, cs)
-					: new VariableEditor(OPPLBuilder.this.owlEditorKit, cs);
+					this.getOwlEditorKit(), cs)
+					: new VariableEditor(this.getOwlEditorKit(), cs);
 			variableEditor.setVariable(this.getVariable());
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					variableEditor) {
-				private static final long serialVersionUID = 7816306100172449202L;
-
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					variableEditor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
 				}
 			};
 			variableEditor.addStatusChangedListener(verificationListener);
-			final JDialog dlg = optionPane.createDialog(
-					OPPLBuilder.this.owlEditorKit.getWorkspace(), null);
+			final JDialog dlg = optionPane.createDialog(this.getOwlEditorKit()
+					.getWorkspace(), null);
 			// The editor shouldn't be modal (or should it?)
 			dlg.setModal(true);
 			dlg.setTitle("Action editor");
 			dlg.setResizable(true);
 			dlg.pack();
-			dlg.setLocationRelativeTo(OPPLBuilder.this.owlEditorKit
-					.getWorkspace());
+			dlg.setLocationRelativeTo(this.getOwlEditorKit().getWorkspace());
 			dlg.addComponentListener(new ComponentAdapter() {
 				@Override
 				public void componentHidden(ComponentEvent e) {
@@ -939,31 +842,21 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 		protected void handleAdd() {
 			final AbstractVariableEditor variableEditor = this
 					.getSelectedValue() instanceof InputVariableSectionHeader ? new VariableEditor(
-					OPPLBuilder.this.owlEditorKit,
-					OPPLBuilder.this.opplBuilderModel.getConstraintSystem())
-					: new GeneratedVariableEditor(
-							OPPLBuilder.this.owlEditorKit,
+					this.getOWLEditorKit(), OPPLBuilder.this.opplBuilderModel
+							.getConstraintSystem())
+					: new GeneratedVariableEditor(this.getOWLEditorKit(),
 							OPPLBuilder.this.opplBuilderModel
 									.getConstraintSystem());
-			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
-					variableEditor) {
-				private static final long serialVersionUID = 7217535942418544769L;
-
-				@Override
-				public void selectInitialValue() {
-					// This is overridden so that the option pane dialog default
-					// button
-					// doesn't get the focus.
-				}
-			};
+			final VerifyingOptionPane optionPane = new NoDefaultFocusVerifyingOptionPane(
+					variableEditor);
 			final InputVerificationStatusChangedListener verificationListener = new InputVerificationStatusChangedListener() {
 				public void verifiedStatusChanged(boolean verified) {
 					optionPane.setOKEnabled(verified);
 				}
 			};
 			variableEditor.addStatusChangedListener(verificationListener);
-			final JDialog dlg = optionPane.createDialog(
-					OPPLBuilder.this.owlEditorKit.getWorkspace(), null);
+			final JDialog dlg = optionPane.createDialog(this.getOWLEditorKit()
+					.getWorkspace(), null);
 			// The editor shouldn't be modal (or should it?)
 			dlg.setModal(true);
 			dlg.setTitle("Variable editor");
@@ -1118,11 +1011,12 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 		this.errorListModel.clear();
 		boolean isValid = this.opplBuilderModel.check();
 		if (isValid) {
-			this.opplScript = OPPLParser.getOPPLFactory().buildOPPLScript(
-					this.opplBuilderModel.getConstraintSystem(),
-					this.opplBuilderModel.getVariables(),
-					this.opplBuilderModel.getOPPLQuery(),
-					this.opplBuilderModel.getActions());
+			this.opplScript = ParserFactory.getInstance().getOPPLFactory()
+					.buildOPPLScript(
+							this.opplBuilderModel.getConstraintSystem(),
+							this.opplBuilderModel.getVariables(),
+							this.opplBuilderModel.getOPPLQuery(),
+							this.opplBuilderModel.getActions());
 		}
 		this.errorPanel.setVisible(!this.errorListModel.isEmpty());
 		if (this.errorPanel.isVisible()) {
@@ -1209,13 +1103,13 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 	public void handleChange(OWLModelManagerChangeEvent event) {
 		EventType type = event.getType();
 		switch (type) {
-		case REASONER_CHANGED:
-			this.opplBuilderModel.getConstraintSystem().setReasoner(
-					this.getOWLEditorKit().getModelManager().getReasoner());
-			this.handleChange();
-			break;
-		default:
-			break;
+			case REASONER_CHANGED:
+				this.opplBuilderModel.getConstraintSystem().setReasoner(
+						this.getOWLEditorKit().getModelManager().getReasoner());
+				this.handleChange();
+				break;
+			default:
+				break;
 		}
 	}
 

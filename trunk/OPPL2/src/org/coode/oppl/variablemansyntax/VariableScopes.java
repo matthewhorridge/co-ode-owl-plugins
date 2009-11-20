@@ -22,10 +22,6 @@
  */
 package org.coode.oppl.variablemansyntax;
 
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.Iterator;
-
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLObjectProperty;
@@ -52,15 +48,14 @@ public class VariableScopes {
 			this.direction = s;
 		}
 
-		static EnumMap<Direction, String> directionMap = new EnumMap<Direction, String>(
-				Direction.class);
-		static {
-			EnumSet<Direction> set = EnumSet.allOf(Direction.class);
-			for (Direction direction : set) {
-				directionMap.put(direction, direction.direction.toLowerCase());
-			}
-		}
-
+		// static EnumMap<Direction, String> directionMap = new
+		// EnumMap<Direction, String>(
+		// Direction.class);
+		// static {
+		// for (Direction direction : values()) {
+		// directionMap.put(direction, direction.direction.toLowerCase());
+		// }
+		// }
 		/**
 		 * Parser the input String and returns the corresponding Direction. If
 		 * the input does not correspond to any possible Direction instance,
@@ -70,18 +65,24 @@ public class VariableScopes {
 		 * @return the Direction corresponding to the input String (can be null)
 		 */
 		public static Direction getDirection(String direction) {
-			boolean found = false;
-			Iterator<Direction> it = directionMap.keySet().iterator();
-			Direction toReturn = null;
-			while (!found && it.hasNext()) {
-				VariableScopes.Direction aDirection = it.next();
-				found = directionMap.get(aDirection).compareTo(
-						direction.toLowerCase()) == 0;
-				if (found) {
-					toReturn = aDirection;
+			for (Direction d : values()) {
+				if (direction.equalsIgnoreCase(d.direction)) {
+					return d;
 				}
 			}
-			return toReturn;
+			return null;
+			// boolean found = false;
+			// Iterator<Direction> it = directionMap.keySet().iterator();
+			// Direction toReturn = null;
+			// while (!found && it.hasNext()) {
+			// VariableScopes.Direction aDirection = it.next();
+			// found = directionMap.get(aDirection)
+			// .equalsIgnoreCase(direction);
+			// if (found) {
+			// toReturn = aDirection;
+			// }
+			// }
+			// return toReturn;
 		}
 
 		@Override

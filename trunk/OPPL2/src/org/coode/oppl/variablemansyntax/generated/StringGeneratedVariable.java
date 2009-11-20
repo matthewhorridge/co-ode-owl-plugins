@@ -5,7 +5,7 @@ import java.net.URI;
 import org.coode.oppl.entity.OWLEntityCreationException;
 import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityFactory;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLDataFactory;
@@ -26,10 +26,12 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 	@Override
 	protected OWLObject generateObject(String aValue) {
 		OWLObject toReturn = null;
-		OWLEntityChecker entityChecker = OPPLParser.getOPPLFactory()
-				.getOWLEntityChecker();
-		OWLEntityFactory ef = OPPLParser.getOPPLFactory().getOWLEntityFactory();
-		OWLDataFactory df = OPPLParser.getOPPLFactory().getOWLDataFactory();
+		OWLEntityChecker entityChecker = ParserFactory.getInstance()
+				.getOPPLFactory().getOWLEntityChecker();
+		OWLEntityFactory ef = ParserFactory.getInstance().getOPPLFactory()
+				.getOWLEntityFactory();
+		OWLDataFactory df = ParserFactory.getInstance().getOPPLFactory()
+				.getOWLDataFactory();
 		switch (getType()) {
 			case CLASS:
 				try {
@@ -95,7 +97,7 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 	private OWLObject createUpdates(
 			OWLEntityCreationSet<? extends OWLEntity> set)
 			throws OWLEntityCreationException, OWLOntologyChangeException {
-		OPPLParser.getOWLOntologyManager().applyChanges(
+		ParserFactory.getInstance().getOWLOntologyManager().applyChanges(
 				set.getOntologyChanges());
 		return set.getOWLEntity();
 	}

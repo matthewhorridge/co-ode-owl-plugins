@@ -143,26 +143,26 @@ public class OPPLAssertedOWLAxiomSearchTree extends
 			for (OWLAxiom axiom : owlOntology.getAxioms()) {
 				axiom.accept(new OWLAxiomVisitorAdapter() {
 					@Override
-					public void visit(OWLClassAssertionAxiom axiom) {
-						axiom.getDescription().accept(constantExtractor);
+					public void visit(OWLClassAssertionAxiom ax) {
+						ax.getDescription().accept(constantExtractor);
 					}
 
 					@Override
-					public void visit(OWLDataPropertyAssertionAxiom axiom) {
-						toReturn.add(axiom.getObject());
+					public void visit(OWLDataPropertyAssertionAxiom ax) {
+						toReturn.add(ax.getObject());
 					}
 
 					@Override
-					public void visit(OWLDisjointClassesAxiom axiom) {
-						for (OWLDescription description : axiom
+					public void visit(OWLDisjointClassesAxiom ax) {
+						for (OWLDescription description : ax
 								.getDescriptions()) {
 							description.accept(constantExtractor);
 						}
 					}
 
 					@Override
-					public void visit(OWLEquivalentClassesAxiom axiom) {
-						for (OWLDescription description : axiom
+					public void visit(OWLEquivalentClassesAxiom ax) {
+						for (OWLDescription description : ax
 								.getDescriptions()) {
 							description.accept(constantExtractor);
 						}
@@ -170,14 +170,14 @@ public class OPPLAssertedOWLAxiomSearchTree extends
 
 					@Override
 					public void visit(
-							OWLNegativeDataPropertyAssertionAxiom axiom) {
-						toReturn.add(axiom.getObject());
+							OWLNegativeDataPropertyAssertionAxiom ax) {
+						toReturn.add(ax.getObject());
 					}
 
 					@Override
-					public void visit(OWLSubClassAxiom axiom) {
-						axiom.getSubClass().accept(constantExtractor);
-						axiom.getSuperClass().accept(constantExtractor);
+					public void visit(OWLSubClassAxiom ax) {
+						ax.getSubClass().accept(constantExtractor);
+						ax.getSuperClass().accept(constantExtractor);
 					}
 				});
 			}

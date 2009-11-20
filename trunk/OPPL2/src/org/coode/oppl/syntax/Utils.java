@@ -61,12 +61,12 @@ public class Utils {
 		return test;
 	}
 
-	protected static String readString(boolean spaceTokens,
+	protected static String readString(OPPLParser parser, boolean spaceTokens,
 			int... delimiterTokenKinds) {
 		StringBuilder toReturn = new StringBuilder();
 		boolean found = false;
 		while (!found) {
-			Token token = OPPLParser.getToken(1);
+			Token token = parser.getToken(1);
 			for (int i = 0; !found && i < delimiterTokenKinds.length; i++) {
 				found = token.kind == OPPLParserConstants.EOF
 						|| delimiterTokenKinds[i] == token.kind;
@@ -76,10 +76,9 @@ public class Utils {
 				if (spaceTokens) {
 					toReturn.append(" ");
 				}
-				OPPLParser.getNextToken();
+				parser.getNextToken();
 			}
 		}
-		System.out.println();
 		return toReturn.toString();
 	}
 

@@ -31,8 +31,8 @@ import org.coode.oppl.protege.ui.ActionListItem;
 import org.coode.oppl.protege.ui.OPPLSelectClauseListItem;
 import org.coode.oppl.protege.ui.OWLObjectListItem;
 import org.coode.oppl.rendering.ManchesterSyntaxRenderer;
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.ArgCheck;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
@@ -104,9 +104,9 @@ public class VariableOWLCellRenderer extends OWLCellRenderer implements
 	@Override
 	public String getRendering(Object object) {
 		if (object instanceof OWLObject) {
-			ManchesterSyntaxRenderer manchesterSyntaxRenderer = OPPLParser
-					.getOPPLFactory().getManchesterSyntaxRenderer(
-							this.constraintSystem);
+			ManchesterSyntaxRenderer manchesterSyntaxRenderer = ParserFactory
+					.getInstance().getOPPLFactory()
+					.getManchesterSyntaxRenderer(this.constraintSystem);
 			OWLObject owlObject = (OWLObject) object;
 			owlObject.accept(manchesterSyntaxRenderer);
 			return manchesterSyntaxRenderer.toString();

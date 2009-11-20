@@ -7,7 +7,7 @@ options {
   JDK_VERSION = "1.5";
     MULTI=false;
     NODE_PREFIX="OPPL";
-
+STATIC = false;
    /* DEBUG_PARSER=true; */
 
 }
@@ -68,39 +68,39 @@ import org.semanticweb.owl.model.RemoveAxiom;
 import org.semanticweb.owl.model.OWLEntity;
 
 public class OPPLParser {
-	private static OWLOntologyManager owlOntologyManager;
+	private OWLOntologyManager owlOntologyManager;
 
-	private static OPPLAbstractFactory opplFactory = null;
-	private static List completions = new ArrayList();
+	private OPPLAbstractFactory opplFactory = null;
+	private List completions = new ArrayList();
 
-	private static OWLOntology ontology;
-	private static OWLReasoner reasoner;
-	private  static OPPLScriptValidator validator=null;
+	private OWLOntology ontology;
+	private OWLReasoner reasoner;
+	private OPPLScriptValidator validator=null;
 
-	public static void setOPPLScriptValidator(OPPLScriptValidator validator){
-		OPPLParser.validator = validator;
+	public void setOPPLScriptValidator(OPPLScriptValidator v){
+		validator = v;
 	}
 
-	public static List getCompletions(){
+	public List getCompletions(){
 		return completions;
 	}
 
-	public static OPPLAbstractFactory getOPPLFactory(){
+	public OPPLAbstractFactory getOPPLFactory(){
 		if(opplFactory ==null){
 			opplFactory = new OPPLFactory(owlOntologyManager, ontology, reasoner);
 		}
 		return opplFactory;
 	}
 
-	public static void setOPPLFactory(OPPLAbstractFactory factory){
+	public void setOPPLFactory(OPPLAbstractFactory factory){
 		opplFactory = factory;
 	}
 
-	public static OWLOntologyManager getOWLOntologyManager(){
+	public OWLOntologyManager getOWLOntologyManager(){
 		return owlOntologyManager;
 	}
 
-	public static void setReasoner(OWLReasoner r){
+	public void setReasoner(OWLReasoner r){
 		reasoner = r;
 	}
 
@@ -111,7 +111,7 @@ public class OPPLParser {
    		reasoner = r;
    }
 
-   	public static void ReInit(Reader reader,
+   	public void ReInit(Reader reader,
 			OWLOntologyManager m, OWLOntology o, OWLReasoner r){
 		ReInit(reader);
 		owlOntologyManager = m;
@@ -134,13 +134,17 @@ public class OPPLParser {
 		OWLOntologyManager m = OWLManager.createOWLOntologyManager();
     try {
 	  OWLOntology o = m.loadOntology(URI.create(ontologyPhysicalURI));
-	  new OPPLParser(System.in, m, o, null);
-      OPPLScript n = OPPLParser.Start();
+
+      OPPLScript n = new OPPLParser(System.in, m, o, null).Start();
       System.out.println("Thank you.");
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
+private ParseException unexpectedException() {
+	return new ParseException("Unexpected condition at line " + this.token.beginLine + " column " + this.token.beginColumn + ": " + this.token.image);
+}
+
 }
 PARSER_END(OPPLParser)
 
@@ -296,7 +300,7 @@ Variable VariableDefinition(ConstraintSystem constraintSystem):
 			completions.addAll(EnumSet.allOf(VariableType.class));
 		}
 	variableTypeToken= <VARIABLETYPE>
-		{variableType = VariableType.getVariableType(variableTypeToken.image);}
+		{variableType = VariableType.valueOfIgnoreCase(variableTypeToken.image);}
 	"=" v = opplFunction(variableNameToken.image,variableType,constraintSystem)
 	{return v;}
 	|LOOKAHEAD(4)
@@ -307,9 +311,9 @@ Variable VariableDefinition(ConstraintSystem constraintSystem):
 	variableTypeToken= <VARIABLETYPE>
 		{
 			try{
-				variableType = VariableType.getVariableType(variableTypeToken.image);
+				variableType = VariableType.valueOfIgnoreCase(variableTypeToken.image);
     	        v =  constraintSystem.createVariable(variableNameToken.image,variableType);
-			}catch(OPPLException e){throw new ParseException(e);}
+			}catch(OPPLException e){throw new ParseException(e.getMessage(), e);}
 		}
 	<OPENSQUAREBRACKETS>
 		{
@@ -332,9 +336,9 @@ Variable VariableDefinition(ConstraintSystem constraintSystem):
 		{
 			completions.clear();
 			try{
-				variableType = VariableType.getVariableType(variableTypeToken.image);
+				variableType = VariableType.valueOfIgnoreCase(variableTypeToken.image);
 				return constraintSystem.createVariable(variableNameToken.image,variableType);
-			}catch(OPPLException e){throw new ParseException(e);}
+			}catch(OPPLException e){throw new ParseException(e.getMessage(), e);}
 		}
 }
 
@@ -363,26 +367,30 @@ JAVACODE
 GeneratedVariable expressionGeneratedVariable(String name,VariableType type, ConstraintSystem constraintSystem){
 int beginningSubSection = token.beginColumn;
 int beginningSubSectionLine = token.beginLine;
-String expression = Utils.readString(true, COMMA, SELECT);
+String expression = Utils.readString(this, true, COMMA, SELECT);
 try {
 	return Utils.parseVariableExpressionGeneratedVariable(name,	type, expression, constraintSystem);
-} catch (ParserException e) {throw new ParseException(Utils.buildException(beginningSubSection, beginningSubSectionLine, e));}
+} catch (ParserException e) {
+Exception temp=Utils.buildException(beginningSubSection, beginningSubSectionLine, e);
+throw new ParseException(temp.getMessage(), temp);}
 }
 
 JAVACODE
 GeneratedVariable regexpOperation(String name,VariableType type, ConstraintSystem constraintSystem){
 int beginningSubSection = token.beginColumn;
 int beginningSubSectionLine = token.beginLine;
-String expression = Utils.readString(false, QUOTE);
+String expression = Utils.readString(this, false, QUOTE);
 try {
 	Pattern.compile(expression);
 } catch (PatternSyntaxException e) {
-	throw new ParseException(Utils.buildException(expression,beginningSubSection, beginningSubSectionLine, e));
+Exception temp=Utils.buildException(expression, beginningSubSection, beginningSubSectionLine, e);
+throw new ParseException(temp.getMessage(), temp);
 }
 try {
 	return Utils.parseRegexpGeneratedVariable(name,	type, expression, constraintSystem);
 } catch (ParserException e) {
-	throw new ParseException(Utils.buildException(beginningSubSection, beginningSubSectionLine, e));
+Exception temp=Utils.buildException(beginningSubSection, beginningSubSectionLine, e);
+throw new ParseException(temp.getMessage(), temp);
 }
 }
 
@@ -583,11 +591,12 @@ JAVACODE
 Set<OWLEntity> matchConstraint(ConstraintSystem cs){
 int beginningSubSection = getToken(1).beginColumn;
 int beginningSubSectionLine = getToken(1).beginLine;
-String expression = Utils.readString(false, QUOTE);
+String expression = Utils.readString(this, false, QUOTE);
 try {
 	return RegExpGeneratedVariable.getMatches(expression, cs);
 } catch (PatternSyntaxException e) {
-	throw new ParseException(e.getMessage(), Utils.buildException(expression, beginningSubSection,beginningSubSectionLine, e));
+Exception temp=Utils.buildException(expression, beginningSubSection, beginningSubSectionLine, e);
+throw new ParseException(temp.getMessage(), temp);
 }
 }
 
@@ -607,17 +616,17 @@ OWLObject OWLExpression(Variable v, ConstraintSystem constraintSystem)
 		}
 	VariableType type = v.getType();
 	manSyntaxString = manSyntaxString.trim();
-	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, constraintSystem,getOWLOntologyManager().getOWLDataFactory(), OPPLParser.getOWLOntologyManager());
+	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, constraintSystem,getOWLOntologyManager().getOWLDataFactory(), getOWLOntologyManager());
 	try{
 	OWLObject toReturn = type.accept(expressionParser);
 	return toReturn;
-	} catch(Exception e){throw new ParseException(e);}
+	} catch(Exception e){throw new ParseException(e.getMessage(), e);}
 }
 
 VariableType variableType() #void:{Token t;}
 {
 	t = <VARIABLETYPE>
-		{return VariableType.getVariableType(t.image);}
+		{return VariableType.valueOfIgnoreCase(t.image);}
 }
 
 OPPLQuery query(ConstraintSystem constraintSystem):{
@@ -680,7 +689,8 @@ OWLAxiom Clause(ConstraintSystem constraintSystem){
 		toReturn = parser.parseAxiom();
 
 	}catch(ParserException e){
-	throw new ParseException("OPPLParser.Clause() " + manSyntaxString + "\t" + e.getMessage(), Utils.buildException(beginningSubSection, beginningSubSectionLine, e));
+	Exception ex=Utils.buildException(beginningSubSection, beginningSubSectionLine, e);
+	throw new ParseException("OPPLParser.Clause() \"" + manSyntaxString + "\"\t" + ex.getMessage(), ex);
 	}
 return toReturn;
 }

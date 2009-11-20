@@ -20,7 +20,6 @@ import org.coode.oppl.search.OPPLAssertedOWLAxiomSearchTree;
 import org.coode.oppl.search.OPPLOWLAxiomSearchNode;
 import org.coode.oppl.search.OWLAxiomSearchTree;
 import org.coode.oppl.search.SearchTree;
-import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.syntax.ParseException;
 import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.utils.VariableExtractor;
@@ -116,14 +115,14 @@ public class SearchTest extends TestCase {
 			final OWLSubClassAxiom subClassAxiom = manager.getOWLDataFactory()
 					.getOWLSubClassAxiom(namedPizzaClass, pizzaClass);
 			String opplString = "?x:CLASS, ?y:CLASS SELECT ASSERTED ?x subClassOf ?y BEGIN ADD ?x subClassOf ?y END;";
-			ParserFactory.initParser(opplString, ontology, manager, null);
-			final OPPLScript opplScript = OPPLParser.Start();
+			final OPPLScript opplScript = this.parsescript(manager, ontology,
+					opplString);
 			OWLAxiom start = opplScript.getQuery().getAssertedAxioms()
 					.iterator().next();
 			SearchTree<OWLAxiom> searchTree = new SearchTree<OWLAxiom>() {
 				@Override
-				protected boolean goalReached(OWLAxiom start) {
-					return start.equals(subClassAxiom);
+				protected boolean goalReached(OWLAxiom startAxiom) {
+					return startAxiom.equals(subClassAxiom);
 				}
 
 				@Override
@@ -159,23 +158,23 @@ public class SearchTest extends TestCase {
 					Set<OWLObject> toReturn = new HashSet<OWLObject>();
 					VariableType type = variable.getType();
 					switch (type) {
-					case CLASS:
-						toReturn.addAll(this.getAllClasses());
-						break;
-					case DATAPROPERTY:
-						toReturn.addAll(this.getAllDataProperties());
-						break;
-					case OBJECTPROPERTY:
-						toReturn.addAll(this.getObjectProperties());
-						break;
-					case INDIVIDUAL:
-						toReturn.addAll(this.getAllIndividuals());
-						break;
-					case CONSTANT:
-						toReturn.addAll(this.getAllConstants());
-						break;
-					default:
-						break;
+						case CLASS:
+							toReturn.addAll(this.getAllClasses());
+							break;
+						case DATAPROPERTY:
+							toReturn.addAll(this.getAllDataProperties());
+							break;
+						case OBJECTPROPERTY:
+							toReturn.addAll(this.getObjectProperties());
+							break;
+						case INDIVIDUAL:
+							toReturn.addAll(this.getAllIndividuals());
+							break;
+						case CONSTANT:
+							toReturn.addAll(this.getAllConstants());
+							break;
+						default:
+							break;
 					}
 					return toReturn;
 				}
@@ -238,6 +237,13 @@ public class SearchTest extends TestCase {
 		}
 	}
 
+	private OPPLScript parsescript(final OWLOntologyManager manager,
+			OWLOntology ontology, String opplString) throws ParseException {
+		final OPPLScript opplScript = ParserFactory.initParser(opplString,
+				ontology, manager, null).Start();
+		return opplScript;
+	}
+
 	public void testOWLAxiomSearchTree() {
 		final OWLOntologyManager manager = OWLManager
 				.createOWLOntologyManager();
@@ -246,8 +252,8 @@ public class SearchTest extends TestCase {
 					.loadOntology(URI
 							.create("http://www.co-ode.org/ontologies/pizza/2007/02/12/pizza.owl"));
 			String opplString = "?x:CLASS, ?y:CLASS SELECT ASSERTED ?x subClassOf ?y BEGIN ADD ?x subClassOf ?y END;";
-			ParserFactory.initParser(opplString, ontology, manager, null);
-			final OPPLScript opplScript = OPPLParser.Start();
+			final OPPLScript opplScript = this.parsescript(manager, ontology,
+					opplString);
 			OWLAxiom start = opplScript.getQuery().getAssertedAxioms()
 					.iterator().next();
 			SearchTree<OWLAxiom> searchTree = new OWLAxiomSearchTree(manager,
@@ -300,11 +306,10 @@ public class SearchTest extends TestCase {
 					.loadOntology(URI
 							.create("http://www.co-ode.org/ontologies/pizza/2007/02/12/pizza.owl"));
 			String opplString = "?x:CLASS, ?y:CLASS SELECT ASSERTED ?x subClassOf Pizza, ASSERTED ?x subClassOf hasTopping some MozzarellaTopping BEGIN ADD ?x subClassOf ?y END;";
-			ParserFactory.initParser(opplString, ontology, manager, null);
-			final OPPLScript opplScript = OPPLParser.Start();
-			// Need another one to make sure the Constraint system is different.
-			ParserFactory.initParser(opplString, ontology, manager, null);
-			final OPPLScript checkOPPLScript = OPPLParser.Start();
+			final OPPLScript opplScript = this.parsescript(manager, ontology,
+					opplString);
+			final OPPLScript checkOPPLScript = this.parsescript(manager,
+					ontology, opplString);
 			final Set<OWLAxiom> correctResults = this
 					.getOPPLScriptCorrectResults(manager, ontology,
 							checkOPPLScript);
@@ -382,11 +387,10 @@ public class SearchTest extends TestCase {
 					.loadOntology(URI
 							.create("http://www.co-ode.org/ontologies/pizza/2007/02/12/pizza.owl"));
 			String opplString = "?x:CLASS, ?y:CLASS SELECT ASSERTED ?x subClassOf NamedPizza, ASSERTED ?x subClassOf hasTopping some MozzarellaTopping BEGIN ADD ?x subClassOf ?y END;";
-			ParserFactory.initParser(opplString, ontology, manager, null);
-			final OPPLScript opplScript = OPPLParser.Start();
-			// Need another one to make sure the Constraint system is different.
-			ParserFactory.initParser(opplString, ontology, manager, null);
-			final OPPLScript checkOPPLScript = OPPLParser.Start();
+			final OPPLScript opplScript = this.parsescript(manager, ontology,
+					opplString);
+			final OPPLScript checkOPPLScript = this.parsescript(manager,
+					ontology, opplString);
 			final Set<OWLAxiom> correctResults = this
 					.getOPPLScriptCorrectResults(manager, ontology,
 							checkOPPLScript);

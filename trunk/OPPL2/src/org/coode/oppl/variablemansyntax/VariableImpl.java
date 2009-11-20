@@ -93,8 +93,8 @@ public final class VariableImpl implements Variable {
 		return this.possibleBindings;
 	}
 
-	public boolean removePossibleBinding(OWLObject uri) {
-		return this.possibleBindings.remove(uri);
+	public boolean removePossibleBinding(OWLObject possibleBindingURI) {
+		return this.possibleBindings.remove(possibleBindingURI);
 	}
 
 	@Override
@@ -105,7 +105,7 @@ public final class VariableImpl implements Variable {
 
 	@Override
 	public int hashCode() {
-		return this.getName().hashCode();
+		return this.name.hashCode();
 	}
 
 	public void clearBindings() {

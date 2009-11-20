@@ -121,12 +121,12 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor,
 					public void check(String text)
 							throws OWLExpressionParserException {
 						this.lastCreatedObject = null;
-						ProtegeParserFactory.initParser(text,
-								OPPLTextEditor.this.getOWLEditorKit()
+						OPPLParser parser = ProtegeParserFactory.initParser(
+								text, OPPLTextEditor.this.getOWLEditorKit()
 										.getModelManager(),
 								OPPLTextEditor.this.validator);
 						try {
-							this.lastCreatedObject = OPPLParser.Start();
+							this.lastCreatedObject = parser.Start();
 						} catch (ParseException e) {
 							this.lastCreatedObject = null;
 							throw new OWLExpressionParserException(e);
@@ -210,11 +210,11 @@ public class OPPLTextEditor extends JPanel implements VerifiedInputEditor,
 	public void handleChange(OWLModelManagerChangeEvent event) {
 		EventType type = event.getType();
 		switch (type) {
-		case REASONER_CHANGED:
-			this.handleChange();
-			break;
-		default:
-			break;
+			case REASONER_CHANGED:
+				this.handleChange();
+				break;
+			default:
+				break;
 		}
 	}
 

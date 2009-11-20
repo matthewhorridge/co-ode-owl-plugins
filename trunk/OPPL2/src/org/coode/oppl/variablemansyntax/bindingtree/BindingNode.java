@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.coode.oppl.entity.OWLEntityRenderer;
-import org.coode.oppl.syntax.OPPLParser;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.Variable;
@@ -42,12 +42,15 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public class BindingNode implements VariableVisitor<OWLObject> {
-	private class VariableInspector implements PlainVariableVisitor {
-		public VariableInspector() {
+	private static class VariableInspector implements PlainVariableVisitor {
+		private Set<Variable> toUpdate;
+
+		public VariableInspector(Set<Variable> toUpdate) {
+			this.toUpdate = toUpdate;
 		}
 
 		public void visit(Variable v) {
-			BindingNode.this.unassignedVariables.add(v);
+			this.toUpdate.add(v);
 		}
 
 		public void visit(GeneratedVariable<?> v) {
@@ -56,7 +59,14 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 
 	private final Set<Assignment> assignments = new HashSet<Assignment>();
 	private final Set<Variable> unassignedVariables = new HashSet<Variable>();
+	private final VariableInspector unassignedVariablesUpdater = new VariableInspector(
+			this.unassignedVariables);
 
+	// TODO multiple issues to be clarified:
+	// - assignments and unassigned variables are done differently in the
+	// constructor and in the add methods
+	// - unassigned variables are either added through a visitor or directly -
+	// that might break things if the variable implementation of accept varies
 	/**
 	 * @param assignments
 	 * @param unassignedVariables
@@ -103,8 +113,8 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	public String render(ConstraintSystem cs) {
 		boolean first = true;
 		StringWriter stringWriter = new StringWriter();
-		OWLEntityRenderer entityRenderer = OPPLParser.getOPPLFactory()
-				.getOWLEntityRenderer(cs);
+		OWLEntityRenderer entityRenderer = ParserFactory.getInstance()
+				.getOPPLFactory().getOWLEntityRenderer(cs);
 		for (Assignment assignment : this.assignments) {
 			OWLObject value = assignment.getAssignment();
 			String assignmentRendering = value instanceof OWLEntity ? entityRenderer
@@ -181,7 +191,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	 * @param v
 	 */
 	public void addUnassignedVariable(Variable v) {
-		v.accept(new VariableInspector());
+		v.accept(this.unassignedVariablesUpdater);
 	}
 
 	public OWLObject visit(Variable v) {

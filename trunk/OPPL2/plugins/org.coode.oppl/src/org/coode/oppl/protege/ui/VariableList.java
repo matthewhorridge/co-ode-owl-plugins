@@ -57,8 +57,7 @@ public class VariableList extends MList {
 			JLabel label = (JLabel) super.getListCellRendererComponent(list,
 					value, index, isSelected, cellHasFocus);
 			if (value instanceof VariableListItem) {
-				Variable variable = ((VariableListItem) value)
-						.getVariable();
+				Variable variable = ((VariableListItem) value).getVariable();
 				VariableScope variableScope = variable.getVariableScope();
 				String variableScopeString = variableScope == null ? ""
 						: "["
@@ -100,18 +99,22 @@ public class VariableList extends MList {
 			ConstraintSystem constraintSystem) {
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
-		setModel(new DefaultListModel());
-		setCellRenderer(this.variableListCellRenderer);
+		this.setModel(new DefaultListModel());
+		this.setCellRenderer(this.variableListCellRenderer);
 	}
 
 	@Override
 	protected void handleDelete() {
 		super.handleDelete();
-		DefaultListModel model = (DefaultListModel) getModel();
-		Object selectedValue = getSelectedValue();
+		DefaultListModel model = (DefaultListModel) this.getModel();
+		Object selectedValue = this.getSelectedValue();
 		if (selectedValue != null) {
 			model.removeElement(selectedValue);
 		}
+	}
+
+	protected OWLEditorKit getOWLEditorKit() {
+		return this.owlEditorKit;
 	}
 
 	public ListCellRenderer getVariableListCellRenderer() {
