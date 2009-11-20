@@ -97,7 +97,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 			}
 		}
 
-		public GeneratedVariable createObject(String text)
+		public GeneratedVariable<?> createObject(String text)
 				throws OWLExpressionParserException {
 			this.check(text);
 			return this.lastEditedObject;
@@ -108,6 +108,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 		public ChangeTypeActionListener() {
 		}
 
+		@SuppressWarnings("unused")
 		public void actionPerformed(ActionEvent e) {
 			GeneratedVariableEditor.this.handleChange();
 		}
@@ -184,6 +185,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 				this.owlEditorKit, new VariableOWLExpressionChecker());
 		this.opplFunctionEditor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
+					@SuppressWarnings("unused")
 					public void verifiedStatusChanged(boolean newState) {
 						GeneratedVariableEditor.this.handleChange();
 					}

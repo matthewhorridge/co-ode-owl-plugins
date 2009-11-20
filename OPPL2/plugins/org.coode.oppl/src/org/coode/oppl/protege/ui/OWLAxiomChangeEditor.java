@@ -69,6 +69,7 @@ public class OWLAxiomChangeEditor extends JPanel implements VerifiedInputEditor 
 		this.axiomEditor = new AxiomEditor(this.owlEditorKit, constraintSystem);
 		this.axiomEditor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
+					@SuppressWarnings("unused")
 					public void verifiedStatusChanged(boolean newState) {
 						OWLAxiomChangeEditor.this.handleChange();
 					}

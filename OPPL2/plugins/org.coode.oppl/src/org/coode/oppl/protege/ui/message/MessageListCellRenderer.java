@@ -32,11 +32,13 @@ public class MessageListCellRenderer implements ListCellRenderer,
 		return toReturn;
 	}
 
+	@SuppressWarnings("unused")
 	public Icon visitError(Error error) {
 		return new ImageIcon(this.getClass().getClassLoader().getResource(
 				"error.png"));
 	}
 
+	@SuppressWarnings("unused")
 	public Icon visitWarning(Warning warning) {
 		return new ImageIcon(this.getClass().getClassLoader().getResource(
 				"warning.png"));

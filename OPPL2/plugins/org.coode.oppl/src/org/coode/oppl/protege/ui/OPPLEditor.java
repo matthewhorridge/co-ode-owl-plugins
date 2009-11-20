@@ -44,17 +44,14 @@ import org.protege.editor.owl.OWLEditorKit;
  * @author Luigi Iannone
  * 
  */
-public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
-		ChangeListener {
-	/**
-	 *
-	 */
+public final class OPPLEditor extends JTabbedPane implements
+		VerifiedInputEditor, ChangeListener {
 	private static final long serialVersionUID = 3481576138019196471L;
 	private final Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private final OWLEditorKit owlEditorKit;
-	private final OPPLBuilder opplBuilder;
-	private final OPPLTextEditor opplTextEditor;
-	private OPPLScript opplScript;
+	protected final OPPLBuilder opplBuilder;
+	protected final OPPLTextEditor opplTextEditor;
+	protected OPPLScript opplScript;
 
 	/**
 	 * @return the opplScript
@@ -173,6 +170,7 @@ public class OPPLEditor extends JTabbedPane implements VerifiedInputEditor,
 		this.opplTextEditor.clear();
 	}
 
+	@SuppressWarnings("unused")
 	public void stateChanged(ChangeEvent changeEvent1) {
 		Component selectedComponent = this.getSelectedComponent();
 		if (selectedComponent.equals(this.opplBuilder)

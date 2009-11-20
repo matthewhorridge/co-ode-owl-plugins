@@ -54,19 +54,19 @@ public class ActionList extends MList {
 	public ActionList(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem, boolean canAdd) {
 		this.owlEditorKit = owlEditorKit;
-		setModel(new ActionListModel(canAdd));
+		this.setModel(new ActionListModel(canAdd));
 		this.canAdd = canAdd;
 		VariableOWLCellRenderer variableAxiomRenderer = new VariableOWLCellRenderer(
 				owlEditorKit, constraintSystem, new OWLCellRenderer(
 						owlEditorKit));
-		setCellRenderer(variableAxiomRenderer);
+		this.setCellRenderer(variableAxiomRenderer);
 	}
 
 	@Override
 	protected void handleDelete() {
 		super.handleDelete();
-		Object selectedValue = getSelectedValue();
-		((ActionListModel) getModel()).removeElement(selectedValue);
+		Object selectedValue = this.getSelectedValue();
+		((ActionListModel) this.getModel()).removeElement(selectedValue);
 	}
 
 	@Override
@@ -101,11 +101,12 @@ public class ActionList extends MList {
 					: ActionBorder.REMOVE;
 		}
 
+		@SuppressWarnings("unused")
 		public void paintBorder(Component c, Graphics g, int x, int y,
 				int width, int height) {
 			Color oldColor = g.getColor();
 			g.setColor(Color.DARK_GRAY);
-			g.drawString(getString(), x + 4, y + 2
+			g.drawString(this.getString(), x + 4, y + 2
 					+ g.getFontMetrics().getAscent()
 					+ g.getFontMetrics().getLeading());
 			g.setColor(oldColor);
@@ -113,11 +114,11 @@ public class ActionList extends MList {
 	}
 
 	public void setConstraintSystem(ConstraintSystem constraintSystem) {
-		setCellRenderer(new VariableOWLCellRenderer(this.owlEditorKit,
+		this.setCellRenderer(new VariableOWLCellRenderer(this.owlEditorKit,
 				constraintSystem, new OWLCellRenderer(this.owlEditorKit)));
 	}
 
 	public void clear() {
-		setModel(new ActionListModel(this.canAdd));
+		this.setModel(new ActionListModel(this.canAdd));
 	}
 }

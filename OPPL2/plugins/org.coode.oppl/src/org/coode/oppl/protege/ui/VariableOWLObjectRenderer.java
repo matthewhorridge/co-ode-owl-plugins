@@ -57,13 +57,13 @@ public class VariableOWLObjectRenderer extends AbstractRenderer implements
 	// private int lastNewLineIndex = 0;
 	// private int currentIndex = 0;
 	private final OWLDescriptionComparator comparator;
-	private OWLEntityRenderer entityRenderer;
 
+	// private OWLEntityRenderer entityRenderer;
 	public VariableOWLObjectRenderer(OWLModelManager owlModelManager) {
 		this.owlModelManager = owlModelManager;
 		this.comparator = new OWLDescriptionComparator(this.owlModelManager);
-		this.entityRenderer = owlModelManager.getOWLEntityRenderer();
-		init();
+		// this.entityRenderer = owlModelManager.getOWLEntityRenderer();
+		this.init();
 	}
 
 	public void dispose() {
@@ -81,8 +81,8 @@ public class VariableOWLObjectRenderer extends AbstractRenderer implements
 	}
 
 	public String render(OWLObject object, OWLEntityRenderer entityRenderer1) {
-		this.entityRenderer = entityRenderer1;
-		reset();
+		// this.entityRenderer = entityRenderer1;
+		this.reset();
 		try {
 			object.accept(this);
 			return this.buffer.toString();
@@ -116,47 +116,47 @@ public class VariableOWLObjectRenderer extends AbstractRenderer implements
 	}
 
 	public void visit(OWLAntiSymmetricObjectPropertyAxiom axiom) {
-		write("AntiSymmetric: ");
+		this.write("AntiSymmetric: ");
 		axiom.getProperty().accept(this);
 	}
 
 	public void visit(OWLAxiomAnnotationAxiom axiom) {
 		axiom.getSubject().accept(this);
-		write(" ");
+		this.write(" ");
 		axiom.getAnnotation().accept(this);
 	}
 
 	public void visit(OWLClass node) {
-		write(getRendering(node));
+		this.write(this.getRendering(node));
 	}
 
 	public void visit(OWLClassAssertionAxiom axiom) {
 		axiom.getIndividual().accept(this);
-		write(" instanceOf ");
+		this.write(" instanceOf ");
 		axiom.getDescription().accept(this);
 	}
 
 	public void visit(OWLConstantAnnotation annotation) {
-		write(this.owlModelManager.getURIRendering(annotation
+		this.write(this.owlModelManager.getURIRendering(annotation
 				.getAnnotationURI()));
-		write(" ");
-		write(annotation.getAnnotationValue().toString());
+		this.write(" ");
+		this.write(annotation.getAnnotationValue().toString());
 	}
 
 	public void visit(OWLDataPropertyDomainAxiom axiom) {
 		axiom.getProperty().accept(this);
-		write(" hasDomain ");
+		this.write(" hasDomain ");
 		axiom.getDomain().accept(this);
 	}
 
 	public void visit(OWLDataPropertyRangeAxiom axiom) {
 		axiom.getProperty().accept(this);
-		write(" hasRange ");
+		this.write(" hasRange ");
 		axiom.getRange().accept(this);
 	}
 
 	public void visit(OWLEquivalentClassesAxiom node) {
-		List<OWLDescription> orderedDescs = sort(node.getDescriptions());
+		List<OWLDescription> orderedDescs = this.sort(node.getDescriptions());
 		for (Iterator<OWLDescription> it = orderedDescs.iterator(); it
 				.hasNext();) {
 			OWLDescription desc = it.next();
@@ -170,57 +170,57 @@ public class VariableOWLObjectRenderer extends AbstractRenderer implements
 				.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(" equivalentTo ");
+				this.write(" equivalentTo ");
 			}
 		}
 	}
 
 	public void visit(OWLImportsDeclaration axiom) {
-		writeOntologyURI(axiom.getImportedOntologyURI());
+		this.writeOntologyURI(axiom.getImportedOntologyURI());
 		if (this.owlModelManager.getOWLOntologyManager().getImportedOntology(
 				axiom) == null) {
-			write("      (Not Loaded)");
+			this.write("      (Not Loaded)");
 		}
 	}
 
 	public void visit(OWLIndividual node) {
 		if (node.isAnonymous()) {
-			write("Anonymous : [");
+			this.write("Anonymous : [");
 			for (OWLOntology ont : this.owlModelManager.getActiveOntologies()) {
 				for (OWLDescription desc : node.getTypes(ont)) {
-					write(" ");
+					this.write(" ");
 					desc.accept(this);
 				}
 			}
-			write(" ]");
+			this.write(" ]");
 		} else {
-			write(getRendering(node));
+			this.write(this.getRendering(node));
 		}
 	}
 
 	public void visit(OWLObjectAnnotation owlObjectAnnotation) {
-		write(this.owlModelManager.getURIRendering(owlObjectAnnotation
+		this.write(this.owlModelManager.getURIRendering(owlObjectAnnotation
 				.getAnnotationURI()));
-		write(" ");
+		this.write(" ");
 		owlObjectAnnotation.getAnnotationValue().accept(this);
 	}
 
 	public void visit(OWLObjectIntersectionOf node) {
-		int indent = getIndent();
-		List<OWLDescription> ops = sort(node.getOperands());
+		int indent = this.getIndent();
+		List<OWLDescription> ops = this.sort(node.getOperands());
 		for (int i = 0; i < ops.size(); i++) {
 			OWLDescription curOp = ops.get(i);
 			curOp.accept(this);
 			if (i < ops.size() - 1) {
-				write("\n");
-				insertIndent(indent);
+				this.write("\n");
+				this.insertIndent(indent);
 				if (curOp instanceof OWLClass
 						&& ops.get(i + 1) instanceof OWLRestriction<?>
 						&& OWLRendererPreferences.getInstance()
 								.isUseThatKeyword()) {
-					write("that ");
+					this.write("that ");
 				} else {
-					writeAndKeyword();
+					this.writeAndKeyword();
 				}
 			}
 		}
@@ -229,46 +229,46 @@ public class VariableOWLObjectRenderer extends AbstractRenderer implements
 	public void visit(OWLObjectPropertyDomainAxiom axiom) {
 		if (!OWLRendererPreferences.getInstance().isRenderDomainAxiomsAsGCIs()) {
 			axiom.getDomain().accept(this);
-			write(" domainOf ");
+			this.write(" domainOf ");
 			axiom.getProperty().accept(this);
 		} else {
 			axiom.getProperty().accept(this);
-			write(" some ");
+			this.write(" some ");
 			this.owlModelManager.getOWLDataFactory().getOWLThing().accept(this);
-			write(" subClassOf ");
+			this.write(" subClassOf ");
 			axiom.getDomain().accept(this);
 		}
 	}
 
 	public void visit(OWLObjectPropertyRangeAxiom axiom) {
 		axiom.getRange().accept(this);
-		write(" rangeOf ");
+		this.write(" rangeOf ");
 		axiom.getProperty().accept(this);
 	}
 
 	public void visit(OWLObjectUnionOf node) {
-		int indent = getIndent();
-		for (Iterator<OWLDescription> it = sort(node.getOperands()).iterator(); it
-				.hasNext();) {
+		int indent = this.getIndent();
+		for (Iterator<OWLDescription> it = this.sort(node.getOperands())
+				.iterator(); it.hasNext();) {
 			OWLDescription curOp = it.next();
-			writeOpenBracket(curOp);
+			this.writeOpenBracket(curOp);
 			curOp.accept(this);
-			writeCloseBracket(curOp);
+			this.writeCloseBracket(curOp);
 			if (it.hasNext()) {
-				write("\n");
-				insertIndent(indent);
-				writeOrKeyword();
+				this.write("\n");
+				this.insertIndent(indent);
+				this.writeOrKeyword();
 			}
 		}
 	}
 
 	public void visit(OWLUntypedConstant node) {
-		write("\"");
-		write(node.getLiteral());
-		write("\"");
+		this.write("\"");
+		this.write(node.getLiteral());
+		this.write("\"");
 		if (node.hasLang()) {
-			write("@");
-			write(node.getLang());
+			this.write("@");
+			this.write(node.getLang());
 		}
 	}
 
@@ -276,12 +276,12 @@ public class VariableOWLObjectRenderer extends AbstractRenderer implements
 	protected void writeOntologyURI(URI uri) {
 		String shortName = this.owlModelManager.getURIRendering(uri);
 		if (shortName != null) {
-			write(shortName);
-			write(" (");
-			write(uri.toString());
-			write(")");
+			this.write(shortName);
+			this.write(" (");
+			this.write(uri.toString());
+			this.write(")");
 		} else {
-			write(uri.toString());
+			this.write(uri.toString());
 		}
 	}
 }

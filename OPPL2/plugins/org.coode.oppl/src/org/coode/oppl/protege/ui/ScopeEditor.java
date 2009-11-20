@@ -155,6 +155,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 			}
 		}
 
+		@SuppressWarnings("unused")
 		public void stateChanged(ChangeEvent e) {
 			JRadioButton selectedButton = this.findSelectedButton();
 			if (selectedButton != null) {
@@ -308,6 +309,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 			this.add(propertyPaneBorder, BorderLayout.SOUTH);
 		}
 
+		@SuppressWarnings("unused")
 		public void valueChanged(TreeSelectionEvent e) {
 		}
 
@@ -341,6 +343,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 			}
 		}
 
+		@SuppressWarnings("unused")
 		public void stateChanged(ChangeEvent e) {
 			Object lastPathComponent = this.propertyTree.getSelectedObject();
 			JRadioButton selectedButton = this.findSelectedButton();

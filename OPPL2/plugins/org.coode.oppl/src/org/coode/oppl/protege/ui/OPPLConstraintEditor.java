@@ -80,7 +80,7 @@ public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor 
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		listener.verifiedStatusChanged(check());
+		listener.verifiedStatusChanged(this.check());
 	}
 
 	private boolean check() {
@@ -114,7 +114,7 @@ public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor 
 	}
 
 	public void handleChange() {
-		boolean isValid = check();
+		boolean isValid = this.check();
 		if (isValid) {
 			try {
 				this.constraint = this.constraintEditor.createObject();
@@ -126,12 +126,12 @@ public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor 
 				throw new RuntimeException(e);
 			}
 		}
-		notifyListeners(isValid);
+		this.notifyListeners(isValid);
 	}
 
 	public OPPLConstraintEditor(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
-		setLayout(new BorderLayout());
+		this.setLayout(new BorderLayout());
 		this.owlEditorKit = owlEditorKit;
 		this.constraintSystem = constraintSystem;
 		// Setup the constraint editor
@@ -175,6 +175,7 @@ public class OPPLConstraintEditor extends JPanel implements VerifiedInputEditor 
 		}
 		this.constraintEditor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
+					@SuppressWarnings("unused")
 					public void verifiedStatusChanged(boolean newState) {
 						OPPLConstraintEditor.this.handleChange();
 					}
