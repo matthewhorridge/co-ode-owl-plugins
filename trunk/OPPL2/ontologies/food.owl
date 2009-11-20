@@ -29,10 +29,10 @@
         <patterns:FoodWithout rdf:datatype="&xsd;string"
             >?x:CLASS, ?forbiddenContent:CLASS = createUnion(?x.VALUES)  BEGIN ADD $thisClass subClassOf Food, ADD ?_thisClass equivalentTo contains only (not ?forbiddenContent) END; A food without ?x; RETURN $thisClass</patterns:FoodWithout>
     </owl:Ontology>
-    
 
 
-    <!-- 
+
+    <!--
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Annotation properties
@@ -49,10 +49,10 @@
     <owl:AnnotationProperty rdf:about="&patterns;Free"/>
     <owl:AnnotationProperty rdf:about="&patterns;FreeMenu"/>
     <owl:AnnotationProperty rdf:about="&patterns;VegetarianMenuFreeMenuPatternInstantiation"/>
-    
 
 
-    <!-- 
+
+    <!--
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Object Properties
@@ -60,7 +60,7 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
+
 
 
     <!-- http://www.coode.org/patterns/examples/food#contains -->
@@ -68,10 +68,10 @@
     <owl:ObjectProperty rdf:about="#contains">
         <rdfs:label xml:lang="it">contiene</rdfs:label>
     </owl:ObjectProperty>
-    
 
 
-    <!-- 
+
+    <!--
     ///////////////////////////////////////////////////////////////////////////////////////
     //
     // Classes
@@ -79,7 +79,7 @@
     ///////////////////////////////////////////////////////////////////////////////////////
      -->
 
-    
+
 
 
     <!-- http://www.coode.org/patterns/examples/food#Course -->
@@ -88,15 +88,18 @@
         <rdfs:label xml:lang="it">Portata</rdfs:label>
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
     </owl:Class>
-    
 
+<owl:Class rdf:about="#Pizza">
+        <rdfs:label xml:lang="it">Pizza</rdfs:label>
+        <rdfs:subClassOf rdf:resource="&owl;Thing"/>
+    </owl:Class>
 
     <!-- http://www.coode.org/patterns/examples/food#Eggs -->
 
     <owl:Class rdf:about="#Eggs">
         <rdfs:subClassOf rdf:resource="#Food"/>
     </owl:Class>
-    
+
 
 
     <!-- http://www.coode.org/patterns/examples/food#Food -->
@@ -105,7 +108,7 @@
         <rdfs:label xml:lang="it">Cibo</rdfs:label>
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
     </owl:Class>
-    
+
 
 
     <!-- http://www.coode.org/patterns/examples/food#Meat -->
@@ -114,7 +117,7 @@
         <rdfs:label xml:lang="it">Carne</rdfs:label>
         <rdfs:subClassOf rdf:resource="#Food"/>
     </owl:Class>
-    
+
 
 
     <!-- http://www.coode.org/patterns/examples/food#Menu -->
@@ -123,7 +126,7 @@
         <rdfs:label xml:lang="it">Men&#249;</rdfs:label>
         <rdfs:subClassOf rdf:resource="&owl;Thing"/>
     </owl:Class>
-    
+
 
 
     <!-- http://www.coode.org/patterns/examples/food#Probe -->
@@ -131,7 +134,7 @@
     <owl:Class rdf:about="#Probe">
         <rdfs:subClassOf rdf:resource="#Menu"/>
     </owl:Class>
-    
+
 
 
     <!-- http://www.coode.org/patterns/examples/food#Vegetable -->
@@ -140,7 +143,7 @@
         <rdfs:label xml:lang="it">Verdura</rdfs:label>
         <rdfs:subClassOf rdf:resource="#Food"/>
     </owl:Class>
-    
+
 
 
     <!-- http://www.coode.org/patterns/examples/food#VegetarianCourse -->
@@ -178,7 +181,7 @@
             </owl:Restriction>
         </owl:object>
     </rdf:Description>
-    
+
 
 
     <!-- http://www.coode.org/patterns/examples/food#VegetarianMenu -->
@@ -226,7 +229,7 @@
             </owl:Restriction>
         </owl:object>
     </rdf:Description>
-    
+
 
 
     <!-- http://www.coode.org/patterns/examples/food#VegeterianFood -->
@@ -285,7 +288,7 @@
         <owl:subject rdf:resource="#VegeterianFood"/>
         <owl:predicate rdf:resource="&rdfs;subClassOf"/>
     </rdf:Description>
-    
+
 
 
     <!-- http://www.w3.org/2002/07/owl#Thing -->
