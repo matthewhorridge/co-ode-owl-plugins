@@ -23,6 +23,7 @@
 package org.coode.oppl.syntax;
 
 import java.util.Collections;
+import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
@@ -54,10 +55,10 @@ public class Utils {
 
 	public static ParserException buildException(String expression,
 			int beginningSubSection, int beginningSubSectionLine, Exception e) {
+		Set<String> set = Collections.emptySet();
 		ParserException test = new ParserException(expression + "\n"
 				+ e.getMessage(), beginningSubSection, beginningSubSectionLine,
-				beginningSubSection, false, false, false, false, false,
-				Collections.EMPTY_SET);
+				beginningSubSection, false, false, false, false, false, set);
 		return test;
 	}
 

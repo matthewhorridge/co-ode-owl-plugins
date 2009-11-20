@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.coode.oppl.utils;
 
@@ -40,15 +40,19 @@ public class OWLObjectExtractor {
 		final Set<OWLClass> toReturn = new HashSet<OWLClass>();
 		for (OWLEntity entity : axiom.getReferencedEntities()) {
 			entity.accept(new OWLEntityVisitor() {
+				@SuppressWarnings("unused")
 				public void visit(OWLDataType dataType) {
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLIndividual individual) {
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLDataProperty property) {
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLObjectProperty property) {
 				}
 
@@ -65,12 +69,15 @@ public class OWLObjectExtractor {
 		final Set<OWLObjectProperty> toReturn = new HashSet<OWLObjectProperty>();
 		for (OWLEntity entity : axiom.getReferencedEntities()) {
 			entity.accept(new OWLEntityVisitor() {
+				@SuppressWarnings("unused")
 				public void visit(OWLDataType dataType) {
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLIndividual individual) {
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLDataProperty property) {
 				}
 
@@ -78,6 +85,7 @@ public class OWLObjectExtractor {
 					toReturn.add(property);
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLClass cls) {
 				}
 			});
@@ -90,9 +98,11 @@ public class OWLObjectExtractor {
 		final Set<OWLDataProperty> toReturn = new HashSet<OWLDataProperty>();
 		for (OWLEntity entity : axiom.getReferencedEntities()) {
 			entity.accept(new OWLEntityVisitor() {
+				@SuppressWarnings("unused")
 				public void visit(OWLDataType dataType) {
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLIndividual individual) {
 				}
 
@@ -100,9 +110,11 @@ public class OWLObjectExtractor {
 					toReturn.add(property);
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLObjectProperty property) {
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLClass cls) {
 				}
 			});
@@ -115,6 +127,7 @@ public class OWLObjectExtractor {
 		final Set<OWLIndividual> toReturn = new HashSet<OWLIndividual>();
 		for (OWLEntity entity : axiom.getReferencedEntities()) {
 			entity.accept(new OWLEntityVisitor() {
+				@SuppressWarnings("unused")
 				public void visit(OWLDataType dataType) {
 				}
 
@@ -122,12 +135,15 @@ public class OWLObjectExtractor {
 					toReturn.add(individual);
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLDataProperty property) {
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLObjectProperty property) {
 				}
 
+				@SuppressWarnings("unused")
 				public void visit(OWLClass cls) {
 				}
 			});

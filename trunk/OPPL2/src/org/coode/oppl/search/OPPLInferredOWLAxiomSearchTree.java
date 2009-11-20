@@ -143,8 +143,8 @@ public class OPPLInferredOWLAxiomSearchTree extends
 		};
 		for (OWLOntology owlOntology : this.getConstraintSystem()
 				.getOntologyManager().getOntologies()) {
-			for (OWLAxiom axiom : owlOntology.getAxioms()) {
-				axiom.accept(new OWLAxiomVisitorAdapter() {
+			for (OWLAxiom axiomToVisit : owlOntology.getAxioms()) {
+				axiomToVisit.accept(new OWLAxiomVisitorAdapter() {
 					@Override
 					public void visit(OWLClassAssertionAxiom axiom) {
 						axiom.getDescription().accept(constantExtractor);

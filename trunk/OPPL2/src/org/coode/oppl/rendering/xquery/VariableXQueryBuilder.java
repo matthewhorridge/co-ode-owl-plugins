@@ -130,6 +130,7 @@ import org.semanticweb.owl.model.SWRLObjectPropertyAtom;
 import org.semanticweb.owl.model.SWRLRule;
 import org.semanticweb.owl.model.SWRLSameAsAtom;
 
+@SuppressWarnings("unused")
 final class PathNode {
 	private final List<PathNode> children = new ArrayList<PathNode>();
 	private final String name;
@@ -206,6 +207,7 @@ final class PathNode {
  * @author Luigi Iannone
  * 
  */
+@SuppressWarnings("unused")
 public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 		ConstraintVisitor {
 	public VariableXQueryBuilder(String axiomName,

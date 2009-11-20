@@ -616,7 +616,7 @@ OWLObject OWLExpression(Variable v, ConstraintSystem constraintSystem)
 		}
 	VariableType type = v.getType();
 	manSyntaxString = manSyntaxString.trim();
-	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, constraintSystem,getOWLOntologyManager().getOWLDataFactory(), getOWLOntologyManager());
+	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, constraintSystem);
 	try{
 	OWLObject toReturn = type.accept(expressionParser);
 	return toReturn;

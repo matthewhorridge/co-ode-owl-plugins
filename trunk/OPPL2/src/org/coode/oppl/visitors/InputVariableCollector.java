@@ -18,6 +18,7 @@ public class InputVariableCollector implements PlainVariableVisitor {
 		this(new ArrayList<Variable>());
 	}
 
+	@SuppressWarnings("unused")
 	public void visit(GeneratedVariable<?> v) {
 		// empty, does not return generated variables
 	}

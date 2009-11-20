@@ -139,15 +139,13 @@ public abstract class AbstractGeneratedVariable<N> implements
 		return this.value;
 	}
 
-	/**
-	 * @see org.coode.oppl.variablemansyntax.GeneratedVariable#accept(org.coode.oppl.variablemansyntax.GeneratedVariable.PlainVariableVisitor)
-	 */
 	public void accept(PlainVariableVisitor visitor) {
 		visitor.visit(this);
 	}
 
 	protected abstract GeneratedVariable<N> replace(GeneratedValue<N> value1);
 
+	@SuppressWarnings("unchecked")
 	public <P> GeneratedVariable<P> replaceValue(GeneratedValue<P> replaceValue) {
 		return (GeneratedVariable<P>) this
 				.replace((GeneratedValue<N>) replaceValue);
@@ -164,6 +162,6 @@ public abstract class AbstractGeneratedVariable<N> implements
 	@Override
 	public String toString() {
 		return this.getName() + ":" + this.getType() + " = "
-				+ getOPPLFunction();
+				+ this.getOPPLFunction();
 	}
 }

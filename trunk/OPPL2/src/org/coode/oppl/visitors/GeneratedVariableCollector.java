@@ -22,6 +22,7 @@ public class GeneratedVariableCollector implements PlainVariableVisitor {
 		this.toReturn.add(v);
 	}
 
+	@SuppressWarnings("unused")
 	public void visit(Variable v) {
 		// empty, does not return input variables
 	}

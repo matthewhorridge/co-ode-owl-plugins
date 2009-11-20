@@ -66,6 +66,9 @@ public class ConstraintSystem {
 		private final Map<String, Variable> map = new HashMap<String, Variable>();
 		private final Map<URI, Variable> urisMap = new HashMap<URI, Variable>();
 
+		public VariableSet() {
+		}
+
 		public Variable get(String name) {
 			return this.map.get(name);
 		}
@@ -146,7 +149,7 @@ public class ConstraintSystem {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void loadReasoner() {
 		try {

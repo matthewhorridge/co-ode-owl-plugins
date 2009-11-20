@@ -407,6 +407,7 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 
 	public void ontologiesChanged(List<? extends OWLOntologyChange> changes)
 			throws OWLException {
+		// TODO if the size of changes is 0, dirty could be set to false?
 		this.setDirty(true);
 	}
 }

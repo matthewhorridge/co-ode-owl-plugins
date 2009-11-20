@@ -50,9 +50,11 @@ public class Executor implements OPPLScriptVisitor {
 				considerImportClosure);
 	}
 
+	@SuppressWarnings("unused")
 	public void visit(Variable v) {
 	}
 
+	@SuppressWarnings("unused")
 	public void visit(OPPLQuery q) {
 	}
 

@@ -53,6 +53,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 			this.toUpdate.add(v);
 		}
 
+		@SuppressWarnings("unused")
 		public void visit(GeneratedVariable<?> v) {
 		}
 	}
