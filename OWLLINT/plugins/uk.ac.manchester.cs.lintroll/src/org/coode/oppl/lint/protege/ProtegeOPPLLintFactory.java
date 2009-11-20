@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.coode.oppl.lint.protege;
 
@@ -7,6 +7,7 @@ import org.coode.oppl.OPPLScript;
 import org.coode.oppl.lint.OPPLLintAbstractFactory;
 import org.coode.oppl.lint.OPPLLintScript;
 import org.coode.oppl.lint.OPPLLintScriptImpl;
+import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.ProtegeParserFactory;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.protege.editor.owl.model.OWLModelManager;
@@ -36,8 +37,8 @@ public class ProtegeOPPLLintFactory implements OPPLLintAbstractFactory {
 	/**
 	 * @see org.coode.oppl.lint.OPPLLintAbstractFactory#initOPPLParser(java.lang.String)
 	 */
-	public void initOPPLParser(String string) {
-		ProtegeParserFactory.initParser(string, this.modelManager);
+	public OPPLParser initOPPLParser(String string) {
+		return ProtegeParserFactory.initParser(string, this.modelManager, null);
 	}
 
 	/**
