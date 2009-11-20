@@ -24,9 +24,7 @@ package org.coode.oppl.variablemansyntax;
 
 import org.coode.oppl.utils.ParserFactory;
 import org.semanticweb.owl.expression.ParserException;
-import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -35,16 +33,12 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 public class ExpressionParser implements VariableTypeVisitorEx<OWLObject> {
 	protected VariableManchesterOWLSyntaxParser parser;
 
-	public ExpressionParser(String string, ConstraintSystem cs,
-			OWLDataFactory dataFactory, OWLOntologyManager ontologyManager) {
+	public ExpressionParser(String string, ConstraintSystem cs) {
 		this.parser = new VariableManchesterOWLSyntaxParser(string, cs);
 		this.parser.setOWLEntityChecker(ParserFactory.getInstance()
 				.getOPPLFactory().getOWLEntityChecker());
 	}
 
-	/**
-	 * @see org.coode.oppl.variablemansyntax.VariableTypeVisitorEx#visit(org.coode.oppl.variablemansyntax.VariableType)
-	 */
 	public OWLObject visit(VariableType type) {
 		OWLObject toReturn = null;
 		try {

@@ -311,8 +311,7 @@ public class SearchTest extends TestCase {
 			final OPPLScript checkOPPLScript = this.parsescript(manager,
 					ontology, opplString);
 			final Set<OWLAxiom> correctResults = this
-					.getOPPLScriptCorrectResults(manager, ontology,
-							checkOPPLScript);
+					.getOPPLScriptCorrectResults(checkOPPLScript);
 			Iterator<OWLAxiom> iterator = opplScript.getQuery()
 					.getAssertedAxioms().iterator();
 			OWLAxiom firstAxiom = iterator.next();
@@ -357,7 +356,6 @@ public class SearchTest extends TestCase {
 	 * @return
 	 */
 	private Set<OWLAxiom> getOPPLScriptCorrectResults(
-			final OWLOntologyManager manager, OWLOntology ontology,
 			final OPPLScript opplScript) {
 		ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
 				.getConstraintSystem(), true);
@@ -392,8 +390,7 @@ public class SearchTest extends TestCase {
 			final OPPLScript checkOPPLScript = this.parsescript(manager,
 					ontology, opplString);
 			final Set<OWLAxiom> correctResults = this
-					.getOPPLScriptCorrectResults(manager, ontology,
-							checkOPPLScript);
+					.getOPPLScriptCorrectResults(checkOPPLScript);
 			Iterator<OWLAxiom> iterator = opplScript.getQuery()
 					.getAssertedAxioms().iterator();
 			OWLAxiom firstAxiom = iterator.next();

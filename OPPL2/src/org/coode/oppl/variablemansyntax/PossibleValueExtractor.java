@@ -178,10 +178,12 @@ public class PossibleValueExtractor implements
 		return toReturn;
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(OWLImportsDeclaration axiom) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(OWLAxiomAnnotationAxiom axiom) {
 		return new HashSet<OWLObject>();
 	}
@@ -287,14 +289,17 @@ public class PossibleValueExtractor implements
 		return toReturn;
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(OWLDeclarationAxiom axiom) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(OWLEntityAnnotationAxiom axiom) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(OWLOntologyAnnotationAxiom axiom) {
 		return new HashSet<OWLObject>();
 	}
@@ -418,6 +423,7 @@ public class PossibleValueExtractor implements
 		return toReturn;
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLRule rule) {
 		return new HashSet<OWLObject>();
 	}
@@ -579,6 +585,7 @@ public class PossibleValueExtractor implements
 		return toReturn;
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(OWLDataType node) {
 		return new HashSet<OWLObject>();
 	}
@@ -622,6 +629,7 @@ public class PossibleValueExtractor implements
 		return toReturn;
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(OWLDataRangeFacetRestriction node) {
 		return new HashSet<OWLObject>();
 	}
@@ -657,58 +665,72 @@ public class PossibleValueExtractor implements
 		return toReturn;
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(OWLObjectAnnotation annotation) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(OWLConstantAnnotation annotation) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLClassAtom node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLDataRangeAtom node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLObjectPropertyAtom node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLDataValuedPropertyAtom node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLBuiltInAtom node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLAtomDVariable node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLAtomIVariable node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLAtomIndividualObject node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLAtomConstantObject node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLSameAsAtom node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(SWRLDifferentFromAtom node) {
 		return new HashSet<OWLObject>();
 	}
 
+	@SuppressWarnings("unused")
 	public Set<OWLObject> visit(OWLOntology ontology) {
 		return new HashSet<OWLObject>();
 	}

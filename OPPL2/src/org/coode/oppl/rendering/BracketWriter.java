@@ -28,6 +28,7 @@ import org.semanticweb.owl.model.OWLTypedConstant;
 import org.semanticweb.owl.model.OWLUntypedConstant;
 import org.semanticweb.owl.util.OWLDescriptionVisitorAdapter;
 
+@SuppressWarnings("unused")
 public class BracketWriter extends OWLDescriptionVisitorAdapter implements
 		OWLDataVisitor {
 	public BracketWriter() {

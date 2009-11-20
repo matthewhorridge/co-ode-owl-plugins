@@ -365,8 +365,7 @@ public class TestQueries extends TestCase {
 	private void testQuery(OPPLScript opplScript,
 			OWLOntologyManager ontologyManager, OWLOntology testOntology) {
 		this.buildOntologyForQuery(opplScript, testOntology, ontologyManager);
-		Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
-				testOntology, opplScript);
+		Set<OWLAxiom> results = this.getOPPLScriptResults(opplScript);
 		StringWriter resultWriter = new StringWriter();
 		for (OWLAxiom owlAxiom : results) {
 			resultWriter.append(owlAxiom.toString());
@@ -393,9 +392,7 @@ public class TestQueries extends TestCase {
 		}
 	}
 
-	private Set<OWLAxiom> getOPPLScriptResults(
-			final OWLOntologyManager manager, OWLOntology ontology,
-			final OPPLScript opplScript) {
+	private Set<OWLAxiom> getOPPLScriptResults(final OPPLScript opplScript) {
 		ChangeExtractor changeExtractor = new ChangeExtractor(opplScript
 				.getConstraintSystem(), true);
 		opplScript.accept(changeExtractor);
@@ -580,8 +577,7 @@ public class TestQueries extends TestCase {
 			String opplString = "?x:OBJECTPROPERTY, ?y:OBJECTPROPERTY SELECT ASSERTED ?x equivalentTo ?y BEGIN ADD ?x equivalentTo ?y END;";
 			OPPLScript opplScript = this.parsescript(opplString,
 					ontologyManager, testOntology);
-			Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
-					testOntology, opplScript);
+			Set<OWLAxiom> results = this.getOPPLScriptResults(opplScript);
 			assertTrue(results.size() == 1);
 			assertTrue(opplScript.getConstraintSystem().getLeaves().size() == 2);
 			Logging.getQueryTestLogging().log(Level.INFO,
@@ -616,8 +612,7 @@ public class TestQueries extends TestCase {
 			String opplString = "?x:DATAPROPERTY, ?y:DATAPROPERTY SELECT ASSERTED ?x equivalentTo ?y BEGIN ADD ?x equivalentTo ?y END;";
 			OPPLScript opplScript = this.parsescript(opplString,
 					ontologyManager, testOntology);
-			Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
-					testOntology, opplScript);
+			Set<OWLAxiom> results = this.getOPPLScriptResults(opplScript);
 			assertTrue(results.size() == 1);
 			assertTrue(opplScript.getConstraintSystem().getLeaves().size() == 2);
 			Logging.getQueryTestLogging().log(Level.INFO,
@@ -652,8 +647,7 @@ public class TestQueries extends TestCase {
 			String opplString = "?x:DATAPROPERTY, ?y:DATAPROPERTY SELECT ASSERTED ?x disjointWith ?y BEGIN ADD ?x disjointWith ?y END;";
 			OPPLScript opplScript = this.parsescript(opplString,
 					ontologyManager, testOntology);
-			Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
-					testOntology, opplScript);
+			Set<OWLAxiom> results = this.getOPPLScriptResults(opplScript);
 			assertTrue(results.size() == 1);
 			assertTrue(opplScript.getConstraintSystem().getLeaves().size() == 2);
 			Logging.getQueryTestLogging().log(Level.INFO,
@@ -688,8 +682,7 @@ public class TestQueries extends TestCase {
 			String opplString = "?x:OBJECTPROPERTY, ?y:OBJECTPROPERTY SELECT ASSERTED ?x disjointWith ?y BEGIN ADD ?x disjointWith ?y END;";
 			OPPLScript opplScript = this.parsescript(opplString,
 					ontologyManager, testOntology);
-			Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
-					testOntology, opplScript);
+			Set<OWLAxiom> results = this.getOPPLScriptResults(opplScript);
 			assertTrue(results.size() == 1);
 			assertTrue(opplScript.getConstraintSystem().getLeaves().size() == 2);
 			Logging.getQueryTestLogging().log(Level.INFO,
@@ -724,8 +717,7 @@ public class TestQueries extends TestCase {
 			String opplString = "?x:CLASS, ?y:CLASS SELECT ASSERTED ?x equivalentTo ?y BEGIN ADD ?x equivalentTo ?y END;";
 			OPPLScript opplScript = this.parsescript(opplString,
 					ontologyManager, testOntology);
-			Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
-					testOntology, opplScript);
+			Set<OWLAxiom> results = this.getOPPLScriptResults(opplScript);
 			assertTrue(results.size() == 1);
 			assertTrue(opplScript.getConstraintSystem().getLeaves().size() == 2);
 			Logging.getQueryTestLogging().log(Level.INFO,
@@ -760,8 +752,7 @@ public class TestQueries extends TestCase {
 			String opplString = "?x:CLASS, ?y:CLASS SELECT ASSERTED ?x disjointWith ?y BEGIN ADD ?x disjointWith ?y END;";
 			OPPLScript opplScript = this.parsescript(opplString,
 					ontologyManager, testOntology);
-			Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
-					testOntology, opplScript);
+			Set<OWLAxiom> results = this.getOPPLScriptResults(opplScript);
 			assertTrue(results.size() == 1);
 			assertTrue(opplScript.getConstraintSystem().getLeaves().size() == 2);
 			Logging.getQueryTestLogging().log(Level.INFO,
@@ -795,8 +786,7 @@ public class TestQueries extends TestCase {
 			String opplString = "?x:INDIVIDUAL, ?y:INDIVIDUAL SELECT ASSERTED ?x SameAs ?y BEGIN ADD ?x SameAs ?y END;";
 			OPPLScript opplScript = this.parsescript(opplString,
 					ontologyManager, testOntology);
-			Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
-					testOntology, opplScript);
+			Set<OWLAxiom> results = this.getOPPLScriptResults(opplScript);
 			assertTrue(results.size() == 1);
 			assertTrue(opplScript.getConstraintSystem().getLeaves().size() == 2);
 			Logging.getQueryTestLogging().log(Level.INFO,
@@ -830,8 +820,7 @@ public class TestQueries extends TestCase {
 			String opplString = "?x:INDIVIDUAL, ?y:INDIVIDUAL SELECT ASSERTED ?x DifferentFrom ?y BEGIN ADD ?x DifferentFrom ?y END;";
 			OPPLScript opplScript = this.parsescript(opplString,
 					ontologyManager, testOntology);
-			Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
-					testOntology, opplScript);
+			Set<OWLAxiom> results = this.getOPPLScriptResults(opplScript);
 			assertTrue(results.size() == 1);
 			assertTrue(opplScript.getConstraintSystem().getLeaves().size() == 2);
 			Logging.getQueryTestLogging().log(Level.INFO,
@@ -870,8 +859,7 @@ public class TestQueries extends TestCase {
 			String opplString = "?x:CLASS, ?y:CLASS SELECT ASSERTED ?x and ?y subClassOf C BEGIN ADD ?x and ?y subClassOf C END;";
 			OPPLScript opplScript = this.parsescript(opplString,
 					ontologyManager, testOntology);
-			Set<OWLAxiom> results = this.getOPPLScriptResults(ontologyManager,
-					testOntology, opplScript);
+			Set<OWLAxiom> results = this.getOPPLScriptResults(opplScript);
 			assertTrue(results.size() == 1);
 			assertTrue("Expected 2 Actual "
 					+ opplScript.getConstraintSystem().getLeaves().size(),

@@ -73,8 +73,8 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		 * @return
 		 */
 		private URI buildURI(String shortName) {
-			return URI.create(getConstraintSystem().getOntology().getURI()
-					.toString()
+			return URI.create(OPPLFactory.this.getConstraintSystem()
+					.getOntology().getURI().toString()
 					+ "#" + shortName);
 		}
 
@@ -125,9 +125,11 @@ public class OPPLFactory implements OPPLAbstractFactory {
 					.createOWLEntity(OWLIndividual.class, shortName, baseURI);
 		}
 
+		@SuppressWarnings("unused")
 		private <T extends OWLEntity> boolean isValidNewID(String shortName,
 				URI baseURI, Class<T> type) {
-			return baseURI.equals(getConstraintSystem().getOntology().getURI());
+			return baseURI.equals(OPPLFactory.this.getConstraintSystem()
+					.getOntology().getURI());
 		}
 
 		/*
@@ -136,13 +138,14 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		 * @see org.coode.oppl.EntityFactory#createOWLEntity(java.lang.Class,
 		 * java.lang.String, java.net.URI)
 		 */
+		@SuppressWarnings("unused")
 		public <T extends OWLEntity> OWLEntityCreationSet<T> createOWLEntity(
 				Class<T> type, String shortName, URI baseURI)
 				throws OWLEntityCreationException {
-			URI anURI = buildURI(shortName);
+			URI anURI = this.buildURI(shortName);
 			T entity = this.getOWLEntity(type, anURI);
-			OWLDeclarationAxiom declarationAxiom = getOWLDataFactory()
-					.getOWLDeclarationAxiom(entity);
+			OWLDeclarationAxiom declarationAxiom = OPPLFactory.this
+					.getOWLDataFactory().getOWLDeclarationAxiom(entity);
 			List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 			changes.add(new AddAxiom(OPPLFactory.this.constraintSystem
 					.getOntology(), declarationAxiom));
@@ -167,13 +170,17 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		@SuppressWarnings("unchecked")
 		private <T extends OWLEntity> T getOWLEntity(Class<T> type, URI uri) {
 			if (OWLClass.class.isAssignableFrom(type)) {
-				return (T) getOWLDataFactory().getOWLClass(uri);
+				return (T) OPPLFactory.this.getOWLDataFactory()
+						.getOWLClass(uri);
 			} else if (OWLObjectProperty.class.isAssignableFrom(type)) {
-				return (T) getOWLDataFactory().getOWLObjectProperty(uri);
+				return (T) OPPLFactory.this.getOWLDataFactory()
+						.getOWLObjectProperty(uri);
 			} else if (OWLDataProperty.class.isAssignableFrom(type)) {
-				return (T) getOWLDataFactory().getOWLDataProperty(uri);
+				return (T) OPPLFactory.this.getOWLDataFactory()
+						.getOWLDataProperty(uri);
 			} else if (OWLIndividual.class.isAssignableFrom(type)) {
-				return (T) getOWLDataFactory().getOWLIndividual(uri);
+				return (T) OPPLFactory.this.getOWLDataFactory()
+						.getOWLIndividual(uri);
 			}
 			return null;
 		}
@@ -259,8 +266,8 @@ public class OPPLFactory implements OPPLAbstractFactory {
 			StringWriter writer) {
 		ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
 				writer);
-		renderer.setShortFormProvider(new SimpleVariableShortFormProvider(
-				getConstraintSystem()));
+		renderer.setShortFormProvider(new SimpleVariableShortFormProvider(this
+				.getConstraintSystem()));
 		return renderer;
 	}
 
@@ -268,7 +275,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	 * @return the constraintSystem
 	 */
 	protected final ConstraintSystem getConstraintSystem() {
-		return this.constraintSystem == null ? createConstraintSystem()
+		return this.constraintSystem == null ? this.createConstraintSystem()
 				: this.constraintSystem;
 	}
 
@@ -291,8 +298,8 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	public ManchesterSyntaxRenderer getManchesterSyntaxRenderer(
 			ConstraintSystem cs) {
 		ArgCheck.checkNullArgument("The constraint system", cs);
-		return new ManchesterSyntaxRenderer(this.ontologyManager,
-				getOWLEntityRenderer(cs), cs);
+		return new ManchesterSyntaxRenderer(this.ontologyManager, this
+				.getOWLEntityRenderer(cs), cs);
 	}
 
 	public OWLOntologyManager getOntologyManager() {

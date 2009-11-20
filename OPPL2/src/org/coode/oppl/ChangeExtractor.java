@@ -66,6 +66,7 @@ public class ChangeExtractor implements
 		return p;
 	}
 
+	@SuppressWarnings("unused")
 	public List<OWLAxiomChange> visit(Variable v, List<OWLAxiomChange> p) {
 		return p;
 	}
