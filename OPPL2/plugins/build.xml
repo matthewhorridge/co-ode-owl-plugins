@@ -63,10 +63,10 @@
 	=========================================-->
 	<target name="javacc">
 		<exec executable="sh" dir="${basedir}/src/org/coode/oppl/syntax">
-			<arg line="/Applications/javacc-4.2/bin/jjtree oppl.jjt"/>
+			<arg line="${javaccpath}jjtree oppl.jjt"/>
 		</exec>
 		<exec executable="sh" dir="${basedir}/src/org/coode/oppl/syntax">
-			<arg line="/Applications/javacc-4.2/bin/javacc oppl.jj"/>
+			<arg line="${javaccpath}javacc oppl.jj"/>
 		</exec>
 	</target>
 
