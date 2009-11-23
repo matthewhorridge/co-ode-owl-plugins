@@ -89,7 +89,7 @@ public class TypeInPatternBuilder extends
 
 					public String createObject(String text)
 							throws OWLExpressionParserException {
-						check(text);
+						this.check(text);
 						return this.lastName;
 					}
 				});
@@ -102,7 +102,7 @@ public class TypeInPatternBuilder extends
 						String localName = TypeInPatternBuilder.this.patternNameTextField
 								.getText();
 						try {
-							if (!localName.isEmpty()) {
+							if (localName.length() != 0) {
 								try {
 									anURI = new URI(PatternModel.NAMESPACE
 											+ localName);
@@ -119,8 +119,9 @@ public class TypeInPatternBuilder extends
 						TypeInPatternBuilder.this.handleChange();
 					}
 
+					@SuppressWarnings("unused")
 					public void verifiedStatusChanged(boolean newState) {
-						updateURI();
+						this.updateURI();
 					}
 				});
 		patternNamePanel.setBorder(ComponentFactory
@@ -129,7 +130,7 @@ public class TypeInPatternBuilder extends
 		this.patternModelEditor = new ExpressionEditor<ProtegePatternModel>(
 				this.owlEditorKit, new PatternModelExpressionChecker(
 						this.owlEditorKit));
-		removeKeyListeners();
+		this.removeKeyListeners();
 		this.patternModelEditor.setPreferredSize(new Dimension(50, 200));
 		JScrollPane opplStatementEditorPane = ComponentFactory
 				.createScrollPane(this.patternModelEditor);
@@ -150,7 +151,7 @@ public class TypeInPatternBuilder extends
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		notifyListener(listener);
+		this.notifyListener(listener);
 	}
 
 	/**
@@ -179,12 +180,12 @@ public class TypeInPatternBuilder extends
 				e.printStackTrace();
 			}
 		}
-		handleChange();
+		this.handleChange();
 	}
 
 	public void handleChange() {
 		for (InputVerificationStatusChangedListener listener : this.listeners) {
-			notifyListener(listener);
+			this.notifyListener(listener);
 		}
 	}
 
