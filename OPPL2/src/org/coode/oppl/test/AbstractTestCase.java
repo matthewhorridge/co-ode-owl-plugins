@@ -207,7 +207,7 @@ public abstract class AbstractTestCase extends TestCase {
 
 	protected void reportUnexpectedStacktrace(String stackTrace) {
 		// assertEquals(0, stackTrace.length());
-		if (!stackTrace.isEmpty()) {
+		if (stackTrace.length() != 0) {
 			System.out
 					.println("ExhaustingTestCase There should not have been a stacktrace!");
 			System.out.println(stackTrace);
