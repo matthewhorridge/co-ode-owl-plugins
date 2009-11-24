@@ -32,6 +32,7 @@ import org.coode.oppl.SimpleVariableShortFormProvider;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
+import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLConstantAnnotation;
 import org.semanticweb.owl.model.OWLOntology;
@@ -53,15 +54,16 @@ public class PatternModelFactory implements AbstractPatternModelFactory {
 	 * @param ontologyManager
 	 */
 	public PatternModelFactory(OWLOntology ontology,
-			OWLOntologyManager ontologyManager, String script) {
+			OWLOntologyManager ontologyManager, OWLReasoner reasoner,
+			String script) {
 		this.ontologyManager = ontologyManager;
 		this.ontology = ontology;
-		initOPPLParser(script);
+		this.initOPPLParser(script, reasoner);
 	}
 
 	public PatternModelFactory(OWLOntology ontology,
 			OWLOntologyManager ontologyManager) {
-		this(ontology, ontologyManager, ";");
+		this(ontology, ontologyManager, null, ";");
 	}
 
 	public PatternModel createPatternModel(OPPLScript opplScript)
@@ -93,9 +95,9 @@ public class PatternModelFactory implements AbstractPatternModelFactory {
 				this.ontologyManager), this.ontologyManager, this);
 	}
 
-	public void initOPPLParser(String string) {
+	public void initOPPLParser(String string, OWLReasoner resoner) {
 		this.opplParser = org.coode.oppl.utils.ParserFactory.initParser(string,
-				this.ontology, this.ontologyManager, null, PatternModel
+				this.ontology, this.ontologyManager, resoner, PatternModel
 						.getScriptValidator());
 	}
 

@@ -57,7 +57,7 @@ public class ProtegeInstantiatedPatternModel extends InstantiatedPatternModel {
 	}
 
 	protected PatternParser initParser(String s) {
-		return org.coode.patterns.utils.ParserFactory.initProtegeParser(s,
+		return org.coode.patterns.protege.utils.ProtegeParserFactory.initProtegeParser(s,
 				this.modelManager);
 	}
 

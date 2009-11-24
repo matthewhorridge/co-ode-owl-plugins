@@ -25,9 +25,7 @@ package org.coode.patterns.utils;
 import java.io.StringReader;
 
 import org.coode.patterns.PatternModelFactory;
-import org.coode.patterns.protege.ProtegePatternModelFactory;
 import org.coode.patterns.syntax.PatternParser;
-import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -45,20 +43,11 @@ public class ParserFactory {
 
 	public static PatternParser initParser(String formulaBody,
 			OWLOntology ontology, OWLOntologyManager ontologyManager,
-			OWLReasoner r) {
+			OWLReasoner reasoner) {
 		PatternParser parser = new PatternParser(new StringReader(formulaBody),
-				ontologyManager, r);
+				ontologyManager, reasoner);
 		parser.setPatternModelFactory(new PatternModelFactory(ontology,
-				ontologyManager, formulaBody));
-		return parser;
-	}
-
-	public static PatternParser initProtegeParser(String formulaBody,
-			OWLModelManager manager) {
-		PatternParser parser = new PatternParser(new StringReader(formulaBody),
-				manager.getOWLOntologyManager(), manager.getReasoner());
-		parser.setPatternModelFactory(new ProtegePatternModelFactory(manager,
-				formulaBody));
+				ontologyManager, reasoner, formulaBody));
 		return parser;
 	}
 

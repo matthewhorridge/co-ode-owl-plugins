@@ -346,12 +346,11 @@ OPPLScript OPPLPatternStatement(PatternConstraintSystem constraintSystem){
 		}
 	}
 	String string = stringbuilder.toString().replace("BEGIN", "\nBEGIN\n").replace("END;", "\nEND;");
-	//System.out.println("PatternParser.OPPLPatternStatement() to execute:\n"+string+"\n");
-	this.modelFactory.initOPPLParser(string);
 	try {
+		this.modelFactory.initOPPLParser(string, constraintSystem.getReasoner());
 		return this.modelFactory.getOPPLParser().parse(constraintSystem);
-	} catch (org.coode.oppl.syntax.ParseException e) {
-		throw new ParseException("The compiled OPPL script is not syntactically correct:\n" + "Compiled pattern: \n" + string + "\nerror message: \"" + e.getMessage() + "\"", e);
+	} catch (Exception e) {
+		throw new ParseException("The compiled OPPL script cannot be parsed correctly:\n" + "Compiled pattern: \n" + string + "\nerror message: \"" + e.getMessage() + "\"", e);
 	}
 }
 
