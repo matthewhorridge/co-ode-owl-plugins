@@ -23,6 +23,7 @@
 package org.coode.oppl.protege.ui;
 
 import java.awt.BorderLayout;
+import java.awt.event.KeyListener;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -138,11 +139,11 @@ public final class OPPLTextEditor extends JPanel implements
 				});
 		this.editor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
-					@SuppressWarnings("unused")
 					public void verifiedStatusChanged(boolean newState) {
 						OPPLTextEditor.this.handleChange();
 					}
 				});
+		this.removeKeyListeners();
 		this.getOWLEditorKit().getModelManager().addListener(this);
 		this.initGUI();
 	}
@@ -208,15 +209,25 @@ public final class OPPLTextEditor extends JPanel implements
 	public void handleChange(OWLModelManagerChangeEvent event) {
 		EventType type = event.getType();
 		switch (type) {
-			case REASONER_CHANGED:
-				this.handleChange();
-				break;
-			default:
-				break;
+		case REASONER_CHANGED:
+			this.handleChange();
+			break;
+		default:
+			break;
 		}
 	}
 
 	public void dispose() {
 		this.getOWLEditorKit().getModelManager().removeListener(this);
+	}
+
+	/**
+	 *
+	 */
+	private void removeKeyListeners() {
+		KeyListener[] keyListeners = this.editor.getKeyListeners();
+		for (KeyListener keyListener : keyListeners) {
+			this.editor.removeKeyListener(keyListener);
+		}
 	}
 }

@@ -21,6 +21,7 @@ import org.semanticweb.owl.model.OWLConstantAnnotation;
 import org.semanticweb.owl.model.OWLDataPropertyDomainAxiom;
 import org.semanticweb.owl.model.OWLDataPropertyRangeAxiom;
 import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLEquivalentClassesAxiom;
 import org.semanticweb.owl.model.OWLImportsDeclaration;
 import org.semanticweb.owl.model.OWLIndividual;
@@ -49,7 +50,6 @@ import org.semanticweb.owl.model.OWLUntypedConstant;
  */
 public class VariableOWLObjectRenderer extends AbstractRenderer implements
 		OWLObjectVisitor, OWLObjectRenderer {
-	private StringBuilder buffer;
 	// private Map<OWLRestrictedDataRangeFacetVocabulary, String> facetMap;
 	// private Map<URI, Boolean> simpleRenderDatatypes;
 	private OWLObject focusedObject;
@@ -80,8 +80,13 @@ public class VariableOWLObjectRenderer extends AbstractRenderer implements
 	public void initialise() {
 	}
 
-	public String render(OWLObject object, OWLEntityRenderer entityRenderer1) {
-		// this.entityRenderer = entityRenderer1;
+	public String render(OWLObject object,
+			final OWLEntityRenderer entityRenderer) {
+		this.entityRenderer = new org.coode.oppl.entity.OWLEntityRenderer() {
+			public String render(OWLEntity entity) {
+				return entityRenderer.render(entity);
+			}
+		};
 		this.reset();
 		try {
 			object.accept(this);

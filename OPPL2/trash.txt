@@ -230,3 +230,10 @@ let $y = $axiom_2/owl2xml:Class[1]/@URI
 WHERE
 $axiom_1/owl2xml:Class[2]/@URI = http://www.semanticweb.org/family.owl#gender and 
 $axiom_2/owl2xml:Class[2]/@URI = http://www.semanticweb.org/family.owl#gender
+
+
+?x:CLASS, ?y:CLASS
+SELECT ?x subClassOf ?y
+BEGIN
+ 	ADD ?x subClassOf Pizza
+END;
