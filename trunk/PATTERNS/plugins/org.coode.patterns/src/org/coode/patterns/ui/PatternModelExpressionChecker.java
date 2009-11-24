@@ -23,10 +23,10 @@
 package org.coode.patterns.ui;
 
 import org.coode.patterns.protege.ProtegePatternModel;
+import org.coode.patterns.protege.utils.ProtegeParserFactory;
 import org.coode.patterns.syntax.ParseException;
 import org.coode.patterns.syntax.PatternParser;
 import org.coode.patterns.syntax.TokenMgrError;
-import org.coode.patterns.utils.ParserFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.description.OWLExpressionParserException;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
@@ -50,7 +50,7 @@ public class PatternModelExpressionChecker implements
 	 */
 	public void check(String text) throws OWLExpressionParserException {
 		this.lastCreatedObject = null;
-		PatternParser parser = ParserFactory.initProtegeParser(text, this.owlEditorKit
+		PatternParser parser = ProtegeParserFactory.initProtegeParser(text, this.owlEditorKit
 				.getModelManager());
 		try {
 			this.lastCreatedObject = (ProtegePatternModel) parser.Start();

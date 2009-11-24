@@ -29,9 +29,9 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.JTextComponent;
 
 import org.apache.log4j.Logger;
+import org.coode.patterns.protege.utils.ProtegeParserFactory;
 import org.coode.patterns.syntax.ParseException;
 import org.coode.patterns.syntax.PatternParser;
-import org.coode.patterns.utils.ParserFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLDescriptionAutoCompleter;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
@@ -59,7 +59,7 @@ public class InstantiatedPatternCompleter extends
 
 	@Override
 	protected List<? extends Object> getMatches() {
-		PatternParser parser = ParserFactory.initProtegeParser(this.textComponent
+		PatternParser parser = ProtegeParserFactory.initProtegeParser(this.textComponent
 				.getText(), this.owlEditorKit.getModelManager());
 		List<? extends Object> toReturn = new ArrayList<Object>();
 		try {

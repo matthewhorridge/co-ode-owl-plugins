@@ -25,8 +25,8 @@ package org.coode.patterns.protege;
 import java.util.Set;
 
 import org.coode.patterns.PatternExtractor;
+import org.coode.patterns.protege.utils.ProtegeParserFactory;
 import org.coode.patterns.syntax.PatternParser;
-import org.coode.patterns.utils.ParserFactory;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.model.OWLConstantAnnotation;
 
@@ -53,7 +53,7 @@ public class ProtegePatternExtractor extends PatternExtractor {
 
 	@Override
 	protected PatternParser initParser(String value) {
-		PatternParser parser = ParserFactory.initProtegeParser(value,
+		PatternParser parser = ProtegeParserFactory.initProtegeParser(value,
 				this.owlModelManager);
 		parser.setVisited(getVisitedPatternNames());
 		// parser.setPatternModelFactory(new ProtegePatternModelFactory(

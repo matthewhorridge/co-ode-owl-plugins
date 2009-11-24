@@ -42,6 +42,7 @@ import org.coode.patterns.PatternExtractor;
 import org.coode.patterns.PatternModel;
 import org.coode.patterns.UnsuitableOPPLScriptException;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLConstantAnnotation;
 
@@ -69,8 +70,11 @@ public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 	 */
 	public ProtegePatternModelFactory(OWLModelManager modelManager,
 			String script) {
+		if (modelManager == null) {
+			throw new NullPointerException("The model manager cannot be null");
+		}
 		this.modelManager = modelManager;
-		initOPPLParser(script);
+		this.initOPPLParser(script, modelManager.getReasoner());
 	}
 
 	public ProtegePatternModelFactory(OWLModelManager modelManager) {
@@ -111,7 +115,7 @@ public class ProtegePatternModelFactory implements AbstractPatternModelFactory {
 						.getReasoner(), this);
 	}
 
-	public void initOPPLParser(String string) {
+	public void initOPPLParser(String string, OWLReasoner reasoner) {
 		this.parser = ProtegeParserFactory.initParser(string,
 				this.modelManager, PatternModel.getScriptValidator());
 	}

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <project name="patterns plugin" default="bundle" basedir="..">
-
+  <property file="${basedir}/plugins/build.properties" />
   <property name="src" location="${basedir}/org.coode.patterns/src"/>
   <property name="classes" location="${basedir}/bin"/>
   <property name="source" location="1.5"/>
