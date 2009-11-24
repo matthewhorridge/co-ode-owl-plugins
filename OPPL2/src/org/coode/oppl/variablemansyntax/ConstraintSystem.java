@@ -272,7 +272,7 @@ public class ConstraintSystem {
 	 * @throws OWLReasonerException
 	 */
 	public OWLReasoner getReasoner() throws OWLReasonerException {
-		if (!this.reasoner.isClassified()) {
+		if (this.reasoner != null && !this.reasoner.isClassified()) {
 			this.reasoner.classify();
 		}
 		return this.reasoner;
