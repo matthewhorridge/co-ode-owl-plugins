@@ -36,7 +36,7 @@ public class Utils {
 			Token token = patternParser.getToken(1);
 			boolean found = false;
 			for (int i = 0; !found && i < delimiterTokenKinds.length; i++) {
-				found = token.kind == PatternParser.EOF
+				found = token.kind == PatternParserConstants.EOF
 						|| delimiterTokenKinds[i] == token.kind;
 			}
 			if (found) {
@@ -57,7 +57,7 @@ public class Utils {
 			Token token = patternParser.getToken(1);
 			boolean found = false;
 			for (int i = 0; !found && i < delimiterTokenKinds.length; i++) {
-				found = token.kind == PatternParser.EOF
+				found = token.kind == PatternParserConstants.EOF
 						|| delimiterTokenKinds[i] == token.kind;
 			}
 			if (found) {

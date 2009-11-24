@@ -217,10 +217,9 @@ public class InstantiatedPatternModel implements InstantiatedOPPLScript,
 	public Set<BindingNode> extractBindingNodes() {
 		Set<Assignment> assignments = new HashSet<Assignment>();
 		for (Variable v : this.getInputVariables()) {
-			Set<OWLObject> instantiations = this.instantiations.get(v);
 			v.clearBindings();
-			if (instantiations != null) {
-				for (OWLObject instantiation : instantiations) {
+			if (this.instantiations.containsKey(v)) {
+				for (OWLObject instantiation : this.instantiations.get(v)) {
 					try {
 						v.addPossibleBinding(instantiation);
 					} catch (OWLReasonerException e) {

@@ -40,6 +40,12 @@ import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
 import org.coode.oppl.visitors.InputVariableCollector;
 import org.coode.patterns.utils.Utils;
 import org.semanticweb.owl.model.AddAxiom;
@@ -106,6 +112,9 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
 public class PatternModel implements OPPLScript, PatternOPPLScript {
 	private final static class PatternOPPLScriptValidator implements
 			OPPLScriptValidator {
+		public PatternOPPLScriptValidator() {
+		}
+
 		public boolean accept(OPPLScript script) {
 			boolean toReturn = script.getQuery() == null;
 			if (toReturn) {
@@ -343,6 +352,7 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 
 		public OWLObject getExtractedObject() {
 			OWLObject toReturn = null;
+			// TODO needs a different way to switch from case to visitor
 			switch (this.variableType) {
 				case CLASS:
 					toReturn = this.extractedDescription;
@@ -839,25 +849,58 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 		return toReturn;
 	}
 
-	private DefinitorialExtractor createDefinitorialExtractor(Variable v,
+	private DefinitorialExtractor createDefinitorialExtractor(Variable variable,
 			ReferenceReplacement referenceReplacement) {
-		OWLDataFactory dataFactory = this.ontologyManager.getOWLDataFactory();
+		final OWLDataFactory dataFactory = this.ontologyManager
+				.getOWLDataFactory();
 		OWLObject owlObject = null;
-		switch (v.getType()) {
-			case CLASS:
-				owlObject = dataFactory.getOWLClass(v.getURI());
-				break;
-			case OBJECTPROPERTY:
-				owlObject = dataFactory.getOWLObjectProperty(v.getURI());
-				break;
-			case DATAPROPERTY:
-				owlObject = dataFactory.getOWLDataProperty(v.getURI());
-				break;
-			default:
-				throw new RuntimeException("Unsupported variable type: "
+		VariableTypeVisitorEx<OWLObject> visitor = new VariableTypeVisitorEx<OWLObject>() {
+			public OWLObject visit(Variable v) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			public OWLObject visit(INDIVIDUALVariable v) {
+				throw this.throwException(v);
+			}
+
+			public OWLObject visit(DATAPROPERTYVariable v) {
+				return dataFactory.getOWLDataProperty(v.getURI());
+			}
+
+			public OWLObject visit(OBJECTPROPERTYVariable v) {
+				return dataFactory.getOWLObjectProperty(v.getURI());
+			}
+
+			public OWLObject visit(CONSTANTVariable v) {
+				throw this.throwException(v);
+			}
+
+			public OWLObject visit(CLASSVariable v) {
+				return dataFactory.getOWLClass(v.getURI());
+			}
+
+			private RuntimeException throwException(Variable v) {
+				return new RuntimeException("Unsupported variable type: "
 						+ v.getType() + " for pattern used in functional mode");
-		}
-		return new DefinitorialExtractor(owlObject, v.getType(), dataFactory,
+			}
+		};
+		owlObject = variable.accept(visitor);
+		// switch (v.getType()) {
+		// case CLASS:
+		// owlObject = dataFactory.getOWLClass(v.getURI());
+		// break;
+		// case OBJECTPROPERTY:
+		// owlObject = dataFactory.getOWLObjectProperty(v.getURI());
+		// break;
+		// case DATAPROPERTY:
+		// owlObject = dataFactory.getOWLDataProperty(v.getURI());
+		// break;
+		// default:
+		// throw new RuntimeException("Unsupported variable type: "
+		// + v.getType() + " for pattern used in functional mode");
+		// }
+		return new DefinitorialExtractor(owlObject, variable.getType(), dataFactory,
 				referenceReplacement);
 	}
 

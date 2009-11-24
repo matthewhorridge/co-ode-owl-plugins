@@ -27,7 +27,13 @@ import org.coode.oppl.entity.OWLEntityCreationException;
 import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.utils.ParserFactory;
-import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
 import org.coode.patterns.PatternException;
 import org.coode.patterns.PatternSignature;
 import org.semanticweb.owl.expression.OWLEntityChecker;
@@ -41,51 +47,134 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  *         Sep 29, 2008
  */
 public class PatternParserUtils {
-	public static String create(OWLOntologyManager manager, String toCreate,
-			int i, PatternSignature signature, OPPLAbstractFactory factory)
-			throws PatternException, OWLEntityCreationException,
-			OWLOntologyChangeException {
-		VariableType ithVariableType = signature.getIthVariableType(i);
-		OWLEntityFactory entityFactory = factory.getOWLEntityFactory();
+	public static String create(OWLOntologyManager manager,
+			final String toCreate, int i, PatternSignature signature,
+			OPPLAbstractFactory factory) throws PatternException,
+			OWLEntityCreationException, OWLOntologyChangeException {
+		// VariableType ithVariableType = signature.getIthVariableType(i);
+		final OWLEntityFactory entityFactory = factory.getOWLEntityFactory();
 		OWLEntity createdEntity = null;
-		OWLEntityChecker entityChecker = factory.getOWLEntityChecker();
+		final OWLEntityChecker entityChecker = factory.getOWLEntityChecker();
 		OWLEntityCreationSet<? extends OWLEntity> owlCreationSet = null;
-		switch (ithVariableType) {
-			case CLASS:
-				createdEntity = entityChecker.getOWLClass(toCreate);
-				if (createdEntity == null) {
-					owlCreationSet = entityFactory.createOWLClass(toCreate,
-							null);
+		VariableTypeVisitorEx<OWLEntity> entityVisitor = new VariableTypeVisitorEx<OWLEntity>() {
+			public OWLEntity visit(Variable v) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			public OWLEntity visit(INDIVIDUALVariable v) {
+				return entityChecker.getOWLIndividual(toCreate);
+			}
+
+			public OWLEntity visit(DATAPROPERTYVariable v) {
+				return entityChecker.getOWLDataProperty(toCreate);
+			}
+
+			public OWLEntity visit(OBJECTPROPERTYVariable v) {
+				return entityChecker.getOWLObjectProperty(toCreate);
+			}
+
+			public OWLEntity visit(CONSTANTVariable v) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			public OWLEntity visit(CLASSVariable v) {
+				return entityChecker.getOWLClass(toCreate);
+			}
+		};
+		createdEntity = signature.getIthVariable(i).accept(entityVisitor);
+		if (createdEntity == null) {
+			VariableTypeVisitorEx<OWLEntityCreationSet<? extends OWLEntity>> owlSetVisitor = new VariableTypeVisitorEx<OWLEntityCreationSet<? extends OWLEntity>>() {
+				public OWLEntityCreationSet<? extends OWLEntity> visit(
+						Variable v) {
+					// TODO Auto-generated method stub
+					return null;
 				}
-				break;
-			case OBJECTPROPERTY:
-				createdEntity = entityChecker.getOWLObjectProperty(toCreate);
-				if (createdEntity == null) {
-					owlCreationSet = entityFactory.createOWLObjectProperty(
-							toCreate, null);
+
+				public OWLEntityCreationSet<? extends OWLEntity> visit(
+						INDIVIDUALVariable v) {
+					try {
+						return entityFactory
+								.createOWLIndividual(toCreate, null);
+					} catch (OWLEntityCreationException e) {
+						throw new RuntimeException(e.getMessage(), e);
+					}
 				}
-				break;
-			case DATAPROPERTY:
-				createdEntity = entityChecker.getOWLDataProperty(toCreate);
-				if (createdEntity == null) {
-					owlCreationSet = entityFactory.createOWLDataProperty(
-							toCreate, null);
+
+				public OWLEntityCreationSet<? extends OWLEntity> visit(
+						DATAPROPERTYVariable v) {
+					try {
+						return entityFactory.createOWLDataProperty(toCreate,
+								null);
+					} catch (OWLEntityCreationException e) {
+						throw new RuntimeException(e.getMessage(), e);
+					}
 				}
-				break;
-			case INDIVIDUAL:
-				createdEntity = entityChecker.getOWLIndividual(toCreate);
-				if (createdEntity == null) {
-					owlCreationSet = entityFactory.createOWLIndividual(
-							toCreate, null);
+
+				public OWLEntityCreationSet<? extends OWLEntity> visit(
+						OBJECTPROPERTYVariable v) {
+					try {
+						return entityFactory.createOWLObjectProperty(toCreate,
+								null);
+					} catch (OWLEntityCreationException e) {
+						throw new RuntimeException(e.getMessage(), e);
+					}
 				}
-				break;
-			default:
-				break;
+
+				public OWLEntityCreationSet<? extends OWLEntity> visit(
+						CONSTANTVariable v) {
+					// TODO Auto-generated method stub
+					return null;
+				}
+
+				public OWLEntityCreationSet<? extends OWLEntity> visit(
+						CLASSVariable v) {
+					try {
+						return entityFactory.createOWLClass(toCreate, null);
+					} catch (OWLEntityCreationException e) {
+						throw new RuntimeException(e.getMessage(), e);
+					}
+				}
+			};
+			owlCreationSet = signature.getIthVariable(i).accept(owlSetVisitor);
+			if (owlCreationSet != null) {
+				manager.applyChanges(owlCreationSet.getOntologyChanges());
+				createdEntity = owlCreationSet.getOWLEntity();
+			}
 		}
-		if (owlCreationSet != null) {
-			manager.applyChanges(owlCreationSet.getOntologyChanges());
-			createdEntity = owlCreationSet.getOWLEntity();
-		}
+		// switch (ithVariableType) {
+		// case CLASS:
+		// createdEntity = entityChecker.getOWLClass(toCreate);
+		// if (createdEntity == null) {
+		// owlCreationSet = entityFactory.createOWLClass(toCreate,
+		// null);
+		// }
+		// break;
+		// case OBJECTPROPERTY:
+		// createdEntity = entityChecker.getOWLObjectProperty(toCreate);
+		// if (createdEntity == null) {
+		// owlCreationSet = entityFactory.createOWLObjectProperty(
+		// toCreate, null);
+		// }
+		// break;
+		// case DATAPROPERTY:
+		// createdEntity = entityChecker.getOWLDataProperty(toCreate);
+		// if (createdEntity == null) {
+		// owlCreationSet = entityFactory.createOWLDataProperty(
+		// toCreate, null);
+		// }
+		// break;
+		// case INDIVIDUAL:
+		// createdEntity = entityChecker.getOWLIndividual(toCreate);
+		// if (createdEntity == null) {
+		// owlCreationSet = entityFactory.createOWLIndividual(
+		// toCreate, null);
+		// }
+		// break;
+		// default:
+		// break;
+		// }
 		return createdEntity != null ? ParserFactory.getInstance()
 				.getOPPLFactory().getOWLEntityRenderer(
 						signature.getPattern().getConstraintSystem()).render(

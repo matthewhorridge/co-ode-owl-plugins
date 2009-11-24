@@ -102,6 +102,7 @@ public class PatternInstantiationEditor extends
 			this.pie = _this;
 		}
 
+		@SuppressWarnings("unused")
 		public void actionPerformed(ActionEvent event) {
 			this.pie.instantiatedPatternModel = null;
 			Object selectedItem = this.pie.patternList.getSelectedItem();
@@ -189,6 +190,7 @@ public class PatternInstantiationEditor extends
 							.getWorkspace());
 			dlg.addComponentListener(new ComponentAdapter() {
 				@Override
+				@SuppressWarnings("unused")
 				public void componentHidden(ComponentEvent e) {
 					Object retVal = optionPane.getValue();
 					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
@@ -624,18 +626,22 @@ public class PatternInstantiationEditor extends
 		}
 	}
 
+	@SuppressWarnings("unused")
 	public void contentsChanged(ListDataEvent e) {
 		this.refreshEffectsPanel();
 	}
 
+	@SuppressWarnings("unused")
 	public void intervalAdded(ListDataEvent e) {
 		this.refreshEffectsPanel();
 	}
 
+	@SuppressWarnings("unused")
 	public void intervalRemoved(ListDataEvent e) {
 		this.refreshEffectsPanel();
 	}
 
+	@SuppressWarnings("unused")
 	public void valueChanged(ListSelectionEvent e) {
 		Object selectedValue = this.variableList.getSelectedValue();
 		this.valueList.getModel().removeListDataListener(this);
