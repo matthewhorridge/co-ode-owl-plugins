@@ -43,6 +43,7 @@ import org.semanticweb.owl.util.OWLDescriptionVisitorAdapter;
 
 public abstract class AbstractOPPLAxiomSearchTree extends
 		SearchTree<OPPLOWLAxiomSearchNode> {
+	/** test */
 	private final class ConstantCollector extends OWLAxiomVisitorAdapter {
 		private final Set<OWLConstant> toReturn;
 		private final OWLDescriptionVisitor constantExtractor;
