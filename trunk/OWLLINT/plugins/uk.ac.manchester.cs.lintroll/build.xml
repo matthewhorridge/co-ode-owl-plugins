@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 
 <!--====================================
-		In order to use the build-file the following variable must be 
+		In order to use the build-file the following variable must be
 		set in a build.properties file
-		
+
 		classes = location where both binaries of the OWLLintApi and binaries of the plug-in are.
 		srcAPI = the absolute path of the directoy containing the source code for the OWLLint API
 		projectLocation = the absolute path of the directoy containing the whole OWLLint checkout version
-		dist = the absolute path of the plugins directory  of the installation of Protege 4 you want to deploy the bundle to	
-		owlapi.bin = the absloute path of the directory containing the compiled version of the OWL-API (loose classes, not jar) 	
+		dist = the absolute path of the plugins directory  of the installation of Protege 4 you want to deploy the bundle to
+		owlapi.bin = the absloute path of the directory containing the compiled version of the OWL-API (loose classes, not jar)
 		oppl.bin = the absolute path of the directory containing the compiled version of the OPPL 2 API (loose classes, not jar)
-		junit.home = the home directory of your JUnit installation (version 3 or higher).	
+		junit.home = the home directory of your JUnit installation (version 3 or higher).
 		protege.bin = the absolute path of the directory containing the compiled version of the Protege 4  (loose classes, not jar)
 	====================================-->
 
@@ -26,7 +26,7 @@
 	<property name="releaselintjardest" location="${releasedownloads}/${releaselintjarname}" />
 
 	<!--
-	Path for compileAPI classpath 
+	Path for compileAPI classpath
 	-->
 	<path id="lintapi.classpath">
 		<dirset dir="${owlapi.bin}">
@@ -46,12 +46,12 @@
 
 	<!--====================================
 		target: init
-		Initialisation and clean-up 
+		Initialisation and clean-up
 	====================================-->
 	<target name="init">
 		<echo message="---------------Building the Bundle-------------" />
 
-		
+
 		<delete dir="${projectLocation}/release">
 		</delete>
 	</target>
@@ -60,7 +60,7 @@
 
 	<!--====================================
 		target: bundle
-		Creates the Protege 4 bundle 
+		Creates the Protege 4 bundle
 	====================================-->
 	<target name="bundle" depends="init, javacc">
 
@@ -97,11 +97,11 @@
 		builds the JavaCC java files.
 	=========================================-->
 	<target name="javacc">
-		<exec executable="sh" dir="${srcAPI}/org/coode/oppl/lint/syntax">
-			<arg line="/Applications/javacc-4.2/bin/jjtree oppllint.jjt" />
+		<exec executable="sh" dir="${basedir}/src/org/coode/oppl/lint/syntax">
+			<arg line="${javaccpath}jjtree oppllint.jjt" />
 		</exec>
-		<exec executable="sh" dir="${srcAPI}/org/coode/oppl/lint/syntax">
-			<arg line="/Applications/javacc-4.2/bin/javacc oppllint.jj" />
+		<exec executable="sh" dir="${basedir}/src/org/coode/oppl/lint/syntax">
+			<arg line="${javaccpath}javacc oppllint.jj" />
 		</exec>
 	</target>
 
