@@ -72,15 +72,15 @@
 				<include name="*.log" />
 			</fileset>
 		</delete>
-		<copy toFile="${classes}/plugin.xml" file="${basedir}/uk.ac.manchester.cs.lintroll/plugin.xml" overwrite="true" />
+		<copy toFile="${classes}/plugin.xml" file="${basedir}/plugins/uk.ac.manchester.cs.lintroll/plugin.xml" overwrite="true" />
 		<copy overwrite="true" todir="${classes}/lib">
-			<fileset dir="${projectLocation}/lib" />
+			<fileset dir="${basedir}/plugins/uk.ac.manchester.cs.lintroll/lib" />
 		</copy>
 
 		<copy overwrite="true" todir="${classes}">
-			<fileset dir="${basedir}/uk.ac.manchester.cs.lintroll/resources" />
+			<fileset dir="${basedir}/plugins/uk.ac.manchester.cs.lintroll/resources" />
 		</copy>
-		<jar basedir="${classes}" jarfile="${jardest}" manifest="${basedir}/uk.ac.manchester.cs.lintroll/META-INF/MANIFEST.MF" update="true" />
+		<jar basedir="${classes}" jarfile="${jardest}" manifest="${basedir}/plugins/uk.ac.manchester.cs.lintroll/META-INF/MANIFEST.MF" update="true" />
 		<delete dir="${classes}/lib" />
 	</target>
 
