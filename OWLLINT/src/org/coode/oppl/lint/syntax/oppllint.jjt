@@ -7,8 +7,8 @@ options {
  	MULTI=false;
     NODE_PREFIX="OPPLLint";
 }
- 
-PARSER_BEGIN(OPPLLintParser) 
+
+PARSER_BEGIN(OPPLLintParser)
 package org.coode.oppl.lint.syntax;
 
 import org.coode.oppl.OPPLScript;
@@ -86,14 +86,14 @@ TOKEN :
 OPPLLintScript Start():{OPPLScript opplScript=null; Token variableNameToken;String name; String description;}
 {
   name = opplName()<SEMICOLON>opplScript = OPPLStatement() <SEMICOLON><RETURN> variableNameToken = <IDENTIFIER><SEMICOLON> description = opplLintDescription()
-  { 
+  {
   	String variableName = variableNameToken.image;
   	Variable v = opplScript.getConstraintSystem().getVariable(variableName);
   	if(v!=null){
   		return getOPPLLintAbstractFactory().buildOPPLLintScript(name, opplScript,v, description);
   	}else{
   		throw new ParseException("Invalid variable name "+variableNameToken.image);
-  	} 
+  	}
   }
 }
 
@@ -105,8 +105,8 @@ OPPLScript OPPLStatement()
 		if(!opplScriptString.endsWith(";")){
 			opplScriptString = opplScriptString+";";
 		}
-		getOPPLLintAbstractFactory().initOPPLParser(opplScriptString);
-		OPPLScript toReturn = OPPLParser.Start();
+		OPPLParser parser=getOPPLLintAbstractFactory().initOPPLParser(opplScriptString);
+		OPPLScript toReturn = parser.Start();
 		if(toReturn.getQuery()!=null){
 			return toReturn;
 		}else{
