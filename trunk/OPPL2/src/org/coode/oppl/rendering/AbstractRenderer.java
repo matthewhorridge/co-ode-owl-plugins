@@ -121,8 +121,8 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 	}
 
 	public final void visit(SWRLAtomDVariable swrlAtomDVariable) {
-		write("?");
-		write(swrlAtomDVariable.getURI().getFragment());
+		this.write("?");
+		this.write(swrlAtomDVariable.getURI().getFragment());
 	}
 
 	public final void visit(SWRLAtomIndividualObject swrlAtomIndividualObject) {
@@ -130,72 +130,72 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 	}
 
 	public final void visit(SWRLAtomIVariable swrlAtomIVariable) {
-		write("?");
-		write(swrlAtomIVariable.getURI().getFragment());
+		this.write("?");
+		this.write(swrlAtomIVariable.getURI().getFragment());
 	}
 
 	public final void visit(SWRLBuiltInAtom swrlBuiltInAtom) {
-		write(swrlBuiltInAtom.getPredicate().getShortName());
-		write("(");
+		this.write(swrlBuiltInAtom.getPredicate().getShortName());
+		this.write("(");
 		Iterator<SWRLAtomDObject> it = swrlBuiltInAtom.getArguments()
 				.iterator();
 		while (it.hasNext()) {
 			SWRLAtomDObject argument = it.next();
 			argument.accept(this);
 			if (it.hasNext()) {
-				write(", ");
+				this.write(", ");
 			}
 		}
-		write(")");
+		this.write(")");
 	}
 
 	public final void visit(SWRLClassAtom swrlClassAtom) {
 		OWLDescription desc = swrlClassAtom.getPredicate();
 		if (desc.isAnonymous()) {
-			write("(");
+			this.write("(");
 		}
 		desc.accept(this);
 		if (desc.isAnonymous()) {
-			write(")");
+			this.write(")");
 		}
-		write("(");
+		this.write("(");
 		swrlClassAtom.getArgument().accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	public final void visit(SWRLDataRangeAtom swrlDataRangeAtom) {
 		swrlDataRangeAtom.getPredicate().accept(this);
-		write("(");
+		this.write("(");
 		swrlDataRangeAtom.getArgument().accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	public final void visit(
 			SWRLDataValuedPropertyAtom swrlDataValuedPropertyAtom) {
 		swrlDataValuedPropertyAtom.getPredicate().accept(this);
-		write("(");
+		this.write("(");
 		swrlDataValuedPropertyAtom.getFirstArgument().accept(this);
-		write(", ");
+		this.write(", ");
 		swrlDataValuedPropertyAtom.getSecondArgument().accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	public final void visit(SWRLDifferentFromAtom swrlDifferentFromAtom) {
 		swrlDifferentFromAtom.getPredicate().accept(this);
-		write("(");
+		this.write("(");
 		swrlDifferentFromAtom.getFirstArgument().accept(this);
-		write(", ");
+		this.write(", ");
 		swrlDifferentFromAtom.getSecondArgument().accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	public final void visit(SWRLObjectPropertyAtom swrlObjectPropertyAtom) {
 		swrlObjectPropertyAtom.getPredicate().accept(this);
-		write("(");
+		this.write("(");
 		swrlObjectPropertyAtom.getFirstArgument().accept(this);
-		write(", ");
+		this.write(", ");
 		swrlObjectPropertyAtom.getSecondArgument().accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	@SuppressWarnings("unchecked")
@@ -204,26 +204,26 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 				.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(" , ");
+				this.write(" , ");
 			}
 		}
-		write(" -> ");
+		this.write(" -> ");
 		for (Iterator<SWRLAtom> it = swrlRule.getHead().iterator(); it
 				.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(" \u2227 ");
+				this.write(" \u2227 ");
 			}
 		}
 	}
 
 	public final void visit(SWRLSameAsAtom swrlSameAsAtom) {
 		swrlSameAsAtom.getPredicate().accept(this);
-		write("(");
+		this.write("(");
 		swrlSameAsAtom.getFirstArgument().accept(this);
-		write(", ");
+		this.write(", ");
 		swrlSameAsAtom.getSecondArgument().accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	protected final void write(String s) {
@@ -236,18 +236,18 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 	}
 
 	protected final void writeAndKeyword() {
-		write(getAndKeyWord());
-		write(" ");
+		this.write(this.getAndKeyWord());
+		this.write(" ");
 	}
 
 	private final void writeCardinality(OWLDataCardinalityRestriction desc,
 			String keyword) {
 		desc.getProperty().accept(this);
-		write(" ");
-		write(keyword);
-		write(" ");
-		write(Integer.toString(desc.getCardinality()));
-		write(" ");
+		this.write(" ");
+		this.write(keyword);
+		this.write(" ");
+		this.write(Integer.toString(desc.getCardinality()));
+		this.write(" ");
 		this.writeOpenBracket(desc.getFiller());
 		desc.getFiller().accept(this);
 		this.writeCloseBracket(desc.getFiller());
@@ -256,11 +256,11 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 	private final void writeCardinality(OWLObjectCardinalityRestriction desc,
 			String keyword) {
 		desc.getProperty().accept(this);
-		write(" ");
-		write(keyword);
-		write(" ");
-		write(Integer.toString(desc.getCardinality()));
-		write(" ");
+		this.write(" ");
+		this.write(keyword);
+		this.write(" ");
+		this.write(Integer.toString(desc.getCardinality()));
+		this.write(" ");
 		this.writeOpenBracket(desc.getFiller());
 		desc.getFiller().accept(this);
 		this.writeCloseBracket(desc.getFiller());
@@ -269,88 +269,88 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 	private final void writeCloseBracket(OWLDataRange dataRange) {
 		dataRange.accept(this.bracketWriter);
 		if (this.bracketWriter.writeBrackets()) {
-			write(")");
+			this.write(")");
 		}
 	}
 
 	protected final void writeCloseBracket(OWLDescription description) {
 		description.accept(this.bracketWriter);
 		if (this.bracketWriter.writeBrackets()) {
-			write(")");
+			this.write(")");
 		}
 	}
 
 	private final void writeNotKeyword() {
-		write(getNotKeyWord());
+		this.write(this.getNotKeyWord());
 	}
 
 	private final void writeOpenBracket(OWLDataRange dataRange) {
 		dataRange.accept(this.bracketWriter);
 		if (this.bracketWriter.writeBrackets()) {
-			write("(");
+			this.write("(");
 		}
 	}
 
 	protected final void writeOpenBracket(OWLDescription description) {
 		description.accept(this.bracketWriter);
 		if (this.bracketWriter.writeBrackets()) {
-			write("(");
+			this.write("(");
 		}
 	}
 
 	public final void visit(OWLDataSomeRestriction node) {
 		node.getProperty().accept(this);
-		write(" ");
-		write(getSomeKeyWord());
-		write(" ");
+		this.write(" ");
+		this.write(this.getSomeKeyWord());
+		this.write(" ");
 		node.getFiller().accept(this);
 	}
 
 	public final void visit(OWLDataSubPropertyAxiom axiom) {
 		axiom.getSubProperty().accept(this);
-		write(" subPropertyOf ");
+		this.write(" subPropertyOf ");
 		axiom.getSuperProperty().accept(this);
 	}
 
 	public final void visit(OWLDataType node) {
-		write(node.getURI().getFragment());
+		this.write(node.getURI().getFragment());
 	}
 
 	public final void visit(OWLDataValueRestriction node) {
 		node.getProperty().accept(this);
-		write(" ");
-		write(getValueKeyWord());
-		write(" ");
+		this.write(" ");
+		this.write(this.getValueKeyWord());
+		this.write(" ");
 		node.getValue().accept(this);
 	}
 
 	public final void visit(OWLDeclarationAxiom axiom) {
 		OWLEntity entity = axiom.getEntity();
 		if (entity.isOWLClass()) {
-			write("Class(");
+			this.write("Class(");
 		} else if (entity.isOWLObjectProperty()) {
-			write("Object property(");
+			this.write("Object property(");
 		} else if (entity.isOWLDataProperty()) {
-			write("Data property(");
+			this.write("Data property(");
 		} else if (entity.isOWLIndividual()) {
-			write("Individual(");
+			this.write("Individual(");
 		} else {
-			write("(");
+			this.write("(");
 		}
 		entity.accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	public final void visit(OWLDifferentIndividualsAxiom axiom) {
-		write("DifferentIndividuals: [");
+		this.write("DifferentIndividuals: [");
 		for (Iterator<OWLIndividual> it = axiom.getIndividuals().iterator(); it
 				.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(", ");
+				this.write(", ");
 			}
 		}
-		write("]");
+		this.write("]");
 	}
 
 	public final void visit(OWLDisjointClassesAxiom node) {
@@ -358,7 +358,7 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 				.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(" disjointWith ");
+				this.write(" disjointWith ");
 			}
 		}
 	}
@@ -368,7 +368,7 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 				.iterator(); it.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(" disjointWith ");
+				this.write(" disjointWith ");
 			}
 		}
 	}
@@ -419,58 +419,58 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 
 	protected final void insertIndent(int indent) {
 		for (int i = 0; i < indent; i++) {
-			write(" ");
+			this.write(" ");
 		}
 	}
 
 	public final void visit(OWLObjectValueRestriction node) {
 		node.getProperty().accept(this);
-		write(" ");
-		write(getValueKeyWord());
-		write(" ");
+		this.write(" ");
+		this.write(this.getValueKeyWord());
+		this.write(" ");
 		node.getValue().accept(this);
 	}
 
 	public final void visit(OWLOntology ontology) {
-		writeOntologyURI(ontology.getURI());
+		this.writeOntologyURI(ontology.getURI());
 	}
 
 	public final void visit(OWLOntologyAnnotationAxiom axiom) {
 		axiom.getSubject().accept(this);
-		write(" ");
+		this.write(" ");
 		axiom.getAnnotation().accept(this);
 	}
 
 	public final void visit(OWLReflexiveObjectPropertyAxiom axiom) {
-		write("Reflexive: ");
+		this.write("Reflexive: ");
 		axiom.getProperty().accept(this);
 	}
 
 	public final void visit(OWLSameIndividualsAxiom axiom) {
-		write("SameIndividuals: [");
+		this.write("SameIndividuals: [");
 		for (Iterator<OWLIndividual> it = axiom.getIndividuals().iterator(); it
 				.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(", ");
+				this.write(", ");
 			}
 		}
-		write("]");
+		this.write("]");
 	}
 
 	public final void visit(OWLSubClassAxiom node) {
 		node.getSubClass().accept(this);
-		write(" subClassOf ");
+		this.write(" subClassOf ");
 		node.getSuperClass().accept(this);
 	}
 
 	public final void visit(OWLSymmetricObjectPropertyAxiom axiom) {
-		write("Symmetric: ");
+		this.write("Symmetric: ");
 		axiom.getProperty().accept(this);
 	}
 
 	public final void visit(OWLTransitiveObjectPropertyAxiom axiom) {
-		write("Transitive: ");
+		this.write("Transitive: ");
 		axiom.getProperty().accept(this);
 	}
 
@@ -479,16 +479,16 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 			boolean renderQuotes = this.simpleRenderDatatypes.get(node
 					.getDataType().getURI());
 			if (renderQuotes) {
-				write("\"");
+				this.write("\"");
 			}
-			write(node.getLiteral());
+			this.write(node.getLiteral());
 			if (renderQuotes) {
-				write("\"");
+				this.write("\"");
 			}
 		} else {
-			write("\"");
-			write(node.getLiteral());
-			write("\"^^");
+			this.write("\"");
+			this.write(node.getLiteral());
+			this.write("\"^^");
 			node.getDataType().accept(this);
 		}
 	}
@@ -497,62 +497,62 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 		URIShortFormProvider uriShortFormProvider = new SimpleURIShortFormProvider();
 		String shortName = uriShortFormProvider.getShortForm(uri);
 		if (shortName != null) {
-			write(shortName);
-			write(" (");
-			write(uri.toString());
-			write(")");
+			this.write(shortName);
+			this.write(" (");
+			this.write(uri.toString());
+			this.write(")");
 		} else {
-			write(uri.toString());
+			this.write(uri.toString());
 		}
 	}
 
 	public final void visit(OWLDataAllRestriction node) {
 		node.getProperty().accept(this);
-		write(" ");
-		write(getAllKeyWord());
-		write(" ");
+		this.write(" ");
+		this.write(this.getAllKeyWord());
+		this.write(" ");
 		node.getFiller().accept(this);
 	}
 
 	public final void visit(OWLDataComplementOf owlDataComplementOf) {
-		write("not(");
+		this.write("not(");
 		owlDataComplementOf.getDataRange().accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	public final void visit(OWLDataExactCardinalityRestriction desc) {
-		this.writeCardinality(desc, getExactlyKeyWord());
+		this.writeCardinality(desc, this.getExactlyKeyWord());
 	}
 
 	public final void visit(OWLDataMaxCardinalityRestriction desc) {
-		this.writeCardinality(desc, getMaxKeyWord());
+		this.writeCardinality(desc, this.getMaxKeyWord());
 	}
 
 	public final void visit(OWLDataMinCardinalityRestriction desc) {
-		this.writeCardinality(desc, getMinKeyWord());
+		this.writeCardinality(desc, this.getMinKeyWord());
 	}
 
 	public final void visit(OWLDataOneOf node) {
-		write("{");
+		this.write("{");
 		for (Iterator<OWLConstant> it = node.getValues().iterator(); it
 				.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(", ");
+				this.write(", ");
 			}
 		}
-		write("}");
+		this.write("}");
 	}
 
 	public final void visit(OWLDataProperty node) {
-		write(getRendering(node));
+		this.write(this.getRendering(node));
 	}
 
 	public final void visit(OWLDataPropertyAssertionAxiom axiom) {
 		axiom.getSubject().accept(this);
-		write(" ");
+		this.write(" ");
 		axiom.getProperty().accept(this);
-		write(" ");
+		this.write(" ");
 		axiom.getObject().accept(this);
 	}
 
@@ -561,23 +561,23 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 		if (rendering == null) {
 			rendering = node.getFacet().getShortName();
 		}
-		write(rendering);
-		write(" ");
+		this.write(rendering);
+		this.write(" ");
 		node.getFacetValue().accept(this);
 	}
 
 	public void visit(OWLDataRangeRestriction node) {
 		// writeOpenBracket(node);
 		node.getDataRange().accept(this);
-		write("[");
+		this.write("[");
 		for (Iterator<OWLDataRangeFacetRestriction> it = node
 				.getFacetRestrictions().iterator(); it.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(", ");
+				this.write(", ");
 			}
 		}
-		write("]");
+		this.write("]");
 		// writeCloseBracket(node);
 	}
 
@@ -586,30 +586,30 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 				.iterator(); it.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(" disjointWith ");
+				this.write(" disjointWith ");
 			}
 		}
 	}
 
 	public void visit(OWLDisjointUnionAxiom axiom) {
 		axiom.getOWLClass().accept(this);
-		write(" disjointUnionOf ");
-		write("[");
-		int indent = getIndent();
+		this.write(" disjointUnionOf ");
+		this.write("[");
+		int indent = this.getIndent();
 		for (Iterator<OWLDescription> it = axiom.getDescriptions().iterator(); it
 				.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write("\n");
-				insertIndent(indent);
+				this.write("\n");
+				this.insertIndent(indent);
 			}
 		}
-		write("]");
+		this.write("]");
 	}
 
 	public void visit(OWLEntityAnnotationAxiom owlEntityAnnotationAxiom) {
 		owlEntityAnnotationAxiom.getSubject().accept(this);
-		write(" ");
+		this.write(" ");
 		owlEntityAnnotationAxiom.getAnnotation().accept(this);
 	}
 
@@ -618,7 +618,7 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 				.iterator(); it.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(" equivalentTo ");
+				this.write(" equivalentTo ");
 			}
 		}
 	}
@@ -628,108 +628,108 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 				.iterator(); it.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(" equivalentTo ");
+				this.write(" equivalentTo ");
 			}
 		}
 	}
 
 	public void visit(OWLFunctionalDataPropertyAxiom axiom) {
-		write("Functional: ");
+		this.write("Functional: ");
 		axiom.getProperty().accept(this);
 	}
 
 	public void visit(OWLFunctionalObjectPropertyAxiom axiom) {
-		write("Functional: ");
+		this.write("Functional: ");
 		axiom.getProperty().accept(this);
 	}
 
 	public void visit(OWLInverseFunctionalObjectPropertyAxiom axiom) {
-		write("InverseFunctional: ");
+		this.write("InverseFunctional: ");
 		axiom.getProperty().accept(this);
 	}
 
 	public void visit(OWLInverseObjectPropertiesAxiom axiom) {
 		axiom.getFirstProperty().accept(this);
-		write(" inverseOf ");
+		this.write(" inverseOf ");
 		axiom.getSecondProperty().accept(this);
 	}
 
 	public void visit(OWLIrreflexiveObjectPropertyAxiom axiom) {
-		write("Irreflexive: ");
+		this.write("Irreflexive: ");
 		axiom.getProperty().accept(this);
 	}
 
 	public void visit(OWLNegativeDataPropertyAssertionAxiom axiom) {
-		write("not(");
+		this.write("not(");
 		axiom.getSubject().accept(this);
-		write(" ");
+		this.write(" ");
 		axiom.getProperty().accept(this);
-		write(" ");
+		this.write(" ");
 		axiom.getObject().accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	public void visit(OWLNegativeObjectPropertyAssertionAxiom axiom) {
-		write("not(");
+		this.write("not(");
 		axiom.getSubject().accept(this);
-		write(" ");
+		this.write(" ");
 		axiom.getProperty().accept(this);
-		write(" ");
+		this.write(" ");
 		axiom.getObject().accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	public void visit(OWLObjectAllRestriction node) {
 		node.getProperty().accept(this);
-		write(" ");
-		write(getAllKeyWord());
-		write(" ");
+		this.write(" ");
+		this.write(this.getAllKeyWord());
+		this.write(" ");
 		this.writeOpenBracket(node.getFiller());
 		node.getFiller().accept(this);
 		this.writeCloseBracket(node.getFiller());
 	}
 
 	public void visit(OWLObjectComplementOf node) {
-		writeNotKeyword();
-		write(" ");
+		this.writeNotKeyword();
+		this.write(" ");
 		this.writeOpenBracket(node.getOperand());
 		node.getOperand().accept(this);
 		this.writeCloseBracket(node.getOperand());
 	}
 
 	public void visit(OWLObjectExactCardinalityRestriction desc) {
-		this.writeCardinality(desc, getExactlyKeyWord());
+		this.writeCardinality(desc, this.getExactlyKeyWord());
 	}
 
 	public void visit(OWLObjectMaxCardinalityRestriction desc) {
-		this.writeCardinality(desc, getMaxKeyWord());
+		this.writeCardinality(desc, this.getMaxKeyWord());
 	}
 
 	public void visit(OWLObjectMinCardinalityRestriction desc) {
-		this.writeCardinality(desc, getMinKeyWord());
+		this.writeCardinality(desc, this.getMinKeyWord());
 	}
 
 	public void visit(OWLObjectOneOf node) {
-		write("{");
+		this.write("{");
 		for (Iterator<OWLIndividual> it = node.getIndividuals().iterator(); it
 				.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(", ");
+				this.write(", ");
 			}
 		}
-		write("}");
+		this.write("}");
 	}
 
 	public void visit(OWLObjectProperty node) {
-		write(getRendering(node));
+		this.write(this.getRendering(node));
 	}
 
 	public void visit(OWLObjectPropertyAssertionAxiom axiom) {
 		axiom.getSubject().accept(this);
-		write(" ");
+		this.write(" ");
 		axiom.getProperty().accept(this);
-		write(" ");
+		this.write(" ");
 		axiom.getObject().accept(this);
 	}
 
@@ -738,31 +738,31 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 				.getPropertyChain().iterator(); it.hasNext();) {
 			it.next().accept(this);
 			if (it.hasNext()) {
-				write(" o ");
+				this.write(" o ");
 			}
 		}
-		write(" \u279E ");
+		this.write(" \u279E ");
 		axiom.getSuperProperty().accept(this);
 	}
 
 	public void visit(OWLObjectPropertyInverse property) {
-		write("inv(");
+		this.write("inv(");
 		property.getInverse().accept(this);
-		write(")");
+		this.write(")");
 	}
 
 	public void visit(OWLObjectSelfRestriction desc) {
 		desc.getProperty().accept(this);
-		write(" ");
-		write(getSomeKeyWord());
-		write(" Self");
+		this.write(" ");
+		this.write(this.getSomeKeyWord());
+		this.write(" Self");
 	}
 
 	public void visit(OWLObjectSomeRestriction node) {
 		node.getProperty().accept(this);
-		write(" ");
-		write(getSomeKeyWord());
-		write(" ");
+		this.write(" ");
+		this.write(this.getSomeKeyWord());
+		this.write(" ");
 		this.writeOpenBracket(node.getFiller());
 		node.getFiller().accept(this);
 		this.writeCloseBracket(node.getFiller());
@@ -770,12 +770,12 @@ public abstract class AbstractRenderer implements OWLObjectVisitor {
 
 	public void visit(OWLObjectSubPropertyAxiom axiom) {
 		axiom.getSubProperty().accept(this);
-		write(" subPropertyOf ");
+		this.write(" subPropertyOf ");
 		axiom.getSuperProperty().accept(this);
 	}
 
 	protected void writeOrKeyword() {
-		write(getOrKeyWord());
-		write(" ");
+		this.write(this.getOrKeyWord());
+		this.write(" ");
 	}
 }
