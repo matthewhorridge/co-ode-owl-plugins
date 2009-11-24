@@ -78,14 +78,12 @@ public abstract class AbstractInstantiatedPatternCompleter {
 		@Override
 		public void keyReleased(KeyEvent e) {
 			if (e.getKeyCode() != KeyEvent.VK_UP
-					&& e.getKeyCode() != KeyEvent.VK_DOWN) {
-				if (this.main.popupWindow.isVisible()
-						&& !this.main.lastTextUpdate
-								.equals(this.main.textComponent.getText())) {
-					this.main.lastTextUpdate = this.main.textComponent
-							.getText();
-					this.main.updatePopup(this.main.getMatches());
-				}
+					&& e.getKeyCode() != KeyEvent.VK_DOWN
+					&& this.main.popupWindow.isVisible()
+					&& !this.main.lastTextUpdate.equals(this.main.textComponent
+							.getText())) {
+				this.main.lastTextUpdate = this.main.textComponent.getText();
+				this.main.updatePopup(this.main.getMatches());
 			}
 		}
 	}
@@ -131,7 +129,7 @@ public abstract class AbstractInstantiatedPatternCompleter {
 				.createOWLCellRenderer());
 		this.popupList.addMouseListener(new SpecializedMouseAdapter(this));
 		this.popupList.setRequestFocusEnabled(false);
-		createPopupWindow();
+		this.createPopupWindow();
 		this.textComponent
 				.addHierarchyListener(new SpecializedHierarchyListener(this));
 	}
@@ -140,8 +138,8 @@ public abstract class AbstractInstantiatedPatternCompleter {
 		if (this.popupWindow.isVisible()) {
 			Object selObject = this.popupList.getSelectedValue();
 			if (selObject != null) {
-				insertWord(getInsertText(selObject));
-				hidePopup();
+				this.insertWord(this.getInsertText(selObject));
+				this.hidePopup();
 			}
 		}
 	}
@@ -182,7 +180,7 @@ public abstract class AbstractInstantiatedPatternCompleter {
 
 	protected final String getWordToComplete() {
 		try {
-			int index = getWordIndex();
+			int index = this.getWordIndex();
 			int caretIndex = this.textComponent.getCaretPosition();
 			return this.textComponent.getDocument().getText(index,
 					caretIndex - index);
@@ -213,9 +211,9 @@ public abstract class AbstractInstantiatedPatternCompleter {
 
 	protected final void insertWord(String word) {
 		try {
-			String wordToComplete = getWordToComplete();
+			String wordToComplete = this.getWordToComplete();
 			if (word.startsWith(wordToComplete)) {
-				int index = getWordIndex();
+				int index = this.getWordIndex();
 				int caretIndex = this.textComponent.getCaretPosition();
 				this.textComponent.getDocument().remove(index,
 						caretIndex - index);
@@ -226,22 +224,22 @@ public abstract class AbstractInstantiatedPatternCompleter {
 						this.textComponent.getText().length(), word, null);
 			}
 		} catch (BadLocationException e) {
-			getLogger().error(e);
+			this.getLogger().error(e);
 		}
 	}
 
 	protected abstract Logger getLogger();
 
 	protected final void performAutoCompletion() {
-		List matches = getMatches();
+		List<?> matches = this.getMatches();
 		if (matches.size() == 1) {
 			// Don't show popup
-			insertWord(getInsertText(matches.iterator().next()));
+			this.insertWord(this.getInsertText(matches.iterator().next()));
 		} else if (matches.size() > 1) {
 			// Show popup
 			this.lastTextUpdate = this.textComponent.getText();
-			showPopup();
-			updatePopup(matches);
+			this.showPopup();
+			this.updatePopup(matches);
 		}
 	}
 
@@ -250,51 +248,51 @@ public abstract class AbstractInstantiatedPatternCompleter {
 	protected final void processKeyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE && e.isControlDown()) {
 			// Show popup
-			performAutoCompletion();
+			this.performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_TAB) {
 			e.consume();
-			performAutoCompletion();
+			this.performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			if (this.popupWindow.isVisible()) {
 				// Hide popup
 				e.consume();
-				hidePopup();
+				this.hidePopup();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if (this.popupWindow.isVisible()) {
 				// Complete
 				e.consume();
-				completeWithPopupSelection();
+				this.completeWithPopupSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			if (this.popupWindow.isVisible()) {
 				e.consume();
-				incrementSelection();
+				this.incrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 			if (this.popupWindow.isVisible()) {
 				e.consume();
-				decrementSelection();
+				this.decrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			hidePopup();
+			this.hidePopup();
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			hidePopup();
+			this.hidePopup();
 		}
 	}
 
 	protected final void showPopup() {
 		if (this.popupWindow == null) {
-			createPopupWindow();
+			this.createPopupWindow();
 		}
 		if (!this.popupWindow.isVisible()) {
 			this.popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
 			try {
-				int wordIndex = getWordIndex();
+				int wordIndex = this.getWordIndex();
 				if (wordIndex < 0) {
 					return;
 				}
-				Point p = this.textComponent.modelToView(getWordIndex())
+				Point p = this.textComponent.modelToView(this.getWordIndex())
 						.getLocation();
 				SwingUtilities.convertPointToScreen(p, this.textComponent);
 				p.y = p.y
@@ -312,7 +310,7 @@ public abstract class AbstractInstantiatedPatternCompleter {
 		this.textComponent.removeKeyListener(this.keyListener);
 	}
 
-	protected final void updatePopup(List matches) {
+	protected final void updatePopup(List<?> matches) {
 		int count = matches.size();
 		if (count > this.maxEntries) {
 			count = this.maxEntries;

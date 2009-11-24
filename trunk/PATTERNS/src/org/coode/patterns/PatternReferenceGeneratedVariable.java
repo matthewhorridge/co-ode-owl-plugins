@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.generated.AbstractGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
@@ -130,8 +131,8 @@ public class PatternReferenceGeneratedVariable extends
 
 	@Override
 	protected GeneratedVariable<PatternReference> replace(
-			GeneratedValue<PatternReference> value) {
-		return new PatternReferenceGeneratedVariable(getType(), value);
+			GeneratedValue<PatternReference> v) {
+		return new PatternReferenceGeneratedVariable(this.getType(), v);
 	}
 
 	public static GeneratedValue<PatternReference> getPatternReferenceGeneratedValue(
@@ -140,6 +141,10 @@ public class PatternReferenceGeneratedVariable extends
 	}
 
 	public String getOPPLFunction() {
-		return getValue().toString();
+		return this.getValue().toString();
+	}
+
+	public <P> P accept(VariableTypeVisitorEx<P> visitor) {
+		return visitor.visit(this);
 	}
 }

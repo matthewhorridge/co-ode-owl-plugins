@@ -75,12 +75,11 @@ public abstract class VariableValueEditor extends JPanel implements
 		private static final long serialVersionUID = -592992214285597817L;
 		private OWLClassSelectorPanel classSelectorPanel;
 
-		private ClassVariableValueEditor(OWLEditorKit owlEditorKit,
-				Variable variable) {
+		ClassVariableValueEditor(OWLEditorKit owlEditorKit, Variable variable) {
 			super(variable.getName(), owlEditorKit);
-			setLayout(new BorderLayout());
-			this.classSelectorPanel = new OWLClassSelectorPanel(
-					getOwlEditorKit());
+			this.setLayout(new BorderLayout());
+			this.classSelectorPanel = new OWLClassSelectorPanel(this
+					.getOwlEditorKit());
 			this.classSelectorPanel.addSelectionListener(this);
 			JPanel classSelectorPanelBorder = new JPanel(new BorderLayout());
 			classSelectorPanelBorder.setBorder(ComponentFactory
@@ -90,13 +89,14 @@ public abstract class VariableValueEditor extends JPanel implements
 			this.add(classSelectorPanelBorder);
 		}
 
+		@SuppressWarnings("unused")
 		public void stateChanged(ChangeEvent e) {
 			Set<OWLClass> selectedObjects = this.classSelectorPanel
 					.getSelectedObjects();
 			if (selectedObjects != null) {
-				setVariableValues(selectedObjects);
+				this.setVariableValues(selectedObjects);
 			}
-			notifyListeners();
+			this.notifyListeners();
 		}
 
 		@Override
@@ -113,13 +113,13 @@ public abstract class VariableValueEditor extends JPanel implements
 		private static final long serialVersionUID = -6634647498199993368L;
 		private AbstractHierarchySelectorPanel<? extends OWLProperty<?, ?>> propertySelector;
 
-		private PropertyVariableValueEditor(OWLEditorKit owlEditorKit,
+		PropertyVariableValueEditor(OWLEditorKit owlEditorKit,
 				Variable variable, boolean isDataProperty) {
 			super(variable.getName(), owlEditorKit);
-			setLayout(new BorderLayout());
+			this.setLayout(new BorderLayout());
 			this.propertySelector = isDataProperty ? new OWLDataPropertySelectorPanel(
-					getOwlEditorKit())
-					: new OWLObjectPropertySelectorPanel(getOwlEditorKit());
+					this.getOwlEditorKit())
+					: new OWLObjectPropertySelectorPanel(this.getOwlEditorKit());
 			this.propertySelector.addSelectionListener(this);
 			JPanel propertySelectorPanelBorder = new JPanel(new BorderLayout());
 			propertySelectorPanelBorder.setBorder(ComponentFactory
@@ -129,13 +129,14 @@ public abstract class VariableValueEditor extends JPanel implements
 			this.add(propertySelectorPanelBorder);
 		}
 
+		@SuppressWarnings("unused")
 		public void stateChanged(ChangeEvent e) {
 			Set<? extends OWLProperty<?, ?>> selectedObjects = this.propertySelector
 					.getSelectedObjects();
 			if (selectedObjects != null) {
-				setVariableValues(selectedObjects);
+				this.setVariableValues(selectedObjects);
 			}
-			notifyListeners();
+			this.notifyListeners();
 		}
 
 		@Override
@@ -152,12 +153,12 @@ public abstract class VariableValueEditor extends JPanel implements
 		private static final long serialVersionUID = -1929930488764454474L;
 		private OWLIndividualSelectorPanel individualSelectorPanel;
 
-		private IndividualVariableValueEditor(OWLEditorKit owlEditorKit,
+		IndividualVariableValueEditor(OWLEditorKit owlEditorKit,
 				Variable variable) {
 			super(variable.getName(), owlEditorKit);
-			setLayout(new BorderLayout());
-			this.individualSelectorPanel = new OWLIndividualSelectorPanel(
-					getOwlEditorKit());
+			this.setLayout(new BorderLayout());
+			this.individualSelectorPanel = new OWLIndividualSelectorPanel(this
+					.getOwlEditorKit());
 			this.individualSelectorPanel.addSelectionListener(this);
 			JPanel individualSelectorPanelBorder = new JPanel(
 					new BorderLayout());
@@ -168,13 +169,14 @@ public abstract class VariableValueEditor extends JPanel implements
 			this.add(individualSelectorPanelBorder);
 		}
 
+		@SuppressWarnings("unused")
 		public void stateChanged(ChangeEvent e) {
 			Set<OWLIndividual> selectedObjects = this.individualSelectorPanel
 					.getSelectedObjects();
 			if (selectedObjects != null) {
-				setVariableValues(selectedObjects);
+				this.setVariableValues(selectedObjects);
 			}
-			notifyListeners();
+			this.notifyListeners();
 		}
 
 		@Override
@@ -192,12 +194,12 @@ public abstract class VariableValueEditor extends JPanel implements
 		private static final long serialVersionUID = -9168873531349410794L;
 		private ExpressionEditor<OWLConstant> owlConstantEditor;
 
-		private ConstantVariableValueEditor(OWLEditorKit owlEditorKit,
-				Variable variable) {
+		ConstantVariableValueEditor(OWLEditorKit owlEditorKit, Variable variable) {
 			super(variable.getName(), owlEditorKit);
-			setLayout(new BorderLayout());
-			this.owlConstantEditor = new ExpressionEditor<OWLConstant>(
-					getOwlEditorKit(), new OWLExpressionChecker<OWLConstant>() {
+			this.setLayout(new BorderLayout());
+			this.owlConstantEditor = new ExpressionEditor<OWLConstant>(this
+					.getOwlEditorKit(),
+					new OWLExpressionChecker<OWLConstant>() {
 						private OWLConstant owlConstant = null;
 
 						public void check(String text)
@@ -218,7 +220,7 @@ public abstract class VariableValueEditor extends JPanel implements
 
 						public OWLConstant createObject(String text)
 								throws OWLExpressionParserException {
-							check(text);
+							this.check(text);
 							return this.owlConstant;
 						}
 					});
@@ -236,7 +238,7 @@ public abstract class VariableValueEditor extends JPanel implements
 				try {
 					OWLConstant owlConstant = this.owlConstantEditor
 							.createObject();
-					setVariableValues(Collections.singleton(owlConstant));
+					this.setVariableValues(Collections.singleton(owlConstant));
 				} catch (OWLExpressionParserException e) {
 					throw new RuntimeException(e);
 				} catch (OWLException e) {
@@ -305,7 +307,7 @@ public abstract class VariableValueEditor extends JPanel implements
 	public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
 		this.listeners.add(listener);
-		notifyListener(listener);
+		this.notifyListener(listener);
 	}
 
 	public void removeStatusChangedListener(
@@ -316,18 +318,19 @@ public abstract class VariableValueEditor extends JPanel implements
 	public void notifyListeners() {
 		for (InputVerificationStatusChangedListener listener : this
 				.getListeners()) {
-			notifyListener(listener);
+			this.notifyListener(listener);
 		}
 	}
 
 	protected void notifyListener(
 			InputVerificationStatusChangedListener listener) {
-		listener.verifiedStatusChanged(getVariableValues() != null
-				&& getVariableValues().size() > 0);
+		listener.verifiedStatusChanged(this.getVariableValues() != null
+				&& this.getVariableValues().size() > 0);
 	}
 
 	public static VariableValueEditor getVariableValueEditor(
 			OWLEditorKit owlEditorKit, Variable variable) {
+		// XXX not easy to turn from switch to other
 		switch (variable.getType()) {
 			case CLASS:
 				return new ClassVariableValueEditor(owlEditorKit, variable);

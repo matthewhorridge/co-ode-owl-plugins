@@ -81,12 +81,12 @@ public class PatternEditor extends
 					}
 				});
 		this.mainPanel.addChangeListener(this);
-		initGUI();
+		this.initGUI();
 	}
 
 	protected void handleChange() {
 		boolean newState = this.patternModel != null;
-		notifyListeners(newState);
+		this.notifyListeners(newState);
 	}
 
 	private void notifyListeners(boolean newState) {
@@ -143,6 +143,7 @@ public class PatternEditor extends
 		return this.mainPanel;
 	}
 
+	@SuppressWarnings("unused")
 	public void stateChanged(ChangeEvent e) {
 		Component selectedComponent = this.mainPanel.getSelectedComponent();
 		if (this.patternModel != null) {

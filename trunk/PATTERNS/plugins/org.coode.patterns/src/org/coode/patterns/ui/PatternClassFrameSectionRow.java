@@ -35,7 +35,6 @@ import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.InstantiatedPatternModel;
 import org.coode.patterns.PatternExtractor;
 import org.coode.patterns.PatternModel;
-import org.coode.patterns.PatternOPPLScript;
 import org.coode.patterns.protege.ProtegeInstantiatedPatternModel;
 import org.coode.patterns.protege.ProtegePatternExtractor;
 import org.coode.patterns.utils.Utils;
@@ -84,7 +83,7 @@ public class PatternClassFrameSectionRow
 	@Override
 	protected OWLEntityAnnotationAxiom createAxiom(
 			InstantiatedPatternModel editedObject) {
-		OWLDataFactory dataFactory = getOWLDataFactory();
+		OWLDataFactory dataFactory = this.getOWLDataFactory();
 		OWLConstant constant = dataFactory.getOWLTypedConstant(editedObject
 				.toString());
 		URI annotationURI = URI.create(PatternModel.NAMESPACE
@@ -94,24 +93,23 @@ public class PatternClassFrameSectionRow
 				+ "PatternInstantiation");
 		OWLConstantAnnotation annotation = dataFactory
 				.getOWLConstantAnnotation(annotationURI, constant);
-		OWLEntityAnnotationAxiom axiom = getOWLDataFactory()
-				.getOWLEntityAnnotationAxiom(getRootObject(), annotation);
-		return axiom;
+		return this.getOWLDataFactory().getOWLEntityAnnotationAxiom(
+				this.getRootObject(), annotation);
 	}
 
 	@Override
 	protected OWLFrameSectionRowObjectEditor<InstantiatedPatternModel> getObjectEditor() {
-		PatternInstantiationEditor editor = new PatternInstantiationEditor(
-				getOWLEditorKit(), getRootObject(), this.factory);
-		OWLEntityAnnotationAxiom annotationAxiom = (OWLEntityAnnotationAxiom) getManipulatableObjects()
-				.iterator().next();
-		PatternExtractor patternExtractor = new ProtegePatternExtractor(
-				getOWLModelManager());
+		PatternInstantiationEditor editor = new PatternInstantiationEditor(this
+				.getOWLEditorKit(), this.getRootObject(), this.factory);
+		OWLEntityAnnotationAxiom annotationAxiom = (OWLEntityAnnotationAxiom) this
+				.getManipulatableObjects().iterator().next();
+		PatternExtractor patternExtractor = new ProtegePatternExtractor(this
+				.getOWLModelManager());
 		OWLAnnotation<? extends OWLObject> annotation = annotationAxiom
 				.getAnnotation();
-		PatternOPPLScript patternModel = annotation.accept(patternExtractor);
 		editor
-				.setInstantiatedPatternModel((ProtegeInstantiatedPatternModel) patternModel);
+				.setInstantiatedPatternModel((ProtegeInstantiatedPatternModel) annotation
+						.accept(patternExtractor));
 		return editor;
 	}
 
@@ -123,13 +121,13 @@ public class PatternClassFrameSectionRow
 	public List<? extends OWLOntologyChange> getDeletionChanges() {
 		List<OWLOntologyChange> deletionChanges = new ArrayList<OWLOntologyChange>(
 				super.getDeletionChanges());
-		Set<OWLAxiom> axioms = getOntology().getAxioms();
-		for (OWLAxiom axiom : axioms) {
-			Set<OWLAxiomAnnotationAxiom> annotationAxioms = axiom
-					.getAnnotationAxioms(getOntology());
+		Set<OWLAxiom> axioms = this.getOntology().getAxioms();
+		for (OWLAxiom ax : axioms) {
+			Set<OWLAxiomAnnotationAxiom> annotationAxioms = ax
+					.getAnnotationAxioms(this.getOntology());
 			if (Utils.isPatternGenerated(this.patternModel
 					.getInstantiatedPatternLocalName(), annotationAxioms)) {
-				deletionChanges.add(new RemoveAxiom(getOntology(), axiom));
+				deletionChanges.add(new RemoveAxiom(this.getOntology(), ax));
 			}
 		}
 		return deletionChanges;
@@ -144,11 +142,11 @@ public class PatternClassFrameSectionRow
 		while (!found && it.hasNext()) {
 			instantiatedPatternModel = it.next();
 			found = instantiatedPatternModel.hasScopedVariables()
-					&& getOWLEditorKit().getModelManager().getReasoner() instanceof NoOpReasoner;
+					&& this.getOWLEditorKit().getModelManager().getReasoner() instanceof NoOpReasoner;
 			if (found) {
 				JOptionPane
 						.showMessageDialog(
-								getOWLEditorKit().getWorkspace(),
+								this.getOWLEditorKit().getWorkspace(),
 								"The pattern model "
 										+ instantiatedPatternModel.getName()
 										+ " has got scoped variables but you are curently using a NoOpReasoner, the pattern will not work properly unless you activate reasoning.",

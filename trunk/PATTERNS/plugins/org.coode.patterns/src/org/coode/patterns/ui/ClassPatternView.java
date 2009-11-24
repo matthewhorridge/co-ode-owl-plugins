@@ -67,9 +67,9 @@ public class ClassPatternView extends AbstractOWLClassViewComponent {
 			private static final long serialVersionUID = 1068899822314449303L;
 
 			@Override
-			protected Border createListItemBorder(JList list, Object value,
+			protected Border createListItemBorder(JList l, Object value,
 					int index, boolean isSelected, boolean cellHasFocus) {
-				Border border = super.createListItemBorder(list, value, index,
+				Border border = super.createListItemBorder(l, value, index,
 						isSelected, cellHasFocus);
 				Border toReturn = border;
 				if (value instanceof PatternOWLEquivalentClassesAxiomFrameSectionRow) {

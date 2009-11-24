@@ -262,15 +262,15 @@ public class PatternBuilder extends
 			PatternBuilder.this.handleChange();
 		}
 
-		public void importPatternModel(PatternModel patternModel) {
-			this.constraintSystem = patternModel.getConstraintSystem();
-			this.name = patternModel.getName();
+		public void importPatternModel(PatternModel pattern) {
+			this.constraintSystem = pattern.getConstraintSystem();
+			this.name = pattern.getName();
 			this.variables.clear();
-			this.variables.addAll(patternModel.getVariables());
+			this.variables.addAll(pattern.getVariables());
 			this.actions.clear();
-			this.actions.addAll(patternModel.getActions());
-			this.modelRendering = patternModel.getRendering();
-			this.returnVariable = patternModel.getReturnVariable();
+			this.actions.addAll(pattern.getActions());
+			this.modelRendering = pattern.getRendering();
+			this.returnVariable = pattern.getReturnVariable();
 			this.notifyBuilder();
 		}
 
@@ -336,6 +336,7 @@ public class PatternBuilder extends
 			}
 
 			@Override
+			@SuppressWarnings("unused")
 			public void componentHidden(ComponentEvent e) {
 				Object retVal = this.optionPane.getValue();
 				if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
@@ -432,6 +433,7 @@ public class PatternBuilder extends
 					.getWorkspace());
 			dlg.addComponentListener(new ComponentAdapter() {
 				@Override
+				@SuppressWarnings("unused")
 				public void componentHidden(ComponentEvent e) {
 					Object retVal = optionPane.getValue();
 					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
@@ -491,6 +493,7 @@ public class PatternBuilder extends
 					.getWorkspace());
 			dlg.addComponentListener(new ComponentAdapter() {
 				@Override
+				@SuppressWarnings("unused")
 				public void componentHidden(ComponentEvent e) {
 					Object retVal = optionPane.getValue();
 					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
@@ -527,6 +530,7 @@ public class PatternBuilder extends
 			this.getModel().addListDataListener(this);
 		}
 
+		@SuppressWarnings("unused")
 		public void contentsChanged(ListDataEvent e) {
 			this.updatePatternModel();
 		}
@@ -537,12 +541,11 @@ public class PatternBuilder extends
 				Object element = model.getElementAt(i);
 				if (element instanceof PatternBuilderVariableListItem) {
 					PatternBuilderVariableListItem item = (PatternBuilderVariableListItem) element;
-					if (PatternBuilder.this.patternModel != null) {
-						if (!PatternBuilder.this.patternModel.getVariables()
-								.contains(item.getVariable())) {
-							PatternBuilder.this.patternModel.addVariable(item
-									.getVariable());
-						}
+					if (PatternBuilder.this.patternModel != null
+							&& !PatternBuilder.this.patternModel.getVariables()
+									.contains(item.getVariable())) {
+						PatternBuilder.this.patternModel.addVariable(item
+								.getVariable());
 					}
 				}
 			}
@@ -556,10 +559,12 @@ public class PatternBuilder extends
 					.addElement(new GeneratedVariableSectionHeader());
 		}
 
+		@SuppressWarnings("unused")
 		public void intervalAdded(ListDataEvent e) {
 			this.updatePatternModel();
 		}
 
+		@SuppressWarnings("unused")
 		public void intervalRemoved(ListDataEvent e) {
 			this.updatePatternModel();
 		}
@@ -642,6 +647,7 @@ public class PatternBuilder extends
 					.getWorkspace());
 			dlg.addComponentListener(new ComponentAdapter() {
 				@Override
+				@SuppressWarnings("unused")
 				public void componentHidden(ComponentEvent e) {
 					Object retVal = optionPane.getValue();
 					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
@@ -650,11 +656,9 @@ public class PatternBuilder extends
 						if (selectedValue instanceof VariableListItem) {
 							VariableListItem item = (VariableListItem) selectedValue;
 							Variable oldVariable = item.getVariable();
-							// PatternBuilder.this.patternBuilderModel
-							// .removeVariable(oldVariable);
-							Variable variable = variableEditor.getVariable();
 							PatternBuilder.this.patternBuilderModel
-									.replaceVariable(oldVariable, variable);
+									.replaceVariable(oldVariable,
+											variableEditor.getVariable());
 						}
 					}
 					variableEditor
@@ -707,18 +711,21 @@ public class PatternBuilder extends
 		this.owlEditorKit = owlEditorKit;
 		this.nameEditor.getDocument().addDocumentListener(
 				new DocumentListener() {
+					@SuppressWarnings("unused")
 					public void changedUpdate(DocumentEvent e) {
 						PatternBuilder.this.patternBuilderModel
 								.setName(PatternBuilder.this.nameEditor
 										.getText());
 					}
 
+					@SuppressWarnings("unused")
 					public void insertUpdate(DocumentEvent e) {
 						PatternBuilder.this.patternBuilderModel
 								.setName(PatternBuilder.this.nameEditor
 										.getText());
 					}
 
+					@SuppressWarnings("unused")
 					public void removeUpdate(DocumentEvent e) {
 						PatternBuilder.this.patternBuilderModel
 								.setName(PatternBuilder.this.nameEditor
@@ -744,18 +751,21 @@ public class PatternBuilder extends
 		builderPanel.add(patternBodyPanel, BorderLayout.CENTER);
 		this.rendering.getDocument().addDocumentListener(
 				new DocumentListener() {
+					@SuppressWarnings("unused")
 					public void changedUpdate(DocumentEvent e) {
 						PatternBuilder.this.patternBuilderModel
 								.setRendering(PatternBuilder.this.rendering
 										.getText());
 					}
 
+					@SuppressWarnings("unused")
 					public void insertUpdate(DocumentEvent e) {
 						PatternBuilder.this.patternBuilderModel
 								.setRendering(PatternBuilder.this.rendering
 										.getText());
 					}
 
+					@SuppressWarnings("unused")
 					public void removeUpdate(DocumentEvent e) {
 						PatternBuilder.this.patternBuilderModel
 								.setRendering(PatternBuilder.this.rendering
@@ -772,6 +782,7 @@ public class PatternBuilder extends
 				.createTitledBorder("Return"));
 		this.allowReturnValueCheckBox = new JCheckBox("Allow Return Value");
 		this.allowReturnValueCheckBox.addActionListener(new ActionListener() {
+			@SuppressWarnings("unused")
 			public void actionPerformed(ActionEvent e) {
 				PatternBuilder.this.returnValuesComboBox
 						.setEnabled(PatternBuilder.this.allowReturnValueCheckBox
@@ -782,6 +793,7 @@ public class PatternBuilder extends
 		this.returnValuesComboBox.setRenderer(this.variableList
 				.getVariableListCellRenderer());
 		this.returnValuesComboBox.addActionListener(new ActionListener() {
+			@SuppressWarnings("unused")
 			public void actionPerformed(ActionEvent e) {
 				Object selectedItem = PatternBuilder.this.returnValuesComboBox
 						.getSelectedItem();

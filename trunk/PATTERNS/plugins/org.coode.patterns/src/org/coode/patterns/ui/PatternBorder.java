@@ -66,6 +66,7 @@ public class PatternBorder implements Border {
 	 * @see javax.swing.border.Border#paintBorder(java.awt.Component,
 	 *      java.awt.Graphics, int, int, int, int)
 	 */
+	@SuppressWarnings("unused")
 	public void paintBorder(Component component, Graphics g, int x, int y,
 			int width, int height) {
 		Color oldColor = g.getColor();

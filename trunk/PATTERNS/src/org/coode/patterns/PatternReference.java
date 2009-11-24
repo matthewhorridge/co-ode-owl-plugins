@@ -33,7 +33,6 @@ import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLAnnotation;
 import org.semanticweb.owl.model.OWLConstantAnnotation;
-import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyAnnotationAxiom;
@@ -204,13 +203,15 @@ public class PatternReference {
 					} else {
 						OWLObject arg = this.parse(anIthAssignment);
 						if (arg != null) {
-							if (arg instanceof OWLEntity) {
-								compatible = variable.getType()
-										.isCompatibleWith(arg);
-							} else {
-								compatible = variable.getType()
-										.isCompatibleWith(arg);
-							}
+							compatible = variable.getType().isCompatibleWith(
+									arg);
+							// if (arg instanceof OWLEntity) {
+							// compatible = variable.getType()
+							// .isCompatibleWith(arg);
+							// } else {
+							// compatible = variable.getType()
+							// .isCompatibleWith(arg);
+							// }
 						} else {
 							compatible = false;
 							throw new PatternException("Illegal argument "
