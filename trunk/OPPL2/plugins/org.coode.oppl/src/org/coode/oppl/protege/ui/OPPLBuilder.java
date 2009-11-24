@@ -1115,14 +1115,10 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 
 	public void handleChange(OWLModelManagerChangeEvent event) {
 		EventType type = event.getType();
-		switch (type) {
-			case REASONER_CHANGED:
-				this.opplBuilderModel.getConstraintSystem().setReasoner(
-						this.getOWLEditorKit().getModelManager().getReasoner());
-				this.handleChange();
-				break;
-			default:
-				break;
+		if (type.equals(EventType.REASONER_CHANGED)) {
+			this.opplBuilderModel.getConstraintSystem().setReasoner(
+					this.getOWLEditorKit().getModelManager().getReasoner());
+			this.handleChange();
 		}
 	}
 

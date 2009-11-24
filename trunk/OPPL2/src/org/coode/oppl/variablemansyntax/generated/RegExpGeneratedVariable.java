@@ -14,6 +14,7 @@ import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.VariableScope;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.VariableVisitor;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.inference.OWLReasonerException;
@@ -127,5 +128,9 @@ public class RegExpGeneratedVariable implements GeneratedVariable<OWLEntity> {
 	public <P> GeneratedVariable<P> replaceValue(GeneratedValue<P> replaceValue) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public <P> P accept(VariableTypeVisitorEx<P> visitor) {
+		return visitor.visit(this);
 	}
 }

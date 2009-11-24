@@ -167,7 +167,8 @@ public class ConstraintSystem {
 	public Variable createVariable(String name, VariableType type)
 			throws OPPLException {
 		if (name.matches("\\?([\\p{Alnum}[-_]])+")) {
-			VariableImpl newVariable = new VariableImpl(name.trim(), type);
+			Variable newVariable = type.instantiateVariable(name);
+			// new VariableImpl(name.trim(), type);
 			this.variables.store(newVariable);
 			return newVariable;
 		} else {

@@ -27,6 +27,12 @@ import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
 
 /**
  * Contains some utility method for mathcing variable names
@@ -47,45 +53,90 @@ public class OPPLVariableMatcher {
 	 *         String from the input ConstraintSystem, provided their type has
 	 *         to be included.
 	 */
-	public static Set<Variable> matches(String name,
-			ConstraintSystem constraintSystem, boolean matchClasses,
-			boolean matchObjectProperties, boolean matchDataProperties,
-			boolean matchIndividuals, boolean matchConstants) {
+	public static Set<Variable> matches(final String name,
+			ConstraintSystem constraintSystem, final boolean matchClasses,
+			final boolean matchObjectProperties,
+			final boolean matchDataProperties, final boolean matchIndividuals,
+			final boolean matchConstants) {
 		Set<Variable> variables = constraintSystem.getVariables();
-		Set<Variable> toReturn = new HashSet<Variable>(variables
-				.size());
-		for (Variable variable : variables) {
-			switch (variable.getType()) {
-				case CLASS:
-					if (matchClasses && variable.getName().startsWith(name)) {
-						toReturn.add(variable);
-					}
-					break;
-				case OBJECTPROPERTY:
-					if (matchObjectProperties
-							&& variable.getName().startsWith(name)) {
-						toReturn.add(variable);
-					}
-					break;
-				case DATAPROPERTY:
-					if (matchDataProperties
-							&& variable.getName().startsWith(name)) {
-						toReturn.add(variable);
-					}
-					break;
-				case INDIVIDUAL:
-					if (matchIndividuals && variable.getName().startsWith(name)) {
-						toReturn.add(variable);
-					}
-					break;
-				case CONSTANT:
-					if (matchConstants && variable.getName().startsWith(name)) {
-						toReturn.add(variable);
-					}
-					break;
-				default:
-					break;
+		Set<Variable> toReturn = new HashSet<Variable>(variables.size());
+		VariableTypeVisitorEx<Variable> visitor = new VariableTypeVisitorEx<Variable>() {
+			public Variable visit(Variable v) {
+				// TODO Auto-generated method stub
+				return null;
 			}
+
+			public Variable visit(INDIVIDUALVariable v) {
+				if (matchIndividuals && v.getName().startsWith(name)) {
+					return v;
+				}
+				return null;
+			}
+
+			public Variable visit(DATAPROPERTYVariable v) {
+				if (matchDataProperties && v.getName().startsWith(name)) {
+					return v;
+				}
+				return null;
+			}
+
+			public Variable visit(OBJECTPROPERTYVariable v) {
+				if (matchObjectProperties && v.getName().startsWith(name)) {
+					return v;
+				}
+				return null;
+			}
+
+			public Variable visit(CONSTANTVariable v) {
+				if (matchConstants && v.getName().startsWith(name)) {
+					return v;
+				}
+				return null;
+			}
+
+			public Variable visit(CLASSVariable v) {
+				if (matchClasses && v.getName().startsWith(name)) {
+					return v;
+				}
+				return null;
+			}
+		};
+		for (Variable variable : variables) {
+			Variable v = variable.accept(visitor);
+			if (v != null) {
+				toReturn.add(v);
+			}
+			// switch (variable.getType()) {
+			// case CLASS:
+			// if (matchClasses && variable.getName().startsWith(name)) {
+			// toReturn.add(variable);
+			// }
+			// break;
+			// case OBJECTPROPERTY:
+			// if (matchObjectProperties
+			// && variable.getName().startsWith(name)) {
+			// toReturn.add(variable);
+			// }
+			// break;
+			// case DATAPROPERTY:
+			// if (matchDataProperties
+			// && variable.getName().startsWith(name)) {
+			// toReturn.add(variable);
+			// }
+			// break;
+			// case INDIVIDUAL:
+			// if (matchIndividuals && variable.getName().startsWith(name)) {
+			// toReturn.add(variable);
+			// }
+			// break;
+			// case CONSTANT:
+			// if (matchConstants && variable.getName().startsWith(name)) {
+			// toReturn.add(variable);
+			// }
+			// break;
+			// default:
+			// break;
+			// }
 		}
 		return toReturn;
 	}

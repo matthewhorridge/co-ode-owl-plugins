@@ -26,9 +26,14 @@ import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.model.AxiomType;
 import org.semanticweb.owl.model.OWLAxiom;
@@ -153,29 +158,62 @@ public class SearchTest extends TestCase {
 					return toReturn;
 				}
 
+				private final VariableTypeVisitorEx<Collection<? extends OWLObject>> assignableValuesVisitor = new VariableTypeVisitorEx<Collection<? extends OWLObject>>() {
+					public Collection<? extends OWLObject> visit(Variable v) {
+						// TODO Auto-generated method stub
+						return Collections.emptySet();
+					}
+
+					public Collection<? extends OWLObject> visit(
+							INDIVIDUALVariable v) {
+						return getAllIndividuals();
+					}
+
+					public Collection<? extends OWLObject> visit(
+							DATAPROPERTYVariable v) {
+						return getAllDataProperties();
+					}
+
+					public Collection<? extends OWLObject> visit(
+							OBJECTPROPERTYVariable v) {
+						return getObjectProperties();
+					}
+
+					public Collection<? extends OWLObject> visit(
+							CONSTANTVariable v) {
+						return getAllConstants();
+					}
+
+					public Collection<? extends OWLObject> visit(CLASSVariable v) {
+						return getAllClasses();
+					}
+				};
+
 				private Collection<? extends OWLObject> getAssignableValues(
 						Variable variable) {
 					Set<OWLObject> toReturn = new HashSet<OWLObject>();
-					VariableType type = variable.getType();
-					switch (type) {
-						case CLASS:
-							toReturn.addAll(this.getAllClasses());
-							break;
-						case DATAPROPERTY:
-							toReturn.addAll(this.getAllDataProperties());
-							break;
-						case OBJECTPROPERTY:
-							toReturn.addAll(this.getObjectProperties());
-							break;
-						case INDIVIDUAL:
-							toReturn.addAll(this.getAllIndividuals());
-							break;
-						case CONSTANT:
-							toReturn.addAll(this.getAllConstants());
-							break;
-						default:
-							break;
-					}
+					toReturn.addAll(variable
+							.accept(this.assignableValuesVisitor));
+					// VariableType type = variable.getType();
+					// switch (type) {
+					// case CLASS:
+					// toReturn.addAll(this.getAllClasses());
+					// break;
+					// case DATAPROPERTY:
+					// toReturn.addAll(this.getAllDataProperties());
+					// break;
+					// case OBJECTPROPERTY:
+					// toReturn.addAll(this.getObjectProperties());
+					// break;
+					// case INDIVIDUAL:
+					// toReturn.addAll(this.getAllIndividuals());
+					// break;
+					// case CONSTANT:
+					// toReturn.addAll(this.getAllConstants());
+					// break;
+					// default:
+					// break;
+					// }
 					return toReturn;
 				}
 

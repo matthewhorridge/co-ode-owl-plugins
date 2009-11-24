@@ -24,9 +24,8 @@ public class OPPLSelectClauseListItem implements MListItem {
 	 * @see org.protege.editor.core.ui.list.MListItem#getTooltip()
 	 */
 	public String getTooltip() {
-		String isAsserted = isAsserted() ? "ASSERTED " : "";
-		StringBuffer buffer = new StringBuffer(isAsserted);
-		return buffer.toString();
+		String isAsserted = this.isAsserted() ? "ASSERTED " : "";
+		return isAsserted;
 	}
 
 	/**

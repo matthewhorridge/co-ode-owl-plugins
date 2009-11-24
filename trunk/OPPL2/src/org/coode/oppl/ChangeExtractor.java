@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.coode.oppl.exceptions.OPPLException;
+import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.semanticweb.owl.model.AddAxiom;
@@ -47,10 +48,7 @@ public class ChangeExtractor implements
 	 */
 	public ChangeExtractor(ConstraintSystem constraintSystem,
 			boolean considerImportClosure) {
-		if (constraintSystem == null) {
-			throw new NullPointerException(
-					"The constraint system cannot be null");
-		}
+		ArgCheck.checkNullArgument("The constraint system", constraintSystem);
 		this.constraintSystem = constraintSystem;
 		this.considerImportClosure = considerImportClosure;
 	}

@@ -369,27 +369,27 @@ public class VariableShortFormEntityChecker implements OWLEntityChecker {
 
 	private OWLEntityCreationSet<? extends OWLEntity> create(String shortName,
 			VariableType type) throws OWLEntityCreationException {
-		Class<? extends OWLEntity> clazz = null;
-		switch (type) {
-			case CLASS:
-				clazz = OWLClass.class;
-				break;
-			case OBJECTPROPERTY:
-				clazz = OWLObjectProperty.class;
-				break;
-			case DATAPROPERTY:
-				clazz = OWLDataProperty.class;
-				break;
-			case INDIVIDUAL:
-				clazz = OWLIndividual.class;
-				break;
-			default:
-				break;
-		}
+		Class<? extends OWLEntity> clazz = type.getOWLEntityClass();
+		// switch (type) {
+		// case CLASS:
+		// clazz = OWLClass.class;
+		// break;
+		// case OBJECTPROPERTY:
+		// clazz = OWLObjectProperty.class;
+		// break;
+		// case DATAPROPERTY:
+		// clazz = OWLDataProperty.class;
+		// break;
+		// case INDIVIDUAL:
+		// clazz = OWLIndividual.class;
+		// break;
+		// default:
+		// break;
+		// }
 		OWLEntityCreationSet<? extends OWLEntity> toReturn = null;
-		org.coode.oppl.entity.OWLEntityFactory owlEntityFactory = ParserFactory
-				.getInstance().getOPPLFactory().getOWLEntityFactory();
 		if (clazz != null) {
+			org.coode.oppl.entity.OWLEntityFactory owlEntityFactory = ParserFactory
+					.getInstance().getOPPLFactory().getOWLEntityFactory();
 			toReturn = owlEntityFactory.createOWLEntity(clazz, shortName, null);
 			this.created.put(shortName, toReturn.getOWLEntity());
 			this.lastAdditions.addAll(toReturn.getOntologyChanges());

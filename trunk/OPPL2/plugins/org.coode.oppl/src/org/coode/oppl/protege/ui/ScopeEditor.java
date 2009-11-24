@@ -411,6 +411,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 
 	public static ScopeEditor getTypeScopeEditor(VariableType variableType,
 			OWLEditorKit owlEditorKit) {
+		// XXX can't replace this with a visitor
 		ScopeEditor toReturn = null;
 		switch (variableType) {
 			case CLASS:

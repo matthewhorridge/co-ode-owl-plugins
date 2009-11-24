@@ -143,7 +143,7 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 		this.copy2ClipboardButton.addActionListener(new ActionListener() {
 			@SuppressWarnings("unused")
 			public void actionPerformed(ActionEvent e) {
-				String opplString = "";
+				StringBuilder opplString = new StringBuilder();
 				ListModel variableModel = OPPLMacroView.this.variableList
 						.getModel();
 				boolean first = true;
@@ -166,15 +166,17 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 									+ "]";
 							variableString += scopeString;
 						}
-						opplString += first ? variableString : ","
-								+ variableString;
+						if (!first) {
+							opplString.append(',');
+						}
 						first = false;
+						opplString.append(variableString);
 					}
 				}
 				first = true;
 				ListModel actionModel = OPPLMacroView.this.recordedActions
 						.getModel();
-				opplString += "\nBEGIN";
+				opplString.append("\nBEGIN");
 				VariableOWLCellRenderer cellRenderer = new VariableOWLCellRenderer(
 						OPPLMacroView.this.getOWLEditorKit(),
 						OPPLMacroView.this.constraintSystem,
@@ -192,12 +194,15 @@ public class OPPLMacroView extends AbstractOWLViewComponent implements
 						OWLAxiom axiom = axiomChange.getAxiom();
 						String axiomRendering = cellRenderer
 								.getRendering(axiom);
-						opplString += isCommaThere + action + axiomRendering;
+						opplString.append(isCommaThere);
+						opplString.append(action);
+						opplString.append(axiomRendering);
 					}
 				}
-				opplString += "\nEND;";
+				opplString.append("\nEND;");
 				Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
-				StringSelection selection = new StringSelection(opplString);
+				StringSelection selection = new StringSelection(opplString
+						.toString());
 				c.setContents(selection, selection);
 			}
 		});

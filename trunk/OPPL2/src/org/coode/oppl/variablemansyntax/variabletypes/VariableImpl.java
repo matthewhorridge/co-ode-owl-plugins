@@ -20,12 +20,21 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-package org.coode.oppl.variablemansyntax;
+package org.coode.oppl.variablemansyntax.variabletypes;
 
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.coode.oppl.utils.ArgCheck;
+import org.coode.oppl.variablemansyntax.ManchesterVariableSyntax;
+import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
+import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.VariableScope;
+import org.coode.oppl.variablemansyntax.VariableScopeChecker;
+import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.VariableVisitor;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -33,7 +42,7 @@ import org.semanticweb.owl.model.OWLObject;
  * @author Luigi Iannone
  * 
  */
-public final class VariableImpl implements Variable {
+public abstract class VariableImpl implements Variable {
 	private final String name;
 	private final VariableType type;
 	private final URI uri;
@@ -41,13 +50,9 @@ public final class VariableImpl implements Variable {
 	private VariableScope variableScope = null;
 	private VariableScopeChecker variableScopeChecker = null;
 
-	public VariableImpl(String name, VariableType type) {
-		if (name == null) {
-			throw new NullPointerException("The name cannot be null");
-		}
-		if (type == null) {
-			throw new NullPointerException("The type cannot be null");
-		}
+	protected VariableImpl(String name, VariableType type) {
+		ArgCheck.checkNullArgument("The name", name);
+		ArgCheck.checkNullArgument("The type", type);
 		this.name = name;
 		this.type = type;
 		String fragment = this.name.substring(this.name.indexOf('?') + 1);
@@ -125,6 +130,8 @@ public final class VariableImpl implements Variable {
 	public <P> P accept(VariableVisitor<P> visitor) {
 		return visitor.visit(this);
 	}
+
+	public abstract <P> P accept(VariableTypeVisitorEx<P> visitor);
 
 	public void accept(PlainVariableVisitor visitor) {
 		visitor.visit(this);

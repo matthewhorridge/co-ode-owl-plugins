@@ -23,6 +23,11 @@
 package org.coode.oppl.variablemansyntax;
 
 import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
 import org.semanticweb.owl.expression.ParserException;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -39,24 +44,87 @@ public class ExpressionParser implements VariableTypeVisitorEx<OWLObject> {
 				.getOPPLFactory().getOWLEntityChecker());
 	}
 
-	public OWLObject visit(VariableType type) {
-		OWLObject toReturn = null;
+	// public OWLObject visit(VariableType type) {
+	// OWLObject toReturn = null;
+	// try {
+	// if (type.equals(VariableType.CLASS)) {
+	// toReturn = this.parser.parseDescription();
+	// } else if (type.equals(VariableType.OBJECTPROPERTY)) {
+	// toReturn = this.parser.parseObjectPropertyExpression();
+	// } else if (type.equals(VariableType.DATAPROPERTY)) {
+	// toReturn = this.parser.parseDataProperty();
+	// } else if (type.equals(VariableType.INDIVIDUAL)) {
+	// toReturn = this.parser.parseIndividual();
+	// } else if (type.equals(VariableType.CONSTANT)) {
+	// toReturn = this.parser.parseConstant();
+	// }
+	// } catch (ParserException e) {
+	// // TODO figure out why no exception was being printed
+	// e.printStackTrace();
+	// }
+	// return toReturn;
+	// }
+	public OWLObject visit(CLASSVariable v) {
 		try {
-			if (type.equals(VariableType.CLASS)) {
-				toReturn = this.parser.parseDescription();
-			} else if (type.equals(VariableType.OBJECTPROPERTY)) {
-				toReturn = this.parser.parseObjectPropertyExpression();
-			} else if (type.equals(VariableType.DATAPROPERTY)) {
-				toReturn = this.parser.parseDataProperty();
-			} else if (type.equals(VariableType.INDIVIDUAL)) {
-				toReturn = this.parser.parseIndividual();
-			} else if (type.equals(VariableType.CONSTANT)) {
-				toReturn = this.parser.parseConstant();
-			}
+			return this.parser.parseDescription();
 		} catch (ParserException e) {
-			// TODO figure out why no exception was being printed
 			e.printStackTrace();
 		}
-		return toReturn;
+		return null;
+	}
+
+	public OWLObject visit(CONSTANTVariable v) {
+		try {
+			return this.parser.parseConstant();
+		} catch (ParserException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public OWLObject visit(OBJECTPROPERTYVariable v) {
+		try {
+			return this.parser.parseObjectPropertyExpression();
+		} catch (ParserException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public OWLObject visit(DATAPROPERTYVariable v) {
+		try {
+			return this.parser.parseDataProperty();
+		} catch (ParserException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public OWLObject visit(INDIVIDUALVariable v) {
+		try {
+			return this.parser.parseIndividual();
+		} catch (ParserException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public OWLObject visit(Variable v) {
+		if (v instanceof CLASSVariable) {
+			this.visit((CLASSVariable) v);
+		}
+		if (v instanceof OBJECTPROPERTYVariable) {
+			this.visit((OBJECTPROPERTYVariable) v);
+		}
+		if (v instanceof DATAPROPERTYVariable) {
+			this.visit((DATAPROPERTYVariable) v);
+		}
+		if (v instanceof INDIVIDUALVariable) {
+			this.visit((INDIVIDUALVariable) v);
+		}
+		if (v instanceof CONSTANTVariable) {
+			this.visit((CONSTANTVariable) v);
+		}
+		return null;
 	}
 }

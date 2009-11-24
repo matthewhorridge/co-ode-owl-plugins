@@ -27,9 +27,15 @@ import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.bindingtree.LeafBrusher;
+import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.AddAxiom;
@@ -127,29 +133,52 @@ public class TestQueries extends TestCase {
 		}
 	}
 
-	private OWLObject generateValue(String string, Variable variable,
-			OWLDataFactory dataFactory) {
-		switch (variable.getType()) {
-			case CLASS:
-				return dataFactory.getOWLClass(URI.create(TEST_NS.toString()
-						+ string));
-			case OBJECTPROPERTY:
-				return dataFactory.getOWLObjectProperty(URI.create(TEST_NS
-						.toString()
-						+ string));
-			case DATAPROPERTY:
-				return dataFactory.getOWLDataProperty(URI.create(TEST_NS
-						.toString()
-						+ string));
-			case INDIVIDUAL:
+	private OWLObject generateValue(final String string, Variable variable,
+			final OWLDataFactory dataFactory) {
+		VariableTypeVisitorEx<OWLObject> visitor = new VariableTypeVisitorEx<OWLObject>() {
+			public OWLObject visit(Variable v) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			public OWLObject visit(INDIVIDUALVariable v) {
 				return dataFactory.getOWLIndividual(URI.create(TEST_NS
 						.toString()
 						+ string));
-			case CONSTANT:
+			}
+
+			public OWLObject visit(DATAPROPERTYVariable v) {
+				return dataFactory.getOWLDataProperty(URI.create(TEST_NS
+						.toString()
+						+ string));
+			}
+
+			public OWLObject visit(OBJECTPROPERTYVariable v) {
+				return dataFactory.getOWLObjectProperty(URI.create(TEST_NS
+						.toString()
+						+ string));
+			}
+
+			public OWLObject visit(CONSTANTVariable v) {
 				return dataFactory.getOWLUntypedConstant(string);
-			default:
-				return null;
-		}
+			}
+
+			public OWLObject visit(CLASSVariable v) {
+				return dataFactory.getOWLClass(URI.create(TEST_NS.toString()
+						+ string));
+			}
+		};
+		return variable.accept(visitor);
+		// switch (variable.getType()) {
+		// case CLASS:
+		//
+		// case OBJECTPROPERTY:
+		// case DATAPROPERTY:
+		// case INDIVIDUAL:
+		// case CONSTANT:
+		// default:
+		// return null;
+		// }
 	}
 
 	// TRANSITIVE_OBJECT_PROPERTY : AxiomType<OWLTransitiveObjectPropertyAxiom>

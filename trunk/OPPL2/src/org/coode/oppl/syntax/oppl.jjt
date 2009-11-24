@@ -509,55 +509,10 @@ VariableScope parseScope(VariableScopes.Direction direction,
 		VariableScope scope = null;
 		int beginningSubSection = token.beginColumn;
 		int beginningSubSectionLine = token.beginLine;
-		switch (variableType) {
-			case CLASS:
-				try {
-					OWLDescription description = parser.parseDescription();
-					if (direction.equals(Direction.SUBCLASSOF)) {
-						scope = VariableScopes.buildSubClassVariableScope(description);
-						} else {
-							scope = VariableScopes.buildSuperClassVariableScope(description);
-						}
-					} catch (ParserException e) {
-						throw Utils.buildException(beginningSubSection, beginningSubSectionLine, e);
-					}
-					break;
-				case OBJECTPROPERTY:
-					try {
-						OWLObjectProperty objectProperty = (OWLObjectProperty) parser.parseObjectPropertyExpression();
-						if (direction.equals(Direction.SUPERPROPERTYOF)) {
-							scope = VariableScopes.buildSuperPropertyVariableScope(objectProperty);
-						} else {
-							scope = VariableScopes.buildSubPropertyVariableScope(objectProperty);
-						}
-					} catch (ParserException e) {
-						throw Utils.buildException(beginningSubSection, beginningSubSectionLine, e);
-					}
-					break;
-				case DATAPROPERTY:
-					try {
-						OWLDataProperty dataProperty = parser.parseDataProperty();
-						if (direction.equals(Direction.SUPERPROPERTYOF)) {
-							scope = VariableScopes.buildSuperPropertyVariableScope(dataProperty);
-						} else {
-							scope = VariableScopes.buildSubPropertyVariableScope(dataProperty);
-						}
-					} catch (ParserException e) {
-						throw Utils.buildException(beginningSubSection, beginningSubSectionLine, e);
-					}
-					break;
-				case INDIVIDUAL:
-					try {
-						OWLDescription description = parser.parseDescription();
-						scope = VariableScopes.buildIndividualVariableScope(description);
-					} catch (ParserException e) {
-						throw Utils.buildException(beginningSubSection, beginningSubSectionLine, e);
-					}
-					break;
-				default:
-					break;
-			}
-			return scope;
+		try {
+			scope = variableType.parseVariable(direction, parser);
+		} catch (ParserException e) {throw Utils.buildException(beginningSubSection, beginningSubSectionLine, e);}
+		return scope;
 	}
 
 
@@ -614,11 +569,10 @@ OWLObject OWLExpression(Variable v, ConstraintSystem constraintSystem)
 				t = getNextToken();
 			}
 		}
-	VariableType type = v.getType();
 	manSyntaxString = manSyntaxString.trim();
 	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, constraintSystem);
 	try{
-	OWLObject toReturn = type.accept(expressionParser);
+	OWLObject toReturn = v.accept(expressionParser);
 	return toReturn;
 	} catch(Exception e){throw new ParseException(e.getMessage(), e);}
 }
