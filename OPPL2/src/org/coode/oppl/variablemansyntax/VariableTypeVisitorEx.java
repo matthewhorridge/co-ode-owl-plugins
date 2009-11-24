@@ -22,10 +22,34 @@
  */
 package org.coode.oppl.variablemansyntax;
 
+import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
+
 /**
  * @author Luigi Iannone
  * 
  */
 public interface VariableTypeVisitorEx<O> {
-	O visit(VariableType type);
+	// @Deprecated
+	// O visit(VariableType type);
+	O visit(CLASSVariable v);
+
+	O visit(CONSTANTVariable v);
+
+	O visit(OBJECTPROPERTYVariable v);
+
+	O visit(DATAPROPERTYVariable v);
+
+	O visit(INDIVIDUALVariable v);
+
+	/**
+	 * dispatch method for when the type is not known (i.e. implementation of
+	 * visit method in VariableImpl); should eventually go away TODO push the
+	 * implementations down to the implementing classes
+	 */
+	@Deprecated
+	O visit(Variable v);
 }

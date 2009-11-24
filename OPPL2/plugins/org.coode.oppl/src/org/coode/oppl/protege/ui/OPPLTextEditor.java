@@ -139,6 +139,7 @@ public final class OPPLTextEditor extends JPanel implements
 				});
 		this.editor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
+					@SuppressWarnings("unused")
 					public void verifiedStatusChanged(boolean newState) {
 						OPPLTextEditor.this.handleChange();
 					}
@@ -208,12 +209,8 @@ public final class OPPLTextEditor extends JPanel implements
 
 	public void handleChange(OWLModelManagerChangeEvent event) {
 		EventType type = event.getType();
-		switch (type) {
-		case REASONER_CHANGED:
+		if (type.equals(EventType.REASONER_CHANGED)) {
 			this.handleChange();
-			break;
-		default:
-			break;
 		}
 	}
 

@@ -144,7 +144,7 @@ public class InferredAxiomQuery extends AbstractAxiomQuery {
 		ValueExtractor valueExtractor = new ValueExtractor(this
 				.getConstraintSystem().getOntologyManager().getOntologies());
 		Set<OWLObject> values;
-		values = variable.getType().accept(valueExtractor);
+		values = variable.accept(valueExtractor);
 		for (OWLObject object : values) {
 			try {
 				variable.addPossibleBinding(object);

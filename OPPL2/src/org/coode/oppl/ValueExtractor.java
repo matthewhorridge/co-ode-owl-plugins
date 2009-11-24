@@ -25,8 +25,13 @@ package org.coode.oppl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
@@ -44,27 +49,82 @@ public class ValueExtractor implements VariableTypeVisitorEx<Set<OWLObject>> {
 		this.ontologies = ontologies;
 	}
 
-	public Set<OWLObject> visit(VariableType type) {
+	// public Set<OWLObject> visit(VariableType type) {
+	// Set<OWLObject> toReturn = new HashSet<OWLObject>();
+	// if (type.equals(VariableType.CLASS)) {
+	// for (OWLOntology ontology : this.ontologies) {
+	// toReturn.addAll(ontology.getReferencedClasses());
+	// }
+	// } else if (type.equals(VariableType.OBJECTPROPERTY)) {
+	// for (OWLOntology ontology : this.ontologies) {
+	// toReturn.addAll(ontology.getReferencedObjectProperties());
+	// }
+	// } else if (type.equals(VariableType.DATAPROPERTY)) {
+	// for (OWLOntology ontology : this.ontologies) {
+	// toReturn.addAll(ontology.getReferencedDataProperties());
+	// }
+	// } else if (type.equals(VariableType.INDIVIDUAL)) {
+	// for (OWLOntology ontology : this.ontologies) {
+	// toReturn.addAll(ontology.getReferencedIndividuals());
+	// }
+	// } else if (type.equals(VariableType.CONSTANT)) {
+	// // TODO fix the constants
+	// }
+	// return toReturn;
+	// }
+	public Set<OWLObject> visit(CLASSVariable v) {
 		Set<OWLObject> toReturn = new HashSet<OWLObject>();
-		if (type.equals(VariableType.CLASS)) {
-			for (OWLOntology ontology : this.ontologies) {
-				toReturn.addAll(ontology.getReferencedClasses());
-			}
-		} else if (type.equals(VariableType.OBJECTPROPERTY)) {
-			for (OWLOntology ontology : this.ontologies) {
-				toReturn.addAll(ontology.getReferencedObjectProperties());
-			}
-		} else if (type.equals(VariableType.DATAPROPERTY)) {
-			for (OWLOntology ontology : this.ontologies) {
-				toReturn.addAll(ontology.getReferencedDataProperties());
-			}
-		} else if (type.equals(VariableType.INDIVIDUAL)) {
-			for (OWLOntology ontology : this.ontologies) {
-				toReturn.addAll(ontology.getReferencedIndividuals());
-			}
-		} else if (type.equals(VariableType.CONSTANT)) {
-			// TODO fix the constants
+		for (OWLOntology ontology : this.ontologies) {
+			toReturn.addAll(ontology.getReferencedClasses());
 		}
 		return toReturn;
+	}
+
+	public Set<OWLObject> visit(CONSTANTVariable v) {
+		Set<OWLObject> toReturn = new HashSet<OWLObject>();
+		return toReturn;
+	}
+
+	public Set<OWLObject> visit(OBJECTPROPERTYVariable v) {
+		Set<OWLObject> toReturn = new HashSet<OWLObject>();
+		for (OWLOntology ontology : this.ontologies) {
+			toReturn.addAll(ontology.getReferencedObjectProperties());
+		}
+		return toReturn;
+	}
+
+	public Set<OWLObject> visit(DATAPROPERTYVariable v) {
+		Set<OWLObject> toReturn = new HashSet<OWLObject>();
+		for (OWLOntology ontology : this.ontologies) {
+			toReturn.addAll(ontology.getReferencedDataProperties());
+		}
+		return toReturn;
+	}
+
+	public Set<OWLObject> visit(INDIVIDUALVariable v) {
+		Set<OWLObject> toReturn = new HashSet<OWLObject>();
+		for (OWLOntology ontology : this.ontologies) {
+			toReturn.addAll(ontology.getReferencedIndividuals());
+		}
+		return toReturn;
+	}
+
+	public Set<OWLObject> visit(Variable v) {
+		if (v instanceof CLASSVariable) {
+			this.visit((CLASSVariable) v);
+		}
+		if (v instanceof OBJECTPROPERTYVariable) {
+			this.visit((OBJECTPROPERTYVariable) v);
+		}
+		if (v instanceof DATAPROPERTYVariable) {
+			this.visit((DATAPROPERTYVariable) v);
+		}
+		if (v instanceof INDIVIDUALVariable) {
+			this.visit((INDIVIDUALVariable) v);
+		}
+		if (v instanceof CONSTANTVariable) {
+			this.visit((CONSTANTVariable) v);
+		}
+		return null;
 	}
 }

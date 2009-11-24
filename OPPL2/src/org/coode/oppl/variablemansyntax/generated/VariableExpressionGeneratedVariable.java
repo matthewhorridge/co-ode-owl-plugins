@@ -8,6 +8,7 @@ import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.semanticweb.owl.model.OWLObject;
 
 /**
@@ -63,5 +64,9 @@ public class VariableExpressionGeneratedVariable extends
 			GeneratedValue<OWLObject> unusedValue) {
 		// TODO check that the unused parameter is legit
 		return this;
+	}
+
+	public <P> P accept(VariableTypeVisitorEx<P> visitor) {
+		return visitor.visit(this);
 	}
 }

@@ -6,7 +6,14 @@ import org.coode.oppl.entity.OWLEntityCreationException;
 import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLEntity;
@@ -24,74 +31,159 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 	}
 
 	@Override
-	protected OWLObject generateObject(String aValue) {
-		OWLObject toReturn = null;
-		OWLEntityChecker entityChecker = ParserFactory.getInstance()
+	protected OWLObject generateObject(final String aValue) {
+		OWLObject objectToReturn = null;
+		final OWLEntityChecker entityChecker = ParserFactory.getInstance()
 				.getOPPLFactory().getOWLEntityChecker();
-		OWLEntityFactory ef = ParserFactory.getInstance().getOPPLFactory()
-				.getOWLEntityFactory();
-		OWLDataFactory df = ParserFactory.getInstance().getOPPLFactory()
+		final OWLEntityFactory ef = ParserFactory.getInstance()
+				.getOPPLFactory().getOWLEntityFactory();
+		final OWLDataFactory df = ParserFactory.getInstance().getOPPLFactory()
 				.getOWLDataFactory();
-		switch (getType()) {
-			case CLASS:
-				try {
-					toReturn = entityChecker.getOWLClass(aValue);
-					if (toReturn == null) {
-						toReturn = createUpdates(ef
-								.createOWLClass(aValue, null));
-					}
-				} catch (OWLEntityCreationException e) {
-					toReturn = df.getOWLClass(buildURI(aValue));
-				} catch (OWLOntologyChangeException e) {
-					throw new RuntimeException(e);
-				}
-				break;
-			case OBJECTPROPERTY:
-				try {
-					toReturn = entityChecker.getOWLObjectProperty(aValue);
-					if (toReturn == null) {
-						toReturn = createUpdates(ef.createOWLObjectProperty(
-								aValue, null));
-					}
-				} catch (OWLEntityCreationException e) {
-					toReturn = df.getOWLObjectProperty(buildURI(aValue));
-				} catch (OWLOntologyChangeException e) {
-					throw new RuntimeException(e);
-				}
-				break;
-			case DATAPROPERTY:
-				try {
-					toReturn = entityChecker.getOWLDataProperty(aValue);
-					if (toReturn == null) {
-						toReturn = createUpdates(ef.createOWLDataProperty(
-								aValue, null));
-					}
-				} catch (OWLEntityCreationException e) {
-					toReturn = df.getOWLDataProperty(buildURI(aValue));
-				} catch (OWLOntologyChangeException e) {
-					throw new RuntimeException(e);
-				}
-				break;
-			case INDIVIDUAL:
+		VariableTypeVisitorEx<OWLObject> visitor = new VariableTypeVisitorEx<OWLObject>() {
+			public OWLObject visit(Variable v) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+
+			public OWLObject visit(INDIVIDUALVariable v) {
+				OWLObject toReturn = null;
 				try {
 					toReturn = entityChecker.getOWLIndividual(aValue);
 					if (toReturn == null) {
-						toReturn = createUpdates(ef.createOWLIndividual(aValue,
-								null));
+						toReturn = StringGeneratedVariable.this
+								.createUpdates(ef.createOWLIndividual(aValue,
+										null));
 					}
 				} catch (OWLEntityCreationException e) {
-					toReturn = df.getOWLIndividual(buildURI(aValue));
+					toReturn = df.getOWLIndividual(StringGeneratedVariable.this
+							.buildURI(aValue));
 				} catch (OWLOntologyChangeException e) {
 					throw new RuntimeException(e);
 				}
-				break;
-			case CONSTANT:
-				toReturn = df.getOWLTypedConstant(aValue);
-				break;
-			default:
-				break;
-		}
-		return toReturn;
+				return toReturn;
+			}
+
+			public OWLObject visit(DATAPROPERTYVariable v) {
+				OWLObject toReturn = null;
+				try {
+					toReturn = entityChecker.getOWLDataProperty(aValue);
+					if (toReturn == null) {
+						toReturn = StringGeneratedVariable.this
+								.createUpdates(ef.createOWLDataProperty(aValue,
+										null));
+					}
+				} catch (OWLEntityCreationException e) {
+					toReturn = df
+							.getOWLDataProperty(StringGeneratedVariable.this
+									.buildURI(aValue));
+				} catch (OWLOntologyChangeException e) {
+					throw new RuntimeException(e);
+				}
+				return toReturn;
+			}
+
+			public OWLObject visit(OBJECTPROPERTYVariable v) {
+				OWLObject toReturn = null;
+				try {
+					toReturn = entityChecker.getOWLObjectProperty(aValue);
+					if (toReturn == null) {
+						toReturn = StringGeneratedVariable.this
+								.createUpdates(ef.createOWLObjectProperty(
+										aValue, null));
+					}
+				} catch (OWLEntityCreationException e) {
+					toReturn = df
+							.getOWLObjectProperty(StringGeneratedVariable.this
+									.buildURI(aValue));
+				} catch (OWLOntologyChangeException e) {
+					throw new RuntimeException(e);
+				}
+				return toReturn;
+			}
+
+			public OWLObject visit(CONSTANTVariable v) {
+				return df.getOWLTypedConstant(aValue);
+			}
+
+			public OWLObject visit(CLASSVariable v) {
+				OWLObject toReturn = null;
+				try {
+					toReturn = entityChecker.getOWLClass(aValue);
+					if (toReturn == null) {
+						toReturn = StringGeneratedVariable.this
+								.createUpdates(ef.createOWLClass(aValue, null));
+					}
+				} catch (OWLEntityCreationException e) {
+					toReturn = df.getOWLClass(StringGeneratedVariable.this
+							.buildURI(aValue));
+				} catch (OWLOntologyChangeException e) {
+					throw new RuntimeException(e);
+				}
+				return toReturn;
+			}
+		};
+		objectToReturn = this.accept(visitor);
+		return objectToReturn;
+		// switch (this.getType()) {
+		// case CLASS:
+		// try {
+		// toReturn = entityChecker.getOWLClass(aValue);
+		// if (toReturn == null) {
+		// toReturn = this.createUpdates(ef.createOWLClass(aValue,
+		// null));
+		// }
+		// } catch (OWLEntityCreationException e) {
+		// toReturn = df.getOWLClass(this.buildURI(aValue));
+		// } catch (OWLOntologyChangeException e) {
+		// throw new RuntimeException(e);
+		// }
+		// break;
+		// case OBJECTPROPERTY:
+		// try {
+		// toReturn = entityChecker.getOWLObjectProperty(aValue);
+		// if (toReturn == null) {
+		// toReturn = this.createUpdates(ef
+		// .createOWLObjectProperty(aValue, null));
+		// }
+		// } catch (OWLEntityCreationException e) {
+		// toReturn = df.getOWLObjectProperty(this.buildURI(aValue));
+		// } catch (OWLOntologyChangeException e) {
+		// throw new RuntimeException(e);
+		// }
+		// break;
+		// case DATAPROPERTY:
+		// try {
+		// toReturn = entityChecker.getOWLDataProperty(aValue);
+		// if (toReturn == null) {
+		// toReturn = this.createUpdates(ef.createOWLDataProperty(
+		// aValue, null));
+		// }
+		// } catch (OWLEntityCreationException e) {
+		// toReturn = df.getOWLDataProperty(this.buildURI(aValue));
+		// } catch (OWLOntologyChangeException e) {
+		// throw new RuntimeException(e);
+		// }
+		// break;
+		// case INDIVIDUAL:
+		// try {
+		// toReturn = entityChecker.getOWLIndividual(aValue);
+		// if (toReturn == null) {
+		// toReturn = this.createUpdates(ef.createOWLIndividual(
+		// aValue, null));
+		// }
+		// } catch (OWLEntityCreationException e) {
+		// toReturn = df.getOWLIndividual(this.buildURI(aValue));
+		// } catch (OWLOntologyChangeException e) {
+		// throw new RuntimeException(e);
+		// }
+		// break;
+		// case CONSTANT:
+		// toReturn = df.getOWLTypedConstant(aValue);
+		// break;
+		// default:
+		// break;
+		// }
+		// return toReturn;
 	}
 
 	private OWLObject createUpdates(
@@ -118,10 +210,15 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 
 	@Override
 	protected GeneratedVariable<String> replace(GeneratedValue<String> v) {
-		return buildGeneratedVariable(getName(), getType(), v, this.ontology);
+		return buildGeneratedVariable(this.getName(), this.getType(), v,
+				this.ontology);
 	}
 
 	public String getOPPLFunction() {
-		return "create(" + getValue() + ")";
+		return "create(" + this.getValue() + ")";
+	}
+
+	public <P> P accept(VariableTypeVisitorEx<P> visitor) {
+		return visitor.visit(this);
 	}
 }

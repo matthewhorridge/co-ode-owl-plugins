@@ -1,10 +1,11 @@
 /**
- * 
+ *
  */
 package org.coode.oppl.search;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,9 +15,14 @@ import org.coode.oppl.utils.VariableExtractor;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PartialOWLObjectInstantiator;
 import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLConstant;
@@ -92,29 +98,57 @@ public class OPPLAssertedSingleOWLAxiomSearchTree extends
 		return this.targetAxiom.equals(start.getAxiom());
 	}
 
+	private final VariableTypeVisitorEx<Set<? extends OWLObject>> assignableValuesVisitor = new VariableTypeVisitorEx<Set<? extends OWLObject>>() {
+		public Set<? extends OWLObject> visit(Variable v) {
+			// TODO Auto-generated method stub
+			return Collections.emptySet();
+		}
+
+		public Set<? extends OWLObject> visit(INDIVIDUALVariable v) {
+			return OPPLAssertedSingleOWLAxiomSearchTree.this.allIndividuals;
+		}
+
+		public Set<? extends OWLObject> visit(DATAPROPERTYVariable v) {
+			return OPPLAssertedSingleOWLAxiomSearchTree.this.allDataProperties;
+		}
+
+		public Set<? extends OWLObject> visit(OBJECTPROPERTYVariable v) {
+			return OPPLAssertedSingleOWLAxiomSearchTree.this.allObjectProperties;
+		}
+
+		public Set<? extends OWLObject> visit(CONSTANTVariable v) {
+			return OPPLAssertedSingleOWLAxiomSearchTree.this.allConstants;
+		}
+
+		public Set<? extends OWLObject> visit(CLASSVariable v) {
+			return OPPLAssertedSingleOWLAxiomSearchTree.this.allClasses;
+		}
+	};
+
 	private Collection<? extends OWLObject> getAssignableValues(
 			Variable variable) {
 		Set<OWLObject> toReturn = new HashSet<OWLObject>();
-		VariableType type = variable.getType();
-		switch (type) {
-		case CLASS:
-			toReturn.addAll(this.allClasses);
-			break;
-		case DATAPROPERTY:
-			toReturn.addAll(this.allDataProperties);
-			break;
-		case OBJECTPROPERTY:
-			toReturn.addAll(this.allObjectProperties);
-			break;
-		case INDIVIDUAL:
-			toReturn.addAll(this.allIndividuals);
-			break;
-		case CONSTANT:
-			toReturn.addAll(this.allConstants);
-			break;
-		default:
-			break;
-		}
+		toReturn.addAll(variable.accept(this.assignableValuesVisitor));
+		// VariableType type = variable.getType();
+		// switch (type) {
+		// case CLASS:
+		// toReturn.addAll(this.allClasses);
+		// break;
+		// case DATAPROPERTY:
+		// toReturn.addAll(this.allDataProperties);
+		// break;
+		// case OBJECTPROPERTY:
+		// toReturn.addAll(this.allObjectProperties);
+		// break;
+		// case INDIVIDUAL:
+		// toReturn.addAll(this.allIndividuals);
+		// break;
+		// case CONSTANT:
+		// toReturn.addAll(this.allConstants);
+		// break;
+		// default:
+		// break;
+		// }
 		return toReturn;
 	}
 

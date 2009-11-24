@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLObject;
@@ -68,6 +69,10 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 		public String getOPPLFunction() {
 			return "createUnion(" + this.getValue().toString() + ")";
 		}
+
+		public <P> P accept(VariableTypeVisitorEx<P> visitor) {
+			return visitor.visit(this);
+		}
 	}
 
 	private static final class ConjunctionImpl extends
@@ -100,6 +105,10 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 
 		public String getOPPLFunction() {
 			return "createIntersection(" + this.getValue().toString() + ")";
+		}
+
+		public <P> P accept(VariableTypeVisitorEx<P> visitor) {
+			return visitor.visit(this);
 		}
 	}
 

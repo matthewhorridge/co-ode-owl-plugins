@@ -88,27 +88,28 @@ public class Utils {
 			ConstraintSystem constraintSystem) throws ParserException {
 		VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(
 				string, constraintSystem);
-		OWLObject owlObject = null;
-		switch (type) {
-			case CLASS:
-				owlObject = parser.parseDescription();
-				break;
-			case OBJECTPROPERTY:
-				owlObject = parser.parseObjectPropertyExpression();
-				break;
-			case DATAPROPERTY:
-				owlObject = parser.parseDataProperty();
-				break;
-			case INDIVIDUAL:
-				owlObject = parser.parseIndividual();
-				break;
-			case CONSTANT:
-				owlObject = parser.parseConstant();
-				break;
-			default:
-				throw new IllegalArgumentException("Unsupported type: "
-						+ type.name());
-		}
+		// TODO move to VariableType
+		OWLObject owlObject = type.parseOWLObject(parser);
+		// switch (type) {
+		// case CLASS:
+		// owlObject = parser.parseDescription();
+		// break;
+		// case OBJECTPROPERTY:
+		// owlObject = parser.parseObjectPropertyExpression();
+		// break;
+		// case DATAPROPERTY:
+		// owlObject = parser.parseDataProperty();
+		// break;
+		// case INDIVIDUAL:
+		// owlObject = parser.parseIndividual();
+		// break;
+		// case CONSTANT:
+		// owlObject = parser.parseConstant();
+		// break;
+		// default:
+		// throw new IllegalArgumentException("Unsupported type: "
+		// + type.name());
+		// }
 		VariableExpressionGeneratedVariable variableExpressionGeneratedVariable = new VariableExpressionGeneratedVariable(
 				name, owlObject, constraintSystem);
 		constraintSystem.importVariable(variableExpressionGeneratedVariable);

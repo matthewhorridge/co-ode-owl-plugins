@@ -108,6 +108,16 @@ public interface Variable {
 	public <P> P accept(VariableVisitor<P> visitor);
 
 	/**
+	 * Visitor pattern interface method for visitors with return type, based on
+	 * variable type: class, objectproperty, etc
+	 * 
+	 * @param <P>
+	 * @param visitor
+	 * @return
+	 */
+	public <P> P accept(VariableTypeVisitorEx<P> visitor);
+
+	/**
 	 * Visitor pattern interface method for visitors without return type
 	 * 
 	 * @param visitor
