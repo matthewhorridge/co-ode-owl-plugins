@@ -27,19 +27,17 @@ import uk.ac.manchester.cs.owl.lint.PatternBasedLintImpl;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 15, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 15, 2008
  */
 public interface LintFactory {
 	/**
 	 * Creates a {@link PatternBasedLintImpl} starting from a variable number of
-	 * {@link LintPattern} elements and an OWLOntologyManager
-	 * 
+	 * {@link LintPattern}
 	 * 
 	 * @param lintPatterns
-	 * @param ontologyManager
-	 * @return a {@link PatternBasedLintImpl}
+	 * @return the created Lint.
 	 */
 	public Lint createLint(LintPattern... lintPatterns);
 

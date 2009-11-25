@@ -16,7 +16,7 @@ public class InferenceLintPatternImpl implements InferenceLintPattern {
 
 	/**
 	 * @param reasoner
-	 * @param ontologyManager
+	 * 
 	 */
 	public InferenceLintPatternImpl(OWLReasoner reasoner) {
 		this.reasoner = reasoner;
