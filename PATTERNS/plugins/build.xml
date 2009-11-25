@@ -7,7 +7,7 @@
   <property name="bundles" location="${protegestandalone.bundles}"/>
   <property name="dist" location="${protegestandalone.equinox}"/>
   <property name="jardest" location="${dist}/plugins/org.coode.patterns.jar"/>
-  <property name="releasedownloadsfull" location="${releasedownloads}/workspace/PROTEGEDOCS/WebContent/oppl/patterns/downloads" />
+  <property name="releasedownloadsfull" location="${releasedownloads}" />
   <property name="releasejardest" location="${releasedownloads}/org.coode.patterns.jar"/>
   <property name="releasezipsourcedest" location="${releasedownloads}/org.coode.patterns-src.zip"/>
   <property name="updateProperty" location="${basedir}/plugins/org.coode.patterns/update.properties"/>
