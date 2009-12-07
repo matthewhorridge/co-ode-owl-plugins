@@ -43,12 +43,5 @@
          manifest = "${basedir}/plugins/org.coode.oae/META-INF/MANIFEST.MF" update="true" />
   </target> 
 
-  <target name="javacc">
-	<exec executable="sh" dir="${basedir}/src/uk/ac/manchester/mae">
-		<arg line="${javacc.home}/bin/jjtree arithmetics.jjt"/>
-	</exec>
-	<exec executable="sh" dir="${basedir}/src/uk/ac/manchester/mae">
-		<arg line="${javacc.home}/bin/javacc arithmetics.jj"/>
-	</exec>
-  </target>
+  
 </project>
