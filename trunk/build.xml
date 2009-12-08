@@ -50,11 +50,6 @@
              dir="./cloud"
              target="${sub.target}"/>
 
-        <echo message = "Building cloud plugin"/>
-        <ant antfile="./build.xml"
-             dir="./cloud"
-             target="${sub.target}"/>
-
         <echo message = "Building existential tree plugin"/>
         <ant antfile="./build.xml"
              dir="./existentialtree"
@@ -65,14 +60,39 @@
              dir="./matrix"
              target="${sub.target}"/>
 
+        <echo message = "Building Nerd plugin"/>
+        <ant antfile="./build.xml"
+             dir="./org.coode.nerd"
+             target="${sub.target}"/>
+
+        <echo message = "Building Obotools plugin"/>
+        <ant antfile="./build.xml"
+             dir="./obotools"
+             target="${sub.target}"/>
+
         <echo message = "Building OWL Doc plugin"/>
         <ant antfile="./build.xml"
              dir="./org.coode.owldoc"
              target="${sub.target}"/>
 
+        <echo message = "Building puntools plugin"/>
+        <ant antfile="./build.xml"
+             dir="./puntools"
+             target="${sub.target}"/>
+
+        <echo message = "Building search plugin"/>
+        <ant antfile="./build.xml"
+             dir="./org.coode.search"
+             target="${sub.target}"/>
+
         <echo message = "Building taxonomy plugin"/>
         <ant antfile="./build.xml"
              dir="./taxonomy"
+             target="${sub.target}"/>
+
+        <echo message = "Building uri plugin"/>
+        <ant antfile="./build.xml"
+             dir="./org.coode.uri"
              target="${sub.target}"/>
 
 
