@@ -4,7 +4,6 @@ import org.coode.owlapi.obo.parser.OBOVocabulary;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.protege.editor.owl.ui.view.cls.AbstractOWLClassHierarchyViewComponent;
-import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLDataFactory;
 /*
@@ -52,7 +51,7 @@ public class OBOObsoleteClassHierarchyViewComponent extends AbstractOWLClassHier
             final OWLModelManager mngr = getOWLModelManager();
             final OWLDataFactory df = mngr.getOWLDataFactory();
             hp = new OBOObsoleteClassHierarchyProvider<OWLClass>(mngr.getOWLHierarchyManager().getOWLClassHierarchyProvider(),
-                                                                 df.getOWLAnnotationProperty(IRI.create(OBOVocabulary.IS_OBSOLETE.getURI())),
+                                                                 df.getOWLAnnotationProperty(OBOVocabulary.IS_OBSOLETE.getIRI()),
                                                                  df.getOWLStringLiteral("true"),
                                                                  mngr);
         }
