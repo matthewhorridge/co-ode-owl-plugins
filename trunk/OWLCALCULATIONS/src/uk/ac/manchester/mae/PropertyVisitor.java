@@ -125,26 +125,6 @@ public class PropertyVisitor implements OWLPropertyExpressionVisitor {
 										+ formulaBody
 										+ " could not be correctly parsed it will be skipped\n"
 										+ e.getMessage(), e);
-				if (e.getMessage().endsWith("invalid property URI or name")) {
-					System.out
-							.println("PropertyVisitor.getExtractedFormulas() Available properties:\nObject:");
-					for (OWLOntology onto : this.ontologies) {
-						for (OWLObjectProperty op : onto
-								.getReferencedObjectProperties()) {// getObjectProperties())
-							// {
-							System.out.println(op.getURI().toString());
-						}
-					}
-					System.out
-							.println("PropertyVisitor.getExtractedFormulas() Available properties:\nData:");
-					for (OWLOntology onto : this.ontologies) {
-						for (OWLDataProperty dp : onto
-								.getReferencedDataProperties()) {// getDataProperties())
-							// {
-							System.out.println(dp.getURI().toString());
-						}
-					}
-				}
 			}
 		}
 		return toReturn;

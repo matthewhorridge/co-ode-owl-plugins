@@ -53,22 +53,23 @@ public class PropertyChainExpressionChecker implements
 					0, 0, false, true, true && this.datatypesAllowed, false,
 					false, this.emptySet);
 		}
-		List<MAEpropertyChainCell> list = checkBasicPropertyChain(_text);
+		List<MAEpropertyChainCell> list = this.checkBasicPropertyChain(_text);
 		for (int i = 0; i < list.size() - 1; i++) {
 			MAEpropertyChainCell c = list.get(i);
-			OWLObjectProperty op = checkObjectProperty(_text, c);
-			OWLDescription odfacet = checkFacet(_text, c, c.getFacet());
+			OWLObjectProperty op = this.checkObjectProperty(_text, c);
+			OWLDescription odfacet = this.checkFacet(_text, c, c.getFacet());
 			this.cells.add(new PropertyChainCell(op, odfacet));
 		}
 		// now check that the last one is a datatype property
 		if (list.size() > 0) {
 			MAEpropertyChainCell c = list.get(list.size() - 1);
 			if (this.objectPropertiesOnly) {
-				OWLObjectProperty op = checkObjectProperty(_text, c);
-				OWLDescription odfacet = checkFacet(_text, c, c.getFacet());
+				OWLObjectProperty op = this.checkObjectProperty(_text, c);
+				OWLDescription odfacet = this
+						.checkFacet(_text, c, c.getFacet());
 				this.cells.add(new PropertyChainCell(op, odfacet));
 			} else {
-				OWLDataProperty dp = checkDataProperty(_text, c);
+				OWLDataProperty dp = this.checkDataProperty(_text, c);
 				this.cells.add(new PropertyChainCell(dp, null));
 			}
 		}
@@ -103,7 +104,7 @@ public class PropertyChainExpressionChecker implements
 
 	private OWLObjectProperty checkObjectProperty(String _text,
 			MAEpropertyChainCell c) throws OWLExpressionParserException {
-		if (c.getPropertyName().isEmpty()) {
+		if (c.getPropertyName().length() == 0) {
 			throw new OWLExpressionParserException(
 					"The chain is not complete: missing objectproperty", _text
 							.length(), _text.length(), false, true, false,
@@ -145,7 +146,7 @@ public class PropertyChainExpressionChecker implements
 
 	private OWLDataProperty checkDataProperty(String _text,
 			MAEpropertyChainCell c) throws OWLExpressionParserException {
-		if (c.getPropertyName().isEmpty()) {
+		if (c.getPropertyName().length() == 0) {
 			throw new OWLExpressionParserException(
 					"The chain is not complete: missing dataproperty", _text
 							.length(), _text.length(), false, true, true,
@@ -166,7 +167,7 @@ public class PropertyChainExpressionChecker implements
 
 	public PropertyChainModel createObject(String text)
 			throws OWLExpressionParserException {
-		check(text);
+		this.check(text);
 		return new PropertyChainModel(this.cells);
 	}
 }

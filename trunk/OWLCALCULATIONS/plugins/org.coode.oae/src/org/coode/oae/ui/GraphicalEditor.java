@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -83,12 +85,12 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		this.mainPanel.add(this.bindingviewer, BorderLayout.CENTER);
 		this.more.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showExtendedView();
+				GraphicalEditor.this.showExtendedView();
 			}
 		});
 		this.less.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				hideExtendedView();
+				GraphicalEditor.this.hideExtendedView();
 			}
 		});
 		this.lowerPanel.add(this.more, BorderLayout.NORTH);
@@ -112,19 +114,19 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		this.lowerPanel.remove(this.more);
 		this.lowerPanel.add(this.less, BorderLayout.NORTH);
 		this.lowerPanel.add(this.extendedArea, BorderLayout.CENTER);
-		validate();
+		this.validate();
 	}
 
 	protected void hideExtendedView() {
 		this.lowerPanel.remove(this.less);
 		this.lowerPanel.remove(this.extendedArea);
 		this.lowerPanel.add(this.more, BorderLayout.NORTH);
-		validate();
+		this.validate();
 	}
 
 	public void refreshComponent() {
 		// copied from ExpressionEditor
-		setFont(OWLRendererPreferences.getInstance().getFont());
+		this.setFont(OWLRendererPreferences.getInstance().getFont());
 	}
 
 	public void addStatusChangedListener(
@@ -138,7 +140,7 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 	}
 
 	public FormulaModel createObject() throws OWLException {
-		return this.checker.createObject(getText());
+		return this.checker.createObject(this.getText());
 	}
 
 	public void clear() {
@@ -154,7 +156,7 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 
 	public FormulaModel getFormulaModel() {
 		FormulaModel fm = new FormulaModel();
-		fm.setFormulaURI(getURI());
+		fm.setFormulaURI(this.getURI());
 		ConflictStrategy selectedConflictStrategy = this.conflictStrategyEditor
 				.getSelectedConflictStrategy();
 		fm.setConflictStrategy(selectedConflictStrategy);
@@ -194,7 +196,7 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 	}
 
 	public String getText() {
-		return getFormulaModel().render(this.edKit.getOWLModelManager());
+		return this.getFormulaModel().render(this.edKit.getOWLModelManager());
 	}
 
 	public void initFormula(FormulaModel fm) {
@@ -220,22 +222,19 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		this.expression.setText(formula);
 		this.bindingviewer.addBindingModels(fm.getBindings());
 		this.initializing = false;
-		handleVerification();
+		this.handleVerification();
 	}
 
 	protected void handleVerification() {
 		if (!this.initializing) {
 			this.report.clearReport();
 			// if the uri is not assigned, it will be false
-			boolean status = getURI() != null;
-			String currentFormula = getText();
-			System.out.println("GraphicalEditor.handleVerification() "
-					+ currentFormula);
-			updateIdentifiers();
+			boolean status = this.getURI() != null;
+			String currentFormula = this.getText();
+			this.updateIdentifiers();
 			try {
 				this.checker.check(currentFormula);
 			} catch (Throwable e) {
-				// e.printStackTrace(System.out);
 				this.report.addReport(e.getMessage().replace(
 						"uk.ac.manchester.mae.parser.ParseException: ", ""));
 				status = false;
@@ -251,7 +250,8 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		 * then there is one or more unbound symbols: take the expression, pull
 		 * out the symbols, add a binding for each one
 		 */
-		List<String> identifiers = getIdentifiers(this.expression.getText());
+		List<String> identifiers = this.getIdentifiers(this.expression
+				.getText());
 		List<String> currentIdentifiers = this.bindingviewer.getBindingNames();
 		// any identifier in the viewer and not in the expression
 		// should be removed; this ought to take into account typing
@@ -268,45 +268,54 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		}
 	}
 
+	private static Pattern variableNames = Pattern
+			.compile("[_a-zA-Z]([_a-zA-Z]|[0-9])*");
+
 	private List<String> getIdentifiers(String _text) {
 		String text = _text;
 		// get rid of functions
 		text = text.replace("SUM(", "").replace("sum(", "");
-		// get rid of math symbols
-		text = text.replace("+", " ").replace("-", " ");
-		text = text.replace("*", " ").replace("/", " ").replace("%", " ");
-		text = text.replace("^", " ");
 		// get rid of parentheses
-		text = text.replace("(", " ").replace(")", " ");
-		// in case someone gets cute with spaces and empty lines
-		text = text.replace("\t", " ").replace("\n", " ");
+		// text = text.replace("(", " ").replace(")", " ");
+		Matcher m = variableNames.matcher(text);
 		List<String> toReturn = new ArrayList<String>();
-		// and a final trim() just in case
-		for (String s : text.split(" ")) {
-			if (s.trim().length() > 0) {
-				toReturn.add(s.trim());
-			}
+		while (m.find()) {
+			toReturn.add(m.group());
 		}
+		// get rid of math symbols
+		// text = text.replace("+", " ").replace("-", " ");
+		// text = text.replace("*", " ").replace("/", " ").replace("%", " ");
+		// text = text.replace("^", " ");
+		//
+		// // in case someone gets cute with spaces and empty lines
+		// text = text.replace("\t", " ").replace("\n", " ");
+		//
+		// // and a final trim() just in case
+		// for (String s : text.split(" ")) {
+		// if (s.trim().length() > 0) {
+		// toReturn.add(s.trim());
+		// }
+		// }
 		return toReturn;
 	}
 
 	public void changedUpdate(DocumentEvent e) {
-		handleVerification();
+		this.handleVerification();
 	}
 
 	public void insertUpdate(DocumentEvent e) {
-		handleVerification();
+		this.handleVerification();
 	}
 
 	public void removeUpdate(DocumentEvent e) {
-		handleVerification();
+		this.handleVerification();
 	}
 
 	public void verifiedStatusChanged(boolean newState) {
-		handleVerification();
+		this.handleVerification();
 	}
 
 	public void actionPerformed(ActionEvent e) {
-		handleVerification();
+		this.handleVerification();
 	}
 }

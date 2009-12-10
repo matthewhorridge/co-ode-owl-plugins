@@ -31,7 +31,7 @@ public class BindingViewer extends JPanel implements VerifiedInputEditor,
 	public BindingViewer(OWLEditorKit kit) {
 		super(new BorderLayout());
 		this.kit = kit;
-		setBorder(ComponentFactory.createTitledBorder("Bindings"));
+		this.setBorder(ComponentFactory.createTitledBorder("Bindings"));
 		// make space for about 10 bindings
 		this.scrollPane.setPreferredSize(new Dimension(
 				((int) BindingEditor.PREFERRED_SIZE.getWidth()) + 20,
@@ -41,7 +41,7 @@ public class BindingViewer extends JPanel implements VerifiedInputEditor,
 
 	public void clear() {
 		this.bindingMap.clear();
-		handleChange();
+		this.handleChange();
 	}
 
 	public void addBinding(String id) {
@@ -50,7 +50,7 @@ public class BindingViewer extends JPanel implements VerifiedInputEditor,
 			e.setBindingModel(id);
 			e.addStatusChangedListener(this);
 			this.bindingMap.put(id, e);
-			handleChange();
+			this.handleChange();
 		} else {
 			// if there is one, make sure it looks enabled
 			this.bindingMap.get(id).setIdentifierUnneeded(false);
@@ -62,7 +62,7 @@ public class BindingViewer extends JPanel implements VerifiedInputEditor,
 			BindingEditor e = this.bindingMap.get(id);
 			if (e.isPropertyChainEmpty()) {
 				this.bindingMap.remove(id);
-				handleChange();
+				this.handleChange();
 			} else {
 				e.setIdentifierUnneeded(true);
 			}
@@ -76,21 +76,22 @@ public class BindingViewer extends JPanel implements VerifiedInputEditor,
 			if (!existing.isInputValid()) {
 				// then it's empty or broken - replace
 				existing.setBindingModel(b);
-				handleChange();
+				this.handleChange();
 			} else {
 				// then it's trying to replace a valid one with another one -
 				// ignore
-				new RuntimeException(
-						"Error: trying to replace a valid bindingmodel with another: "
-								+ existing.getBindingModel().toString() + "\t"
-								+ b.toString()).printStackTrace(System.out);
+				System.out
+						.println("Error: trying to replace a valid bindingmodel with another: "
+								+ existing.getBindingModel().toString()
+								+ "\t"
+								+ b.toString());
 			}
 		} else {
 			BindingEditor e = new BindingEditor(this.kit);
 			e.setBindingModel(b);
 			e.addStatusChangedListener(this);
 			this.bindingMap.put(b.getIdentifier(), e);
-			handleChange();
+			this.handleChange();
 		}
 	}
 
@@ -121,8 +122,8 @@ public class BindingViewer extends JPanel implements VerifiedInputEditor,
 				BindingEditor.PREFERRED_SIZE.width + 10,
 				BindingEditor.PREFERRED_SIZE.height
 						* this.bindingMap.values().size() + 10));
-		validate();
-		verifiedStatusChanged(false);
+		this.validate();
+		this.verifiedStatusChanged(false);
 	}
 
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.swing.ButtonGroup;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
@@ -99,14 +98,5 @@ public class ConflictStrategyRadioPanel extends JPanel implements
 		for (InputVerificationStatusChangedListener i : this.listeners) {
 			i.verifiedStatusChanged(true);
 		}
-	}
-
-	public static void main(String[] args) {
-		ConflictStrategyRadioPanel cp = new ConflictStrategyRadioPanel();
-		JFrame test = new JFrame();
-		test.getContentPane().add(cp);
-		test.pack();
-		test.setVisible(true);
-		System.out.println(cp.getWidth() + " " + cp.getHeight());
 	}
 }

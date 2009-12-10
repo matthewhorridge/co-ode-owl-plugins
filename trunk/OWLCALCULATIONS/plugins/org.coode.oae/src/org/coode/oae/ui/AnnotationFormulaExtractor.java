@@ -93,9 +93,8 @@ public class AnnotationFormulaExtractor implements OWLAnnotationVisitor {
 							|| this.owlClass.equals(extractedClass) ? extractedF
 							: null;
 				} catch (Throwable e) {
-					System.out.println("Caught at:");
-					new Exception().printStackTrace(System.out);
 					System.out.println(formulaString);
+					System.out.println("Caught at:");
 					e.printStackTrace(System.out);
 				}
 			}

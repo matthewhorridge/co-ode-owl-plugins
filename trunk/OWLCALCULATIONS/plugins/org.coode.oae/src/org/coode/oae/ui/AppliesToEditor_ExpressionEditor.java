@@ -24,21 +24,21 @@ public class AppliesToEditor_ExpressionEditor extends
 	}
 
 	public void setAppliesTo(OWLDescription f) {
-		setExpressionObject(f);
+		this.setExpressionObject(f);
 	}
 
 	public OWLDescription getAppliesTo() {
-		if (getText().trim().isEmpty()) {
+		if (this.getText().trim().length() == 0) {
 			return null;
 		}
 		try {
-			return createObject();
+			return this.createObject();
 		} catch (OWLException e) {
 			return null;
 		}
 	}
 
 	public void clear() {
-		setExpressionObject(null);
+		this.setExpressionObject(null);
 	}
 }
