@@ -66,7 +66,7 @@ public class FormulaCompleter {
 	protected final class SpecializedKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
-			processKeyPressed(e);
+			FormulaCompleter.this.processKeyPressed(e);
 		}
 
 		@Override
@@ -79,7 +79,8 @@ public class FormulaCompleter {
 										.getText())) {
 					FormulaCompleter.this.lastTextUpdate = FormulaCompleter.this.textComponent
 							.getText();
-					updatePopup(getMatches());
+					FormulaCompleter.this.updatePopup(FormulaCompleter.this
+							.getMatches());
 				}
 			}
 		}
@@ -132,7 +133,7 @@ public class FormulaCompleter {
 			}
 		});
 		this.popupList.setRequestFocusEnabled(false);
-		createPopupWindow();
+		this.createPopupWindow();
 		this.textComponent.addHierarchyListener(new HierarchyListener() {
 			/**
 			 * Called when the hierarchy has been changed. To discern the actual
@@ -152,36 +153,36 @@ public class FormulaCompleter {
 	protected final void processKeyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE && e.isControlDown()) {
 			// Show popup
-			performAutoCompletion();
+			this.performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_TAB) {
 			e.consume();
-			performAutoCompletion();
+			this.performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			if (this.popupWindow.isVisible()) {
 				// Hide popup
 				e.consume();
-				hidePopup();
+				this.hidePopup();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if (this.popupWindow.isVisible()) {
 				// Complete
 				e.consume();
-				completeWithPopupSelection();
+				this.completeWithPopupSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
 			if (this.popupWindow.isVisible()) {
 				e.consume();
-				incrementSelection();
+				this.incrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
 			if (this.popupWindow.isVisible()) {
 				e.consume();
-				decrementSelection();
+				this.decrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			hidePopup();
+			this.hidePopup();
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			hidePopup();
+			this.hidePopup();
 		}
 	}
 
@@ -189,8 +190,8 @@ public class FormulaCompleter {
 		if (this.popupWindow.isVisible()) {
 			Object selObject = this.popupList.getSelectedValue();
 			if (selObject != null) {
-				insertWord(getInsertText(selObject));
-				hidePopup();
+				this.insertWord(this.getInsertText(selObject));
+				this.hidePopup();
 			}
 		}
 	}
@@ -206,9 +207,9 @@ public class FormulaCompleter {
 			completions = ArithmeticsParser.getCompletions();
 		}
 		List toReturn = new ArrayList(completions);
-		String wordToComplete = getWordToComplete().replaceAll("[<>{}]", "");
+		String wordToComplete = this.getWordToComplete().replaceAll("[<>{}]",
+				"");
 		wordToComplete = wordToComplete.replaceAll("(\\S)*!", "");
-		// System.out.println(wordToComplete);
 		if (wordToComplete.length() > 0) {
 			for (Object object : completions) {
 				if (!object.toString().trim().startsWith(wordToComplete)) {
@@ -230,28 +231,28 @@ public class FormulaCompleter {
 	}
 
 	private void performAutoCompletion() {
-		List matches = getMatches();
+		List matches = this.getMatches();
 		if (matches.size() == 1) {
 			// Don't show popup
-			insertWord(getInsertText(matches.iterator().next()));
+			this.insertWord(this.getInsertText(matches.iterator().next()));
 		} else if (matches.size() > 1) {
 			// Show popup
 			this.lastTextUpdate = this.textComponent.getText();
-			showPopup();
-			updatePopup(matches);
+			this.showPopup();
+			this.updatePopup(matches);
 		}
 	}
 
 	private void insertWord(String word) {
 		try {
-			String wordToComplete = getWordToComplete()
-					.replaceAll("[<>{}]", "");
+			String wordToComplete = this.getWordToComplete().replaceAll(
+					"[<>{}]", "");
 			wordToComplete = wordToComplete.replaceAll("(\\S)*!", "");
-			int prefixIndex = getWordToComplete().indexOf(wordToComplete);
-			String prefix = prefixIndex > 0 ? getWordToComplete().substring(0,
-					prefixIndex) : "";
+			int prefixIndex = this.getWordToComplete().indexOf(wordToComplete);
+			String prefix = prefixIndex > 0 ? this.getWordToComplete()
+					.substring(0, prefixIndex) : "";
 			if (wordToComplete.length() > 0 && word.startsWith(wordToComplete)) {
-				int index = getWordIndex();
+				int index = this.getWordIndex();
 				int caretIndex = this.textComponent.getCaretPosition();
 				this.textComponent.getDocument().remove(index,
 						caretIndex - index);
@@ -268,12 +269,12 @@ public class FormulaCompleter {
 
 	private void showPopup() {
 		if (this.popupWindow == null) {
-			createPopupWindow();
+			this.createPopupWindow();
 		}
 		if (!this.popupWindow.isVisible()) {
 			this.popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
 			try {
-				int wordIndex = getWordIndex();
+				int wordIndex = this.getWordIndex();
 				if (wordIndex < 0) {
 					wordIndex = 0;
 				}
@@ -367,7 +368,7 @@ public class FormulaCompleter {
 
 	private String getWordToComplete() {
 		try {
-			int index = getWordIndex();
+			int index = this.getWordIndex();
 			int caretIndex = this.textComponent.getCaretPosition();
 			String toReturn = this.textComponent.getDocument().getText(index,
 					caretIndex - index);

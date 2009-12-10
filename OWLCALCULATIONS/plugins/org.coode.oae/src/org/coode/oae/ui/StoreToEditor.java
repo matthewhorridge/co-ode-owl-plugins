@@ -23,24 +23,24 @@ public class StoreToEditor extends ExpressionEditor<PropertyChainModel> {
 
 	public void setStoreTo(PropertyChainModel _pcm) {
 		if (_pcm != null) {
-			setText(_pcm.render(getOWLEditorKit().getModelManager()));
+			this.setText(_pcm.render(this.getOWLEditorKit().getModelManager()));
 		} else {
-			setText("");
+			this.setText("");
 		}
 	}
 
 	public PropertyChainModel getPropertyChainModel() {
-		if (getText().trim().isEmpty()) {
+		if (this.getText().trim().length() == 0) {
 			return null;
 		}
 		try {
-			return createObject();
+			return this.createObject();
 		} catch (OWLException e) {
 			return null;
 		}
 	}
 
 	public void clear() {
-		setStoreTo(null);
+		this.setStoreTo(null);
 	}
 }
