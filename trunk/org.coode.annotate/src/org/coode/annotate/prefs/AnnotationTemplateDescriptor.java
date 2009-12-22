@@ -117,7 +117,7 @@ public class AnnotationTemplateDescriptor {
 
     public void export(PrintStream out) {
         for (OWLAnnotationProperty property : properties){
-            out.println(property.getURI() + ", " + prop2EditorMap.get(property));
+            out.println(property.getIRI() + ", " + prop2EditorMap.get(property));
         }
     }
 
@@ -130,7 +130,7 @@ public class AnnotationTemplateDescriptor {
     public List<String> exportStringList() {
         List<String> list = new ArrayList<String>();
         for (OWLAnnotationProperty property : properties){
-            list.add(property.getURI() + ", " + prop2EditorMap.get(property));
+            list.add(property.getIRI() + ", " + prop2EditorMap.get(property));
         }
         return list;
     }
