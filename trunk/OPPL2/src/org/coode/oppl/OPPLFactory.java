@@ -226,6 +226,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 				new SimpleShortFormProvider());
 		// XXX fix for missing Thing
 		bshp.add(this.ontologyManager.getOWLDataFactory().getOWLThing());
+		bshp.add(this.ontologyManager.getOWLDataFactory().getOWLNothing());
 		return new ShortFormEntityChecker(bshp);
 	}
 

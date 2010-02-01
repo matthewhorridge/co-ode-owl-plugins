@@ -23,8 +23,10 @@
 package org.coode.oppl.variablemansyntax;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
@@ -364,6 +366,15 @@ public enum VariableType {
 
 	public abstract Set<? extends OWLObject> getReferencedValues(
 			OWLOntology ontology);
+
+	public Set<? extends OWLObject> getReferencedValues(
+			Collection<OWLOntology> ontologies) {
+		Set<OWLObject> toReturn = new HashSet<OWLObject>();
+		for (OWLOntology o : ontologies) {
+			toReturn.addAll(this.getReferencedValues(o));
+		}
+		return toReturn;
+	}
 
 	// public <O> O accept(VariableTypeVisitorEx<O> visitor) {
 	// return visitor.visit(this);

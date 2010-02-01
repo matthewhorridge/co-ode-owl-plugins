@@ -21,6 +21,7 @@ import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.inference.OWLReasonerFactory;
+import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyCreationException;
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -33,7 +34,7 @@ public abstract class AbstractTestCase extends TestCase {
 	private static String baseURI = "file:///"
 			+ new File("../OPPL2/ontologies/").getAbsolutePath() + "/";
 	// ontology manager
-	private static OWLOntologyManager ontologyManager = OWLManager
+	protected static OWLOntologyManager ontologyManager = OWLManager
 			.createOWLOntologyManager();
 	// ontology for tests
 	private OWLOntologyURIMapper siemensmapper = new AutoURIMapper(new File(
@@ -75,7 +76,11 @@ public abstract class AbstractTestCase extends TestCase {
 	protected void execute(OPPLScript script) {
 		try {
 			Executor exec = new Executor(script.getConstraintSystem(), true);
-			exec.visitActions(script.getActions());
+			script.accept(exec);
+			for (OWLAxiomChange change : script.getActions()) {
+				System.out.println(change);
+			}
+			// exec.visitActions(script.getActions());
 		} catch (Exception e) {
 			this.log(e);
 		}
@@ -124,9 +129,13 @@ public abstract class AbstractTestCase extends TestCase {
 	private static OWLReasoner testReasoner = null;
 
 	protected OPPLScript parse(String script) {
+		return this.parse(script, "test.owl");
+	}
+
+	protected OPPLScript parse(String script, String ontology) {
 		try {
 			if (testReasoner == null) {
-				testReasoner = this.initReasoner(this.getOntology("test.owl"));
+				testReasoner = this.initReasoner(this.getOntology(ontology));
 			}
 			OPPLParser parser = ParserFactory.initParser(script, this
 					.getOntology("test.owl"), ontologyManager, testReasoner);
