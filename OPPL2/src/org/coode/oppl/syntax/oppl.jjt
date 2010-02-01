@@ -164,7 +164,7 @@ TOKEN : /* IDENTIFIERS */
 {
   < IDENTIFIER: "?" <NAME> >
 | <#NAME:  <LETTER> (<LETTER>|<DIGIT>)*>
-|  < #LETTER: ["_","a"-"z","A"-"Z", "\u00e0"-"\u00f9"] >
+|  < #LETTER: ["_","\'","a"-"z","A"-"Z", "\u00e0"-"\u00f9"] >
 |  < #DIGIT: ["0"-"9"] >
 }
 
@@ -457,7 +457,7 @@ GeneratedValue generatedValue(ConstraintSystem constraintSystem) #void:
 			Variable v = constraintSystem.getVariable(variableName);
 			if(v !=null){
 
-				int index=Integer.parseValue(attributeString);
+				int index=Integer.parseInt(attributeString);
 				System.out.println(index);
 				try {
 					Attribute attribute = Attribute.valueOf(attributeString);

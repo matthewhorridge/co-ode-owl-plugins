@@ -37,7 +37,7 @@ final class RenderingAttributeGenerator implements AttributeGenerator<String> {
 		if (object instanceof OWLEntity) {
 			toReturn = this.entityRenderer.render((OWLEntity) object);
 		} else {
-			toReturn = object.toString();
+			toReturn = object == null ? null : object.toString();
 		}
 		return toReturn;
 	}

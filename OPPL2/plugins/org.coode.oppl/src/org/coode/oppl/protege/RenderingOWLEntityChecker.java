@@ -22,6 +22,9 @@
  */
 package org.coode.oppl.protege;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.expression.ShortFormEntityChecker;
@@ -64,10 +67,16 @@ public class RenderingOWLEntityChecker implements OWLEntityChecker {
 			toReturn = this.shortFormEntityChecker.getOWLClass(name);
 		}
 		if (name.length() > 0 && toReturn == null) {
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			String[] split = nsUtil.split(name, null);
-			if (split.length == 2) {
-				toReturn = this.shortFormEntityChecker.getOWLClass(split[1]);
+			try {
+				new URI(name);
+				NamespaceUtil nsUtil = new NamespaceUtil();
+				String[] split = nsUtil.split(name, null);
+				if (split.length == 2) {
+					toReturn = this.shortFormEntityChecker
+							.getOWLClass(split[1]);
+				}
+			} catch (URISyntaxException e) {
+				toReturn = null;
 			}
 		}
 		return toReturn;
@@ -83,11 +92,16 @@ public class RenderingOWLEntityChecker implements OWLEntityChecker {
 			toReturn = this.shortFormEntityChecker.getOWLDataProperty(name);
 		}
 		if (name.length() > 0 && toReturn == null) {
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			String[] split = nsUtil.split(name, null);
-			if (split.length == 2) {
-				toReturn = this.shortFormEntityChecker
-						.getOWLDataProperty(split[1]);
+			try {
+				new URI(name);
+				NamespaceUtil nsUtil = new NamespaceUtil();
+				String[] split = nsUtil.split(name, null);
+				if (split.length == 2) {
+					toReturn = this.shortFormEntityChecker
+							.getOWLDataProperty(split[1]);
+				}
+			} catch (URISyntaxException e) {
+				toReturn = null;
 			}
 		}
 		return toReturn;
@@ -109,11 +123,16 @@ public class RenderingOWLEntityChecker implements OWLEntityChecker {
 			toReturn = this.shortFormEntityChecker.getOWLIndividual(name);
 		}
 		if (name.length() > 0 && toReturn == null) {
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			String[] split = nsUtil.split(name, null);
-			if (split.length == 2) {
-				toReturn = this.shortFormEntityChecker
-						.getOWLIndividual(split[1]);
+			try {
+				new URI(name);
+				NamespaceUtil nsUtil = new NamespaceUtil();
+				String[] split = nsUtil.split(name, null);
+				if (split.length == 2) {
+					toReturn = this.shortFormEntityChecker
+							.getOWLIndividual(split[1]);
+				}
+			} catch (URISyntaxException e) {
+				toReturn = null;
 			}
 		}
 		return toReturn;
@@ -129,11 +148,16 @@ public class RenderingOWLEntityChecker implements OWLEntityChecker {
 			toReturn = this.shortFormEntityChecker.getOWLObjectProperty(name);
 		}
 		if (name.length() > 0 && toReturn == null) {
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			String[] split = nsUtil.split(name, null);
-			if (split.length == 2) {
-				toReturn = this.shortFormEntityChecker
-						.getOWLObjectProperty(split[1]);
+			try {
+				new URI(name);
+				NamespaceUtil nsUtil = new NamespaceUtil();
+				String[] split = nsUtil.split(name, null);
+				if (split.length == 2) {
+					toReturn = this.shortFormEntityChecker
+							.getOWLObjectProperty(split[1]);
+				}
+			} catch (URISyntaxException e) {
+				toReturn = null;
 			}
 		}
 		return toReturn;
