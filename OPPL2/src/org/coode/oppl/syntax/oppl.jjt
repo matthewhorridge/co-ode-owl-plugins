@@ -28,6 +28,7 @@ import java.util.regex.PatternSyntaxException;
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
 import org.coode.oppl.AbstractConstraint;
 import org.coode.oppl.InCollectionConstraint;
+import org.coode.oppl.InCollectionRegExpConstraint;
 import org.coode.oppl.InequalityConstraint;
 import org.coode.oppl.OPPLAbstractFactory;
 import org.coode.oppl.OPPLFactory;
@@ -224,7 +225,7 @@ TOKEN : /* VARIABLE SCOPE OTHER DIRECTIONS */
 
 
 TOKEN :/* VARIABLE ATTRIBUTES*/
-{	<RENDERINGVARIABLEATTRIBUTE: "RENDERING">|<VALUESVARIABLEATTRIBUTE: "VALUES">}
+{	<RENDERINGVARIABLEATTRIBUTE: "RENDERING">|<VALUESVARIABLEATTRIBUTE: "VALUES">|<GROUPSVARIABLEATTRIBUTE: "GROUPS">}
 
 TOKEN : /* MANSYNTAX ENTITY NAMES */
 {	<ENTITYNAMES : <LETTER> (<LETTER>|<DIGIT>)*>}
@@ -350,9 +351,9 @@ GeneratedVariable opplFunction(String name,VariableType type, ConstraintSystem c
 	GeneratedVariable regexpVariable;
 }
 {
-	/*<MATCH><OPENPARENTHESYS><QUOTE>regexpVariable = regexpOperation(name, type, constraintSystem)<QUOTE><CLOSEDPARENTHESYS>
+	<MATCH><OPENPARENTHESYS><QUOTE>regexpVariable = regexpOperation(name, type, constraintSystem)<QUOTE><CLOSEDPARENTHESYS>
 		{return regexpVariable;}
-	|*/
+	|
 	<CREATE><OPENPARENTHESYS>value = stringOperation(constraintSystem)<CLOSEDPARENTHESYS>
 		{return constraintSystem.createStringGeneratedVariable(name,type, value);}
 	|<CREATEINTERSECTION><OPENPARENTHESYS>collection = set(type,constraintSystem)<CLOSEDPARENTHESYS>
@@ -437,17 +438,33 @@ GeneratedValue generatedValue(ConstraintSystem constraintSystem) #void:
 {
 	<QUOTE>valueToken = <ENTITYNAMES><QUOTE>
 		{return new StringGeneratedValue(valueToken.image);}
-	|variableNameToken = <IDENTIFIER>"." variableAttributeToken = <RENDERINGVARIABLEATTRIBUTE>
+	|LOOKAHEAD(4)
+	variableNameToken = <IDENTIFIER>"." variableAttributeToken = <RENDERINGVARIABLEATTRIBUTE>
 		{	String attributeString = variableAttributeToken.image;
 			String variableName = variableNameToken.image;
 			Variable v = constraintSystem.getVariable(variableName);
 			if(v !=null){
-				if (attributeString == null) {throw new ParseException("Invalid attribute name: null; valid names are: "+ Arrays.toString(Attribute.values()));}
 				try {
 					Attribute attribute = Attribute.valueOf(attributeString);
 					return AttributeFactory.getVariableGeneratedValue(attribute, v, constraintSystem);
 				} catch (IllegalArgumentException e) {throw new ParseException("Invalid attribute name: " + e.getMessage() + "; valid names are: " + Arrays.toString(Attribute.values()));}
 		}else{throw new ParseException("Invalid variable name: "+variableName);}
+		}
+	|LOOKAHEAD(4)
+	variableNameToken = <IDENTIFIER>"." <GROUPSVARIABLEATTRIBUTE><OPENPARENTHESYS> variableAttributeToken = <INTEGER_LITERAL><CLOSEDPARENTHESYS>
+		{	String attributeString = variableAttributeToken.image;
+			String variableName = variableNameToken.image;
+			Variable v = constraintSystem.getVariable(variableName);
+			if(v !=null){
+
+				int index=Integer.parseValue(attributeString);
+				System.out.println(index);
+				try {
+					Attribute attribute = Attribute.valueOf(attributeString);
+					return AttributeFactory.getVariableGeneratedValue(attribute, v, constraintSystem);
+				} catch (IllegalArgumentException e) {throw new ParseException("Invalid attribute name: " + e.getMessage() + "; valid names are: " + Arrays.toString(Attribute.values()));}
+		}else{throw new ParseException("Invalid variable name: "+variableName);}
+
 		}
 }
 
@@ -521,15 +538,17 @@ AbstractConstraint Constraint(ConstraintSystem constraintSystem):
 OWLObject owlObject;
 Variable variable;
 Set<OWLObject> owlObjects = new HashSet<OWLObject>();
-Set<OWLEntity> matches = new HashSet<OWLEntity>();}
+Set<OWLEntity> matches = new HashSet<OWLEntity>();
+InCollectionRegExpConstraint regexpConstraint;
+}
 {
 	t = <IDENTIFIER>
 		{
 			variable = constraintSystem.getVariable(t.image);
 			if(variable==null){throw new ParseException("Undeclared variable "+t.image);}
 		}
-	(	<MATCH><QUOTE> matches = matchConstraint(constraintSystem)<QUOTE>
-		{return new InCollectionConstraint(variable, matches,constraintSystem);}
+	(	<MATCH><QUOTE> regexpConstraint = matchConstraint(variable, constraintSystem)<QUOTE>
+		{return regexpConstraint;}
 	|	<NEQ> owlObject = OWLExpression(variable, constraintSystem)
 		{return new InequalityConstraint(variable, owlObject,constraintSystem);}
 	|	<IN><OPENCURLYBRACKETS>owlObject = OWLExpression(variable,constraintSystem)
@@ -543,12 +562,12 @@ Set<OWLEntity> matches = new HashSet<OWLEntity>();}
 }
 
 JAVACODE
-Set<OWLEntity> matchConstraint(ConstraintSystem cs){
+InCollectionRegExpConstraint matchConstraint(Variable variable, ConstraintSystem cs){
 int beginningSubSection = getToken(1).beginColumn;
 int beginningSubSectionLine = getToken(1).beginLine;
 String expression = Utils.readString(this, false, QUOTE);
 try {
-	return RegExpGeneratedVariable.getMatches(expression, cs);
+	return  new InCollectionRegExpConstraint(expression, variable, RegExpGeneratedVariable.getMatches(expression, cs));
 } catch (PatternSyntaxException e) {
 Exception temp=Utils.buildException(expression, beginningSubSection, beginningSubSectionLine, e);
 throw new ParseException(temp.getMessage(), temp);

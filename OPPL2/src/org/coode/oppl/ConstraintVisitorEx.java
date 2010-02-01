@@ -46,4 +46,13 @@ public interface ConstraintVisitorEx<O extends Object> {
 	 *         implementation)
 	 */
 	O visit(InCollectionConstraint<? extends OWLObject> c);
+
+	/**
+	 * Visitor pattern required method
+	 * 
+	 * @param c
+	 * @return the specific output of the visit (dependent on the
+	 *         implementation)
+	 */
+	O visit(InCollectionRegExpConstraint<? extends OWLObject> c);
 }

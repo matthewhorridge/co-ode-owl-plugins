@@ -74,7 +74,7 @@ public class OPPLScriptImpl implements OPPLScript {
 	public List<Variable> getInputVariables() {
 		InputVariableCollector visitor = new InputVariableCollector(
 				new ArrayList<Variable>());
-		for (Variable variable : getVariables()) {
+		for (Variable variable : this.getVariables()) {
 			variable.accept(visitor);
 		}
 		return visitor.getCollectedVariables();
@@ -102,20 +102,20 @@ public class OPPLScriptImpl implements OPPLScript {
 	}
 
 	public void accept(OPPLScriptVisitor visitor) {
-		for (Variable v : getVariables()) {
+		for (Variable v : this.getVariables()) {
 			visitor.visit(v);
 		}
-		visitor.visit(getQuery());
-		visitor.visitActions(getActions());
+		visitor.visit(this.getQuery());
+		visitor.visitActions(this.getActions());
 	}
 
 	public <P> P accept(OPPLScriptVisitorEx<P> visitor) {
 		P p = null;
-		for (Variable v : getVariables()) {
+		for (Variable v : this.getVariables()) {
 			p = visitor.visit(v, p);
 		}
-		p = visitor.visit(getQuery(), p);
-		p = visitor.visitActions(getActions(), p);
+		p = visitor.visit(this.getQuery(), p);
+		p = visitor.visitActions(this.getActions(), p);
 		return p;
 	}
 
@@ -123,7 +123,7 @@ public class OPPLScriptImpl implements OPPLScript {
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
 		boolean first = true;
-		for (Variable v : getVariables()) {
+		for (Variable v : this.getVariables()) {
 			String commaString = first ? "" : ", ";
 			first = false;
 			buffer.append(commaString);
@@ -144,14 +144,14 @@ public class OPPLScriptImpl implements OPPLScript {
 				buffer.append(']');
 			}
 		}
-		OPPLQuery opplQuery = getQuery();
+		OPPLQuery opplQuery = this.getQuery();
 		if (this.query != null) {
 			buffer.append(opplQuery.toString());
 		}
-		if (getActions().size() > 0) {
+		if (this.getActions().size() > 0) {
 			buffer.append(" BEGIN ");
 			first = true;
-			for (OWLAxiomChange action : getActions()) {
+			for (OWLAxiomChange action : this.getActions()) {
 				String commaString = first ? "" : ", ";
 				StringWriter writer = new StringWriter();
 				ManchesterOWLSyntaxObjectRenderer renderer = new ManchesterOWLSyntaxObjectRenderer(
@@ -175,7 +175,7 @@ public class OPPLScriptImpl implements OPPLScript {
 	public String render() {
 		StringBuffer buffer = new StringBuffer();
 		boolean first = true;
-		for (Variable v : getVariables()) {
+		for (Variable v : this.getVariables()) {
 			String commaString = first ? "" : ",\n ";
 			buffer.append(commaString);
 			first = false;
@@ -193,15 +193,15 @@ public class OPPLScriptImpl implements OPPLScript {
 				buffer.append(']');
 			}
 		}
-		OPPLQuery opplQuery = getQuery();
+		OPPLQuery opplQuery = this.getQuery();
 		buffer.append('\n');
 		if (this.query != null) {
 			buffer.append(opplQuery.render());
 		}
-		if (getActions().size() > 0) {
+		if (this.getActions().size() > 0) {
 			buffer.append("BEGIN\n ");
 			first = true;
-			for (OWLAxiomChange action : getActions()) {
+			for (OWLAxiomChange action : this.getActions()) {
 				String commaString = first ? "" : ",\n ";
 				String actionString = action instanceof AddAxiom ? "\tADD "
 						: "\tREMOVE ";

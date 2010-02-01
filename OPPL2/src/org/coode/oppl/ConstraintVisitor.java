@@ -45,4 +45,13 @@ public interface ConstraintVisitor {
 	 */
 	void visitInCollectionConstraint(
 			InCollectionConstraint<? extends OWLObject> c);
+
+	/**
+	 * Visitor pattern required method
+	 * 
+	 * @param c
+	 * 
+	 */
+	void visitInCollectionConstraint(
+			InCollectionRegExpConstraint<? extends OWLObject> c);
 }

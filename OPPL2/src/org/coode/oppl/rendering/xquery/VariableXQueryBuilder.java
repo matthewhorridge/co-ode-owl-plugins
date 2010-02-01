@@ -32,6 +32,7 @@ import java.util.Set;
 
 import org.coode.oppl.ConstraintVisitor;
 import org.coode.oppl.InCollectionConstraint;
+import org.coode.oppl.InCollectionRegExpConstraint;
 import org.coode.oppl.InequalityConstraint;
 import org.coode.oppl.utils.ArgCheck;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
@@ -1548,6 +1549,33 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 
 	public void visitInCollectionConstraint(
 			InCollectionConstraint<? extends OWLObject> c) {
+		final String variableReference = c.getVariable().getName().replace('?',
+				'$');
+		final StringWriter writer = new StringWriter();
+		writer.append("( ");
+		Collection<? extends OWLObject> collection = c.getCollection();
+		boolean first = true;
+		for (OWLObject object : collection) {
+			String andString = " ";
+			if (!first) {
+				andString = " or ";
+			}
+			first = first ? false : first;
+			writer.append(andString);
+			if (object instanceof OWLEntity) {
+				((OWLEntity) object).accept(new SpecializedOWLEntityVisitor(
+						writer, variableReference));
+			} else if (object instanceof OWLConstant) {
+				((OWLConstant) object).accept(new SpecializedOWLDataVisitor(
+						variableReference, writer));
+			}
+		}
+		writer.append(")");
+		this.whereConditions.add(writer.toString());
+	}
+
+	public void visitInCollectionConstraint(
+			InCollectionRegExpConstraint<? extends OWLObject> c) {
 		final String variableReference = c.getVariable().getName().replace('?',
 				'$');
 		final StringWriter writer = new StringWriter();

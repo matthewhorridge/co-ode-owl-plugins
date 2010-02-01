@@ -71,11 +71,11 @@ public class ChangeExtractor implements
 
 	public List<OWLAxiomChange> visitActions(List<OWLAxiomChange> changes,
 			List<OWLAxiomChange> p) {
+		if (p == null) {
+			p = new ArrayList<OWLAxiomChange>();
+		}
 		for (OWLAxiomChange change : changes) {
 			boolean isAdd = change instanceof AddAxiom;
-			if (p == null) {
-				p = new ArrayList<OWLAxiomChange>();
-			}
 			ActionType action = isAdd ? ActionType.ADD : ActionType.REMOVE;
 			if (this.considerImportClosure && !isAdd) {
 				p.addAll(ActionFactory.createChanges(action, change.getAxiom(),
