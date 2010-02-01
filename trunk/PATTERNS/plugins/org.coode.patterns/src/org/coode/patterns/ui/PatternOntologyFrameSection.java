@@ -90,36 +90,37 @@ public class PatternOntologyFrameSection
 
 	@Override
 	protected OWLOntologyAnnotationAxiom createAxiom(PatternModel object) {
-		OWLDataFactory dataFactory = getOWLDataFactory();
+		OWLDataFactory dataFactory = this.getOWLDataFactory();
 		OWLConstant constant = dataFactory.getOWLTypedConstant(object
 				.toString());
 		URI annotationURI = object.getUri();
 		OWLConstantAnnotation annotation = dataFactory
 				.getOWLConstantAnnotation(annotationURI, constant);
-		OWLOntologyAnnotationAxiom axiom = getOWLDataFactory()
-				.getOWLOntologyAnnotationAxiom(getRootObject(), annotation);
+		OWLOntologyAnnotationAxiom axiom = this
+				.getOWLDataFactory()
+				.getOWLOntologyAnnotationAxiom(this.getRootObject(), annotation);
 		return axiom;
 	}
 
 	@Override
 	public OWLFrameSectionRowObjectEditor<PatternModel> getObjectEditor() {
 		// return new PatternBuilder(this.getOWLEditorKit());
-		return new PatternEditor(getOWLEditorKit(), this.factory);
+		return new PatternEditor(this.getOWLEditorKit(), this.factory);
 	}
 
 	@Override
 	protected void refill(OWLOntology ontology) {
-		for (OWLOntologyAnnotationAxiom ontologyAnnotationAxiom : ontology
-				.getOntologyAnnotationAxioms()) {
+		for (OWLOntologyAnnotationAxiom ontologyAnnotationAxiom : this
+				.getRootObject().getAnnotations(ontology)) {
 			PatternExtractor patternExtractor = new ProtegePatternExtractor(
-					getOWLModelManager());
+					this.getOWLModelManager());
 			OWLAnnotation<? extends OWLObject> annotation = ontologyAnnotationAxiom
 					.getAnnotation();
 			if (annotation.accept(patternExtractor) != null) {
-				addRow(new PatternOntologyFrameSectionRow(getOWLEditorKit(),
-						this, ontology, getRootObject(),
-						ontologyAnnotationAxiom, this.canEdit, this.canDelete,
-						this.factory));
+				this.addRow(new PatternOntologyFrameSectionRow(this
+						.getOWLEditorKit(), this, ontology, this
+						.getRootObject(), ontologyAnnotationAxiom,
+						this.canEdit, this.canDelete, this.factory));
 			}
 		}
 	}
@@ -130,18 +131,18 @@ public class PatternOntologyFrameSection
 
 	@Override
 	public void visit(OWLOntologyAnnotationAxiom ontologyAnnotationAxiom) {
-		PatternExtractor patternExtractor = new ProtegePatternExtractor(
-				getOWLModelManager());
+		PatternExtractor patternExtractor = new ProtegePatternExtractor(this
+				.getOWLModelManager());
 		OWLAnnotation<? extends OWLObject> annotation = ontologyAnnotationAxiom
 				.getAnnotation();
 		if (annotation.accept(patternExtractor) != null) {
-			reset();
+			this.reset();
 		}
 	}
 
 	@Override
 	protected void handleChanges(List<? extends OWLOntologyChange> changes) {
-		if (getRootObject() == null) {
+		if (this.getRootObject() == null) {
 			return;
 		}
 		for (OWLOntologyChange change : changes) {
