@@ -200,7 +200,7 @@ TOKEN : /* IDENTIFIERS */
 {
   < IDENTIFIER: <LETTER> (<LETTER>|<DIGIT>)* >
 | <CREATEDIDENTIFIER: "!"<IDENTIFIER>>
-|  < #LETTER: ["_","-","a"-"z","A"-"Z"] >
+|  < #LETTER: ["_","\'","-","a"-"z","A"-"Z"] >
 |  < #DIGIT: ["0"-"9"] >
 }
 

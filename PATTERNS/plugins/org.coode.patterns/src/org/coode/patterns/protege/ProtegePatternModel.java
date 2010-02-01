@@ -22,8 +22,6 @@
  */
 package org.coode.patterns.protege;
 
-import java.util.StringTokenizer;
-
 import org.coode.oppl.OPPLScript;
 import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.PatternModel;
@@ -54,18 +52,18 @@ public class ProtegePatternModel extends PatternModel {
 		this.modelManager = modelManager;
 	}
 
-	@Override
-	public String toString() {
-		String renderedString = super.toString();
-		StringBuilder toReturn = new StringBuilder();
-		StringTokenizer tokenizer = new StringTokenizer(renderedString,
-				" \n\t,[()];", true);
-		while (tokenizer.hasMoreTokens()) {
-			toReturn.append(unRender(tokenizer.nextToken()));
-		}
-		return toReturn.toString();
-	}
-
+	// @Override
+	// public String toString() {
+	// // String renderedString = super.toString();
+	// // StringBuilder toReturn = new StringBuilder();
+	// // StringTokenizer tokenizer = new StringTokenizer(renderedString,
+	// // " \n\t,[()];", true);
+	// // while (tokenizer.hasMoreTokens()) {
+	// // toReturn.append(unRender(tokenizer.nextToken()));
+	// // }
+	// // return toReturn.toString();
+	//		
+	// }
 	private String unRender(String chunk) {
 		String toReturn = chunk;
 		OWLEntity object = this.modelManager.getOWLEntity(chunk);
