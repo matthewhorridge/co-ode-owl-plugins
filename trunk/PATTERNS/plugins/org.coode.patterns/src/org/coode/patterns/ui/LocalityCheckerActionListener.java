@@ -34,6 +34,7 @@ public class LocalityCheckerActionListener extends LocalityChecker implements
 		this.resultButton = resultButton;
 		this.resultButton.setIcon(this.generateIcon(Color.gray));
 		this.resultButton.setToolTipText("Check not executed yet");
+		this.resultButton.setEnabled(false);
 		this.not = kit.getOWLModelManager().getOWLDataFactory().getOWLNothing();
 	}
 
@@ -77,6 +78,7 @@ public class LocalityCheckerActionListener extends LocalityChecker implements
 	}
 
 	public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+		this.resultButton.setEnabled(true);
 		this.resultButton.setToolTipText(SAFETY_ANALYSIS_BREAKDOWN);
 		if (this.ipm != null) {
 			if (!this.isLocal(this.activeOntology)) {
