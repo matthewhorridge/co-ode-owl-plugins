@@ -77,6 +77,7 @@ public class OWLAxiomChangeEditor extends JPanel implements VerifiedInputEditor 
 		this.setLayout(new BorderLayout());
 		JPanel actionPanel = new JPanel(new GridLayout(0, 2));
 		JRadioButton addRadioButton = new JRadioButton("ADD");
+		addRadioButton.setSelected(true);
 		this.radioButtonActionMap.put(addRadioButton, "ADD");
 		this.actionStringRadioButtonMap.put("ADD", addRadioButton);
 		this.actionButtonGroup.add(addRadioButton);
