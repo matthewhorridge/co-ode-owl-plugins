@@ -237,3 +237,16 @@ SELECT ?x subClassOf ?y
 BEGIN
  	ADD ?x subClassOf Pizza
 END;
+
+?x:CLASS,
+ ?act:CLASS,
+ ?ion:CLASS = create(?y.RENDERING+ "_Ion"),
+ ?y:CLASS,
+ ?activityType:CLASS
+BEGIN
+ 	ADD ?act subClassOf 'metallochaperone activity',
+ 	ADD ?act subClassOf enables some (binds some ?ion
+                              and delivers some ?ion
+                              and deliversTo some ?x)
+END;
+?act of type ?activityType chaperones ?ion to ?x 
