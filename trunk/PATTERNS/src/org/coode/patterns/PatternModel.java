@@ -648,6 +648,10 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 		return this.factory;
 	}
 
+	public OWLOntologyManager getOWLOntologyManager() {
+		return this.ontologyManager;
+	}
+
 	public PatternModel(OPPLScript opplScript,
 			OWLOntologyManager ontologyManager, AbstractPatternModelFactory f)
 			throws UnsuitableOPPLScriptException {
@@ -849,8 +853,8 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 		return toReturn;
 	}
 
-	private DefinitorialExtractor createDefinitorialExtractor(Variable variable,
-			ReferenceReplacement referenceReplacement) {
+	private DefinitorialExtractor createDefinitorialExtractor(
+			Variable variable, ReferenceReplacement referenceReplacement) {
 		final OWLDataFactory dataFactory = this.ontologyManager
 				.getOWLDataFactory();
 		OWLObject owlObject = null;
@@ -900,8 +904,8 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 		// throw new RuntimeException("Unsupported variable type: "
 		// + v.getType() + " for pattern used in functional mode");
 		// }
-		return new DefinitorialExtractor(owlObject, variable.getType(), dataFactory,
-				referenceReplacement);
+		return new DefinitorialExtractor(owlObject, variable.getType(),
+				dataFactory, referenceReplacement);
 	}
 
 	public void setUnresolvedOPPLStatement(String unresolvedString) {
