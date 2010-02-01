@@ -67,9 +67,11 @@ public class PatternReference {
 			PatternConstraintSystem constraintSystem,
 			OWLOntologyManager ontologyManager, Set<String> visitedPatterns,
 			List<String>... args) throws PatternException {
-		this(patternName, constraintSystem, ontologyManager, args);
+		this.patternName = patternName;
+		this.patternConstraintSystem = constraintSystem;
+		this.ontologyManger = ontologyManager;
 		this.visited = visitedPatterns;
-		// init(args);
+		this.init(args);
 	}
 
 	protected void init(List<String>... args) throws PatternException {
