@@ -84,6 +84,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 			this.setLayout(new BorderLayout());
 			JRadioButton superClassRadioButton = new JRadioButton(
 					Direction.SUPERCLASSOF.toString());
+			superClassRadioButton.setSelected(true);
 			this.radioButtonDirectionMap.put(superClassRadioButton,
 					Direction.SUPERCLASSOF);
 			this.directionRadioButtonMap.put(Direction.SUPERCLASSOF,
@@ -272,6 +273,7 @@ public abstract class ScopeEditor extends JPanel implements VerifiedInputEditor 
 			this.setLayout(new BorderLayout());
 			JRadioButton superClassRadioButton = new JRadioButton(
 					Direction.SUBPROPERTYOF.toString());
+			superClassRadioButton.setSelected(true);
 			this.radioButtonDirectionMap.put(superClassRadioButton,
 					Direction.SUBPROPERTYOF);
 			this.directionButtonGroup.add(superClassRadioButton);

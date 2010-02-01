@@ -22,6 +22,7 @@ import javax.swing.JSplitPane;
 import org.coode.oppl.AbstractConstraint;
 import org.coode.oppl.ConstraintVisitorEx;
 import org.coode.oppl.InCollectionConstraint;
+import org.coode.oppl.InCollectionRegExpConstraint;
 import org.coode.oppl.InequalityConstraint;
 import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLScript;
@@ -327,6 +328,25 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 			}
 
 			public Boolean visit(InCollectionConstraint<? extends OWLObject> c) {
+				boolean toReturn = c.getVariable().equals(this.v);
+				if (!toReturn) {
+					Collection<? extends OWLObject> collection = c
+							.getCollection();
+					Iterator<? extends OWLObject> it = collection.iterator();
+					NamedVariableDetector variableDetector = new NamedVariableDetector(
+							this.v, OPPLBuilderModel.this.getConstraintSystem());
+					boolean detected = false;
+					while (!detected && it.hasNext()) {
+						OWLObject object = it.next();
+						detected = object.accept(variableDetector);
+					}
+					toReturn = detected;
+				}
+				return toReturn;
+			}
+
+			public Boolean visit(
+					InCollectionRegExpConstraint<? extends OWLObject> c) {
 				boolean toReturn = c.getVariable().equals(this.v);
 				if (!toReturn) {
 					Collection<? extends OWLObject> collection = c
@@ -938,10 +958,10 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 		this.owlEditorKit = owlEditorKit;
 		this.validator = validator;
 		// Setup the variable list on the left
-		JPanel variablePanel = new JPanel(new BorderLayout());
+		// JPanel variablePanel = new JPanel(new BorderLayout());
 		this.variableList = new OPPLVariableList(this.owlEditorKit,
 				this.opplBuilderModel);
-		variablePanel.add(this.variableList);
+		// variablePanel.add(this.variableList);
 		builderPane.add(ComponentFactory.createScrollPane(this.variableList),
 				JSplitPane.LEFT);
 		// Now setup the right hand side panel which will be further split into
@@ -989,8 +1009,8 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 		this.errorPanel.setBorder(ComponentFactory
 				.createTitledBorder("Errors:"));
 		this.errorPanel.setPreferredSize(new Dimension(100, 500));
-		this.add(this.errorPanel, JSplitPane.TOP);
-		this.add(builderPane, JSplitPane.BOTTOM);
+		this.add(this.errorPanel, JSplitPane.BOTTOM);
+		this.add(builderPane, JSplitPane.TOP);
 		builderPane.setDividerLocation(.5);
 		builderPane.setResizeWeight(.3);
 		this.setDividerLocation(.3);

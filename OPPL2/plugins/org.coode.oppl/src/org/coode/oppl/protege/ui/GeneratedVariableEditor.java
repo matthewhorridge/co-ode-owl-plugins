@@ -172,6 +172,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 			this.jRadioButtonTypeMap.put(typeRadioButton, variableType);
 			this.typeJRadioButonMap.put(variableType, typeRadioButton);
 		}
+		this.typeJRadioButonMap.get(VariableType.values()[0]).setSelected(true);
 		JPanel scopeBorderPanel = new JPanel(new BorderLayout());
 		scopeBorderPanel.setBorder(ComponentFactory
 				.createTitledBorder("Variable Scope"));

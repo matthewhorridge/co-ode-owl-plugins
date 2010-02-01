@@ -214,13 +214,13 @@ public final class OPPLView extends AbstractOWLViewComponent implements
 
 	class OPPLExecutorSwingWorker extends
 			SwingWorker<List<OWLAxiomChange>, OPPLScript> {
-		private final List<OWLAxiomChange> changes;
+		private final List<OWLAxiomChange> changes = new ArrayList<OWLAxiomChange>();
 
 		/**
 		 * @param changes
 		 */
 		protected OPPLExecutorSwingWorker(List<OWLAxiomChange> changes) {
-			this.changes = changes;
+			this.changes.addAll(changes);
 		}
 
 		@Override
@@ -251,8 +251,10 @@ public final class OPPLView extends AbstractOWLViewComponent implements
 				ActionListModel model = (ActionListModel) OPPLView.this.affectedAxioms
 						.getModel();
 				model.clear();
-				for (OWLAxiomChange axiomChange : changes) {
-					model.addAction(axiomChange, false, true);
+				if (changes != null) {
+					for (OWLAxiomChange axiomChange : changes) {
+						model.addAction(axiomChange, false, true);
+					}
 				}
 				OPPLView.this.revalidate();
 				OPPLView.this.bindingTableModel = new InstantiationTableModel(

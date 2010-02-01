@@ -59,18 +59,17 @@ public class VariableList extends MList {
 			if (value instanceof VariableListItem) {
 				Variable variable = ((VariableListItem) value).getVariable();
 				VariableScope variableScope = variable.getVariableScope();
-				String variableScopeString = variableScope == null ? ""
-						: "["
-								+ new StringBuilder()
-										.append(variableScope.getDirection())
-										.append(" ")
-										.append(
-												VariableList.this.owlEditorKit
-														.getModelManager()
-														.getRendering(
-																variableScope
-																		.getScopingObject()))
-										.append("] ").toString();
+				String variableScopeString = null;
+				if (variableScope == null) {
+					variableScopeString = "";
+				} else {
+					String rendering = VariableList.this.owlEditorKit
+							.getModelManager().getRendering(
+									variableScope.getScopingObject());
+					variableScopeString = new StringBuilder("[").append(
+							variableScope.getDirection()).append(" ").append(
+							rendering).append("] ").toString();
+				}
 				label
 						.setIcon(new ImageIcon(
 								this
@@ -87,9 +86,6 @@ public class VariableList extends MList {
 		}
 	}
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = 6135780833694887712L;
 	private final VariableListCellRenderer variableListCellRenderer = new VariableListCellRenderer();
 	protected final OWLEditorKit owlEditorKit;
