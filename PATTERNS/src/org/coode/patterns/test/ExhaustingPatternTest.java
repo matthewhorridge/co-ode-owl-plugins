@@ -106,11 +106,4 @@ public class ExhaustingPatternTest extends AbstractTestCase {
 		}
 		return null;
 	}
-
-	public static void main(String[] args) throws Exception {
-		ExhaustingPatternTest pt = new ExhaustingPatternTest();
-		pt.setUp();
-		pt.testMultilineError();
-		pt.tearDown();
-	}
 }

@@ -23,6 +23,7 @@
 package org.coode.patterns.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -37,20 +38,25 @@ import java.util.Set;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableCellRenderer;
 
 import org.coode.oppl.protege.ui.ActionList;
 import org.coode.oppl.protege.ui.ActionListItem;
@@ -67,12 +73,18 @@ import org.coode.patterns.InstantiatedPatternModel;
 import org.coode.patterns.PatternConstant;
 import org.coode.patterns.PatternConstraintSystem;
 import org.coode.patterns.PatternModel;
+import org.coode.patterns.locality.LocalityChecker;
+import org.coode.patterns.protege.utils.OWLEntitySelector;
+import org.coode.patterns.protege.utils.RenderableObjectCellRenderer;
+import org.coode.patterns.protege.utils.VariableListModel;
 import org.coode.patterns.utils.Utils;
 import org.protege.editor.core.ui.list.MList;
+import org.protege.editor.core.ui.list.MListButton;
 import org.protege.editor.core.ui.list.MListItem;
 import org.protege.editor.core.ui.list.MListSectionHeader;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
+import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.core.ui.util.VerifyingOptionPane;
 import org.protege.editor.owl.OWLEditorKit;
@@ -82,6 +94,7 @@ import org.semanticweb.owl.model.AddAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.RemoveAxiom;
 
@@ -95,10 +108,10 @@ public class PatternInstantiationEditor extends
 		implements VerifiedInputEditor,
 		// InputVerificationStatusChangedListener,
 		ListDataListener, ListSelectionListener {
-	private final class SpecializedActionListener implements ActionListener {
+	private final class PatternListActionListener implements ActionListener {
 		final PatternInstantiationEditor pie;
 
-		public SpecializedActionListener(PatternInstantiationEditor _this) {
+		public PatternListActionListener(PatternInstantiationEditor _this) {
 			this.pie = _this;
 		}
 
@@ -120,18 +133,18 @@ public class PatternInstantiationEditor extends
 				this.pie.refreshInstantiationPanel();
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						SpecializedActionListener.this.pie
+						PatternListActionListener.this.pie
 								.refreshEffectsPanel();
 					}
 				});
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						SpecializedActionListener.this.pie.handleChange();
+						PatternListActionListener.this.pie.handleChange();
 					}
 				});
 				SwingUtilities.invokeLater(new Runnable() {
 					public void run() {
-						SpecializedActionListener.this.pie.variableList
+						PatternListActionListener.this.pie.variableList
 								.setSelectedIndex(0);
 					}
 				});
@@ -319,7 +332,6 @@ public class PatternInstantiationEditor extends
 	private final static class InstantiatedPatternCellRenderer implements
 			ListCellRenderer {
 		public InstantiatedPatternCellRenderer() {
-			// TODO Auto-generated constructor stub
 		}
 
 		private final static DefaultListCellRenderer DELEGATE = new DefaultListCellRenderer();
@@ -350,7 +362,58 @@ public class PatternInstantiationEditor extends
 		}
 	}
 
-	protected OWLEditorKit owlEditorKit;
+	private final class LocalityResultActionListener implements ActionListener {
+		LocalityResultActionListener() {
+		}
+
+		public void actionPerformed(@SuppressWarnings("unused") ActionEvent e) {
+			JTable table = new JTable(
+					PatternInstantiationEditor.this.localityChecker.print());
+			table.setGridColor(Color.black);
+			table.setDefaultRenderer(String.class, new TableCellRenderer() {
+				private JLabel safeFalse = new JLabel(
+						PatternInstantiationEditor.this.localityChecker
+								.generateIcon(Color.red));
+				private JLabel safeTrue = new JLabel(
+						PatternInstantiationEditor.this.localityChecker
+								.generateIcon(Color.green));
+				private JCheckBox present = new JCheckBox("", true);
+				private JCheckBox absent = new JCheckBox("", false);
+
+				public Component getTableCellRendererComponent(JTable table,
+						Object value, boolean isSelected, boolean hasFocus,
+						int row, int column) {
+					if (value.equals(Boolean.toString(false))) {
+						return this.safeFalse;
+					}
+					if (value.equals(Boolean.toString(true))) {
+						return this.safeTrue;
+					}
+					if (value.equals("X")) {
+						return this.present;
+					}
+					return this.absent;
+				}
+			});
+			JScrollPane report = ComponentFactory.createScrollPane(table);
+			final VerifyingOptionPane optionPane = new VerifyingOptionPane(
+					report);
+			final JDialog dlg = optionPane
+					.createDialog(PatternInstantiationEditor.this.owlEditorKit
+							.getWorkspace(), null);
+			// The editor shouldn't be modal (or should it?)
+			dlg.setModal(false);
+			dlg.setTitle("Safety analysis breakdown");
+			dlg.setResizable(true);
+			dlg.pack();
+			dlg
+					.setLocationRelativeTo(PatternInstantiationEditor.this.owlEditorKit
+							.getWorkspace());
+			dlg.setVisible(true);
+		}
+	}
+
+	protected final OWLEditorKit owlEditorKit;
 	private JPanel mainPane;
 	// private ExpressionEditor<InstantiatedPatternModel> nameEditor;
 	private DefaultComboBoxModel patternListModel = new DefaultComboBoxModel();
@@ -370,6 +433,14 @@ public class PatternInstantiationEditor extends
 	private final DefaultListModel problemListModel = new DefaultListModel();
 	private final JList problemList = new JList(this.problemListModel);
 	private final AbstractPatternModelFactory factory;
+	private JButton localityCheckResultButton = new JButton();
+	private JButton localityCheckButton = new JButton("Check Locality");
+	private JButton localityCheckPreferenceButton = new JButton("Signature");
+	protected LocalityCheckerActionListener localityChecker;
+	protected final Set<OWLEntity> localityCheckerSignature = new HashSet<OWLEntity>();
+	protected final VariableListModel<OWLEntity> localityCheckerSignatureModel = new VariableListModel<OWLEntity>(
+			this.localityCheckerSignature, "Signature elements");
+	private JPanel buttonPanel;
 
 	/**
 	 * Builds a PatternInstantiationEditor for a specific class, i.e.: an editor
@@ -402,6 +473,98 @@ public class PatternInstantiationEditor extends
 		this.factory = f;
 		this.mainPane = new JPanel(new BorderLayout());
 		this.mainPane.setFocusable(false);
+		this.localityCheckerSignature.addAll(LocalityChecker
+				.collectEntities(this.owlEditorKit.getOWLModelManager()
+						.getOntologies()));
+		this.localityCheckerSignatureModel.init();
+		this.localityCheckResultButton
+				.addActionListener(new LocalityResultActionListener());
+		this.localityChecker = new LocalityCheckerActionListener(
+				this.owlEditorKit, this.localityCheckerSignature,
+				this.localityCheckResultButton);
+		this.localityCheckButton.addActionListener(this.localityChecker);
+		this.localityCheckPreferenceButton
+				.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						MList list = new MList() {
+							@Override
+							protected List<MListButton> getButtons(Object value) {
+								// TODO Auto-generated method stub
+								return super.getButtons(value);
+							}
+
+							@Override
+							protected void handleAdd() {
+								OWLEntitySelector oes = new OWLEntitySelector(
+										PatternInstantiationEditor.this.owlEditorKit);
+								int ret = JOptionPaneEx
+										.showValidatingConfirmDialog(
+												this.getParent(),
+												"Add an entity to the signature",
+												oes, JOptionPane.PLAIN_MESSAGE,
+												JOptionPane.OK_CANCEL_OPTION,
+												oes);
+								if (ret == JOptionPane.OK_OPTION) {
+									OWLEntity toAdd = oes.getOWLClass();
+									if (toAdd != null) {
+										PatternInstantiationEditor.this.localityCheckerSignature
+												.add(toAdd);
+									}
+								}
+								PatternInstantiationEditor.this.localityCheckerSignatureModel
+										.init();
+							}
+
+							@Override
+							protected void handleDelete() {
+								PatternInstantiationEditor.this.localityCheckerSignature
+										.remove(((org.coode.patterns.protege.utils.VariableListModel.VariableListItem<OWLEntity>) this
+												.getSelectedValue()).getItem());
+								PatternInstantiationEditor.this.localityCheckerSignatureModel
+										.init();
+							}
+						};
+						list
+								.setModel(PatternInstantiationEditor.this.localityCheckerSignatureModel);
+						list.setCellRenderer(new RenderableObjectCellRenderer(
+								PatternInstantiationEditor.this.owlEditorKit));
+						JScrollPane pane = ComponentFactory
+								.createScrollPane(list);
+						final VerifyingOptionPane optionPane = new VerifyingOptionPane(
+								pane);
+						final JDialog dlg = optionPane.createDialog(
+								PatternInstantiationEditor.this.owlEditorKit
+										.getWorkspace(), null);
+						// The editor shouldn't be modal (or should it?)
+						dlg.setModal(false);
+						dlg.setTitle("Current signature");
+						dlg.setResizable(true);
+						dlg.pack();
+						dlg
+								.setLocationRelativeTo(PatternInstantiationEditor.this.owlEditorKit
+										.getWorkspace());
+						dlg.setVisible(true);
+					}
+				});
+		this.buttonPanel = new JPanel(new BorderLayout());
+		this.buttonPanel.add(this.localityCheckResultButton, BorderLayout.WEST);
+		this.buttonPanel.add(this.localityCheckButton, BorderLayout.CENTER);
+		this.buttonPanel.add(this.localityCheckPreferenceButton,
+				BorderLayout.EAST);
+		this.localityCheckerSignatureModel
+				.addListDataListener(new ListDataListener() {
+					public void intervalRemoved(ListDataEvent e) {
+						PatternInstantiationEditor.this.handleChange();
+					}
+
+					public void intervalAdded(ListDataEvent e) {
+						PatternInstantiationEditor.this.handleChange();
+					}
+
+					public void contentsChanged(ListDataEvent e) {
+						PatternInstantiationEditor.this.handleChange();
+					}
+				});
 		this.setup();
 	}
 
@@ -409,7 +572,7 @@ public class PatternInstantiationEditor extends
 		this.mainPane.setPreferredSize(new Dimension(500, 600));
 		this.refillPatternList();
 		this.patternList.setPreferredSize(new Dimension(50, 20));
-		this.patternList.addActionListener(new SpecializedActionListener(this));
+		this.patternList.addActionListener(new PatternListActionListener(this));
 		JPanel namePanel = new JPanel(new BorderLayout());
 		namePanel.setBorder(ComponentFactory.createTitledBorder("Pattern:"));
 		namePanel.add(ComponentFactory.createScrollPane(this.patternList),
@@ -449,6 +612,8 @@ public class PatternInstantiationEditor extends
 		centerPane.add(this.effectsBorder, JSplitPane.BOTTOM);
 		centerPane.setDividerLocation(.5);
 		this.mainPane.add(centerPane, BorderLayout.CENTER);
+		this.mainPane.add(this.buttonPanel, BorderLayout.SOUTH);
+		this.localityCheckButton.setEnabled(false);
 	}
 
 	private void refillPatternList() {
@@ -600,6 +765,18 @@ public class PatternInstantiationEditor extends
 		boolean newState = this.check();
 		for (InputVerificationStatusChangedListener listener : this.listeners) {
 			this.notifyListener(newState, listener);
+		}
+		this.localityCheckButton.removeActionListener(this.localityChecker);
+		this.localityChecker = new LocalityCheckerActionListener(
+				this.owlEditorKit, this.localityCheckerSignature,
+				this.localityCheckResultButton);
+		this.localityCheckButton.addActionListener(this.localityChecker);
+		this.localityChecker
+				.setInstantiatedPatternModel(this.instantiatedPatternModel);
+		if (this.instantiatedPatternModel != null) {
+			this.localityCheckButton.setEnabled(true);
+		} else {
+			this.localityCheckButton.setEnabled(false);
 		}
 		this.problemPanel.setVisible(!this.problemListModel.isEmpty());
 	}

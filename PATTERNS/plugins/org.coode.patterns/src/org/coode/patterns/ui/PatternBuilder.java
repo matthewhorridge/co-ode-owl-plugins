@@ -47,6 +47,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.event.DocumentEvent;
@@ -695,6 +696,7 @@ public class PatternBuilder extends
 	protected final DefaultListModel errorListModel = new DefaultListModel();
 	private final JList errorList = new JList(this.errorListModel);
 	private final AbstractPatternModelFactory factory;
+	private JSplitPane patternBodyPanel;
 
 	public PatternBuilder(OWLEditorKit owlEditorKit,
 			AbstractPatternModelFactory f) {
@@ -738,38 +740,33 @@ public class PatternBuilder extends
 				.createTitledBorder("Pattern name"));
 		builderPanel.add(patternNamePanel, BorderLayout.NORTH);
 		this.removeKeyListeners();
-		JPanel patternBodyPanel = new JPanel(new BorderLayout());
+		this.patternBodyPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		// patternBodyPanel.setDividerLocation(JSplitPane.5);
 		this.variableList = new PatternVariableList(this.owlEditorKit);
 		this.actionList = new PatternBuilderActionList();
 		// this.actionList.getModel().addListDataListener(this.actionListListener);
 		JScrollPane variablePane = ComponentFactory
 				.createScrollPane(this.variableList);
-		patternBodyPanel.add(variablePane, BorderLayout.NORTH);
-		patternBodyPanel.add(
-				ComponentFactory.createScrollPane(this.actionList),
-				BorderLayout.CENTER);
-		builderPanel.add(patternBodyPanel, BorderLayout.CENTER);
+		this.patternBodyPanel.add(variablePane, JSplitPane.TOP);
+		this.patternBodyPanel.add(ComponentFactory
+				.createScrollPane(this.actionList), JSplitPane.BOTTOM);
+		builderPanel.add(this.patternBodyPanel, BorderLayout.CENTER);
+		this.patternBodyPanel.setResizeWeight(0.5);
 		this.rendering.getDocument().addDocumentListener(
 				new DocumentListener() {
 					@SuppressWarnings("unused")
 					public void changedUpdate(DocumentEvent e) {
-						PatternBuilder.this.patternBuilderModel
-								.setRendering(PatternBuilder.this.rendering
-										.getText());
+						PatternBuilder.this.renderingUpdate();
 					}
 
 					@SuppressWarnings("unused")
 					public void insertUpdate(DocumentEvent e) {
-						PatternBuilder.this.patternBuilderModel
-								.setRendering(PatternBuilder.this.rendering
-										.getText());
+						PatternBuilder.this.renderingUpdate();
 					}
 
 					@SuppressWarnings("unused")
 					public void removeUpdate(DocumentEvent e) {
-						PatternBuilder.this.patternBuilderModel
-								.setRendering(PatternBuilder.this.rendering
-										.getText());
+						PatternBuilder.this.renderingUpdate();
 					}
 				});
 		JPanel renderingPanelBorder = new JPanel(new BorderLayout());
@@ -813,8 +810,12 @@ public class PatternBuilder extends
 		southPanel.add(returnPanelBorder, BorderLayout.CENTER);
 		builderPanel.add(southPanel, BorderLayout.SOUTH);
 		builderPanel.revalidate();
-		this.mainPanel.add(this.errorPanel, BorderLayout.NORTH);
+		this.mainPanel.add(this.errorPanel, BorderLayout.SOUTH);
 		this.mainPanel.add(builderPanel, BorderLayout.CENTER);
+	}
+
+	protected void renderingUpdate() {
+		this.patternBuilderModel.setRendering(this.rendering.getText());
 	}
 
 	/**

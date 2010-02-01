@@ -52,6 +52,7 @@ import org.semanticweb.owl.model.OWLAnnotationAxiom;
 import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.RemoveAxiom;
@@ -216,7 +217,8 @@ public class InstantiatedPatternModel implements InstantiatedOPPLScript,
 
 	public Set<BindingNode> extractBindingNodes() {
 		Set<Assignment> assignments = new HashSet<Assignment>();
-		for (Variable v : this.getInputVariables()) {
+		List<Variable> inputVariables = this.getInputVariables();
+		for (Variable v : inputVariables) {
 			v.clearBindings();
 			if (this.instantiations.containsKey(v)) {
 				for (OWLObject instantiation : this.instantiations.get(v)) {
@@ -228,7 +230,7 @@ public class InstantiatedPatternModel implements InstantiatedOPPLScript,
 				}
 			}
 		}
-		Set<Variable> toAssign = new HashSet<Variable>(this.getInputVariables());
+		Set<Variable> toAssign = new HashSet<Variable>(inputVariables);
 		if (this.isClassPattern()) {
 			toAssign.add(this.getConstraintSystem().getThisClassVariable());
 		}
@@ -237,6 +239,35 @@ public class InstantiatedPatternModel implements InstantiatedOPPLScript,
 		rootBindingNode.accept(leafBrusher);
 		Set<BindingNode> leaves = leafBrusher.getLeaves();
 		return leaves;
+	}
+
+	public Set<Variable> extractAllPossibleBindingNodes(OWLOntology o,
+			Set<OWLEntity> signature) {
+		List<Variable> inputVariables = this.getInputVariables();
+		for (Variable v : inputVariables) {
+			if (!this.instantiations.containsKey(v)) {
+				Set<? extends OWLObject> referencedValues = v.getType()
+						.getReferencedValues(o);
+				for (OWLObject bind : referencedValues) {
+					try {
+						if (signature.contains(bind)
+								&& v.getPossibleBindings().size() == 0) {
+							v.addPossibleBinding(bind);
+						}
+						v.addPossibleBinding(this.patternModel
+								.getOWLOntologyManager().getOWLDataFactory()
+								.getOWLNothing());
+					} catch (OWLReasonerException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+		}
+		Set<Variable> toAssign = new HashSet<Variable>(inputVariables);
+		// if (this.isClassPattern()) {
+		// toAssign.add(this.getConstraintSystem().getThisClassVariable());
+		// }
+		return toAssign;
 	}
 
 	@SuppressWarnings("unchecked")
