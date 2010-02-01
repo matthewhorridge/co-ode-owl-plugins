@@ -88,6 +88,7 @@ import org.protege.editor.core.ui.util.JOptionPaneEx;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.core.ui.util.VerifyingOptionPane;
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRowObjectEditor;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.model.AddAxiom;
@@ -441,6 +442,7 @@ public class PatternInstantiationEditor extends
 	protected final VariableListModel<OWLEntity> localityCheckerSignatureModel = new VariableListModel<OWLEntity>(
 			this.localityCheckerSignature, "Signature elements");
 	private JPanel buttonPanel;
+	private JLabel reasonerWarning = new JLabel();
 
 	/**
 	 * Builds a PatternInstantiationEditor for a specific class, i.e.: an editor
@@ -551,6 +553,8 @@ public class PatternInstantiationEditor extends
 		this.buttonPanel.add(this.localityCheckButton, BorderLayout.CENTER);
 		this.buttonPanel.add(this.localityCheckPreferenceButton,
 				BorderLayout.EAST);
+		this.buttonPanel.add(this.reasonerWarning, BorderLayout.SOUTH);
+		this.checkReasoner();
 		this.localityCheckerSignatureModel
 				.addListDataListener(new ListDataListener() {
 					public void intervalRemoved(ListDataEvent e) {
@@ -761,7 +765,16 @@ public class PatternInstantiationEditor extends
 		}
 	}
 
+	void checkReasoner() {
+		if (this.owlEditorKit.getOWLModelManager().getReasoner() instanceof NoOpReasoner) {
+			this.reasonerWarning.setText("Warning: no reasoner selected.");
+		} else {
+			this.reasonerWarning.setText("A DL reasoner has been selected.");
+		}
+	}
+
 	public void handleChange() {
+		this.checkReasoner();
 		boolean newState = this.check();
 		for (InputVerificationStatusChangedListener listener : this.listeners) {
 			this.notifyListener(newState, listener);
