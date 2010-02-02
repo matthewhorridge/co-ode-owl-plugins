@@ -57,10 +57,9 @@ public class SimpleVariableShortFormProvider implements ShortFormProvider {
 		String toReturn = this.uriShortFormProvider.getShortForm(entity
 				.getURI());
 		if (this.constraintSystem != null) {
-			Variable v = this.constraintSystem
-					.getVariable(entity.getURI());
+			Variable v = this.constraintSystem.getVariable(entity.getURI());
 			if (v != null) {
-				toReturn = v.getName();
+				toReturn = this.constraintSystem.render(v);
 			}
 		}
 		return toReturn;

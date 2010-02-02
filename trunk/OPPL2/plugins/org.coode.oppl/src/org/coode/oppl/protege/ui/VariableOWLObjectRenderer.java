@@ -132,7 +132,8 @@ public class VariableOWLObjectRenderer extends AbstractRenderer implements
 	}
 
 	public void visit(OWLClass node) {
-		this.write(this.getRendering(node));
+		String rendering = this.getRendering(node);
+		this.write(rendering);
 	}
 
 	public void visit(OWLClassAssertionAxiom axiom) {
