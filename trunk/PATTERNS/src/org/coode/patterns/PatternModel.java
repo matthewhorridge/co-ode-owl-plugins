@@ -354,17 +354,17 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 			OWLObject toReturn = null;
 			// TODO needs a different way to switch from case to visitor
 			switch (this.variableType) {
-				case CLASS:
-					toReturn = this.extractedDescription;
-					break;
-				case OBJECTPROPERTY:
-				case DATAPROPERTY:
-					toReturn = this.extractedProperty;
-					break;
-				default:
-					throw new RuntimeException("Unsupported variable type: "
-							+ this.variableType
-							+ " for pattern used in functional mode");
+			case CLASS:
+				toReturn = this.extractedDescription;
+				break;
+			case OBJECTPROPERTY:
+			case DATAPROPERTY:
+				toReturn = this.extractedProperty;
+				break;
+			default:
+				throw new RuntimeException("Unsupported variable type: "
+						+ this.variableType
+						+ " for pattern used in functional mode");
 			}
 			return toReturn;
 		}
@@ -679,13 +679,13 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 
 	@Override
 	public String toString() {
-		String statementRendering;
-		if (this.unresolvedOPPLStatementString == null) {
-			statementRendering = this.opplStatement.toString();
-		} else {
-			statementRendering = this.unresolvedOPPLStatementString;
-		}
-		return statementRendering + " " + this.rendering;
+		// String statementRendering;
+		// if (this.unresolvedOPPLStatementString == null) {
+		// statementRendering = this.opplStatement.toString();
+		// } else {
+		// statementRendering = this.unresolvedOPPLStatementString;
+		// }
+		return this.opplStatement.toString() + " " + this.rendering;
 	}
 
 	/**

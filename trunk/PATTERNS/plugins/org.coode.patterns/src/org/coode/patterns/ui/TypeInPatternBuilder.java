@@ -119,7 +119,6 @@ public class TypeInPatternBuilder extends
 						TypeInPatternBuilder.this.handleChange();
 					}
 
-					@SuppressWarnings("unused")
 					public void verifiedStatusChanged(boolean newState) {
 						this.updateURI();
 					}
