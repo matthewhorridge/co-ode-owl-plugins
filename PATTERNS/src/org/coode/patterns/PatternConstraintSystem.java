@@ -268,9 +268,10 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	public String render(Variable variable) {
 		GeneratedVariable<?> specialVariable = this.specialVariables
 				.get(variable.getName());
-		String rendering = specialVariable != null
+		boolean specialRenderingPresent = specialVariable != null
 				&& this.specialVariableRenderings
-						.get(specialVariable.getName()) != null ? this.specialVariableRenderings
+						.get(specialVariable.getName()) != null;
+		String rendering = specialRenderingPresent ? this.specialVariableRenderings
 				.get(specialVariable.getName())
 				: super.render(variable);
 		return rendering;

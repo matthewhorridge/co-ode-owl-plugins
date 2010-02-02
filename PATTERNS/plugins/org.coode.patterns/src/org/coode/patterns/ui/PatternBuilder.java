@@ -677,23 +677,23 @@ public class PatternBuilder extends
 	 */
 	private static final long serialVersionUID = -4071865934355642992L;
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
-	protected OWLEditorKit owlEditorKit;
-	protected PatternModel patternModel = null;
+	private OWLEditorKit owlEditorKit;
+	private PatternModel patternModel = null;
 	private JPanel mainPanel = new JPanel();
 	private PatternVariableList variableList;
 	private ActionList actionList;
 	// private ExpressionEditor<String> nameEditor;
-	protected final JTextField nameEditor = new JTextField();
-	protected JTextField rendering = new JTextField();
+	private final JTextField nameEditor = new JTextField();
+	private JTextField rendering = new JTextField();
 	private JCheckBox allowReturnValueCheckBox;
 	private final DefaultComboBoxModel returnValueListModel = new DefaultComboBoxModel();
 	private final JComboBox returnValuesComboBox = new JComboBox(
 			this.returnValueListModel);
 	// private PatternConstraintSystem constraintSystem = PatternParser
 	// .getPatternModelFactory().createConstraintSystem();
-	protected final PatternBuilderModel patternBuilderModel;
+	private final PatternBuilderModel patternBuilderModel;
 	private final JPanel errorPanel = new JPanel(new BorderLayout());
-	protected final DefaultListModel errorListModel = new DefaultListModel();
+	private final DefaultListModel errorListModel = new DefaultListModel();
 	private final JList errorList = new JList(this.errorListModel);
 	private final AbstractPatternModelFactory factory;
 	private JSplitPane patternBodyPanel;
@@ -884,6 +884,8 @@ public class PatternBuilder extends
 	public void handleChange() {
 		this.patternModel = null;
 		this.errorListModel.clear();
+		this.actionList.setConstraintSystem(this.patternBuilderModel
+				.getConstraintSystem());
 		boolean newState = this.patternBuilderModel.check();
 		if (newState) {
 			List<Variable> variables = this.patternBuilderModel.getVariables();
