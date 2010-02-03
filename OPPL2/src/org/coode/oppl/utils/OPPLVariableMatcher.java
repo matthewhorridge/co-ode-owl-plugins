@@ -63,7 +63,9 @@ public class OPPLVariableMatcher {
 		Set<Variable> toReturn = new HashSet<Variable>(variables.size());
 		VariableTypeVisitorEx<Variable> visitor = new VariableTypeVisitorEx<Variable>() {
 			public Variable visit(GeneratedVariable<?> v) {
-				// TODO verify whether generated variables should be matched
+				if (v.getName().startsWith(name)) {
+					return v;
+				}
 				return null;
 			}
 
