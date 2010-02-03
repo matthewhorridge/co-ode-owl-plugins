@@ -23,6 +23,7 @@
 package org.coode.oppl.variablemansyntax;
 
 import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -109,21 +110,24 @@ public class ExpressionParser implements VariableTypeVisitorEx<OWLObject> {
 		return null;
 	}
 
-	public OWLObject visit(Variable v) {
-		if (v instanceof CLASSVariable) {
-			this.visit((CLASSVariable) v);
-		}
-		if (v instanceof OBJECTPROPERTYVariable) {
-			this.visit((OBJECTPROPERTYVariable) v);
-		}
-		if (v instanceof DATAPROPERTYVariable) {
-			this.visit((DATAPROPERTYVariable) v);
-		}
-		if (v instanceof INDIVIDUALVariable) {
-			this.visit((INDIVIDUALVariable) v);
-		}
-		if (v instanceof CONSTANTVariable) {
-			this.visit((CONSTANTVariable) v);
+	public OWLObject visit(GeneratedVariable<?> v) {
+		try {
+			switch (v.getType()) {
+				case CLASS:
+					return this.parser.parseDescription();
+				case DATAPROPERTY:
+					return this.parser.parseDataProperty();
+				case OBJECTPROPERTY:
+					return this.parser.parseObjectPropertyExpression();
+				case CONSTANT:
+					return this.parser.parseConstant();
+				case INDIVIDUAL:
+					return this.parser.parseIndividual();
+				default:
+					return null;
+			}
+		} catch (ParserException e) {
+			e.printStackTrace();
 		}
 		return null;
 	}

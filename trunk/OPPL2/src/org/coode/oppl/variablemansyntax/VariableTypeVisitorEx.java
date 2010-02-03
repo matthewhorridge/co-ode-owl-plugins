@@ -22,6 +22,7 @@
  */
 package org.coode.oppl.variablemansyntax;
 
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -50,6 +51,7 @@ public interface VariableTypeVisitorEx<O> {
 	 * visit method in VariableImpl); should eventually go away TODO push the
 	 * implementations down to the implementing classes
 	 */
-	@Deprecated
-	O visit(Variable v);
+	// @Deprecated
+	// O visit(Variable v);
+	O visit(GeneratedVariable<?> v);
 }

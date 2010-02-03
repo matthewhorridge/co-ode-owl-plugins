@@ -25,8 +25,8 @@ package org.coode.oppl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -109,22 +109,23 @@ public class ValueExtractor implements VariableTypeVisitorEx<Set<OWLObject>> {
 		return toReturn;
 	}
 
-	public Set<OWLObject> visit(Variable v) {
-		if (v instanceof CLASSVariable) {
-			this.visit((CLASSVariable) v);
-		}
-		if (v instanceof OBJECTPROPERTYVariable) {
-			this.visit((OBJECTPROPERTYVariable) v);
-		}
-		if (v instanceof DATAPROPERTYVariable) {
-			this.visit((DATAPROPERTYVariable) v);
-		}
-		if (v instanceof INDIVIDUALVariable) {
-			this.visit((INDIVIDUALVariable) v);
-		}
-		if (v instanceof CONSTANTVariable) {
-			this.visit((CONSTANTVariable) v);
-		}
-		return null;
+	public Set<OWLObject> visit(GeneratedVariable<?> v) {
+		return v.getPossibleBindings();
+		// if (v instanceof CLASSVariable) {
+		// this.visit((CLASSVariable) v);
+		// }
+		// if (v instanceof OBJECTPROPERTYVariable) {
+		// this.visit((OBJECTPROPERTYVariable) v);
+		// }
+		// if (v instanceof DATAPROPERTYVariable) {
+		// this.visit((DATAPROPERTYVariable) v);
+		// }
+		// if (v instanceof INDIVIDUALVariable) {
+		// this.visit((INDIVIDUALVariable) v);
+		// }
+		// if (v instanceof CONSTANTVariable) {
+		// this.visit((CONSTANTVariable) v);
+		// }
+		// return null;
 	}
 }
