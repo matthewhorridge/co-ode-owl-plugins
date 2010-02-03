@@ -769,7 +769,7 @@ public class PatternInstantiationEditor extends
 		if (this.owlEditorKit.getOWLModelManager().getReasoner() instanceof NoOpReasoner) {
 			this.reasonerWarning.setText("Warning: no reasoner selected.");
 		} else {
-			this.reasonerWarning.setText("A DL reasoner has been selected.");
+			this.reasonerWarning.setText("");
 		}
 	}
 

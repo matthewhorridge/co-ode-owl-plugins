@@ -34,6 +34,7 @@ import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -103,9 +104,8 @@ public class PatternSignature {
 		final Set<OWLOntology> ontologies = this.ontologyManager
 				.getOntologies();
 		VariableTypeVisitorEx<Set<OWLObject>> visitor = new VariableTypeVisitorEx<Set<OWLObject>>() {
-			public Set<OWLObject> visit(Variable v) {
-				// TODO Auto-generated method stub
-				return null;
+			public Set<OWLObject> visit(GeneratedVariable<?> v) {
+				return v.getPossibleBindings();
 			}
 
 			public Set<OWLObject> visit(INDIVIDUALVariable v) {

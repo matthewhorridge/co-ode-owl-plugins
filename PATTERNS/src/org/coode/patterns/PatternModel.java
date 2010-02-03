@@ -41,6 +41,7 @@ import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -354,17 +355,17 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 			OWLObject toReturn = null;
 			// TODO needs a different way to switch from case to visitor
 			switch (this.variableType) {
-			case CLASS:
-				toReturn = this.extractedDescription;
-				break;
-			case OBJECTPROPERTY:
-			case DATAPROPERTY:
-				toReturn = this.extractedProperty;
-				break;
-			default:
-				throw new RuntimeException("Unsupported variable type: "
-						+ this.variableType
-						+ " for pattern used in functional mode");
+				case CLASS:
+					toReturn = this.extractedDescription;
+					break;
+				case OBJECTPROPERTY:
+				case DATAPROPERTY:
+					toReturn = this.extractedProperty;
+					break;
+				default:
+					throw new RuntimeException("Unsupported variable type: "
+							+ this.variableType
+							+ " for pattern used in functional mode");
 			}
 			return toReturn;
 		}
@@ -859,13 +860,33 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 				.getOWLDataFactory();
 		OWLObject owlObject = null;
 		VariableTypeVisitorEx<OWLObject> visitor = new VariableTypeVisitorEx<OWLObject>() {
-			public OWLObject visit(Variable v) {
-				// TODO Auto-generated method stub
-				return null;
+			public OWLObject visit(GeneratedVariable<?> v) {
+				switch (v.getType()) {
+					case CLASS:
+						return dataFactory.getOWLClass(v.getURI());
+					case DATAPROPERTY:
+						return dataFactory.getOWLDataProperty(v.getURI());
+					case OBJECTPROPERTY:
+						return dataFactory.getOWLObjectProperty(v.getURI());
+					case CONSTANT:
+						throw new RuntimeException(
+								"Unsupported variable type: "
+										+ v.getType()
+										+ " for pattern used in functional mode");
+					case INDIVIDUAL:
+						throw new RuntimeException(
+								"Unsupported variable type: "
+										+ v.getType()
+										+ " for pattern used in functional mode");
+					default:
+						return null;
+				}
+				// XXX what's the correct behaviour here?
 			}
 
 			public OWLObject visit(INDIVIDUALVariable v) {
-				throw this.throwException(v);
+				throw new RuntimeException("Unsupported variable type: "
+						+ v.getType() + " for pattern used in functional mode");
 			}
 
 			public OWLObject visit(DATAPROPERTYVariable v) {
@@ -877,16 +898,12 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 			}
 
 			public OWLObject visit(CONSTANTVariable v) {
-				throw this.throwException(v);
+				throw new RuntimeException("Unsupported variable type: "
+						+ v.getType() + " for pattern used in functional mode");
 			}
 
 			public OWLObject visit(CLASSVariable v) {
 				return dataFactory.getOWLClass(v.getURI());
-			}
-
-			private RuntimeException throwException(Variable v) {
-				return new RuntimeException("Unsupported variable type: "
-						+ v.getType() + " for pattern used in functional mode");
 			}
 		};
 		owlObject = variable.accept(visitor);

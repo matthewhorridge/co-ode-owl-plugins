@@ -27,8 +27,8 @@ import org.coode.oppl.entity.OWLEntityCreationException;
 import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.utils.ParserFactory;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -57,8 +57,22 @@ public class PatternParserUtils {
 		final OWLEntityChecker entityChecker = factory.getOWLEntityChecker();
 		OWLEntityCreationSet<? extends OWLEntity> owlCreationSet = null;
 		VariableTypeVisitorEx<OWLEntity> entityVisitor = new VariableTypeVisitorEx<OWLEntity>() {
-			public OWLEntity visit(Variable v) {
-				// TODO Auto-generated method stub
+			public OWLEntity visit(GeneratedVariable<?> v) {
+				switch (v.getType()) {
+					case CLASS:
+						return entityChecker.getOWLClass(toCreate);
+					case OBJECTPROPERTY:
+						return entityChecker.getOWLObjectProperty(toCreate);
+					case DATAPROPERTY:
+						return entityChecker.getOWLDataProperty(toCreate);
+					case CONSTANT:
+						return null;
+					case INDIVIDUAL:
+						return entityChecker.getOWLIndividual(toCreate);
+					default:
+						break;
+				}
+				// FIXME same as the other method in the other nested class
 				return null;
 			}
 
@@ -87,8 +101,43 @@ public class PatternParserUtils {
 		if (createdEntity == null) {
 			VariableTypeVisitorEx<OWLEntityCreationSet<? extends OWLEntity>> owlSetVisitor = new VariableTypeVisitorEx<OWLEntityCreationSet<? extends OWLEntity>>() {
 				public OWLEntityCreationSet<? extends OWLEntity> visit(
-						Variable v) {
-					// TODO Auto-generated method stub
+						GeneratedVariable<?> v) {
+					switch (v.getType()) {
+						case CLASS:
+							try {
+								return entityFactory.createOWLClass(toCreate,
+										null);
+							} catch (OWLEntityCreationException e) {
+								throw new RuntimeException(e.getMessage(), e);
+							}
+						case OBJECTPROPERTY:
+							try {
+								return entityFactory.createOWLObjectProperty(
+										toCreate, null);
+							} catch (OWLEntityCreationException e) {
+								throw new RuntimeException(e.getMessage(), e);
+							}
+						case DATAPROPERTY:
+							try {
+								return entityFactory.createOWLDataProperty(
+										toCreate, null);
+							} catch (OWLEntityCreationException e) {
+								throw new RuntimeException(e.getMessage(), e);
+							}
+						case CONSTANT:
+							return null;
+						case INDIVIDUAL:
+							try {
+								return entityFactory.createOWLIndividual(
+										toCreate, null);
+							} catch (OWLEntityCreationException e) {
+								throw new RuntimeException(e.getMessage(), e);
+							}
+						default:
+							break;
+					}
+					// FIXME this needs to be reworked in the
+					// VariableType.buildOWLObject
 					return null;
 				}
 
