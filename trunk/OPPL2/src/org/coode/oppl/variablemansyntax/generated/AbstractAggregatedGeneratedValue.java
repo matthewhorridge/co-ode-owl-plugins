@@ -60,6 +60,14 @@ public abstract class AbstractAggregatedGeneratedValue<N> implements
 		for (GeneratedValue<N> value : this.values2Aggregate) {
 			toAggregate.add(value.getGeneratedValue(node));
 		}
+		// if any of the items is null, then null should be returned
+		// fixes a bug with StringGeneratedVariables when there is no assigned
+		// variable yet
+		for (N n : toAggregate) {
+			if (n == null) {
+				return null;
+			}
+		}
 		return this.aggregateValues(toAggregate);
 	}
 

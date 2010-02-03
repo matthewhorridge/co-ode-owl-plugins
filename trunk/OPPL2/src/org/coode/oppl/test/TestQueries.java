@@ -138,8 +138,8 @@ public class TestQueries extends TestCase {
 			final OWLDataFactory dataFactory) {
 		VariableTypeVisitorEx<OWLObject> visitor = new VariableTypeVisitorEx<OWLObject>() {
 			public OWLObject visit(GeneratedVariable<?> v) {
-				// TODO Auto-generated method stub
-				return null;
+				return v.getType().buildOWLObject(dataFactory,
+						URI.create(TEST_NS.toString() + string), null);
 			}
 
 			public OWLObject visit(INDIVIDUALVariable v) {

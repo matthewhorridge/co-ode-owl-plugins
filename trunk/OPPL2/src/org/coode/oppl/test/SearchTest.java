@@ -162,8 +162,7 @@ public class SearchTest extends TestCase {
 				private final VariableTypeVisitorEx<Collection<? extends OWLObject>> assignableValuesVisitor = new VariableTypeVisitorEx<Collection<? extends OWLObject>>() {
 					public Collection<? extends OWLObject> visit(
 							GeneratedVariable<?> v) {
-						// FIXME Auto-generated method stub
-						return Collections.emptySet();
+						return v.getPossibleBindings();
 					}
 
 					public Collection<? extends OWLObject> visit(

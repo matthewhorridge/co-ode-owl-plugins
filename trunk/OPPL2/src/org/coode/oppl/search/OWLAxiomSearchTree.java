@@ -149,8 +149,7 @@ public class OWLAxiomSearchTree extends SearchTree<OWLAxiom> {
 
 	private final VariableTypeVisitorEx<Collection<? extends OWLObject>> assignableValuesVisitor = new VariableTypeVisitorEx<Collection<? extends OWLObject>>() {
 		public Collection<? extends OWLObject> visit(GeneratedVariable<?> v) {
-			// TODO Auto-generated method stub
-			return Collections.emptySet();
+			return v.getPossibleBindings();
 		}
 
 		public Collection<? extends OWLObject> visit(INDIVIDUALVariable v) {
