@@ -5,7 +5,6 @@ package org.coode.oppl.search;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,6 +17,7 @@ import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -99,11 +99,6 @@ public class OPPLAssertedSingleOWLAxiomSearchTree extends
 	}
 
 	private final VariableTypeVisitorEx<Set<? extends OWLObject>> assignableValuesVisitor = new VariableTypeVisitorEx<Set<? extends OWLObject>>() {
-		public Set<? extends OWLObject> visit(Variable v) {
-			// TODO Auto-generated method stub
-			return Collections.emptySet();
-		}
-
 		public Set<? extends OWLObject> visit(INDIVIDUALVariable v) {
 			return OPPLAssertedSingleOWLAxiomSearchTree.this.allIndividuals;
 		}
@@ -122,6 +117,16 @@ public class OPPLAssertedSingleOWLAxiomSearchTree extends
 
 		public Set<? extends OWLObject> visit(CLASSVariable v) {
 			return OPPLAssertedSingleOWLAxiomSearchTree.this.allClasses;
+		}
+
+		public Set<? extends OWLObject> visit(GeneratedVariable<?> v) {
+			// TODO this needs verification: is this the expected behaviour?
+			Set<OWLObject> toReturn = new HashSet<OWLObject>();
+			for (GeneratedVariable<?> g : OPPLAssertedSingleOWLAxiomSearchTree.this.constraintSystem
+					.getGeneratedVariables()) {
+				toReturn.addAll(g.getPossibleBindings());
+			}
+			return toReturn;
 		}
 	};
 

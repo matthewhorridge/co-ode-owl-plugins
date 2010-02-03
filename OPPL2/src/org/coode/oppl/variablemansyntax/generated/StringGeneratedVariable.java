@@ -6,7 +6,6 @@ import org.coode.oppl.entity.OWLEntityCreationException;
 import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.utils.ParserFactory;
-import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
@@ -40,12 +39,34 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 		final OWLDataFactory df = ParserFactory.getInstance().getOPPLFactory()
 				.getOWLDataFactory();
 		VariableTypeVisitorEx<OWLObject> visitor = new VariableTypeVisitorEx<OWLObject>() {
-			public OWLObject visit(Variable v) {
-				// TODO Auto-generated method stub
-				return null;
+			public OWLObject visit(GeneratedVariable<?> v) {
+				// TODO not nice
+				switch (v.getType()) {
+					case CLASS:
+						return this.buildClass(aValue, entityChecker, ef, df);
+					case DATAPROPERTY:
+						return this.buildDataProperty(aValue, entityChecker,
+								ef, df);
+					case OBJECTPROPERTY:
+						return this.buildObjectProperty(aValue, entityChecker,
+								ef, df);
+					case CONSTANT:
+						return this.buildConstant(aValue, df);
+					case INDIVIDUAL:
+						return this.buildIndividual(aValue, entityChecker, ef,
+								df);
+					default:
+						return null;
+				}
 			}
 
 			public OWLObject visit(INDIVIDUALVariable v) {
+				return this.buildIndividual(aValue, entityChecker, ef, df);
+			}
+
+			private OWLObject buildIndividual(final String aValue,
+					final OWLEntityChecker entityChecker,
+					final OWLEntityFactory ef, final OWLDataFactory df) {
 				OWLObject toReturn = null;
 				try {
 					toReturn = entityChecker.getOWLIndividual(aValue);
@@ -64,6 +85,12 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 			}
 
 			public OWLObject visit(DATAPROPERTYVariable v) {
+				return this.buildDataProperty(aValue, entityChecker, ef, df);
+			}
+
+			private OWLObject buildDataProperty(final String aValue,
+					final OWLEntityChecker entityChecker,
+					final OWLEntityFactory ef, final OWLDataFactory df) {
 				OWLObject toReturn = null;
 				try {
 					toReturn = entityChecker.getOWLDataProperty(aValue);
@@ -83,6 +110,12 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 			}
 
 			public OWLObject visit(OBJECTPROPERTYVariable v) {
+				return this.buildObjectProperty(aValue, entityChecker, ef, df);
+			}
+
+			private OWLObject buildObjectProperty(final String aValue,
+					final OWLEntityChecker entityChecker,
+					final OWLEntityFactory ef, final OWLDataFactory df) {
 				OWLObject toReturn = null;
 				try {
 					toReturn = entityChecker.getOWLObjectProperty(aValue);
@@ -102,10 +135,21 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 			}
 
 			public OWLObject visit(CONSTANTVariable v) {
+				return this.buildConstant(aValue, df);
+			}
+
+			private OWLObject buildConstant(final String aValue,
+					final OWLDataFactory df) {
 				return df.getOWLTypedConstant(aValue);
 			}
 
 			public OWLObject visit(CLASSVariable v) {
+				return this.buildClass(aValue, entityChecker, ef, df);
+			}
+
+			private OWLObject buildClass(final String aValue,
+					final OWLEntityChecker entityChecker,
+					final OWLEntityFactory ef, final OWLDataFactory df) {
 				OWLObject toReturn = null;
 				try {
 					toReturn = entityChecker.getOWLClass(aValue);

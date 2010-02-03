@@ -28,6 +28,7 @@ import java.util.Set;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -35,7 +36,7 @@ import org.coode.oppl.variablemansyntax.variabletypes.INDIVIDUALVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.OBJECTPROPERTYVariable;
 
 /**
- * Contains some utility method for mathcing variable names
+ * Contains some utility method for matching variable names
  * 
  * @author Luigi Iannone
  * 
@@ -61,8 +62,8 @@ public class OPPLVariableMatcher {
 		Set<Variable> variables = constraintSystem.getVariables();
 		Set<Variable> toReturn = new HashSet<Variable>(variables.size());
 		VariableTypeVisitorEx<Variable> visitor = new VariableTypeVisitorEx<Variable>() {
-			public Variable visit(Variable v) {
-				// TODO Auto-generated method stub
+			public Variable visit(GeneratedVariable<?> v) {
+				// TODO verify whether generated variables should be matched
 				return null;
 			}
 
