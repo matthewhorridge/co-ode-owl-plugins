@@ -322,12 +322,12 @@ public class PatternBuilder extends
 	}
 
 	private class PatternBuilderActionList extends ActionList {
-		final class SpecializedComponentAdapter extends ComponentAdapter {
+		final class AddActionAdapter extends ComponentAdapter {
 			private final VerifyingOptionPane optionPane;
 			private final InputVerificationStatusChangedListener verificationListener;
 			private final OWLAxiomChangeEditor actionEditor;
 
-			SpecializedComponentAdapter(
+			AddActionAdapter(
 					VerifyingOptionPane optionPane,
 					InputVerificationStatusChangedListener verificationListener,
 					OWLAxiomChangeEditor actionEditor) {
@@ -380,8 +380,8 @@ public class PatternBuilder extends
 			dlg.pack();
 			dlg.setLocationRelativeTo(PatternBuilder.this.owlEditorKit
 					.getWorkspace());
-			dlg.addComponentListener(new SpecializedComponentAdapter(
-					optionPane, verificationListener, actionEditor));
+			dlg.addComponentListener(new AddActionAdapter(optionPane,
+					verificationListener, actionEditor));
 			dlg.setVisible(true);
 		}
 
@@ -403,6 +403,45 @@ public class PatternBuilder extends
 	}
 
 	private class PatternBuilderActionListItem extends ActionListItem {
+		private final class EditActionAdapter extends ComponentAdapter {
+			private final VerifyingOptionPane optionPane;
+			private final OWLAxiomChangeEditor actionEditor;
+			private final InputVerificationStatusChangedListener verificationListener;
+
+			private EditActionAdapter(VerifyingOptionPane optionPane,
+					OWLAxiomChangeEditor actionEditor,
+					InputVerificationStatusChangedListener verificationListener) {
+				this.optionPane = optionPane;
+				this.actionEditor = actionEditor;
+				this.verificationListener = verificationListener;
+			}
+
+			@Override
+			@SuppressWarnings("unused")
+			public void componentHidden(ComponentEvent e) {
+				Object retVal = this.optionPane.getValue();
+				if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
+					OWLAxiomChange action = this.actionEditor
+							.getOwlAxiomChange();
+					// DefaultListModel model = (DefaultListModel)
+					// PatternBuilder.this.actionList
+					// .getModel();
+					PatternBuilderActionListItem selectedValue = (PatternBuilderActionListItem) PatternBuilder.this.actionList
+							.getSelectedValue();
+					// model.removeElement(selectedValue);
+					PatternBuilder.this.patternBuilderModel
+							.removeAction(selectedValue.getAxiomChange());
+					PatternBuilder.this.patternBuilderModel.addAction(action);
+					// model.addElement(new PatternBuilderActionListItem(action,
+					// true, true));
+					PatternBuilder.this.handleChange();
+				}
+				this.actionEditor
+						.removeStatusChangedListener(this.verificationListener);
+				this.actionEditor.dispose();
+			}
+		}
+
 		public PatternBuilderActionListItem(OWLAxiomChange axiomChange,
 				boolean isEditable, boolean isDeleteable) {
 			super(axiomChange, isEditable, isDeleteable);
@@ -432,27 +471,8 @@ public class PatternBuilder extends
 			dlg.pack();
 			dlg.setLocationRelativeTo(PatternBuilder.this.owlEditorKit
 					.getWorkspace());
-			dlg.addComponentListener(new ComponentAdapter() {
-				@Override
-				@SuppressWarnings("unused")
-				public void componentHidden(ComponentEvent e) {
-					Object retVal = optionPane.getValue();
-					if (retVal != null && retVal.equals(JOptionPane.OK_OPTION)) {
-						OWLAxiomChange action = actionEditor
-								.getOwlAxiomChange();
-						DefaultListModel model = (DefaultListModel) PatternBuilder.this.actionList
-								.getModel();
-						model.removeElement(PatternBuilder.this.actionList
-								.getSelectedValue());
-						model.addElement(new PatternBuilderActionListItem(
-								action, true, true));
-						PatternBuilder.this.handleChange();
-					}
-					actionEditor
-							.removeStatusChangedListener(verificationListener);
-					actionEditor.dispose();
-				}
-			});
+			dlg.addComponentListener(new EditActionAdapter(optionPane,
+					actionEditor, verificationListener));
 			dlg.setVisible(true);
 		}
 	}
