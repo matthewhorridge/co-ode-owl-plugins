@@ -31,11 +31,16 @@ public class OWLObjectCollectionGeneratedValue extends
 		if (leaves != null && !leaves.isEmpty()) {
 			toReturn = new HashSet<OWLObject>();
 			for (BindingNode bindingNode : leaves) {
-				OWLObject assignmentValue = bindingNode
-						.getAssignmentValue(getVariable());
+				OWLObject assignmentValue = bindingNode.getAssignmentValue(this
+						.getVariable());
 				if (assignmentValue != null) {
 					toReturn.add(assignmentValue);
 				}
+			}
+			// must not return an empty collection, otherwise bad rendering
+			// happens in Patterns
+			if (toReturn.size() == 0) {
+				toReturn = null;
 			}
 		}
 		return toReturn;
@@ -43,7 +48,7 @@ public class OWLObjectCollectionGeneratedValue extends
 
 	public List<Collection<OWLObject>> computePossibleValues() {
 		List<Collection<OWLObject>> toReturn = new ArrayList<Collection<OWLObject>>();
-		Collection<OWLObject> generatedValue = getGeneratedValue(null);
+		Collection<OWLObject> generatedValue = this.getGeneratedValue(null);
 		if (generatedValue != null) {
 			toReturn.add(Collections.unmodifiableCollection(generatedValue));
 		}
