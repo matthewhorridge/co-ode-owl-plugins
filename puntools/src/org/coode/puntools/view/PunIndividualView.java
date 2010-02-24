@@ -95,7 +95,7 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
         if (currentEntity != null && !currentEntity.isOWLNamedIndividual()){
             final OWLOntology ont = getOWLModelManager().getActiveOntology();
             final OWLDataFactory df = getOWLModelManager().getOWLDataFactory();
-            OWLNamedIndividual ind = df.getOWLNamedIndividual(currentEntity.getURI());
+            OWLNamedIndividual ind = df.getOWLNamedIndividual(currentEntity.getIRI());
             getOWLModelManager().applyChange(new AddAxiom(ont, df.getOWLDeclarationAxiom(ind)));
             updateViewContentAndHeader();
         }
@@ -125,7 +125,7 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
         else{
             IRI iri = currentEntity.getIRI();
             for (OWLOntology ont : getOWLModelManager().getActiveOntologies()){
-                if (ont.containsIndividualReference(iri)){
+                if (ont.containsIndividualInSignature(iri)){
                     pun = getOWLModelManager().getOWLDataFactory().getOWLNamedIndividual(iri);
                     break;
                 }
