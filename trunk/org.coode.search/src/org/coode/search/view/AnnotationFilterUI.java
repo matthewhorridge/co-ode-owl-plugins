@@ -209,7 +209,7 @@ public class AnnotationFilterUI extends JComponent {
     public Set<OWLAnnotationProperty> getAllAnnotationProperties() {
         Set<OWLAnnotationProperty> allAnnotationProperties = new HashSet<OWLAnnotationProperty>();
         for (OWLOntology ont : eKit.getOWLModelManager().getActiveOntologies()){
-            allAnnotationProperties.addAll(ont.getReferencedAnnotationProperties());
+            allAnnotationProperties.addAll(ont.getAnnotationPropertiesInSignature());
         }
         return allAnnotationProperties;
     }
