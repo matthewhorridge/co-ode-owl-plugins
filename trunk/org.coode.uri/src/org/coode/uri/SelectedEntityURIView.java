@@ -52,7 +52,7 @@ public class SelectedEntityURIView extends AbstractOWLSelectionViewComponent {
         uriComponent.setText("");
         OWLEntity selEntity = getOWLWorkspace().getOWLSelectionModel().getSelectedEntity();
         if (selEntity != null){
-            uriComponent.setText(selEntity.getURI().toString());
+            uriComponent.setText(selEntity.getIRI().toString());
         }
         return selEntity;
     }
