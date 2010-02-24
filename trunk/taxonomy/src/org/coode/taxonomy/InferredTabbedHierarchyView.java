@@ -55,7 +55,7 @@ public class InferredTabbedHierarchyView extends AbstractOWLClassViewComponent {
         for (int i=0; i<indent; i++){
             namesComponent.append("\t");
         }
-        namesComponent.append(selectedClass.getURI().toString());
+        namesComponent.append(selectedClass.getIRI().toString());
         namesComponent.append("\n");
 
 
