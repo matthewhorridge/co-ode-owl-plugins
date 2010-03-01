@@ -25,11 +25,6 @@
              dir="./org.coode.annotate"
              target="${sub.target}"/>
 
-        <echo message = "Building bean shell plugin"/>
-        <ant antfile="./build.xml"
-             dir="./org.coode.shell"
-             target="${sub.target}"/>
-
         <echo message = "Building bookmark plugin}"/>
         <ant antfile="./build.xml"
              dir="./bookmark"
@@ -70,11 +65,13 @@
              dir="./obotools"
              target="${sub.target}"/>
 
+        <!-- doesn't compile any more.
         <echo message = "Building OWL Doc plugin"/>
         <ant antfile="./build.xml"
              dir="./org.coode.owldoc"
              target="${sub.target}"/>
-
+        -->
+        
         <echo message = "Building puntools plugin"/>
         <ant antfile="./build.xml"
              dir="./puntools"
@@ -83,6 +80,11 @@
         <echo message = "Building search plugin"/>
         <ant antfile="./build.xml"
              dir="./org.coode.search"
+             target="${sub.target}"/>
+
+        <echo message = "Building bean shell plugin"/>
+        <ant antfile="./build.xml"
+             dir="./org.coode.shell"
              target="${sub.target}"/>
 
         <echo message = "Building taxonomy plugin"/>
@@ -114,13 +116,6 @@
         <antcall target="invoke">
             <param name="sub.target" value="install"/>
         </antcall>
-        <property environment="env"/>
-        <property name="protege.home"      location="${env.PROTEGE_HOME}"/>
-        <delete>
-            <fileset dir="${protege.home}/configuration">
-                <include name="org.eclipse.*"/>
-            </fileset>
-        </delete>
     </target>
 
     <target name="clean">
