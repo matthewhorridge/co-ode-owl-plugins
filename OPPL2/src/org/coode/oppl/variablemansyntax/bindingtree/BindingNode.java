@@ -24,7 +24,6 @@ package org.coode.oppl.variablemansyntax.bindingtree;
 
 import java.io.StringWriter;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import org.coode.oppl.entity.OWLEntityRenderer;
@@ -95,12 +94,13 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 	}
 
 	public boolean isLeaf() {
-		boolean found = false;
-		Iterator<Variable> it = this.unassignedVariables.iterator();
-		while (!found && it.hasNext()) {
-			found = !it.next().getPossibleBindings().isEmpty();
-		}
-		return this.unassignedVariables.isEmpty() || !found;
+		// boolean found = false;
+		// Iterator<Variable> it = this.unassignedVariables.iterator();
+		// while (!found && it.hasNext()) {
+		// found = !it.next().getPossibleBindings().isEmpty();
+		// }
+		// return this.unassignedVariables.isEmpty() || !found;
+		return this.unassignedVariables.isEmpty();
 	}
 
 	@Override
