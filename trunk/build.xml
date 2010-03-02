@@ -1,6 +1,7 @@
 <?xml version = "1.0" encoding = "utf-8"?>
 <project name = "Co-ODE Installer" default = "usage" basedir = "."> 
     <property file="local.properties"/>
+    <property name="build" location="./build"/>
 
     <target name="init">
         <taskdef resource="svntask.properties" classpathref="svn.classpath"/>
@@ -23,80 +24,114 @@
         <echo message = "Building annotate plugin}"/>
         <ant antfile="./build.xml"
              dir="./org.coode.annotate"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.annotate"/>
+        </ant>
+
+        <echo message = "Building bean shell plugin"/>
+        <ant antfile="./build.xml"
+             dir="./org.coode.shell"
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.shell"/>
+        </ant>
 
         <echo message = "Building bookmark plugin}"/>
         <ant antfile="./build.xml"
              dir="./bookmark"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.bookmark"/>
+        </ant>
 
         <echo message = "Building cardinality plugin"/>
         <ant antfile="./build.xml"
              dir="./cardinality"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.cardinality"/>
+        </ant>
 
         <echo message = "Building changes plugin"/>
         <ant antfile="./build.xml"
              dir="./org.coode.change"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.change"/>
+        </ant>
 
         <echo message = "Building cloud plugin"/>
         <ant antfile="./build.xml"
              dir="./cloud"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.cloud"/>
+        </ant>
 
         <echo message = "Building existential tree plugin"/>
         <ant antfile="./build.xml"
              dir="./existentialtree"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.existentialtree"/>
+        </ant>
 
         <echo message = "Building Matrix plugin"/>
         <ant antfile="./build.xml"
              dir="./matrix"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.matrix"/>
+        </ant>
+
 
         <echo message = "Building Nerd plugin"/>
         <ant antfile="./build.xml"
              dir="./org.coode.nerd"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.nerd"/>
+        </ant>
+
 
         <echo message = "Building Obotools plugin"/>
         <ant antfile="./build.xml"
              dir="./obotools"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.obotools"/>
+        </ant>
 
-        <!-- doesn't compile any more.
+        <!-- 
         <echo message = "Building OWL Doc plugin"/>
         <ant antfile="./build.xml"
              dir="./org.coode.owldoc"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.owldoc"/>
+        </ant>
         -->
         
         <echo message = "Building puntools plugin"/>
         <ant antfile="./build.xml"
              dir="./puntools"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.puntools"/>
+        </ant>
+
 
         <echo message = "Building search plugin"/>
         <ant antfile="./build.xml"
              dir="./org.coode.search"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.search"/>
+        </ant>
 
-        <echo message = "Building bean shell plugin"/>
-        <ant antfile="./build.xml"
-             dir="./org.coode.shell"
-             target="${sub.target}"/>
 
         <echo message = "Building taxonomy plugin"/>
         <ant antfile="./build.xml"
              dir="./taxonomy"
-             target="${sub.target}"/>
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.taxonomy"/>
+        </ant>
+
 
         <echo message = "Building uri plugin"/>
         <ant antfile="./build.xml"
              dir="./org.coode.uri"
-             target="${sub.target}"/>
-
+             target="${sub.target}">
+            <property name="classes" location="${build}/classes.uri"/>
+        </ant>
 
         <echo message = "======================= Completed ${sub.target} build step on co-ode projects"/>
     </target>
@@ -107,15 +142,23 @@
         <antcall target="invoke">
             <param name="sub.target" value="jar"/>
         </antcall>
-        <copy todir="./co-ode.jars" flatten="true">
-            <fileset dir="." includes="**/org.coode.*.jar"/>
-        </copy>
     </target>
 
     <target name="install">
         <antcall target="invoke">
             <param name="sub.target" value="install"/>
         </antcall>
+    </target>
+
+    <target name="dist">
+        <antcall target="invoke">
+            <param name="sub.target" value="dist"/>
+        </antcall>
+        <copy todir="registries/4_1">
+            <fileset dir="${build}">
+                <include name="update.*.properties"/>
+            </fileset>
+        </copy>
     </target>
 
     <target name="clean">
