@@ -23,7 +23,7 @@ http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.matrix.
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.obotools.properties
 
 // OWLDoc
-http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.owldoc.properties
+// http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.owldoc.properties
 
 // Pun tools
 //http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.puntools.properties
