@@ -16,6 +16,12 @@
         distributions 
      -->
    <property file="local.properties"/>
+
+   <property file="version.properties"/>
+   <property name="major.version" value="1"/>
+   <property name="minor.version" value="1"/>
+   <property name="micro.version" value="1"/>
+
    <property name = "protege.common"    location="${protege.home}/bundles"/>
    <property name = "protege.plugins"   location="${protege.home}/plugins"/>
    <property name = "protege.osgi"      location="${protege.home}/org.eclipse.osgi.jar"/>
@@ -162,6 +168,8 @@
      <tstamp>
        <format property="build.time" pattern="MM/dd/yyyy hh:mm aa"/>
      </tstamp>
+     <property name="bundle.version"
+               value="${major.version}.${minor.version}.${micro.version}"/>
      <mkdir dir = "${build}"/>
      <mkdir dir = "${classes}"/>
      <mkdir dir = "${classes}/lib"/>
@@ -203,6 +211,7 @@
                mode = "update">
         <attribute name="Built-By" value = "${user.name}"/>
         <attribute name="Build-Date" value = "${build.time}"/>
+        <attribute name="Bundle-Version" value="${bundle.version}"/>
      </manifest>
    </target>
 
@@ -213,12 +222,31 @@
    </target>
 
    <target name = "install" depends = "jar">
-     <!-- flush cache -->
-     <delete dir = "${protege.home}/configuration/org.eclipse.core.runtime"/>
-     <delete dir = "${protege.home}/configuration/org.eclipse.osgi"/>
      <copy file="${build}/${plugin}.jar" 
            todir = "${protege.plugins}"
            overwrite = "true"/>
+   </target>
+
+   <target name = "create.update.properties">
+       <property name="update.properties.file"
+                 location="${build}/update.shell.properties"/>
+       <echo file="${update.properties.file}" append="false">
+name=Beanshell View
+id=${plugin}
+version=${bundle.version}
+download=http://co-ode-owl-plugins.googlecode.com/files/${plugin}_${major.version}_${minor.version}_${micro.version}.zip
+readme=http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/version.shell.html
+license=http://www.beanshell.org/license.html
+author=CO-ODE, The University of Manchester
+       </echo>
+   </target>
+
+   <target name = "dist" depends="jar, create.update.properties">
+       <zip destfile="${build}/${plugin}_${major.version}_${minor.version}_${micro.version}.zip">
+           <fileset dir="${build}">
+               <filename name="${plugin}.jar"/>
+           </fileset>
+       </zip>
    </target>
 	
    <target name = "clean">
