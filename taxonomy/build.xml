@@ -225,7 +225,21 @@
            overwrite = "true"/>
    </target>
 
-   <target name = "dist" depends="jar">
+   <target name = "create.update.properties">
+       <property name="update.properties.file"
+                 location="${build}/update.taxonomy.properties"/>
+       <echo file="${update.properties.file}" append="false">
+name=Example Plugin (Tabbed Subclasses)
+id=${plugin}
+version=${bundle.version}
+download=http://co-ode-owl-plugins.googlecode.com/files/${plugin}_${major.version}_${minor.version}_${micro.version}.zip
+readme=http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/version.taxonomy.html
+license=http://www.gnu.org/licenses/lgpl.html
+author=CO-ODE, The University of Manchester
+       </echo>
+   </target>
+
+   <target name = "dist" depends="jar,create.update.properties">
        <zip destfile="${build}/${plugin}_${major.version}_${minor.version}_${micro.version}.zip">
            <fileset dir="${build}">
                <filename name="${plugin}.jar"/>
