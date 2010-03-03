@@ -452,19 +452,21 @@ GeneratedValue generatedValue(ConstraintSystem constraintSystem) #void:
 		}
 	|LOOKAHEAD(4)
 	variableNameToken = <IDENTIFIER>"." <GROUPSVARIABLEATTRIBUTE><OPENPARENTHESYS> variableAttributeToken = <INTEGER_LITERAL><CLOSEDPARENTHESYS>
-		{	String attributeString = variableAttributeToken.image;
-			String variableName = variableNameToken.image;
-			Variable v = constraintSystem.getVariable(variableName);
-			if(v !=null){
-
-				int index=Integer.parseInt(attributeString);
-				System.out.println(index);
-				try {
-					Attribute attribute = Attribute.valueOf(attributeString);
-					return AttributeFactory.getVariableGeneratedValue(attribute, v, constraintSystem);
-				} catch (IllegalArgumentException e) {throw new ParseException("Invalid attribute name: " + e.getMessage() + "; valid names are: " + Arrays.toString(Attribute.values()));}
+		{
+		String attributeString = variableAttributeToken.image;
+		String variableName = variableNameToken.image;
+		Variable v = constraintSystem.getVariable(variableName);
+		if (v != null) {
+			int index = Integer.parseInt(attributeString);
+			RegExpGeneratedVariable gv = (RegExpGeneratedVariable) v;
+			Set<OWLObject> bindings = gv.getPossibleBindings();
+			if (bindings.size() > 0) {
+				List<String> l = gv.getGroups((OWLEntity) bindings.iterator().next());
+				if (index >= l.size()) {throw new ParseException("Invalid group index: " + index);}
+				return new StringGeneratedValue(l.get(index));
+			}
+			throw new ParseException("No matches found for variable: " + v);
 		}else{throw new ParseException("Invalid variable name: "+variableName);}
-
 		}
 }
 
