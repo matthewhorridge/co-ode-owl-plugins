@@ -247,7 +247,14 @@ public class ExhaustingTestCase extends AbstractTestCase {
 
 	public void testRegExpGroupUse() {
 		OPPLScript result = this
-				.parse("?island:CLASS=Match(\"[iI]sland\"), ?newIsland:CLASS=create(\"Test\"+?island.GROUPS(13)) BEGIN ADD ?newIsland subClassOf ?Island END;");
+				.parse("?island:CLASS=Match(\"([iI]sland)\"), ?newIsland:CLASS=create(\"Test\"+?island.GROUPS(0)) BEGIN ADD ?newIsland subClassOf ?island END;");
+		this.expectedCorrect(result);
+		this.execute(result);
+	}
+
+	public void testAssembleVariables() {
+		OPPLScript result = this
+				.parse("?y:CLASS, ?x:CLASS=create(\"Test\"+?y.RENDERING) SELECT ASSERTED ?y subClassOf Island  BEGIN ADD ?x subClassOf ?y END;");
 		this.expectedCorrect(result);
 		this.execute(result);
 	}
