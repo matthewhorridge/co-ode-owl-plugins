@@ -72,8 +72,9 @@ public class ConstraintChecker implements ConstraintVisitorEx<Boolean> {
 		return collection.contains(assignedValue);
 	}
 
-	public Boolean visit(InCollectionRegExpConstraint<? extends OWLObject> c) {
-		Collection<? extends OWLObject> collection = c.getCollection();
+	public Boolean visit(InCollectionRegExpConstraint c) {
+		Collection<? extends OWLObject> collection = c
+				.getCollection(this.bindingNode);
 		OWLObject assignedValue = this.bindingNode.getAssignmentValue(c
 				.getVariable());
 		return collection.contains(assignedValue);

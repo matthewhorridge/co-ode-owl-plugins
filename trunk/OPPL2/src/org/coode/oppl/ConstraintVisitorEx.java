@@ -54,5 +54,5 @@ public interface ConstraintVisitorEx<O extends Object> {
 	 * @return the specific output of the visit (dependent on the
 	 *         implementation)
 	 */
-	O visit(InCollectionRegExpConstraint<? extends OWLObject> c);
+	O visit(InCollectionRegExpConstraint c);
 }

@@ -288,11 +288,17 @@ public final class OPPLView extends AbstractOWLViewComponent implements
 
 		@Override
 		protected List<OWLAxiomChange> doInBackground() {
-			ChangeExtractor changeExtractor = new ChangeExtractor(
-					OPPLView.this.statementModel.getConstraintSystem(),
-					OPPLView.this.considerImportClosureCheckBox.isSelected());
-			List<OWLAxiomChange> result = OPPLView.this.statementModel
-					.accept(changeExtractor);
+			List<OWLAxiomChange> result = new ArrayList<OWLAxiomChange>();
+			try {
+				ChangeExtractor changeExtractor = new ChangeExtractor(
+						OPPLView.this.statementModel.getConstraintSystem(),
+						OPPLView.this.considerImportClosureCheckBox
+								.isSelected());
+				result.addAll(OPPLView.this.statementModel
+						.accept(changeExtractor));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			return result;
 		}
 	}

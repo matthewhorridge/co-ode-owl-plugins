@@ -34,6 +34,7 @@ import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.core.ui.list.MListSectionHeader;
@@ -345,21 +346,30 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 				return toReturn;
 			}
 
-			public Boolean visit(
-					InCollectionRegExpConstraint<? extends OWLObject> c) {
+			public Boolean visit(InCollectionRegExpConstraint c) {
 				boolean toReturn = c.getVariable().equals(this.v);
 				if (!toReturn) {
-					Collection<? extends OWLObject> collection = c
-							.getCollection();
-					Iterator<? extends OWLObject> it = collection.iterator();
-					NamedVariableDetector variableDetector = new NamedVariableDetector(
-							this.v, OPPLBuilderModel.this.getConstraintSystem());
-					boolean detected = false;
-					while (!detected && it.hasNext()) {
-						OWLObject object = it.next();
-						detected = object.accept(variableDetector);
+					if (OPPLBuilderModel.this.constraintSystem.getLeaves() != null) {
+						for (BindingNode leave : OPPLBuilderModel.this.constraintSystem
+								.getLeaves()) {
+							Collection<? extends OWLObject> collection = c
+									.getCollection(leave);
+							Iterator<? extends OWLObject> it = collection
+									.iterator();
+							NamedVariableDetector variableDetector = new NamedVariableDetector(
+									this.v, OPPLBuilderModel.this
+											.getConstraintSystem());
+							boolean detected = false;
+							while (!detected && it.hasNext()) {
+								OWLObject object = it.next();
+								detected = object.accept(variableDetector);
+							}
+							toReturn = detected;
+							if (toReturn) {
+								return toReturn;
+							}
+						}
 					}
-					toReturn = detected;
 				}
 				return toReturn;
 			}
