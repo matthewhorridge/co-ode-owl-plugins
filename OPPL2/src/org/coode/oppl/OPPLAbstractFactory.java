@@ -99,6 +99,9 @@ public interface OPPLAbstractFactory {
 	 */
 	ConstraintSystem createConstraintSystem();
 
+	/** @return the constraint system */
+	ConstraintSystem getConstraintSystem();
+
 	@Deprecated
 	public ManchesterOWLSyntaxObjectRenderer getOWLObjectRenderer(
 			StringWriter writer);

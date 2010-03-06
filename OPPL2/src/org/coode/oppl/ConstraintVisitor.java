@@ -22,7 +22,6 @@
  */
 package org.coode.oppl;
 
-import org.semanticweb.owl.model.OWLObject;
 
 /**
  * @author Luigi Iannone
@@ -43,8 +42,7 @@ public interface ConstraintVisitor {
 	 * @param c
 	 * 
 	 */
-	void visitInCollectionConstraint(
-			InCollectionConstraint<? extends OWLObject> c);
+	void visitInCollectionConstraint(InCollectionConstraint c);
 
 	/**
 	 * Visitor pattern required method
@@ -52,6 +50,5 @@ public interface ConstraintVisitor {
 	 * @param c
 	 * 
 	 */
-	void visitInCollectionConstraint(
-			InCollectionRegExpConstraint<? extends OWLObject> c);
+	void visitInCollectionConstraint(InCollectionRegExpConstraint c);
 }

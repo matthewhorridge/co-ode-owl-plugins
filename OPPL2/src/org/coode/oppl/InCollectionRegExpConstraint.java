@@ -22,11 +22,21 @@
  */
 package org.coode.oppl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.coode.oppl.entity.OWLEntityRenderer;
+import org.coode.oppl.utils.ParserFactory;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
+import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
 /**
@@ -36,22 +46,45 @@ import org.semanticweb.owl.model.OWLObject;
  * @author Luigi Iannone
  * 
  */
-public class InCollectionRegExpConstraint<P extends OWLObject> implements
-		AbstractConstraint {
+public class InCollectionRegExpConstraint implements AbstractConstraint {
 	private final Variable variable;
-	private final Map<P, List<String>> collection;
-	private final String source;
+	private final Map<OWLEntity, List<String>> collection = new HashMap<OWLEntity, List<String>>();
+	private final GeneratedValue<String> expression;
+	private ConstraintSystem cs;
 
 	/**
 	 * @param variable
 	 * @param collection
 	 * @param constraintSystem
 	 */
-	public InCollectionRegExpConstraint(String source, Variable variable,
-			Map<P, List<String>> collection) {
+	public InCollectionRegExpConstraint(Variable variable,
+			GeneratedValue<String> exp, ConstraintSystem cs) {
 		this.variable = variable;
-		this.collection = collection;
-		this.source = source;
+		this.cs = cs;
+		this.expression = exp;
+	}
+
+	private Map<OWLEntity, List<String>> getMatches(String exp) {
+		Map<OWLEntity, List<String>> toReturn = new HashMap<OWLEntity, List<String>>();
+		Pattern regExpression = Pattern.compile(exp);
+		OWLEntityRenderer entityRenderer = ParserFactory.getInstance()
+				.getOPPLFactory().getOWLEntityRenderer(this.cs);
+		for (OWLObject o : this.variable.getType().getReferencedValues(
+				this.cs.getOntology())) {
+			if (o instanceof OWLEntity) {
+				OWLEntity e = (OWLEntity) o;
+				String toMatch = entityRenderer.render(e);
+				Matcher m = regExpression.matcher(toMatch);
+				List<String> group = new ArrayList<String>();
+				while (m.find()) {
+					group.add(m.group());
+				}
+				if (group.size() > 0) {
+					toReturn.put(e, group);
+				}
+			}
+		}
+		return toReturn;
 	}
 
 	/**
@@ -75,7 +108,11 @@ public class InCollectionRegExpConstraint<P extends OWLObject> implements
 	/**
 	 * @return the collection
 	 */
-	public Collection<P> getCollection() {
+	public Collection<OWLEntity> getCollection(BindingNode node) {
+		String regexp = this.expression.getGeneratedValue(node);
+		if (regexp != null) {
+			this.collection.putAll(this.getMatches(regexp));
+		}
 		return this.collection.keySet();
 	}
 
@@ -88,17 +125,17 @@ public class InCollectionRegExpConstraint<P extends OWLObject> implements
 	@Override
 	public boolean equals(Object obj) {
 		boolean toReturn = false;
-		if (obj instanceof InCollectionRegExpConstraint<?>) {
-			InCollectionRegExpConstraint<?> toCompare = (InCollectionRegExpConstraint<?>) obj;
+		if (obj instanceof InCollectionRegExpConstraint) {
+			InCollectionRegExpConstraint toCompare = (InCollectionRegExpConstraint) obj;
 			toReturn = this.getVariable().equals(toCompare.variable)
-					&& this.getCollection().equals(toCompare.getCollection());
+					&& this.expression.equals(toCompare.expression);
 		}
 		return toReturn;
 	}
 
 	@Override
 	public String toString() {
-		return "Match \"" + this.source + "\"";
+		return "Match \"" + this.expression + "\"";
 		// StringBuffer buffer = new StringBuffer();
 		// buffer.append(this.variable.getName());
 		// buffer.append(" IN {");
@@ -123,7 +160,7 @@ public class InCollectionRegExpConstraint<P extends OWLObject> implements
 	}
 
 	public String render() {
-		return "Match \"" + this.source + "\"";
+		return "Match \"" + this.expression + "\"";
 		// StringBuffer buffer = new StringBuffer();
 		// buffer.append(this.variable.getName());
 		// buffer.append(" IN {");
