@@ -22,13 +22,18 @@
  */
 package org.coode.oppl.syntax;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
+import org.coode.oppl.entity.OWLEntityRenderer;
+import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
 import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.VariableExpressionGeneratedVariable;
 import org.semanticweb.owl.expression.ParserException;
@@ -53,7 +58,7 @@ public class Utils {
 		return test;
 	}
 
-	public static ParserException buildException(String expression,
+	public static ParserException buildException(Object expression,
 			int beginningSubSection, int beginningSubSectionLine, Exception e) {
 		Set<String> set = Collections.emptySet();
 		ParserException test = new ParserException(expression + "\n"
@@ -62,28 +67,34 @@ public class Utils {
 		return test;
 	}
 
-	protected static String readString(OPPLParser parser, boolean spaceTokens,
+	public static String readString(OPPLParser parser, boolean spaceTokens,
 			int... delimiterTokenKinds) {
 		StringBuilder toReturn = new StringBuilder();
 		boolean found = false;
+		Token token = parser.getToken(1);
 		while (!found) {
-			Token token = parser.getToken(1);
 			for (int i = 0; !found && i < delimiterTokenKinds.length; i++) {
 				found = token.kind == OPPLParserConstants.EOF
 						|| delimiterTokenKinds[i] == token.kind;
 			}
 			if (!found) {
 				toReturn.append(token.image);
-				if (spaceTokens) {
-					toReturn.append(" ");
-				}
+				int end = token.endColumn;
 				parser.getNextToken();
+				token = parser.getToken(1);
+				if (spaceTokens) {
+					// verify whether there is a space in the original token sequence
+					if (end < token.beginColumn - 1) {
+						toReturn.append(" ");
+					}
+				}
 			}
 		}
-		return toReturn.toString();
+		String s = toReturn.toString();
+		return s;
 	}
 
-	protected static GeneratedVariable<OWLObject> parseVariableExpressionGeneratedVariable(
+	public static GeneratedVariable<OWLObject> parseVariableExpressionGeneratedVariable(
 			String name, VariableType type, String string,
 			ConstraintSystem constraintSystem) throws ParserException {
 		VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(
@@ -116,11 +127,18 @@ public class Utils {
 		return variableExpressionGeneratedVariable;
 	}
 
-	protected static GeneratedVariable<OWLEntity> parseRegexpGeneratedVariable(
-			String name, VariableType type, String string,
+	public static GeneratedVariable<Collection<OWLEntity>> parseRegexpGeneratedVariable(
+			String name, VariableType type, GeneratedValue<String> string,
 			ConstraintSystem constraintSystem) throws ParserException {
+		Set<? extends OWLObject> referencedValues = type
+				.getReferencedValues(constraintSystem.getOntologyManager()
+						.getOntologies());
+		OWLEntityRenderer renderer = ParserFactory.getInstance()
+				.getOPPLFactory().getOWLEntityRenderer(constraintSystem);
+		RegExpGeneratedValue val = new RegExpGeneratedValue(referencedValues,
+				string, renderer);
 		RegExpGeneratedVariable v = new RegExpGeneratedVariable(name, type,
-				constraintSystem, string);
+				constraintSystem, val);
 		constraintSystem.importVariable(v);
 		return v;
 	}
