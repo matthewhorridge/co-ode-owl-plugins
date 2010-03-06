@@ -1,17 +1,11 @@
 package org.coode.oppl.variablemansyntax.generated;
 
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.coode.oppl.entity.OWLEntityRenderer;
-import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.ManchesterVariableSyntax;
 import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
@@ -25,45 +19,25 @@ import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
-public class RegExpGeneratedVariable implements GeneratedVariable<OWLEntity> {
+public class RegExpGeneratedVariable implements
+		GeneratedVariable<Collection<OWLEntity>> {
 	private final String name;
 	private final VariableType type;
-	private final ConstraintSystem cs;
-	private final String expression;
-	private final Map<OWLEntity, List<String>> possibleValues;
-	private GeneratedValue<OWLEntity> value;
+	private RegExpGeneratedValue value;
 
 	public RegExpGeneratedVariable(String name, VariableType type,
-			ConstraintSystem cs, String exp) {
+			ConstraintSystem cs, RegExpGeneratedValue exp) {
 		this.name = name;
 		this.type = type;
-		this.cs = cs;
-		this.expression = exp;
-		this.possibleValues = getMatches(this.expression, this.cs);
-	}
-
-	public static Map<OWLEntity, List<String>> getMatches(String exp,
-			ConstraintSystem cs) {
-		Map<OWLEntity, List<String>> toReturn = new HashMap<OWLEntity, List<String>>();
-		Pattern regExpression = Pattern.compile(exp);
-		OWLEntityRenderer entityRenderer = ParserFactory.getInstance()
-				.getOPPLFactory().getOWLEntityRenderer(cs);
-		for (OWLEntity e : cs.getOntology().getReferencedEntities()) {
-			String toMatch = entityRenderer.render(e);
-			Matcher m = regExpression.matcher(toMatch);
-			List<String> group = new ArrayList<String>();
-			while (m.find()) {
-				group.add(m.group());
-			}
-			if (group.size() > 0) {
-				toReturn.put(e, group);
-			}
-		}
-		return toReturn;
+		this.value = exp;
 	}
 
 	public String getOPPLFunction() {
-		return "Match(\"" + this.expression + "\")";
+		return "Match(" + this.value + ")";
+	}
+
+	public String getArgumentString() {
+		return this.value.toString();
 	}
 
 	protected OWLObject generateObject(OWLEntity v) {
@@ -80,25 +54,20 @@ public class RegExpGeneratedVariable implements GeneratedVariable<OWLEntity> {
 
 	public boolean addPossibleBinding(OWLObject object)
 			throws OWLReasonerException {
-		if (object instanceof OWLEntity) {
-			if (this.possibleValues.containsKey(object)) {
-				return false;
-			}
-			List<String> empty = Collections.emptyList();
-			this.possibleValues.put((OWLEntity) object, empty);
-			return true;
-		} else {
-			throw new IllegalArgumentException(
-					"Arguments must be of type OWLEntity: " + object);
-		}
+		return false;
 	}
 
 	public void clearBindings() {
-		this.possibleValues.clear();
 	}
 
-	public OWLObject getGeneratedOWLObject(BindingNode bindingNode) {
-		return bindingNode.visit(this);
+	public OWLEntity getGeneratedOWLObject(BindingNode bindingNode) {
+		Collection<OWLEntity> entities = this.value
+				.getGeneratedValue(bindingNode);
+		//XXX this requires a single result but it's really a set
+		if (entities.size() > 0) {
+			return entities.iterator().next();
+		}
+		return null;
 	}
 
 	public String getName() {
@@ -106,8 +75,8 @@ public class RegExpGeneratedVariable implements GeneratedVariable<OWLEntity> {
 	}
 
 	public Set<OWLObject> getPossibleBindings() {
-		return Collections.<OWLObject> unmodifiableSet(this.possibleValues
-				.keySet());
+		return Collections.<OWLObject> unmodifiableSet(new HashSet<OWLEntity>(
+				this.value.computePossibleValues().get(0)));
 	}
 
 	public VariableType getType() {
@@ -119,7 +88,7 @@ public class RegExpGeneratedVariable implements GeneratedVariable<OWLEntity> {
 		return URI.create(ManchesterVariableSyntax.NAMESPACE + fragment);
 	}
 
-	public GeneratedValue<OWLEntity> getValue() {
+	public RegExpGeneratedValue getValue() {
 		return this.value;
 	}
 
@@ -129,14 +98,11 @@ public class RegExpGeneratedVariable implements GeneratedVariable<OWLEntity> {
 	}
 
 	public boolean removePossibleBinding(OWLObject object) {
-		if (this.possibleValues.remove(object) == null) {
-			return false;
-		}
-		return true;
+		return false;
 	}
 
-	public void setValue(GeneratedValue<OWLEntity> value) {
-		this.value = value;
+	public void setValue(GeneratedValue<Collection<OWLEntity>> value) {
+		this.value = (RegExpGeneratedValue) value;
 	}
 
 	public void setVariableScope(VariableScope variableScope,
@@ -152,10 +118,8 @@ public class RegExpGeneratedVariable implements GeneratedVariable<OWLEntity> {
 		return visitor.visit(this);
 	}
 
-	public List<String> getGroups(OWLEntity key) {
-		if (this.possibleValues.containsKey(key)) {
-			return new ArrayList<String>(this.possibleValues.get(key));
-		}
-		return Collections.emptyList();
+	@Override
+	public String toString() {
+		return this.name + ":" + this.type + "=" + this.getOPPLFunction();
 	}
 }

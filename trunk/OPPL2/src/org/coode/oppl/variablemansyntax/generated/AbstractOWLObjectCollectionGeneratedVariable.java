@@ -70,6 +70,10 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 			return "createUnion(" + this.getValue().toString() + ")";
 		}
 
+		public String getArgumentString() {
+			return this.getValue().toString();
+		}
+
 		public <P> P accept(VariableTypeVisitorEx<P> visitor) {
 			return visitor.visit(this);
 		}
@@ -105,6 +109,10 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 
 		public String getOPPLFunction() {
 			return "createIntersection(" + this.getValue().toString() + ")";
+		}
+
+		public String getArgumentString() {
+			return this.getValue().toString();
 		}
 
 		public <P> P accept(VariableTypeVisitorEx<P> visitor) {
