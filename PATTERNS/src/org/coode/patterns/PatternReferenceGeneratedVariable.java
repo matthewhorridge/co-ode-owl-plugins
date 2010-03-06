@@ -147,4 +147,8 @@ public class PatternReferenceGeneratedVariable extends
 	public <P> P accept(VariableTypeVisitorEx<P> visitor) {
 		return visitor.visit(this);
 	}
+
+	public String getArgumentString() {
+		return this.getOPPLFunction();
+	}
 }
