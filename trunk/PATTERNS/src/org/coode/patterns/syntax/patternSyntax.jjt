@@ -14,47 +14,51 @@ PARSER_BEGIN(PatternParser)
 package org.coode.patterns.syntax;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
+import java.io.Reader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.util.BidirectionalShortFormProvider;
-import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
-import org.semanticweb.owl.util.SimpleShortFormProvider;
-import org.semanticweb.owl.expression.ShortFormEntityChecker;
-import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.patterns.PatternConstraintSystem;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.model.OWLDataFactory;
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.inference.OWLReasoner;
-import org.protege.editor.owl.OWLEditorKit;
-import java.io.Reader;
-import org.coode.oppl.syntax.*;
 import org.coode.oppl.OPPLScript;
-
-import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.ExpressionParser;
-import org.coode.patterns.PatternModel;
-import org.coode.patterns.PatternSignature;
-import org.coode.patterns.PatternException;
-import org.coode.patterns.InstantiatedPatternModel;
+import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
+import org.coode.oppl.variablemansyntax.VariableType;
+import org.coode.oppl.variablemansyntax.generated.AbstractCollectionGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.Attribute;
+import org.coode.oppl.variablemansyntax.generated.ConcatGeneratedValues;
+import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.StringGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.VariableIndexGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.factory.AttributeFactory;
 import org.coode.patterns.AbstractPatternModelFactory;
+import org.coode.patterns.InstantiatedPatternModel;
+import org.coode.patterns.PatternConstant;
+import org.coode.patterns.PatternConstraintSystem;
+import org.coode.patterns.PatternException;
+import org.coode.patterns.PatternModel;
+import org.coode.patterns.PatternOPPLScript;
+import org.coode.patterns.PatternSignature;
 import org.coode.patterns.utils.ParserFactory;
 import org.coode.patterns.utils.Utils;
-import org.coode.patterns.PatternOPPLScript;
-import org.coode.patterns.PatternConstant;
-
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owl.apibinding.OWLManager;
+import org.semanticweb.owl.expression.ParserException;
+import org.semanticweb.owl.inference.OWLReasoner;
+import org.semanticweb.owl.model.OWLAxiom;
+import org.semanticweb.owl.model.OWLClass;
+import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owl.model.OWLEntity;
+import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 public class PatternParser {
 	private OWLOntologyManager owlOntologyManager;
@@ -181,7 +185,32 @@ TOKEN : /*ACTION SYNTAX*/
 
 TOKEN[IGNORE_CASE]:/* OPPL FUNCTIONS*/
 {
-	<OPPLFUNCTION: "create" |"CreateIntersection"|"CreateUnion">
+	/*<CREATE:   "create">
+	| <CREATEINTERSECTION: "CreateIntersection">
+	| <CREATEUNION: "CreateUnion">
+	| <MATCH:"Match">*/
+<OPPLFUNCTION: "create" |"CreateIntersection"|"CreateUnion"|"Match">
+}
+
+/* MANSYNTAX KEYWORDS */
+/*TOKEN:
+{	<SUBCLASSOF: "SubClassOf" | "subClassOf">
+	|<EQUIVALENTTO: "EquivalentTo" | "equivalentTo">
+	|<DISJOINTWITH: "DisjointWith" | "disjointWith">
+	|<DISJOINT_UNION_OF: "DisjointUnionOf">
+	|<FUNCTIONAL: "Functional">
+	|<INVERSE: "inv">
+	|<INVERSE_FUNCTIONAL: "InverseFunctional">
+	|<SUB_PROPERTY_OF: "SubPropertyOf" | "subPropertyOf">
+	|<SYMMETRIC: "Symmetric">
+	|<TRANSITIVE: "Transitive">
+}*/
+
+TOKEN : /* VARIABLE SCOPE OTHER DIRECTIONS */
+{	<OTHERDIRECTION: <SUPERCLASSOF> |<SUPER_PROPERTY_OF> |<INSTANCE_OF>>
+	| <#SUPERCLASSOF: "SuperClassOf"|"superClassOf">
+	|<#SUPER_PROPERTY_OF: "SuperPropertyOf"|"superPropertyOf">
+	|<#INSTANCE_OF: "InstanceOf"|"instanceOf">
 }
 
 TOKEN : /*VARIABLE NAMES*/
@@ -190,6 +219,8 @@ TOKEN : /*VARIABLE NAMES*/
 	|<VARIABLETYPE: "CLASS" | "OBJECTPROPERTY" | "DATAPROPERTY" | "INDIVIDUAL" | "CONSTANT">
 	|<PATTERNREFERENCEVARIABLE: <VARIABLENAME><OPENPARENTHESYS>(<IDENTIFIER>(<COMMA><IDENTIFIER>))*<CLOSEDPARENTHESYS>>
 }
+TOKEN :/* VARIABLE ATTRIBUTES*/
+{	<RENDERINGVARIABLEATTRIBUTE: "RENDERING">|<VALUESVARIABLEATTRIBUTE: "VALUES">|<GROUPSVARIABLEATTRIBUTE: "GROUPS">}
 
 TOKEN : /*RETURN*/
 {
@@ -204,6 +235,9 @@ TOKEN : /* IDENTIFIERS */
 |  < #DIGIT: ["0"-"9"] >
 }
 
+/*TOKEN:
+{<REGEXPMETACHAR:["\\","-","$","|","?","*"]>}
+*/
 
 TOKEN: /*PUNCTUATION*/
 {
@@ -222,6 +256,12 @@ TOKEN: /*PUNCTUATION*/
 	| <CLOSEDSQUAREBRACKETS: "]">
 	| <EQUALS:"=">
 }
+
+/*TOKEN:{
+<ALLOWEDBETWEENQUOTES:<IDENTIFIER>|<OPENPARENTHESYS>|<CLOSEDPARENTHESYS>
+|<OPENSQUAREBRACKETS>|<CLOSEDSQUAREBRACKETS>|<POWER>|<DOT>
+|<REGEXPMETACHAR>|<PLUS>|<COMMA>>
+}*/
 
 TOKEN : /* PATTERN CONSTANTS*/
 {
@@ -382,110 +422,37 @@ String Rendering(ConstraintSystem constraintSystem)
 
 String resolvedString(PatternConstraintSystem constraintSystem, boolean writeUnresolved) #void :{
 	Token t=null;String resolvedPattern=null;
-	String variableDefinition=null;}
+	String variableDefinition=null;
+	String partial;}
 {
-	variableDefinition=variableReference(constraintSystem){
-		if(writeUnresolved){
-			unresolvedString+=variableDefinition+" ";
-		}
-		return variableDefinition;
-	}
-	| resolvedPattern =resolveInnerPattern(constraintSystem){
-		 return resolvedPattern;
-	}
+	variableDefinition=variableReference(constraintSystem){if(writeUnresolved){unresolvedString+=variableDefinition+" ";}return variableDefinition;}
+	| resolvedPattern =resolveInnerPattern(constraintSystem){return resolvedPattern;}
 	| t = <THISCLASS>{
-		if(writeUnresolved){
-			unresolvedString += t.image+" ";
-		}
-		 return new PatternConstant<OWLClass>(
-				PatternConstraintSystem.THIS_CLASS_VARIABLE_NAME, VariableType.CLASS, constraintSystem.getOntologyManager().getOWLDataFactory()).getName();
+		if(writeUnresolved){unresolvedString += t.image+" ";}
+		 return new PatternConstant<OWLClass>(PatternConstraintSystem.THIS_CLASS_VARIABLE_NAME,
+		 VariableType.CLASS, constraintSystem.getOntologyManager().getOWLDataFactory()).getName();
 	}
-
-	| t = <ACTIONTOKENS>{
-		if(writeUnresolved){
-			unresolvedString += t.image+" ";
-		}
-		 return t.image;
-	}
-	| t = <END>{
-		if(writeUnresolved){
-			unresolvedString += t.image+" ";
-		}
-		return t.image;
-	}
-	| t = <IDENTIFIER>{
-		if(writeUnresolved){
-			unresolvedString += t.image+" ";
-		}
-		 return t.image;
-	}
-	| t= <CREATEDIDENTIFIER>{
-		unresolvedString+= t.image+" ";
-		return t.image;
-	}
-	| t=<OPENCURLYBRACKETS>{
-		if(writeUnresolved){
-			unresolvedString += t.image;
-		}
-		return t.image;
-	}
-	| t=<CLOSEDCURLYBRACKETS>{
-		if(writeUnresolved){
-			unresolvedString += t.image+" ";
-		}
-		return t.image;
-	}
-	| t=<COMMA>{
-		if(writeUnresolved){
-			unresolvedString += t.image+" ";
-		}
-		return t.image;
-	}
-	| t=<OPENPARENTHESYS>{
-		if(writeUnresolved){
-			unresolvedString += t.image;
-		}
-		return t.image;
-	}
-	| t=<CLOSEDPARENTHESYS>{
-		if(writeUnresolved){
-			unresolvedString += t.image+" ";
-		}
-		return t.image;
-	}
-	| t=<INTEGER_LITERAL>{
-		if(writeUnresolved){
-			unresolvedString += t.image+" ";
-		}
-		return t.image;
-	}
-	| t=<SEMICOLON>{
-		if(writeUnresolved){
-			unresolvedString += t.image;
-		}
-		return "";
-	}
-	| <QUOTE> t=<IDENTIFIER><QUOTE>{
-		if(writeUnresolved){
-			unresolvedString += "\""+t.image+"\"";
-		}
-		return "\""+t.image+"\"";
-	}
-	| t = <DOT>{
-		if(writeUnresolved){
-			unresolvedString += t.image+" ";
-		}
-		return  t.image;
-	}
-	| t = <PLUS>{
-		if(writeUnresolved){
-			unresolvedString += t.image+" ";
-		}
-		return  t.image;
-	}
+	| t = <ACTIONTOKENS>{if(writeUnresolved){unresolvedString += t.image+" ";}return t.image;}
+	| t = <END>{if(writeUnresolved){unresolvedString += t.image+" ";}return t.image;}
+	| t = <IDENTIFIER>{if(writeUnresolved){unresolvedString += t.image+" ";}return t.image;}
+	| t= <CREATEDIDENTIFIER>{unresolvedString+= t.image+" ";return t.image;}
+	| t=<OPENCURLYBRACKETS>{if(writeUnresolved){unresolvedString += t.image;}return t.image;}
+	| t=<CLOSEDCURLYBRACKETS>{if(writeUnresolved){unresolvedString += t.image+" ";}return t.image;}
+	| t=<COMMA>{if(writeUnresolved){unresolvedString += t.image+" ";}return t.image;}
+	| t=<OPENPARENTHESYS>{if(writeUnresolved){unresolvedString += t.image;}return t.image;}
+	| t=<CLOSEDPARENTHESYS>{if(writeUnresolved){unresolvedString += t.image+" ";}return t.image;}
+	| t=<INTEGER_LITERAL>{if(writeUnresolved){unresolvedString += t.image+" ";}return t.image;}
+	| t=<SEMICOLON>{if(writeUnresolved){unresolvedString += t.image;}return "";}
+	| <QUOTE> partial=simpleCall()<QUOTE>{if(writeUnresolved){unresolvedString += "\""+partial+"\"";}return "\""+partial+"\"";}
+	| t = <DOT>{if(writeUnresolved){unresolvedString += t.image+" ";}return  t.image;}
+	| t = <PLUS>{if(writeUnresolved){unresolvedString += t.image+" ";}return  t.image;}
 
 }
 
+JAVACODE
+String simpleCall(){
+return PatternUtils.readString(this, true, QUOTE);
+}
 
 String variableReference(PatternConstraintSystem constraintSystem) #void:{
 	Token variableNameToken;
@@ -497,6 +464,8 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 	String opplFunctionArgs="";
 	String variableExpression="";
 	String opplFunction="";
+	//GeneratedVariable opplFunctionVariable;
+	Token groupnumber;
 	}
 {
 	LOOKAHEAD(4)
@@ -509,6 +478,7 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 	LOOKAHEAD(4)
 	variableNameToken= <VARIABLENAME> <COLON> variableType= <VARIABLETYPE><EQUALS> opplFunction = opplFunction(variableNameToken.image, variableType.image, constraintSystem)
 	{
+
 		return variableNameToken.image+":"+variableType.image+" = "+opplFunction;
 	}
 	|
@@ -521,7 +491,18 @@ String variableReference(PatternConstraintSystem constraintSystem) #void:{
 			throw new ParseException(e.getMessage(), e);
 		}
 	}
-
+	|LOOKAHEAD(3)
+	variableNameToken=<VARIABLENAME><DOT><RENDERINGVARIABLEATTRIBUTE>{
+	return variableNameToken.image+"."+"RENDERING";
+	}
+	|LOOKAHEAD(3)
+	variableNameToken=<VARIABLENAME><DOT><VALUESVARIABLEATTRIBUTE>{
+	return variableNameToken.image+"."+"VALUES";
+	}
+	|LOOKAHEAD(3)
+	variableNameToken=<VARIABLENAME><DOT><GROUPSVARIABLEATTRIBUTE><OPENPARENTHESYS>groupnumber=<INTEGER_LITERAL><CLOSEDPARENTHESYS>{
+	return variableNameToken.image+"."+"GROUPS("+groupnumber.image+")";
+	}
 	| variableNameToken=<VARIABLENAME>{
 		return variableNameToken.image;
 	}
@@ -539,21 +520,22 @@ String opplFunction(String variableNameString, String variableTypeString, Patter
 	   {
 	   		return opplFunctionNameToken.image+"("+opplFunctionArgs+")";
 	   }
-	  | variableExpression = variableExpression()
+	  | variableExpression = variableExpression(constraintSystem)
 		{
 			return variableExpression;
 		}
 }
 
+
 JAVACODE
-String variableExpression(){
-	String expression = org.coode.patterns.syntax.Utils.readString(this,COMMA,ACTIONTOKENS);
+String variableExpression(PatternConstraintSystem cs){
+	String expression = org.coode.patterns.syntax.PatternUtils.readAndResolveString(this, cs, true, COMMA,ACTIONTOKENS);
 	return expression;
 }
 
 JAVACODE
 String opplFunctionArgs(PatternConstraintSystem constraintSystem){
-	return org.coode.patterns.syntax.Utils.readAndResolveString(this,constraintSystem, CLOSEDPARENTHESYS);
+	return org.coode.patterns.syntax.PatternUtils.readAndResolveString(this,constraintSystem, true, CLOSEDPARENTHESYS);
 }
 
 String resolveInnerPattern(PatternConstraintSystem constraintSystem) #void:{Token t;List<List<String>> args; PatternSignature signature = null;}
@@ -680,6 +662,203 @@ String argToken(int i, PatternSignature signature) #void :{Token t;}
 			return PatternParserUtils.create(getOWLOntologyManager(), toCreate, i, signature, modelFactory.getOPPLParser().getOPPLFactory());
 		}catch(Exception e){throw new ParseException(e.getMessage(), e);}
 	}
+}
+
+/*
+GeneratedVariable opplFunction(String name,VariableType type, PatternConstraintSystem constraintSystem) #void:
+{	GeneratedValue<String> value=null;
+	AbstractCollectionGeneratedValue<? extends OWLObject> collection=null;
+	GeneratedVariable expressionVariable;
+	GeneratedValue<String> expression;
+	GeneratedVariable regexpVariable;
+}
+{
+	<MATCH><OPENPARENTHESYS>expression=stringOperation(constraintSystem, true)<CLOSEDPARENTHESYS>
+		{
+		regexpVariable = regexpOperation(name, type, expression, constraintSystem);
+		return regexpVariable;
+		}
+	|
+	<CREATE><OPENPARENTHESYS>value = stringOperation(constraintSystem, true)<CLOSEDPARENTHESYS>
+		{return constraintSystem.createStringGeneratedVariable(name,type, value);}
+	|<CREATEINTERSECTION><OPENPARENTHESYS>collection = set(type,constraintSystem)<CLOSEDPARENTHESYS>
+		{return constraintSystem.createIntersectionGeneratedVariable(name,type,(AbstractCollectionGeneratedValue<OWLClass>) collection);}
+	|<CREATEUNION><OPENPARENTHESYS> collection = set(type,constraintSystem)<CLOSEDPARENTHESYS>
+		{return constraintSystem.createUnionGeneratedVariable(name,type,(AbstractCollectionGeneratedValue<OWLClass>) collection);}
+	| expressionVariable = expressionGeneratedVariable(name,type,constraintSystem)
+		{return expressionVariable;}
+}*/
+
+JAVACODE
+GeneratedVariable expressionGeneratedVariable(String name,VariableType type, PatternConstraintSystem constraintSystem){
+int beginningSubSection = token.beginColumn;
+int beginningSubSectionLine = token.beginLine;
+String expression = PatternUtils.readAndResolveString(this, constraintSystem, false, COMMA, ACTIONTOKENS);
+try {
+	return org.coode.oppl.syntax.Utils.parseVariableExpressionGeneratedVariable(name, type, expression, constraintSystem);
+} catch (ParserException e) {
+Exception temp=org.coode.oppl.syntax.Utils.buildException(beginningSubSection, beginningSubSectionLine, e);
+throw new ParseException(temp.getMessage(), temp);}
+}
+
+JAVACODE
+GeneratedVariable regexpOperation(String name,VariableType type, GeneratedValue<String> expression, PatternConstraintSystem constraintSystem){
+int beginningSubSection = token.beginColumn;
+int beginningSubSectionLine = token.beginLine;
+
+//try {
+//	Pattern.compile(expression);
+//} catch (PatternSyntaxException e) {
+//Exception temp=org.coode.oppl.syntax.Utils.buildException(expression, beginningSubSection, beginningSubSectionLine, e);
+//throw new ParseException(temp.getMessage(), temp);
+//}
+try {
+	return org.coode.oppl.syntax.Utils.parseRegexpGeneratedVariable(name, type, expression, constraintSystem);
+} catch (ParserException e) {
+Exception temp=org.coode.oppl.syntax.Utils.buildException(beginningSubSection, beginningSubSectionLine, e);
+throw new ParseException(temp.getMessage(), temp);
+}
+}
+
+AbstractCollectionGeneratedValue<? extends OWLObject> set(VariableType type,PatternConstraintSystem constraintSystem) #void:
+{Token variableNameToken=null;}
+{
+	variableNameToken = <VARIABLENAME>"."<VALUESVARIABLEATTRIBUTE>
+		{	String variableName = variableNameToken.image;
+			Variable v = constraintSystem.getVariable(variableName);
+			if (v != null) {
+				if (type == v.getType()) {
+					Attribute attribute = Attribute.VALUES;
+					return AttributeFactory.getCollectionGeneratedValue(attribute, v, constraintSystem);
+				} else {throw new ParseException("Type mismatch for variable " + v.getName() + ": type " + type + " needed instead of the actual " + v.getType());}
+			} else {throw new ParseException("Invalid variable name: " + variableName);}
+		}
+}
+
+GeneratedValue<String> stringOperation(PatternConstraintSystem constraintSystem, boolean spacesAdded) #void:
+{GeneratedValue result=null;}
+{
+	result = stringConcat(constraintSystem, spacesAdded)
+		{return result;}
+}
+
+GeneratedValue<String> stringConcat(PatternConstraintSystem constraintSystem, boolean spacesAdded) #void:
+{	GeneratedValue aGeneratedValue;
+	List<GeneratedValue<String>> components = new ArrayList<GeneratedValue<String>>();
+}
+{
+	aGeneratedValue = generatedValue(constraintSystem, spacesAdded)
+		{components.add(aGeneratedValue);}
+	("+"  aGeneratedValue = generatedValue(constraintSystem, spacesAdded)
+		{components.add(aGeneratedValue);}
+	)*
+		{if(components.size()==1){return aGeneratedValue;}else{return new ConcatGeneratedValues(components);}}
+}
+
+GeneratedValue generatedValue(PatternConstraintSystem constraintSystem, boolean spacesAdded) #void:
+{	String valueToken;
+	Token variableNameToken;
+	Token variableAttributeToken;
+}
+{
+	<QUOTE>valueToken = readString(spacesAdded, constraintSystem)<QUOTE>
+		{return new StringGeneratedValue(valueToken);}
+	|LOOKAHEAD(4)
+	variableNameToken = <IDENTIFIER>"." variableAttributeToken = <RENDERINGVARIABLEATTRIBUTE>
+		{	String attributeString = variableAttributeToken.image;
+			String variableName = variableNameToken.image;
+			Variable v = constraintSystem.getVariable(variableName);
+			if(v !=null){
+				try {
+					Attribute attribute = Attribute.valueOf(attributeString);
+					return AttributeFactory.getVariableGeneratedValue(attribute, v, constraintSystem);
+				} catch (IllegalArgumentException e) {throw new ParseException("Invalid attribute name: " + e.getMessage() + "; valid names are: " + Arrays.toString(Attribute.values()));}
+		}else{throw new ParseException("Invalid variable name: "+variableName);}
+		}
+	|LOOKAHEAD(4)
+	variableNameToken = <IDENTIFIER>"." <GROUPSVARIABLEATTRIBUTE><OPENPARENTHESYS> variableAttributeToken = <INTEGER_LITERAL><CLOSEDPARENTHESYS>
+		{
+		String attributeString = variableAttributeToken.image;
+		String variableName = variableNameToken.image;
+		Variable v = constraintSystem.getVariable(variableName);
+		if (v != null) {
+			int index = Integer.parseInt(attributeString);
+			RegExpGeneratedVariable gv = (RegExpGeneratedVariable) v;
+			Set<OWLObject> bindings = gv.getPossibleBindings();
+			if (bindings.size() > 0) {
+				VariableIndexGeneratedValue toReturn=new VariableIndexGeneratedValue(gv, index, (OWLEntity) bindings.iterator().next());
+				return toReturn;
+			}
+			throw new ParseException("No matches found for variable: " + v);
+		}else{throw new ParseException("Invalid variable name: "+variableName);}
+		}
+}
+
+JAVACODE
+String readString(boolean spacesAdded, PatternConstraintSystem cs){
+return PatternUtils.readAndResolveString(this, cs, spacesAdded, QUOTE);
+}
+
+
+JAVACODE
+OWLObject OWLExpression(Variable v, PatternConstraintSystem constraintSystem)
+{
+		Token t;
+		String manSyntaxString="";
+		while(true){
+			t = getToken(1);
+			if (t.kind==COMMA || t.kind ==CLOSEDCURLYBRACKETS || t.kind==SEMICOLON || t.kind==ACTIONTOKENS || t.kind==END || t.kind == EOF){
+				break;
+			}else{
+				manSyntaxString += t.image+" ";
+				t = getNextToken();
+			}
+		}
+	manSyntaxString = manSyntaxString.trim();
+	ExpressionParser expressionParser = new ExpressionParser(manSyntaxString, constraintSystem);
+	try{
+	OWLObject toReturn = v.accept(expressionParser);
+	return toReturn;
+	} catch(Exception e){throw new ParseException(e.getMessage(), e);}
+}
+
+VariableType variableType() #void:{Token t;}
+{
+	t = <VARIABLETYPE>
+		{return VariableType.valueOfIgnoreCase(t.image);}
+}
+
+
+JAVACODE
+OWLAxiom Clause(PatternConstraintSystem constraintSystem){
+	int beginningSubSection = -1;
+	int beginningSubSectionLine = -1;
+	OWLAxiom toReturn =null;
+	String manSyntaxString="";
+	Token t;
+		while(true){
+			t = getToken(1);
+			if (beginningSubSection < 0) {beginningSubSection = t.beginColumn;}
+			if (beginningSubSectionLine < 0) {beginningSubSectionLine = t.beginLine;}
+			if (t.kind==COMMA || t.kind==SEMICOLON || t.kind==ACTIONTOKENS || t.kind==END || t.kind == EOF){
+				break;
+			}else{
+				manSyntaxString += t.image+" ";
+				t = getNextToken();
+			}
+		}
+	manSyntaxString = manSyntaxString.trim();
+	VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(manSyntaxString, constraintSystem
+					);
+	//parser.setOWLEntityChecker(getOPPLFactory().getOWLEntityChecker());
+	try{
+		toReturn = parser.parseAxiom();
+
+	}catch(ParserException e){
+	Exception ex=org.coode.oppl.syntax.Utils.buildException(beginningSubSection, beginningSubSectionLine, e);
+	throw new ParseException("OPPLParser.Clause() \"" + manSyntaxString + "\"\t" + ex.getMessage(), ex);
+	}
+return toReturn;
 }
 
 
