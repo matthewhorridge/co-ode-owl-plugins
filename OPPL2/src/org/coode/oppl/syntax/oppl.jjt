@@ -48,6 +48,7 @@ import org.coode.oppl.variablemansyntax.generated.Attribute;
 import org.coode.oppl.variablemansyntax.generated.AbstractCollectionGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.ConcatGeneratedValues;
 import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.VariableIndexGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.StringGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
@@ -185,6 +186,7 @@ TOKEN[IGNORE_CASE]: /* OPPL SYNTAX*/
 TOKEN: /*PUNCTUATION*/
 {<COMMA:",">
 	| <SEMICOLON: ";">
+	| <APO: "'">
 	| <COLON: ":">
 	| <OPENPARENTHESYS: "(">
 	| <CLOSEDPARENTHESYS: ")">
@@ -348,13 +350,17 @@ GeneratedVariable opplFunction(String name,VariableType type, ConstraintSystem c
 {	GeneratedValue<String> value=null;
 	AbstractCollectionGeneratedValue<? extends OWLObject> collection=null;
 	GeneratedVariable expressionVariable;
+	GeneratedValue<String> expression;
 	GeneratedVariable regexpVariable;
 }
 {
-	<MATCH><OPENPARENTHESYS><QUOTE>regexpVariable = regexpOperation(name, type, constraintSystem)<QUOTE><CLOSEDPARENTHESYS>
-		{return regexpVariable;}
+	<MATCH><OPENPARENTHESYS>expression=stringOperation(constraintSystem, true)<CLOSEDPARENTHESYS>
+		{
+		regexpVariable = regexpOperation(name, type, expression, constraintSystem);
+		return regexpVariable;
+		}
 	|
-	<CREATE><OPENPARENTHESYS>value = stringOperation(constraintSystem)<CLOSEDPARENTHESYS>
+	<CREATE><OPENPARENTHESYS>value = stringOperation(constraintSystem, true)<CLOSEDPARENTHESYS>
 		{return constraintSystem.createStringGeneratedVariable(name,type, value);}
 	|<CREATEINTERSECTION><OPENPARENTHESYS>collection = set(type,constraintSystem)<CLOSEDPARENTHESYS>
 		{return constraintSystem.createIntersectionGeneratedVariable(name,type,(AbstractCollectionGeneratedValue<OWLClass>) collection);}
@@ -368,7 +374,7 @@ JAVACODE
 GeneratedVariable expressionGeneratedVariable(String name,VariableType type, ConstraintSystem constraintSystem){
 int beginningSubSection = token.beginColumn;
 int beginningSubSectionLine = token.beginLine;
-String expression = Utils.readString(this, true, COMMA, SELECT);
+String expression = Utils.readString(this, false, COMMA, SELECT);
 try {
 	return Utils.parseVariableExpressionGeneratedVariable(name,	type, expression, constraintSystem);
 } catch (ParserException e) {
@@ -377,16 +383,16 @@ throw new ParseException(temp.getMessage(), temp);}
 }
 
 JAVACODE
-GeneratedVariable regexpOperation(String name,VariableType type, ConstraintSystem constraintSystem){
+GeneratedVariable regexpOperation(String name,VariableType type, GeneratedValue<String> expression, ConstraintSystem constraintSystem){
 int beginningSubSection = token.beginColumn;
 int beginningSubSectionLine = token.beginLine;
-String expression = Utils.readString(this, false, QUOTE);
-try {
-	Pattern.compile(expression);
-} catch (PatternSyntaxException e) {
-Exception temp=Utils.buildException(expression, beginningSubSection, beginningSubSectionLine, e);
-throw new ParseException(temp.getMessage(), temp);
-}
+
+//try {
+//	Pattern.compile(expression);
+//} catch (PatternSyntaxException e) {
+//Exception temp=Utils.buildException(expression, beginningSubSection, beginningSubSectionLine, e);
+//throw new ParseException(temp.getMessage(), temp);
+//}
 try {
 	return Utils.parseRegexpGeneratedVariable(name,	type, expression, constraintSystem);
 } catch (ParserException e) {
@@ -410,34 +416,34 @@ AbstractCollectionGeneratedValue<? extends OWLObject> set(VariableType type,Cons
 		}
 }
 
-GeneratedValue<String> stringOperation(ConstraintSystem constraintSystem) #void:
+GeneratedValue<String> stringOperation(ConstraintSystem constraintSystem, boolean spacesAdded) #void:
 {GeneratedValue result=null;}
 {
-	result = stringConcat(constraintSystem)
+	result = stringConcat(constraintSystem, spacesAdded)
 		{return result;}
 }
 
-GeneratedValue<String> stringConcat(ConstraintSystem constraintSystem) #void:
+GeneratedValue<String> stringConcat(ConstraintSystem constraintSystem, boolean spacesAdded) #void:
 {	GeneratedValue aGeneratedValue;
 	List<GeneratedValue<String>> components = new ArrayList<GeneratedValue<String>>();
 }
 {
-	aGeneratedValue = generatedValue(constraintSystem)
+	aGeneratedValue = generatedValue(constraintSystem, spacesAdded)
 		{components.add(aGeneratedValue);}
-	("+"  aGeneratedValue = generatedValue(constraintSystem)
+	("+"  aGeneratedValue = generatedValue(constraintSystem, spacesAdded)
 		{components.add(aGeneratedValue);}
 	)*
 		{if(components.size()==1){return aGeneratedValue;}else{return new ConcatGeneratedValues(components);}}
 }
 
-GeneratedValue generatedValue(ConstraintSystem constraintSystem) #void:
-{	Token valueToken;
+GeneratedValue generatedValue(ConstraintSystem constraintSystem, boolean spacesAdded) #void:
+{	String valueToken;
 	Token variableNameToken;
 	Token variableAttributeToken;
 }
 {
-	<QUOTE>valueToken = <ENTITYNAMES><QUOTE>
-		{return new StringGeneratedValue(valueToken.image);}
+	<QUOTE>valueToken = readString(spacesAdded)<QUOTE>
+		{return new StringGeneratedValue(valueToken);}
 	|LOOKAHEAD(4)
 	variableNameToken = <IDENTIFIER>"." variableAttributeToken = <RENDERINGVARIABLEATTRIBUTE>
 		{	String attributeString = variableAttributeToken.image;
@@ -461,14 +467,19 @@ GeneratedValue generatedValue(ConstraintSystem constraintSystem) #void:
 			RegExpGeneratedVariable gv = (RegExpGeneratedVariable) v;
 			Set<OWLObject> bindings = gv.getPossibleBindings();
 			if (bindings.size() > 0) {
-				List<String> l = gv.getGroups((OWLEntity) bindings.iterator().next());
-				if (index >= l.size()) {throw new ParseException("Invalid group index: " + index);}
-				return new StringGeneratedValue(l.get(index));
+				VariableIndexGeneratedValue toReturn=new VariableIndexGeneratedValue(gv, index, (OWLEntity) bindings.iterator().next());
+				return toReturn;
 			}
 			throw new ParseException("No matches found for variable: " + v);
 		}else{throw new ParseException("Invalid variable name: "+variableName);}
 		}
 }
+
+JAVACODE
+String readString(boolean spacesAdded){
+return Utils.readString(this, spacesAdded, QUOTE);
+}
+
 
 VariableScopes.Direction direction() #void: {Token t=null;}
 {
@@ -549,8 +560,9 @@ InCollectionRegExpConstraint regexpConstraint;
 			variable = constraintSystem.getVariable(t.image);
 			if(variable==null){throw new ParseException("Undeclared variable "+t.image);}
 		}
-	(	<MATCH><QUOTE> regexpConstraint = matchConstraint(variable, constraintSystem)<QUOTE>
-		{return regexpConstraint;}
+	(
+	<MATCH><OPENPARENTHESYS>regexpConstraint = matchConstraint(variable, constraintSystem, stringOperation(constraintSystem, true))<CLOSEDPARENTHESYS>
+	{return regexpConstraint;}
 	|	<NEQ> owlObject = OWLExpression(variable, constraintSystem)
 		{return new InequalityConstraint(variable, owlObject,constraintSystem);}
 	|	<IN><OPENCURLYBRACKETS>owlObject = OWLExpression(variable,constraintSystem)
@@ -564,12 +576,12 @@ InCollectionRegExpConstraint regexpConstraint;
 }
 
 JAVACODE
-InCollectionRegExpConstraint matchConstraint(Variable variable, ConstraintSystem cs){
+InCollectionRegExpConstraint matchConstraint(Variable variable, ConstraintSystem cs, GeneratedValue expression){
 int beginningSubSection = getToken(1).beginColumn;
 int beginningSubSectionLine = getToken(1).beginLine;
-String expression = Utils.readString(this, false, QUOTE);
+//String expression = Utils.readString(this, true, QUOTE);
 try {
-	return  new InCollectionRegExpConstraint(expression, variable, RegExpGeneratedVariable.getMatches(expression, cs));
+	return  new InCollectionRegExpConstraint(variable, expression, cs);
 } catch (PatternSyntaxException e) {
 Exception temp=Utils.buildException(expression, beginningSubSection, beginningSubSectionLine, e);
 throw new ParseException(temp.getMessage(), temp);
