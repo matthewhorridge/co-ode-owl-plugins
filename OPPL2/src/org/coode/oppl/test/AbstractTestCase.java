@@ -80,7 +80,7 @@ public abstract class AbstractTestCase extends TestCase {
 			for (OWLAxiomChange change : script.getActions()) {
 				System.out.println(change);
 			}
-			// exec.visitActions(script.getActions());
+			exec.visitActions(script.getActions());
 		} catch (Exception e) {
 			this.log(e);
 		}

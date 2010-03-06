@@ -59,6 +59,10 @@ public class VariableExpressionGeneratedVariable extends
 		return manchesterSyntaxRenderer.toString();
 	}
 
+	public String getArgumentString() {
+		return this.getOPPLFunction();
+	}
+
 	@Override
 	protected GeneratedVariable<OWLObject> replace(
 			GeneratedValue<OWLObject> unusedValue) {

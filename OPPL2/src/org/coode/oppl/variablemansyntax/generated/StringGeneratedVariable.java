@@ -151,6 +151,28 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 					final OWLEntityChecker entityChecker,
 					final OWLEntityFactory ef, final OWLDataFactory df) {
 				OWLObject toReturn = null;
+				//XXX not too nice a way to handle the case in which the name passed in is not good for a class URI
+				//handle the creation of a class using text only valid for a label
+				//				if (aValue.indexOf('\'') > -1 || aValue.indexOf(' ') > -1) {
+				//					// then either "'" or " " are in the string - label needed
+				//					String label = aValue.trim().replace("'", "");
+				//					String realShortName = label.replace(" ", "_");
+				//					toReturn = this.buildClass(realShortName, entityChecker,
+				//							ef, df);
+				//					OWLLabelAnnotation labelAnnotation = df
+				//							.getOWLLabelAnnotation(label);
+				//					OWLAxiomChange extraChange = new AddAxiom(
+				//							StringGeneratedVariable.this.ontology, df
+				//									.getOWLEntityAnnotationAxiom(
+				//											(OWLClass) toReturn,
+				//											labelAnnotation));
+				//					try {
+				//						ParserFactory.getInstance().getOWLOntologyManager()
+				//								.applyChanges(Arrays.asList(extraChange));
+				//					} catch (OWLOntologyChangeException e) {
+				//						throw new RuntimeException(e);
+				//					}
+				//				} else {
 				try {
 					toReturn = entityChecker.getOWLClass(aValue);
 					if (toReturn == null) {
@@ -163,6 +185,7 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 				} catch (OWLOntologyChangeException e) {
 					throw new RuntimeException(e);
 				}
+				//	}
 				return toReturn;
 			}
 		};
@@ -260,6 +283,10 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 
 	public String getOPPLFunction() {
 		return "create(" + this.getValue() + ")";
+	}
+
+	public String getArgumentString() {
+		return this.getValue().toString();
 	}
 
 	public <P> P accept(VariableTypeVisitorEx<P> visitor) {

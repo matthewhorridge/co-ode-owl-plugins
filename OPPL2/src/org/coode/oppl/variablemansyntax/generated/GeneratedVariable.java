@@ -10,6 +10,8 @@ public interface GeneratedVariable<N> extends Variable {
 	 */
 	public String getOPPLFunction();
 
+	public String getArgumentString();
+
 	public OWLObject getGeneratedOWLObject(BindingNode bindingNode);
 
 	public GeneratedValue<N> getValue();

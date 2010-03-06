@@ -33,9 +33,7 @@ import org.coode.oppl.exceptions.InvalidVariableNameException;
 import org.coode.oppl.exceptions.OPPLException;
 import org.coode.oppl.utils.VariableDetector;
 import org.coode.oppl.utils.VariableExtractor;
-import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
-import org.coode.oppl.variablemansyntax.bindingtree.LeafBrusher;
 import org.coode.oppl.variablemansyntax.generated.AbstractCollectionGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.AbstractGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.AbstractOWLObjectCollectionGeneratedVariable;
@@ -52,7 +50,6 @@ import org.semanticweb.owl.model.OWLConstant;
 import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLIndividual;
-import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
@@ -215,29 +212,28 @@ public class ConstraintSystem {
 				this.leaves);
 	}
 
-	protected void setupLeaves() {
-		Set<Variable> inputVariables = this.getInputVariables();
-		for (Variable variable : inputVariables) {
-			for (OWLOntology ontology1 : this.getOntologyManager()
-					.getOntologies()) {
-				Set<? extends OWLObject> referencedValues = variable.getType()
-						.getReferencedValues(ontology1);
-				for (OWLObject object : referencedValues) {
-					try {
-						variable.addPossibleBinding(object);
-					} catch (OWLReasonerException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-		BindingNode root = new BindingNode(new HashSet<Assignment>(),
-				inputVariables);
-		LeafBrusher leafBrusher = new LeafBrusher();
-		root.accept(leafBrusher);
-		this.leaves = leafBrusher.getLeaves();
-	}
-
+	//	protected void setupLeaves() {
+	//		Set<Variable> inputVariables = this.getInputVariables();
+	//		for (Variable variable : inputVariables) {
+	//			for (OWLOntology ontology1 : this.getOntologyManager()
+	//					.getOntologies()) {
+	//				Set<? extends OWLObject> referencedValues = variable.getType()
+	//						.getReferencedValues(ontology1);
+	//				for (OWLObject object : referencedValues) {
+	//					try {
+	//						variable.addPossibleBinding(object);
+	//					} catch (OWLReasonerException e) {
+	//						e.printStackTrace();
+	//					}
+	//				}
+	//			}
+	//		}
+	//		BindingNode root = new BindingNode(new HashSet<Assignment>(),
+	//				inputVariables);
+	//		LeafBrusher leafBrusher = new LeafBrusher();
+	//		root.accept(leafBrusher);
+	//		this.leaves = leafBrusher.getLeaves();
+	//	}
 	public Set<Variable> getInputVariables() {
 		return this.variables.getInputVariables();
 	}

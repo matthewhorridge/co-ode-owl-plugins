@@ -61,12 +61,14 @@ public interface Variable {
 	 * @param object
 	 * @throws OWLReasonerException
 	 */
+	@Deprecated
 	public boolean addPossibleBinding(OWLObject object)
 			throws OWLReasonerException;
 
 	/**
 	 * @return the currently possible values that a Variable can assume
 	 */
+	@Deprecated
 	public Set<OWLObject> getPossibleBindings();
 
 	/**
@@ -75,11 +77,13 @@ public interface Variable {
 	 * 
 	 * @param object
 	 */
+	@Deprecated
 	public boolean removePossibleBinding(OWLObject object);
 
 	/**
 	 * Empties the set of current possible values for the Variable
 	 */
+	@Deprecated
 	public void clearBindings();
 
 	/**

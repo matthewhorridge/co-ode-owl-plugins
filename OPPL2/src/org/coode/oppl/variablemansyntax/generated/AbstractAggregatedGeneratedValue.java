@@ -119,7 +119,8 @@ public abstract class AbstractAggregatedGeneratedValue<N> implements
 		ValueTree(List<GeneratedValue<N>> root) {
 			List<List<N>> rootNode2Assign = new ArrayList<List<N>>();
 			for (GeneratedValue<N> generatedValue : root) {
-				rootNode2Assign.add(generatedValue.computePossibleValues());
+				List<N> computePossibleValues = generatedValue.computePossibleValues();
+				rootNode2Assign.add(computePossibleValues);
 			}
 			this.rootNode = new ValueTreeNode<N>(rootNode2Assign,
 					new ArrayList<N>());
