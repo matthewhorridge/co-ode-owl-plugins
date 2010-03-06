@@ -23,7 +23,6 @@
 package org.coode.oppl.protege;
 
 import java.io.StringWriter;
-import java.net.URI;
 import java.util.List;
 
 import org.coode.oppl.OPPLAbstractFactory;
@@ -31,8 +30,6 @@ import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLQueryImpl;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.OPPLScriptImpl;
-import org.coode.oppl.entity.OWLEntityCreationException;
-import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.entity.OWLEntityRenderer;
 import org.coode.oppl.exceptions.OPPLException;
@@ -46,13 +43,8 @@ import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.model.OWLAxiomChange;
-import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDataFactory;
-import org.semanticweb.owl.model.OWLDataProperty;
 import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLIndividual;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLOntologyChange;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
@@ -78,101 +70,6 @@ public final class ProtegeOPPLFactory implements OPPLAbstractFactory {
 		}
 	}
 
-	private final class ProtegeOWLEntityFactory implements OWLEntityFactory {
-		public ProtegeOWLEntityFactory() {
-		}
-
-		private final org.protege.editor.owl.model.entity.OWLEntityFactory protegeOWLEntityFactory = ProtegeOPPLFactory.this.modelManager
-				.getOWLEntityFactory();
-
-		public OWLEntityCreationSet<OWLClass> createOWLClass(String shortName,
-				URI baseURI) throws OWLEntityCreationException {
-			try {
-				org.protege.editor.owl.model.entity.OWLEntityCreationSet<OWLClass> protegeCreationSet = this.protegeOWLEntityFactory
-						.createOWLClass(shortName, baseURI);
-				return this.convert(protegeCreationSet);
-			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e);
-			}
-		}
-
-		private <T extends OWLEntity> OWLEntityCreationSet<T> convert(
-				org.protege.editor.owl.model.entity.OWLEntityCreationSet<T> protegeCreationSet) {
-			List<? extends OWLOntologyChange> changes = protegeCreationSet
-					.getOntologyChanges();
-			T entity = protegeCreationSet.getOWLEntity();
-			OWLEntityCreationSet<T> toReturn = new OWLEntityCreationSet<T>(
-					entity, changes);
-			return toReturn;
-		}
-
-		public OWLEntityCreationSet<OWLDataProperty> createOWLDataProperty(
-				String shortName, URI baseURI)
-				throws OWLEntityCreationException {
-			try {
-				org.protege.editor.owl.model.entity.OWLEntityCreationSet<OWLDataProperty> protegeCreationSet = this.protegeOWLEntityFactory
-						.createOWLDataProperty(shortName, baseURI);
-				return this.convert(protegeCreationSet);
-			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e);
-			}
-		}
-
-		public <T extends OWLEntity> OWLEntityCreationSet<T> createOWLEntity(
-				Class<T> type, String shortName, URI baseURI)
-				throws OWLEntityCreationException {
-			try {
-				org.protege.editor.owl.model.entity.OWLEntityCreationSet<T> protegeCreationSet = this.protegeOWLEntityFactory
-						.createOWLEntity(type, shortName, baseURI);
-				return this.convert(protegeCreationSet);
-			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e);
-			}
-		}
-
-		public OWLEntityCreationSet<OWLIndividual> createOWLIndividual(
-				String shortName, URI baseURI)
-				throws OWLEntityCreationException {
-			try {
-				org.protege.editor.owl.model.entity.OWLEntityCreationSet<OWLIndividual> protegeCreationSet = this.protegeOWLEntityFactory
-						.createOWLIndividual(shortName, baseURI);
-				return this.convert(protegeCreationSet);
-			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e);
-			}
-		}
-
-		public OWLEntityCreationSet<OWLObjectProperty> createOWLObjectProperty(
-				String shortName, URI baseURI)
-				throws OWLEntityCreationException {
-			try {
-				org.protege.editor.owl.model.entity.OWLEntityCreationSet<OWLObjectProperty> protegeCreationSet = this.protegeOWLEntityFactory
-						.createOWLObjectProperty(shortName, baseURI);
-				return this.convert(protegeCreationSet);
-			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e);
-			}
-		}
-
-		public <T extends OWLEntity> OWLEntityCreationSet<T> preview(
-				Class<T> type, String shortName, URI baseURI)
-				throws OWLEntityCreationException {
-			try {
-				org.protege.editor.owl.model.entity.OWLEntityCreationSet<T> protegeCreationSet = this.protegeOWLEntityFactory
-						.preview(type, shortName, baseURI);
-				return this.convert(protegeCreationSet);
-			} catch (org.protege.editor.owl.model.entity.OWLEntityCreationException e) {
-				throw new OWLEntityCreationException(e);
-			}
-		}
-
-		public void tryCreate(Class<? extends OWLEntity> type,
-				String shortName, URI baseURI)
-				throws OWLEntityCreationException {
-			// TODO: not sure how this goes
-		}
-	}
-
 	protected OWLModelManager modelManager;
 	private ProtegeScopeVariableChecker variableScopeVariableChecker = null;
 	private final ProtegeOWLEntityFactory entityFactory;
@@ -188,7 +85,7 @@ public final class ProtegeOPPLFactory implements OPPLAbstractFactory {
 			throw new NullPointerException("The model manager cannot be null");
 		}
 		this.modelManager = modelManager;
-		this.entityFactory = new ProtegeOWLEntityFactory();
+		this.entityFactory = new ProtegeOWLEntityFactory(this);
 		this.entityRenderer = new ProtegeOWLEntityRenderer();
 	}
 
@@ -259,7 +156,7 @@ public final class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	/**
 	 * @return the constraintSystem
 	 */
-	private ConstraintSystem getConstraintSystem() {
+	public ConstraintSystem getConstraintSystem() {
 		return this.createConstraintSystem();
 	}
 
