@@ -1547,8 +1547,7 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 		}
 	}
 
-	public void visitInCollectionConstraint(
-			InCollectionConstraint<? extends OWLObject> c) {
+	public void visitInCollectionConstraint(InCollectionConstraint c) {
 		final String variableReference = c.getVariable().getName().replace('?',
 				'$');
 		final StringWriter writer = new StringWriter();
@@ -1574,13 +1573,13 @@ public class VariableXQueryBuilder implements OWLAxiomVisitorEx<String>,
 		this.whereConditions.add(writer.toString());
 	}
 
-	public void visitInCollectionConstraint(
-			InCollectionRegExpConstraint<? extends OWLObject> c) {
+	public void visitInCollectionConstraint(InCollectionRegExpConstraint c) {
 		final String variableReference = c.getVariable().getName().replace('?',
 				'$');
 		final StringWriter writer = new StringWriter();
 		writer.append("( ");
-		Collection<? extends OWLObject> collection = c.getCollection();
+		//XXX a bindingnode is needed here
+		Collection<? extends OWLObject> collection = c.getCollection(null);
 		boolean first = true;
 		for (OWLObject object : collection) {
 			String andString = " ";
