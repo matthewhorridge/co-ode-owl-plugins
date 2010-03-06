@@ -256,10 +256,6 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	}
 
 	@Override
-	protected void setupLeaves() {
-	}
-
-	@Override
 	public Set<Variable> getInputVariables() {
 		return this.constraintSystem.getInputVariables();
 	}

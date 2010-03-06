@@ -156,4 +156,8 @@ public class PatternConstant<P extends OWLEntity> extends
 	public <P> P accept(VariableTypeVisitorEx<P> visitor) {
 		return visitor.visit(this);
 	}
+
+	public String getArgumentString() {
+		return this.getOPPLFunction();
+	}
 }
