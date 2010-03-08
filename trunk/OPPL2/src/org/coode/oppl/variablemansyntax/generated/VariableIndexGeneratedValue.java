@@ -34,6 +34,7 @@ import org.semanticweb.owl.model.OWLEntity;
  */
 public class VariableIndexGeneratedValue implements GeneratedValue<String> {
 	private final RegExpGeneratedVariable variable;
+	private final RegExpGeneratedValue value;
 	private final int index;
 	private OWLEntity entity;
 
@@ -44,6 +45,7 @@ public class VariableIndexGeneratedValue implements GeneratedValue<String> {
 	public VariableIndexGeneratedValue(RegExpGeneratedVariable variable, int i,
 			OWLEntity e) {
 		this.variable = variable;
+		this.value = variable.getValue();
 		this.index = i;
 		this.entity = e;
 	}
@@ -72,7 +74,8 @@ public class VariableIndexGeneratedValue implements GeneratedValue<String> {
 	}
 
 	public String getGeneratedValue(BindingNode node) {
-		List<String> l = this.computePossibleValues();
+		this.value.getGeneratedValue(node);
+		List<String> l = this.entity.accept(this.value);
 		if (l.size() > this.index) {
 			return l.get(this.index);
 		}
