@@ -4,15 +4,17 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 import junit.framework.TestCase;
 import net.sf.saxon.exslt.Math;
 
-import org.coode.oppl.Executor;
+import org.coode.oppl.ChangeExtractor;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.ParserFactory;
@@ -23,6 +25,7 @@ import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.inference.OWLReasonerFactory;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owl.model.OWLOntologyChangeException;
 import org.semanticweb.owl.model.OWLOntologyCreationException;
 import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.model.OWLOntologyURIMapper;
@@ -40,6 +43,7 @@ public abstract class AbstractTestCase extends TestCase {
 	private OWLOntologyURIMapper siemensmapper = new AutoURIMapper(new File(
 			"../OPPL2/ontologies/"), true);
 	private static Map<String, OWLOntology> cache = new HashMap<String, OWLOntology>();
+	protected TestQueries testQueries = new TestQueries();
 
 	public AbstractTestCase() {
 		ontologyManager.addURIMapper(this.siemensmapper);
@@ -75,15 +79,24 @@ public abstract class AbstractTestCase extends TestCase {
 
 	protected void execute(OPPLScript script) {
 		try {
-			Executor exec = new Executor(script.getConstraintSystem(), true);
-			script.accept(exec);
+			ChangeExtractor changeExtractor = new ChangeExtractor(script
+					.getConstraintSystem(), true);
+			List<OWLAxiomChange> changes = script.accept(changeExtractor);
+			List<OWLAxiomChange> actions = new ArrayList<OWLAxiomChange>();
+			changeExtractor.visitActions(changes, actions);
+			try {
+				changeExtractor.getConstraintSystem().getOntologyManager()
+						.applyChanges(actions);
+			} catch (OWLOntologyChangeException e) {
+				e.printStackTrace();
+			}
 			for (OWLAxiomChange change : script.getActions()) {
 				System.out.println(change);
 			}
-			exec.visitActions(script.getActions());
 		} catch (Exception e) {
 			this.log(e);
 		}
+		//		this.testQueries.genericTestQuery(script);
 	}
 
 	private void init() {
@@ -96,6 +109,7 @@ public abstract class AbstractTestCase extends TestCase {
 		// reload the ontology for each test;
 		// tests are independent of each other
 		this.init();
+		this.testQueries.setUp();
 	}
 
 	@Override
