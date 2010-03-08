@@ -31,7 +31,7 @@ public class ExhaustingTestCase extends AbstractTestCase {
 
 	public void testParseMissingVariableDeclaration() {
 		OPPLScript result = this
-				.parse("SELECT ASSERTED Asinara InstanceOf ContinentalIsland BEGIN ADD Asinara InstanceOf ContinentalIsland END;");
+				.parse("SELECT ASSERTED Asinara InstanceOf ContinentalIsland BEGIN ADD Asinara InstanceOf Thing END;");
 		this.expectedCorrect(result);
 		this.execute(result);
 		result = this
@@ -271,6 +271,13 @@ public class ExhaustingTestCase extends AbstractTestCase {
 	public void testAssembleConstantAndVariables() {
 		OPPLScript result = this
 				.parse("?y:CLASS, ?x:CLASS=create(\"'test and \"+?y.RENDERING+\"'\") SELECT ASSERTED ?y subClassOf Island  BEGIN ADD ?y subClassOf ?x END;");
+		this.expectedCorrect(result);
+		this.execute(result);
+	}
+
+	public void testReverseRegularExpressions() {
+		OPPLScript result = this
+				.parse("?regexp:CLASS=Match(\"'test ([a-z]+)'\"), ?x:CLASS=create(?regexp.GROUPS(0)) SELECT ASSERTED ?regexp subClassOf Thing  BEGIN ADD ?x subClassOf Thing END;");
 		this.expectedCorrect(result);
 		this.execute(result);
 	}

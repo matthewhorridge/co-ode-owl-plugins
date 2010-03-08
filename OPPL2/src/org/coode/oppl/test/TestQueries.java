@@ -90,12 +90,14 @@ public class TestQueries extends TestCase {
 			if (query != null) {
 				List<OWLAxiom> axioms = query.getAssertedAxioms();
 				axioms.addAll(query.getAxioms());
-				for (BindingNode bindingNode : leaves) {
-					PartialOWLObjectInstantiator partialOWLObjectInstantiator = new PartialOWLObjectInstantiator(
-							bindingNode, opplScript.getConstraintSystem());
-					for (OWLAxiom owlAxiom : axioms) {
-						manager.addAxiom(testOntology, (OWLAxiom) owlAxiom
-								.accept(partialOWLObjectInstantiator));
+				if (leaves != null) {
+					for (BindingNode bindingNode : leaves) {
+						PartialOWLObjectInstantiator partialOWLObjectInstantiator = new PartialOWLObjectInstantiator(
+								bindingNode, opplScript.getConstraintSystem());
+						for (OWLAxiom owlAxiom : axioms) {
+							manager.addAxiom(testOntology, (OWLAxiom) owlAxiom
+									.accept(partialOWLObjectInstantiator));
+						}
 					}
 				}
 			}
@@ -185,10 +187,10 @@ public class TestQueries extends TestCase {
 	// TRANSITIVE_OBJECT_PROPERTY : AxiomType<OWLTransitiveObjectPropertyAxiom>
 	public void testTransitiveObjectPropertyQuery() {
 		String opplString = "?x:OBJECTPROPERTY SELECT ASSERTED Transitive ?x BEGIN ADD transitive ?x END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
-	private void testQuery(String opplString) {
+	public void genericTestQuery(String opplString) {
 		OWLOntologyManager ontologyManager = OWLManager
 				.createOWLOntologyManager();
 		OWLOntology testOntology;
@@ -206,6 +208,19 @@ public class TestQueries extends TestCase {
 		}
 	}
 
+	public void genericTestQuery(OPPLScript opplScript) {
+		OWLOntologyManager ontologyManager = OWLManager
+				.createOWLOntologyManager();
+		OWLOntology testOntology;
+		try {
+			testOntology = ontologyManager.createOntology(TEST_NS);
+			this.testQuery(opplScript, ontologyManager, testOntology);
+		} catch (OWLOntologyCreationException e) {
+			e.printStackTrace();
+			fail(e.getMessage());
+		}
+	}
+
 	private OPPLScript parsescript(String opplString,
 			OWLOntologyManager ontologyManager, OWLOntology testOntology)
 			throws ParseException {
@@ -216,122 +231,122 @@ public class TestQueries extends TestCase {
 
 	public void testSymmetricObjectPropertyQuery() {
 		String opplString = "?x:OBJECTPROPERTY SELECT ASSERTED symmetric ?x BEGIN ADD symmetric ?x END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testReflexiveObjectPropertyQuery() {
 		String opplString = "?x:OBJECTPROPERTY SELECT ASSERTED reflexive ?x BEGIN ADD reflexive ?x END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testIrreflexiveObjectPropertyQuery() {
 		String opplString = "?x:OBJECTPROPERTY SELECT ASSERTED Irreflexive ?x BEGIN ADD Irreflexive ?x END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testInverseObjectPropertiesQuery() {
 		String opplString = "?x:OBJECTPROPERTY, ?y:OBJECTPROPERTY SELECT ASSERTED ?x InverseOf (?y) BEGIN ADD ?x InverseOf (?y) END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testInverseFunctionalObjectPropertiesQuery() {
 		String opplString = "?x:OBJECTPROPERTY SELECT ASSERTED InverseFunctional (?x) BEGIN ADD InverseFunctional (?x) END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testFunctionalDataPropertiesQuery() {
 		String opplString = "?x:DATAPROPERTY SELECT ASSERTED Functional ?x BEGIN ADD Functional ?x END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testFunctionalObjectPropertiesQuery() {
 		String opplString = "?x:OBJECTPROPERTY SELECT ASSERTED Functional ?x BEGIN ADD Functional ?x END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testEquivalentObjectPropertiesQuery() {
 		String opplString = "?x:OBJECTPROPERTY,?y:OBJECTPROPERTY SELECT ASSERTED ?x equivalentTo ?y BEGIN ADD ?x equivalentTo ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testEquivalentDataPropertiesQuery() {
 		String opplString = "?x:DATAPROPERTY,?y:DATAPROPERTY SELECT ASSERTED ?x equivalentTo ?y BEGIN ADD ?x equivalentTo ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testEquivalentClassesQuery() {
 		String opplString = "?x:CLASS,?y:CLASS SELECT ASSERTED ?x equivalentTo ?y BEGIN ADD ?x equivalentTo ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testDisjointObjectPropertiesQuery() {
 		String opplString = "?x:OBJECTPROPERTY,?y:OBJECTPROPERTY SELECT ASSERTED ?x disjointWith ?y BEGIN ADD ?x disjointWith ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testDisjointDataPropertiesQuery() {
 		String opplString = "?x:DATAPROPERTY,?y:DATAPROPERTY SELECT ASSERTED ?x disjointWith ?y BEGIN ADD ?x disjointWith ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testDisjointClassesQuery() {
 		String opplString = "?x:CLASS,?y:CLASS SELECT ASSERTED ?x disjointWith ?y BEGIN ADD ?x disjointWith ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testDataPropertyRangeQuery() {
 		String opplString = "?x:DATAPROPERTY SELECT ASSERTED ?x range int BEGIN ADD ?x range int END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testObjectPropertyDomainQuery() {
 		String opplString = "?x:OBJECTPROPERTY, ?y:CLASS SELECT ASSERTED ?x domain ?y BEGIN ADD ?x domain ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testObjectPropertyRangeQuery() {
 		String opplString = "?x:OBJECTPROPERTY, ?y:CLASS SELECT ASSERTED ?x range ?y BEGIN ADD ?x range ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testDataPropertyDomainQuery() {
 		String opplString = "?x:DATAPROPERTY, ?y:CLASS SELECT ASSERTED	?x domain ?y  BEGIN ADD ?x domain ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testSameIndividualsQuery() {
 		String opplString = "?x:INDIVIDUAL,?y:INDIVIDUAL SELECT ASSERTED ?x  SameAs  ?y BEGIN ADD ?x  DifferentFrom ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testDifferentIndividualsQuery() {
 		String opplString = "?x:INDIVIDUAL,?y:INDIVIDUAL SELECT ASSERTED ?x  DifferentFrom  ?y BEGIN ADD ?x  DifferentFrom ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testNegativeObjectPropertyAssertionQuery() {
 		String opplString = "?x:INDIVIDUAL,?y:INDIVIDUAL,?z:OBJECTPROPERTY SELECT ASSERTED not ?x ?z ?y BEGIN ADD ?x ?z ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testObjectPropertyAssertionQuery() {
 		String opplString = "?x:INDIVIDUAL,?y:INDIVIDUAL,?z:OBJECTPROPERTY SELECT ASSERTED ?x ?z ?y BEGIN ADD ?x ?z ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testNegativeDataPropertyAssertionQuery() {
 		String opplString = "?x:INDIVIDUAL,?y:CONSTANT,?z:DATAPROPERTY SELECT ASSERTED not ?x ?z ?y BEGIN ADD ?x ?z ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testDataPropertyAssertionQuery() {
 		String opplString = "?x:INDIVIDUAL,?y:CONSTANT,?z:DATAPROPERTY SELECT ASSERTED ?x ?z ?y BEGIN ADD ?x ?z ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testSubClassQuery() {
 		String opplString = "?x:CLASS,?y:CLASS SELECT ASSERTED ?x subClassOf ?y BEGIN ADD ?x subClassOf ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testComplexSubClassUnaryQueries() {
@@ -377,19 +392,19 @@ public class TestQueries extends TestCase {
 
 	public void testBinarySubClassQuery() {
 		String opplString = "?x:CLASS,?y:CLASS, ?z:CLASS SELECT ASSERTED ?x subClassOf ?z, ASSERTED ?y subClassOf ?z BEGIN ADD ?x subClassOf ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 		opplString = "?x:CLASS,?y:CLASS, ?z:CLASS SELECT ASSERTED ?x subClassOf ?y, ASSERTED ?x subClassOf ?z BEGIN ADD ?x subClassOf ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testSubDataPropertyQuery() {
 		String opplString = "?x:DATAPROPERTY,?y:DATAPROPERTY SELECT ASSERTED ?x subPropertyOf ?y BEGIN ADD ?x subPropertyOf ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	public void testSubObjectPropertyQuery() {
 		String opplString = "?x:OBJECTPROPERTY,?y:OBJECTPROPERTY SELECT ASSERTED ?x subPropertyOf ?y BEGIN ADD ?x subPropertyOf ?y END;";
-		this.testQuery(opplString);
+		this.genericTestQuery(opplString);
 	}
 
 	private void testQuery(OPPLScript opplScript,
@@ -402,18 +417,21 @@ public class TestQueries extends TestCase {
 			resultWriter.append("\n");
 		}
 		OPPLQuery query = opplScript.getQuery();
-		List<OWLAxiom> queryAxioms = query.getAssertedAxioms();
-		queryAxioms.addAll(query.getAxioms());
-		double expected = 0;
-		VariableExtractor variableExtractor = new VariableExtractor(opplScript
-				.getConstraintSystem());
-		for (OWLAxiom owlAxiom : queryAxioms) {
-			Set<Variable> axiomVariables = owlAxiom.accept(variableExtractor);
-			expected += Math.pow(this.valuesCount, axiomVariables.size());
+		if (query != null) {
+			List<OWLAxiom> queryAxioms = query.getAssertedAxioms();
+			queryAxioms.addAll(query.getAxioms());
+			double expected = 0;
+			VariableExtractor variableExtractor = new VariableExtractor(
+					opplScript.getConstraintSystem());
+			for (OWLAxiom owlAxiom : queryAxioms) {
+				Set<Variable> axiomVariables = owlAxiom
+						.accept(variableExtractor);
+				expected += Math.pow(this.valuesCount, axiomVariables.size());
+			}
+			assertTrue("Query " + opplScript.render() + "\n" + " Actual "
+					+ results.size() + " Expected " + expected + "\n"
+					+ resultWriter.toString(), results.size() == expected);
 		}
-		assertTrue("Query " + opplScript.render() + "\n" + " Actual "
-				+ results.size() + " Expected " + expected + "\n"
-				+ resultWriter.toString(), results.size() == expected);
 		VariableDetector variableDetector = new VariableDetector(opplScript
 				.getConstraintSystem());
 		for (OWLAxiom owlAxiom : results) {
@@ -430,14 +448,18 @@ public class TestQueries extends TestCase {
 				.getLeaves();
 		final Set<OWLAxiom> correctResults = new HashSet<OWLAxiom>();
 		Set<OWLAxiom> queryAxioms = new HashSet<OWLAxiom>();
-		queryAxioms.addAll(opplScript.getQuery().getAssertedAxioms());
-		queryAxioms.addAll(opplScript.getQuery().getAxioms());
-		for (BindingNode bindingNode : checkLeaves) {
-			PartialOWLObjectInstantiator partialOWLObjectInstantiator = new PartialOWLObjectInstantiator(
-					bindingNode, opplScript.getConstraintSystem());
-			for (OWLAxiom owlAxiom : queryAxioms) {
-				correctResults.add((OWLAxiom) owlAxiom
-						.accept(partialOWLObjectInstantiator));
+		if (opplScript.getQuery() != null) {
+			queryAxioms.addAll(opplScript.getQuery().getAssertedAxioms());
+			queryAxioms.addAll(opplScript.getQuery().getAxioms());
+		}
+		if (checkLeaves != null) {
+			for (BindingNode bindingNode : checkLeaves) {
+				PartialOWLObjectInstantiator partialOWLObjectInstantiator = new PartialOWLObjectInstantiator(
+						bindingNode, opplScript.getConstraintSystem());
+				for (OWLAxiom owlAxiom : queryAxioms) {
+					correctResults.add((OWLAxiom) owlAxiom
+							.accept(partialOWLObjectInstantiator));
+				}
 			}
 		}
 		return correctResults;
