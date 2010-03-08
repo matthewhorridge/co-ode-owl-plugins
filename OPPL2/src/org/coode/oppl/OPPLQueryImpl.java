@@ -206,7 +206,7 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -226,7 +226,7 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override
@@ -301,7 +301,7 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 			BindingNode leaf;
 			while (it.hasNext()) {
 				leaf = it.next();
-				boolean holdingLeaf = this.checkConstraints(leaf);
+				boolean holdingLeaf = this.checkConstraint(leaf, c);
 				if (!holdingLeaf) {
 					it.remove();
 				}
@@ -387,6 +387,14 @@ public class OPPLQueryImpl implements OPPLQuery, OWLOntologyChangeListener {
 			c = it.next();
 			hold = c.accept(constraintChecker);
 		}
+		return hold;
+	}
+
+	private boolean checkConstraint(BindingNode leaf, AbstractConstraint c) {
+		boolean hold = true;
+		ConstraintChecker constraintChecker = new ConstraintChecker(leaf, this
+				.getConstraintSystem());
+		hold = c.accept(constraintChecker);
 		return hold;
 	}
 
