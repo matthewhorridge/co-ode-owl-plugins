@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,11 +56,7 @@ public class RegExpGeneratedValue implements
 			List<OWLEntity> toReturn = new ArrayList<OWLEntity>();
 			for (OWLEntity e : this.candidates) {
 				String toMatch = this.renderer.render(e);
-				Matcher m = regExpression.matcher(toMatch);
-				List<String> group = new ArrayList<String>();
-				while (m.find()) {
-					group.add(m.group());
-				}
+				List<String> group = actualMatch(regExpression, toMatch);
 				if (group.size() > 0) {
 					this.matches.put(e, group);
 					toReturn.add(e);
@@ -68,6 +65,24 @@ public class RegExpGeneratedValue implements
 			return toReturn;
 		}
 		return Collections.emptyList();
+	}
+
+	public static List<String> actualMatch(Pattern regExpression, String toMatch) {
+		List<String> group = new ArrayList<String>();
+		try {
+			Matcher m = regExpression.matcher(toMatch);
+			m.find();
+			MatchResult mr = m.toMatchResult();
+			for (int i = 0; i < mr.groupCount(); i++) {
+				group.add(mr.group(i));
+			}
+		} catch (IllegalStateException e) {
+			//XXX needs logging or something
+			//			System.out.println("RegExpGeneratedValue.actualMatch() Matching \""
+			//					+ regExpression + "\" to \"" + toMatch
+			//					+ "\": no match found");
+		}
+		return group;
 	}
 
 	private List<String> retrieve(OWLEntity e) {
