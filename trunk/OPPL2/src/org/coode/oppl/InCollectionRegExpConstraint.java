@@ -22,12 +22,10 @@
  */
 package org.coode.oppl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.coode.oppl.entity.OWLEntityRenderer;
@@ -36,6 +34,7 @@ import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedValue;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -74,11 +73,8 @@ public class InCollectionRegExpConstraint implements AbstractConstraint {
 			if (o instanceof OWLEntity) {
 				OWLEntity e = (OWLEntity) o;
 				String toMatch = entityRenderer.render(e);
-				Matcher m = regExpression.matcher(toMatch);
-				List<String> group = new ArrayList<String>();
-				while (m.find()) {
-					group.add(m.group());
-				}
+				List<String> group = RegExpGeneratedValue.actualMatch(
+						regExpression, toMatch);
 				if (group.size() > 0) {
 					toReturn.put(e, group);
 				}
