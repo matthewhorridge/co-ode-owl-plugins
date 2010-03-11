@@ -36,6 +36,13 @@ public class ExhaustingTestCase_TestQueries extends AbstractTestCase {
 		this.execute(result);
 	}
 
+	public void testAssembleVariablesConstants() {
+		OPPLScript result = this
+				.parse("?y:CLASS, ?k:CONSTANT=create(\"mytest\"), ?x:CLASS=create(\"Test\"+?k.RENDERING) SELECT ASSERTED ?y subClassOf Island  BEGIN ADD ?x subClassOf ?y END;");
+		this.expectedCorrect(result);
+		this.execute(result);
+	}
+
 	public void testAssembleConstantVariables() {
 		OPPLScript result = this
 				.parse("?y:CLASS, ?x:CLASS=create(\"'test \"+?y.RENDERING+\"'\") SELECT ASSERTED ?y subClassOf Island  BEGIN ADD ?y subClassOf ?x END;");
