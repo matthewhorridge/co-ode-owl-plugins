@@ -362,7 +362,8 @@ public class TestQueries extends TestCase {
 					0, cs);
 			Set<OWLDescription> superClasses = this.generateClasses(
 					dataFactory, 1, cs);
-			VariableExtractor variableExtractor = new VariableExtractor(cs);
+			VariableExtractor variableExtractor = new VariableExtractor(cs,
+					false);
 			int testSize = subClasses.size() * superClasses.size();
 			int i = 1;
 			for (OWLDescription subClass : subClasses) {
@@ -422,7 +423,7 @@ public class TestQueries extends TestCase {
 			queryAxioms.addAll(query.getAxioms());
 			double expected = 0;
 			VariableExtractor variableExtractor = new VariableExtractor(
-					opplScript.getConstraintSystem());
+					opplScript.getConstraintSystem(), false);
 			for (OWLAxiom owlAxiom : queryAxioms) {
 				Set<Variable> axiomVariables = owlAxiom
 						.accept(variableExtractor);
@@ -487,125 +488,92 @@ public class TestQueries extends TestCase {
 			Variable anotherIndividualVariable = cs.createVariable(
 					"?anotherIndividual_" + counter, VariableType.INDIVIDUAL);
 			switch (descriptionType) {
-				case CLASS:
-					toReturn.add(dataFactory
-							.getOWLClass(classVariable.getURI()));
-					break;
-				case OWLDATAEXACTCARDINALITYRESTRICTION:
-					toReturn.add(dataFactory
-							.getOWLDataExactCardinalityRestriction(dataFactory
-									.getOWLDataProperty(dataPropertyVariable
-											.getURI()), 3));
-					break;
-				case OWLDATAMAXCARDINALITYRESTRICTION:
-					toReturn.add(dataFactory
-							.getOWLDataMaxCardinalityRestriction(dataFactory
-									.getOWLDataProperty(dataPropertyVariable
-											.getURI()), 3));
-					break;
-				case OWLDATAMINCARDINALITYRESTRICTION:
-					toReturn.add(dataFactory
-							.getOWLDataMinCardinalityRestriction(dataFactory
-									.getOWLDataProperty(dataPropertyVariable
-											.getURI()), 3));
-					break;
-				case OWLDATAVALUERESTRICTION:
-					toReturn.add(dataFactory.getOWLDataValueRestriction(
-							dataFactory.getOWLDataProperty(dataPropertyVariable
-									.getURI()), dataFactory
-									.getOWLUntypedConstant(constantVariable
-											.getName())));
-					break;
-				case OWLOBJECTALLRESTRICTION:
-					toReturn
-							.add(dataFactory
-									.getOWLObjectAllRestriction(
-											dataFactory
-													.getOWLObjectProperty(objectPropertyVariable
-															.getURI()),
-											dataFactory
-													.getOWLClass(classVariable
-															.getURI())));
-					break;
-				case OWLOBJECTCOMPLEMENTOF:
-					toReturn.add(dataFactory
-							.getOWLObjectComplementOf(dataFactory
-									.getOWLClass(classVariable.getURI())));
-					break;
-				case OWLOBJECTEXACTCARDINALITYRESTRICTION:
-					toReturn
-							.add(dataFactory
-									.getOWLObjectExactCardinalityRestriction(
-											dataFactory
-													.getOWLObjectProperty(objectPropertyVariable
-															.getURI()), 2));
-					break;
-				case OWLOBJECTINTERSECTIONOF:
-					toReturn.add(dataFactory.getOWLObjectIntersectionOf(
-							dataFactory.getOWLClass(classVariable.getURI()),
-							dataFactory.getOWLClass(anotherClassVariable
-									.getURI())));
-					break;
-				case OWLOBJECTEXACTCARDINALITYRESTRCTION:
-					toReturn
-							.add(dataFactory
-									.getOWLObjectExactCardinalityRestriction(
-											dataFactory
-													.getOWLObjectProperty(objectPropertyVariable
-															.getURI()), 4));
-					break;
-				case OWLOBJECTMINCARDINALITYRESTRICTION:
-					toReturn
-							.add(dataFactory
-									.getOWLObjectMinCardinalityRestriction(
-											dataFactory
-													.getOWLObjectProperty(objectPropertyVariable
-															.getURI()), 4));
-					break;
-				case OWLOBJECTSOMERESTRICTION:
-					toReturn
-							.add(dataFactory
-									.getOWLObjectSomeRestriction(
-											dataFactory
-													.getOWLObjectProperty(objectPropertyVariable
-															.getURI()),
-											dataFactory
-													.getOWLClass(classVariable
-															.getURI())));
-					break;
-				case OWLOBJECTONEOF:
-					toReturn.add(dataFactory.getOWLObjectOneOf(dataFactory
-							.getOWLIndividual(anIndividualVariable.getURI()),
-							dataFactory
-									.getOWLIndividual(anotherIndividualVariable
-											.getURI())));
-					break;
-				case OWLOBJECTUNIONOF:
-					toReturn.add(dataFactory.getOWLObjectUnionOf(dataFactory
-							.getOWLClass(classVariable.getURI()), dataFactory
-							.getOWLClass(anotherClassVariable.getURI())));
-					break;
-				case OWLOBJECTVALUERESTRICTION:
-					toReturn
-							.add(dataFactory
-									.getOWLObjectValueRestriction(
-											dataFactory
-													.getOWLObjectProperty(objectPropertyVariable
-															.getURI()),
-											dataFactory
-													.getOWLIndividual(anIndividualVariable
-															.getURI())));
-					break;
-				case OWLOBJECTMAXCARDINALITYRESTRICTION:
-					toReturn
-							.add(dataFactory
-									.getOWLObjectMaxCardinalityRestriction(
-											dataFactory
-													.getOWLObjectProperty(objectPropertyVariable
-															.getURI()), 4));
-					break;
-				default:
-					break;
+			case CLASS:
+				toReturn.add(dataFactory.getOWLClass(classVariable.getURI()));
+				break;
+			case OWLDATAEXACTCARDINALITYRESTRICTION:
+				toReturn.add(dataFactory.getOWLDataExactCardinalityRestriction(
+						dataFactory.getOWLDataProperty(dataPropertyVariable
+								.getURI()), 3));
+				break;
+			case OWLDATAMAXCARDINALITYRESTRICTION:
+				toReturn.add(dataFactory.getOWLDataMaxCardinalityRestriction(
+						dataFactory.getOWLDataProperty(dataPropertyVariable
+								.getURI()), 3));
+				break;
+			case OWLDATAMINCARDINALITYRESTRICTION:
+				toReturn.add(dataFactory.getOWLDataMinCardinalityRestriction(
+						dataFactory.getOWLDataProperty(dataPropertyVariable
+								.getURI()), 3));
+				break;
+			case OWLDATAVALUERESTRICTION:
+				toReturn.add(dataFactory.getOWLDataValueRestriction(dataFactory
+						.getOWLDataProperty(dataPropertyVariable.getURI()),
+						dataFactory.getOWLUntypedConstant(constantVariable
+								.getName())));
+				break;
+			case OWLOBJECTALLRESTRICTION:
+				toReturn.add(dataFactory.getOWLObjectAllRestriction(dataFactory
+						.getOWLObjectProperty(objectPropertyVariable.getURI()),
+						dataFactory.getOWLClass(classVariable.getURI())));
+				break;
+			case OWLOBJECTCOMPLEMENTOF:
+				toReturn.add(dataFactory.getOWLObjectComplementOf(dataFactory
+						.getOWLClass(classVariable.getURI())));
+				break;
+			case OWLOBJECTEXACTCARDINALITYRESTRICTION:
+				toReturn.add(dataFactory
+						.getOWLObjectExactCardinalityRestriction(dataFactory
+								.getOWLObjectProperty(objectPropertyVariable
+										.getURI()), 2));
+				break;
+			case OWLOBJECTINTERSECTIONOF:
+				toReturn.add(dataFactory.getOWLObjectIntersectionOf(dataFactory
+						.getOWLClass(classVariable.getURI()), dataFactory
+						.getOWLClass(anotherClassVariable.getURI())));
+				break;
+			case OWLOBJECTEXACTCARDINALITYRESTRCTION:
+				toReturn.add(dataFactory
+						.getOWLObjectExactCardinalityRestriction(dataFactory
+								.getOWLObjectProperty(objectPropertyVariable
+										.getURI()), 4));
+				break;
+			case OWLOBJECTMINCARDINALITYRESTRICTION:
+				toReturn.add(dataFactory.getOWLObjectMinCardinalityRestriction(
+						dataFactory.getOWLObjectProperty(objectPropertyVariable
+								.getURI()), 4));
+				break;
+			case OWLOBJECTSOMERESTRICTION:
+				toReturn.add(dataFactory.getOWLObjectSomeRestriction(
+						dataFactory.getOWLObjectProperty(objectPropertyVariable
+								.getURI()), dataFactory
+								.getOWLClass(classVariable.getURI())));
+				break;
+			case OWLOBJECTONEOF:
+				toReturn.add(dataFactory.getOWLObjectOneOf(dataFactory
+						.getOWLIndividual(anIndividualVariable.getURI()),
+						dataFactory.getOWLIndividual(anotherIndividualVariable
+								.getURI())));
+				break;
+			case OWLOBJECTUNIONOF:
+				toReturn.add(dataFactory.getOWLObjectUnionOf(dataFactory
+						.getOWLClass(classVariable.getURI()), dataFactory
+						.getOWLClass(anotherClassVariable.getURI())));
+				break;
+			case OWLOBJECTVALUERESTRICTION:
+				toReturn.add(dataFactory.getOWLObjectValueRestriction(
+						dataFactory.getOWLObjectProperty(objectPropertyVariable
+								.getURI()),
+						dataFactory.getOWLIndividual(anIndividualVariable
+								.getURI())));
+				break;
+			case OWLOBJECTMAXCARDINALITYRESTRICTION:
+				toReturn.add(dataFactory.getOWLObjectMaxCardinalityRestriction(
+						dataFactory.getOWLObjectProperty(objectPropertyVariable
+								.getURI()), 4));
+				break;
+			default:
+				break;
 			}
 		}
 		return toReturn;

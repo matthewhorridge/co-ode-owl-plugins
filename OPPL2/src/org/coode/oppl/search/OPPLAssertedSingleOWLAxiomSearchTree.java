@@ -65,7 +65,7 @@ public class OPPLAssertedSingleOWLAxiomSearchTree extends
 			OPPLOWLAxiomSearchNode node) {
 		List<OPPLOWLAxiomSearchNode> toReturn = new ArrayList<OPPLOWLAxiomSearchNode>();
 		VariableExtractor variableExtractor = new VariableExtractor(this
-				.getConstraintSystem());
+				.getConstraintSystem(), false);
 		Set<Variable> variables = node.getAxiom().accept(variableExtractor);
 		BindingNode binding = node.getBinding();
 		for (Variable variable : variables) {
