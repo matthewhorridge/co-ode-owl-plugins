@@ -174,7 +174,8 @@ public class ConstraintSystem {
 	}
 
 	public Set<Variable> getAxiomVariables(OWLAxiom axiom) {
-		VariableExtractor axiomVariableExtractor = new VariableExtractor(this);
+		VariableExtractor axiomVariableExtractor = new VariableExtractor(this,
+				true);
 		Set<Variable> axiomVariables = axiom.accept(axiomVariableExtractor);
 		return new HashSet<Variable>(axiomVariables);
 	}
@@ -212,28 +213,28 @@ public class ConstraintSystem {
 				this.leaves);
 	}
 
-	//	protected void setupLeaves() {
-	//		Set<Variable> inputVariables = this.getInputVariables();
-	//		for (Variable variable : inputVariables) {
-	//			for (OWLOntology ontology1 : this.getOntologyManager()
-	//					.getOntologies()) {
-	//				Set<? extends OWLObject> referencedValues = variable.getType()
-	//						.getReferencedValues(ontology1);
-	//				for (OWLObject object : referencedValues) {
-	//					try {
-	//						variable.addPossibleBinding(object);
-	//					} catch (OWLReasonerException e) {
-	//						e.printStackTrace();
-	//					}
-	//				}
-	//			}
-	//		}
-	//		BindingNode root = new BindingNode(new HashSet<Assignment>(),
-	//				inputVariables);
-	//		LeafBrusher leafBrusher = new LeafBrusher();
-	//		root.accept(leafBrusher);
-	//		this.leaves = leafBrusher.getLeaves();
-	//	}
+	// protected void setupLeaves() {
+	// Set<Variable> inputVariables = this.getInputVariables();
+	// for (Variable variable : inputVariables) {
+	// for (OWLOntology ontology1 : this.getOntologyManager()
+	// .getOntologies()) {
+	// Set<? extends OWLObject> referencedValues = variable.getType()
+	// .getReferencedValues(ontology1);
+	// for (OWLObject object : referencedValues) {
+	// try {
+	// variable.addPossibleBinding(object);
+	// } catch (OWLReasonerException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// }
+	// }
+	// BindingNode root = new BindingNode(new HashSet<Assignment>(),
+	// inputVariables);
+	// LeafBrusher leafBrusher = new LeafBrusher();
+	// root.accept(leafBrusher);
+	// this.leaves = leafBrusher.getLeaves();
+	// }
 	public Set<Variable> getInputVariables() {
 		return this.variables.getInputVariables();
 	}

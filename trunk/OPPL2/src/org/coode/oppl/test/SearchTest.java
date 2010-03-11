@@ -136,7 +136,7 @@ public class SearchTest extends TestCase {
 					ConstraintSystem constraintSystem = opplScript
 							.getConstraintSystem();
 					VariableExtractor variableExtractor = new VariableExtractor(
-							constraintSystem);
+							constraintSystem, false);
 					Set<Variable> variables = node.accept(variableExtractor);
 					List<OWLAxiom> toReturn = new ArrayList<OWLAxiom>();
 					for (Variable variable : variables) {
@@ -356,7 +356,7 @@ public class SearchTest extends TestCase {
 			OWLAxiom firstAxiom = iterator.next();
 			OWLAxiom secondAxiom = iterator.next();
 			VariableExtractor variableExtractor = new VariableExtractor(
-					opplScript.getConstraintSystem());
+					opplScript.getConstraintSystem(), false);
 			OPPLAssertedOWLAxiomSearchTree searchTree = new OPPLAssertedOWLAxiomSearchTree(
 					opplScript.getConstraintSystem());
 			List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();
@@ -435,7 +435,7 @@ public class SearchTest extends TestCase {
 			OWLAxiom firstAxiom = iterator.next();
 			OWLAxiom secondAxiom = iterator.next();
 			VariableExtractor variableExtractor = new VariableExtractor(
-					opplScript.getConstraintSystem());
+					opplScript.getConstraintSystem(), false);
 			OPPLAssertedOWLAxiomSearchTree searchTree = new OPPLAssertedOWLAxiomSearchTree(
 					opplScript.getConstraintSystem());
 			List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();

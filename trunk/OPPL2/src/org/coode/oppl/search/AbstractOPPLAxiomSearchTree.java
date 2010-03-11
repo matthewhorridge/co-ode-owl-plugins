@@ -134,7 +134,7 @@ public abstract class AbstractOPPLAxiomSearchTree extends
 		Set<BindingNode> leaves = this.getConstraintSystem().getLeaves();
 		List<OPPLOWLAxiomSearchNode> toReturn = new ArrayList<OPPLOWLAxiomSearchNode>();
 		VariableExtractor variableExtractor = new VariableExtractor(this
-				.getConstraintSystem());
+				.getConstraintSystem(), false);
 		Set<Variable> variables = node.getAxiom().accept(variableExtractor);
 		BindingNode binding = node.getBinding();
 		for (Variable variable : variables) {

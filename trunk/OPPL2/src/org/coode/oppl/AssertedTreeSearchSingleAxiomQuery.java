@@ -79,7 +79,7 @@ public class AssertedTreeSearchSingleAxiomQuery extends AbstractAxiomQuery {
 		List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();
 		if (leaves == null) {
 			VariableExtractor variableExtractor = new VariableExtractor(this
-					.getConstraintSystem());
+					.getConstraintSystem(), false);
 			OPPLOWLAxiomSearchNode start = new OPPLOWLAxiomSearchNode(axiom,
 					new BindingNode(new HashSet<Assignment>(), axiom
 							.accept(variableExtractor)));
@@ -186,7 +186,7 @@ public class AssertedTreeSearchSingleAxiomQuery extends AbstractAxiomQuery {
 			Collection<? extends OWLAxiom> axioms) {
 		Set<OWLAxiom> toReturn = new HashSet<OWLAxiom>();
 		VariableExtractor variableExtractor = new VariableExtractor(this
-				.getConstraintSystem());
+				.getConstraintSystem(), true);
 		Set<Variable> variables = toMatchAxiom.accept(variableExtractor);
 		Collection<? extends OWLObject> toMatchAllOWLObjects = this
 				.extractOWLObjects(toMatchAxiom);

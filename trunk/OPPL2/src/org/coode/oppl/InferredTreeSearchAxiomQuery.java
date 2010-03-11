@@ -60,7 +60,7 @@ public class InferredTreeSearchAxiomQuery extends AbstractAxiomQuery {
 		OPPLInferredOWLAxiomSearchTree searchTree = new OPPLInferredOWLAxiomSearchTree(
 				this.getConstraintSystem());
 		VariableExtractor variableExtractor = new VariableExtractor(this
-				.getConstraintSystem());
+				.getConstraintSystem(), false);
 		List<List<OPPLOWLAxiomSearchNode>> solutions = new ArrayList<List<OPPLOWLAxiomSearchNode>>();
 		searchTree.exhaustiveSearchTree(new OPPLOWLAxiomSearchNode(axiom,
 				new BindingNode(new HashSet<Assignment>(), axiom

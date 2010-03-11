@@ -63,7 +63,7 @@ public class OWLAxiomSearchTree extends SearchTree<OWLAxiom> {
 		Set<BindingNode> leaves = this.getConstraintSystem().getLeaves();
 		List<OWLAxiom> toReturn = new ArrayList<OWLAxiom>();
 		VariableExtractor variableExtractor = new VariableExtractor(this
-				.getConstraintSystem());
+				.getConstraintSystem(), false);
 		Set<Variable> variables = node.accept(variableExtractor);
 		for (Variable variable : variables) {
 			Collection<OWLObject> values = new HashSet<OWLObject>();

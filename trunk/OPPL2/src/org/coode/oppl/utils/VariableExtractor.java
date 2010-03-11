@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLAxiomAnnotationAxiom;
 import org.semanticweb.owl.model.OWLClass;
@@ -122,16 +124,19 @@ import org.semanticweb.owl.model.SWRLSameAsAtom;
 @SuppressWarnings("unused")
 public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 	private final ConstraintSystem constraintSystem;
+	private final boolean includeGenerated;
 
 	/**
 	 * @param constraintSystem
 	 */
-	public VariableExtractor(ConstraintSystem constraintSystem) {
+	public VariableExtractor(ConstraintSystem constraintSystem,
+			boolean includeGenerated) {
 		if (constraintSystem == null) {
 			throw new NullPointerException(
 					"The constraint system cannot be null");
 		}
 		this.constraintSystem = constraintSystem;
+		this.includeGenerated = includeGenerated;
 	}
 
 	public Set<Variable> visit(OWLSubClassAxiom axiom) {
@@ -432,13 +437,32 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 
 	public Set<Variable> visit(OWLClass desc) {
 		boolean isVariable = this.constraintSystem.isVariable(desc);
-		Set<Variable> toReturn = new HashSet<Variable>();
+		final Set<Variable> toReturn = new HashSet<Variable>();
 		if (isVariable) {
 			Variable variable = this.constraintSystem
 					.getVariable(desc.getURI());
-			toReturn.add(variable);
+			this.vetoVariableIntoCollection(toReturn, variable);
 		}
 		return toReturn;
+	}
+
+	/**
+	 * @param collection
+	 * @param variable
+	 */
+	private void vetoVariableIntoCollection(final Set<Variable> collection,
+			Variable variable) {
+		variable.accept(new PlainVariableVisitor() {
+			public void visit(GeneratedVariable<?> v) {
+				if (VariableExtractor.this.includeGenerated) {
+					collection.add(v);
+				}
+			}
+
+			public void visit(Variable v) {
+				collection.add(v);
+			}
+		});
 	}
 
 	public Set<Variable> visit(OWLObjectIntersectionOf desc) {
@@ -623,7 +647,7 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 		if (isVariable) {
 			Variable variable = this.constraintSystem.getVariable(node
 					.getLiteral());
-			toReturn.add(variable);
+			this.vetoVariableIntoCollection(toReturn, variable);
 		}
 		return toReturn;
 	}
@@ -634,7 +658,7 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 		if (isVariable) {
 			Variable variable = this.constraintSystem.getVariable(node
 					.getLiteral());
-			toReturn.add(variable);
+			this.vetoVariableIntoCollection(toReturn, variable);
 		}
 		return toReturn;
 	}
@@ -649,7 +673,7 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 		if (isVariable) {
 			Variable variable = this.constraintSystem.getVariable(property
 					.getURI());
-			toReturn.add(variable);
+			this.vetoVariableIntoCollection(toReturn, variable);
 		}
 		return toReturn;
 	}
@@ -667,7 +691,7 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 		if (isVariable) {
 			Variable variable = this.constraintSystem.getVariable(property
 					.getURI());
-			toReturn.add(variable);
+			this.vetoVariableIntoCollection(toReturn, variable);
 		}
 		return toReturn;
 	}
@@ -678,7 +702,7 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 		if (isVariable) {
 			Variable variable = this.constraintSystem.getVariable(individual
 					.getURI());
-			toReturn.add(variable);
+			this.vetoVariableIntoCollection(toReturn, variable);
 		}
 		return toReturn;
 	}
