@@ -9,6 +9,7 @@ import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.generated.AttributeGenerator;
+import org.semanticweb.owl.model.OWLConstant;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -36,6 +37,8 @@ final class RenderingAttributeGenerator implements AttributeGenerator<String> {
 		String toReturn = null;
 		if (object instanceof OWLEntity) {
 			toReturn = this.entityRenderer.render((OWLEntity) object);
+		} else if (object instanceof OWLConstant) {
+			toReturn = ((OWLConstant) object).getLiteral();
 		} else {
 			toReturn = object == null ? null : object.toString();
 		}
