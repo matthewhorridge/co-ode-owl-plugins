@@ -20,6 +20,7 @@ import org.coode.oppl.syntax.OPPLParser;
 import org.coode.oppl.utils.ParserFactory;
 import org.mindswap.pellet.owlapi.PelletReasonerFactory;
 import org.semanticweb.owl.apibinding.OWLManager;
+import org.semanticweb.owl.expression.OWLEntityChecker;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.inference.OWLReasonerFactory;
@@ -99,16 +100,20 @@ public abstract class AbstractTestCase extends TestCase {
 		this.testQueries.genericTestQuery(script);
 	}
 
-	private void init() {
-		ParserFactory.initParser(";", this.getOntology("test.owl"),
-				ontologyManager, null);
+	protected void init(String name) {
+		ParserFactory.initParser(";", this.getOntology(name), ontologyManager,
+				null);
+		//		OWLModelManager manager = new OWLModelManagerImpl();
+		//		manager.setActiveOntology(this.getOntology(name));
+		//		OWLEntityChecker test = new ProtegeOWLEntityChecker(manager);
+		//		ParserFactory.getInstance().getOPPLFactory().setOWLEntityChecker(test);
 	}
 
 	@Override
 	protected void setUp() throws Exception {
 		// reload the ontology for each test;
 		// tests are independent of each other
-		this.init();
+		this.init("test.owl");
 		this.testQueries.setUp();
 	}
 
@@ -153,6 +158,27 @@ public abstract class AbstractTestCase extends TestCase {
 			}
 			OPPLParser parser = ParserFactory.initParser(script, this
 					.getOntology("test.owl"), ontologyManager, testReasoner);
+			return parser.Start();
+		} catch (Exception e) {
+			if (this.longStackTrace) {
+				e.printStackTrace(this.p);
+			} else {
+				this.p.print(e.getMessage().replace("\n", "\t"));
+			}
+			this.p.flush();
+		}
+		return null;
+	}
+
+	protected OPPLScript parse(String script, String ontology,
+			OWLEntityChecker checker) {
+		try {
+			if (testReasoner == null) {
+				testReasoner = this.initReasoner(this.getOntology(ontology));
+			}
+			OPPLParser parser = ParserFactory.initParser(script, this
+					.getOntology("test.owl"), ontologyManager, testReasoner);
+			parser.getOPPLFactory().setOWLEntityChecker(checker);
 			return parser.Start();
 		} catch (Exception e) {
 			if (this.longStackTrace) {
