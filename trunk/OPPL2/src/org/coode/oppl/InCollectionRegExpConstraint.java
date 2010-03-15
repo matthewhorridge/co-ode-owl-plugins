@@ -23,9 +23,11 @@
 package org.coode.oppl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.regex.Pattern;
 
 import org.coode.oppl.entity.OWLEntityRenderer;
@@ -50,6 +52,7 @@ public class InCollectionRegExpConstraint implements AbstractConstraint {
 	private final Map<OWLEntity, List<String>> collection = new HashMap<OWLEntity, List<String>>();
 	private final SingleValueGeneratedValue<String> expression;
 	private ConstraintSystem cs;
+	private final WeakHashMap<String, Collection<OWLEntity>> cache = new WeakHashMap<String, Collection<OWLEntity>>();
 
 	/**
 	 * @param variable
@@ -106,10 +109,15 @@ public class InCollectionRegExpConstraint implements AbstractConstraint {
 	 */
 	public Collection<OWLEntity> getCollection(BindingNode node) {
 		String regexp = this.expression.getGeneratedValue(node);
-		if (regexp != null) {
-			this.collection.putAll(this.getMatches(regexp));
+		if (regexp == null) {
+			return Collections.emptyList();
 		}
-		return this.collection.keySet();
+		if (!this.cache.containsKey(regexp)) {
+			Map<OWLEntity, List<String>> matches = this.getMatches(regexp);
+			this.collection.putAll(matches);
+			this.cache.put(regexp, this.collection.keySet());
+		}
+		return this.cache.get(regexp);
 	}
 
 	@Override
