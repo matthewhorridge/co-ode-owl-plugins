@@ -41,7 +41,7 @@ import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -860,7 +860,7 @@ public class PatternModel implements OPPLScript, PatternOPPLScript {
 				.getOWLDataFactory();
 		OWLObject owlObject = null;
 		VariableTypeVisitorEx<OWLObject> visitor = new VariableTypeVisitorEx<OWLObject>() {
-			public OWLObject visit(GeneratedVariable<?> v) {
+			public OWLObject visit(SingleValueGeneratedVariable<?> v) {
 				switch (v.getType()) {
 					case CLASS:
 						return dataFactory.getOWLClass(v.getURI());

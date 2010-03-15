@@ -30,8 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.VariableGeneratedValue;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLAxiomAnnotationAxiom;
@@ -178,9 +178,9 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 		// toReturn = this.replacements.get(i);
 		// }
 		// }
-		else if (v instanceof GeneratedVariable<?>) {
+		else if (v instanceof SingleValueGeneratedVariable<?>) {
 			// generated variable
-			GeneratedValue<?> value = ((GeneratedVariable<?>) v).getValue();
+			SingleValueGeneratedValue<?> value = ((SingleValueGeneratedVariable<?>) v).getValue();
 			if (value instanceof VariableGeneratedValue<?>) {
 				Variable generatingVariable = ((VariableGeneratedValue<?>) value)
 						.getVariable();
@@ -189,7 +189,7 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 					VariableGeneratedValue<?> replaceValue = ((VariableGeneratedValue<?>) value)
 							.replaceVariable(generatingVariable,
 									this.constraintSystem);
-					toReturn = ((GeneratedVariable<?>) v)
+					toReturn = ((SingleValueGeneratedVariable<?>) v)
 							.replaceValue(replaceValue);
 				}
 			} else {
@@ -211,8 +211,8 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 	}
 
 	private boolean isGenVariable(Variable variable) {
-		return variable instanceof GeneratedVariable<?>
-				&& ((GeneratedVariable<?>) variable).getValue() instanceof VariableGeneratedValue<?>;
+		return variable instanceof SingleValueGeneratedVariable<?>
+				&& ((SingleValueGeneratedVariable<?>) variable).getValue() instanceof VariableGeneratedValue<?>;
 	}
 
 	public OWLObject visit(OWLIndividual individual) {
@@ -221,14 +221,14 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 			Variable variable = this.constraintSystem.getVariable(individual
 					.getURI());
 			if (isGenVariable(variable)) {
-				VariableGeneratedValue<?> variableGeneratedValue = (VariableGeneratedValue<?>) ((GeneratedVariable<?>) variable)
+				VariableGeneratedValue<?> variableGeneratedValue = (VariableGeneratedValue<?>) ((SingleValueGeneratedVariable<?>) variable)
 						.getValue();
 				Object replacement = getReplacement(variableGeneratedValue);
 				if (replacement instanceof Variable) {
 					VariableGeneratedValue<?> replaceValue = variableGeneratedValue
 							.replaceVariable((Variable) replacement,
 									this.constraintSystem);
-					GeneratedVariable<?> replaceVariable = ((GeneratedVariable<?>) variable)
+					SingleValueGeneratedVariable<?> replaceVariable = ((SingleValueGeneratedVariable<?>) variable)
 							.replaceValue(replaceValue);
 					toReturn = this.dataFactory
 							.getOWLIndividual(replaceVariable.getURI());
@@ -256,7 +256,7 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 	}
 
 	private VariableGeneratedValue<?> getVGenValue(Variable v) {
-		return (VariableGeneratedValue<?>) ((GeneratedVariable<?>) v)
+		return (VariableGeneratedValue<?>) ((SingleValueGeneratedVariable<?>) v)
 				.getValue();
 	}
 
@@ -323,7 +323,7 @@ public class ReferenceReplacement implements OWLObjectVisitorEx<OWLObject> {
 			VariableGeneratedValue<?> vGenValue, Object replacement) {
 		VariableGeneratedValue<?> replaceValue = vGenValue.replaceVariable(
 				(Variable) replacement, this.constraintSystem);
-		GeneratedVariable<?> replaceVariable = ((GeneratedVariable<?>) variable)
+		SingleValueGeneratedVariable<?> replaceVariable = ((SingleValueGeneratedVariable<?>) variable)
 				.replaceValue(replaceValue);
 		return replaceVariable.getURI();
 	}
