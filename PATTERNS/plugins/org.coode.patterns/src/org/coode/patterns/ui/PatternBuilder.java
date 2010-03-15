@@ -71,7 +71,7 @@ import org.coode.oppl.protege.ui.message.Error;
 import org.coode.oppl.protege.ui.message.MessageListCellRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.patterns.AbstractPatternModelFactory;
 import org.coode.patterns.EmptyActionListException;
 import org.coode.patterns.EmptyVariableListException;
@@ -597,7 +597,7 @@ public class PatternBuilder extends
 			DefaultListModel model = (DefaultListModel) PatternVariableList.this
 					.getModel();
 			int i = -1;
-			if (listItem.getVariable() instanceof GeneratedVariable<?>) {
+			if (listItem.getVariable() instanceof SingleValueGeneratedVariable<?>) {
 				i = model.getSize();
 			} else {
 				Enumeration<?> elements = model.elements();
@@ -645,7 +645,7 @@ public class PatternBuilder extends
 		public void handleEdit() {
 			ConstraintSystem cs = PatternBuilder.this.patternBuilderModel
 					.getConstraintSystem();
-			final AbstractVariableEditor variableEditor = this.getVariable() instanceof GeneratedVariable<?> ? new GeneratedVariableEditor(
+			final AbstractVariableEditor variableEditor = this.getVariable() instanceof SingleValueGeneratedVariable<?> ? new GeneratedVariableEditor(
 					PatternBuilder.this.owlEditorKit, cs)
 					: new VariableEditor(PatternBuilder.this.owlEditorKit, cs);
 			variableEditor.setVariable(this.getVariable());

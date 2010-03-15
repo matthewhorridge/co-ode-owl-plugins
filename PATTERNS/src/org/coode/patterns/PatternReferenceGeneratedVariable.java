@@ -33,8 +33,8 @@ import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.generated.AbstractGeneratedVariable;
-import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.semanticweb.owl.model.OWLObject;
 
 import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRenderer;
@@ -47,7 +47,7 @@ import uk.ac.manchester.cs.owl.mansyntaxrenderer.ManchesterOWLSyntaxObjectRender
 public class PatternReferenceGeneratedVariable extends
 		AbstractGeneratedVariable<PatternReference> {
 	public PatternReferenceGeneratedVariable(VariableType type,
-			GeneratedValue<PatternReference> value) {
+			SingleValueGeneratedValue<PatternReference> value) {
 		super(value.toString(), type, value);
 	}
 
@@ -57,7 +57,7 @@ public class PatternReferenceGeneratedVariable extends
 	 *         Dec 10, 2008
 	 */
 	private static class PatternReferenceGeneratedValue implements
-			GeneratedValue<PatternReference> {
+			SingleValueGeneratedValue<PatternReference> {
 		private final PatternReference patternReference;
 
 		public PatternReferenceGeneratedValue(PatternReference patternReference) {
@@ -65,7 +65,7 @@ public class PatternReferenceGeneratedVariable extends
 		}
 
 		/**
-		 * @see org.coode.oppl.variablemansyntax.generated.GeneratedValue#getGeneratedValue(org.coode.oppl.variablemansyntax.bindingtree.BindingNode)
+		 * @see org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedValue#getGeneratedValue(org.coode.oppl.variablemansyntax.bindingtree.BindingNode)
 		 */
 		public PatternReference getGeneratedValue(BindingNode node) {
 			List<List<String>> newArguments = new ArrayList<List<String>>(
@@ -130,12 +130,12 @@ public class PatternReferenceGeneratedVariable extends
 	}
 
 	@Override
-	protected GeneratedVariable<PatternReference> replace(
-			GeneratedValue<PatternReference> v) {
+	protected SingleValueGeneratedVariable<PatternReference> replace(
+			SingleValueGeneratedValue<PatternReference> v) {
 		return new PatternReferenceGeneratedVariable(this.getType(), v);
 	}
 
-	public static GeneratedValue<PatternReference> getPatternReferenceGeneratedValue(
+	public static SingleValueGeneratedValue<PatternReference> getPatternReferenceGeneratedValue(
 			PatternReference patternReference) {
 		return new PatternReferenceGeneratedValue(patternReference);
 	}

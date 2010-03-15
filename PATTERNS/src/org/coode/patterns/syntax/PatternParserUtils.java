@@ -28,7 +28,7 @@ import org.coode.oppl.entity.OWLEntityCreationSet;
 import org.coode.oppl.entity.OWLEntityFactory;
 import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -57,7 +57,7 @@ public class PatternParserUtils {
 		final OWLEntityChecker entityChecker = factory.getOWLEntityChecker();
 		OWLEntityCreationSet<? extends OWLEntity> owlCreationSet = null;
 		VariableTypeVisitorEx<OWLEntity> entityVisitor = new VariableTypeVisitorEx<OWLEntity>() {
-			public OWLEntity visit(GeneratedVariable<?> v) {
+			public OWLEntity visit(SingleValueGeneratedVariable<?> v) {
 				switch (v.getType()) {
 					case CLASS:
 						return entityChecker.getOWLClass(toCreate);
@@ -101,7 +101,7 @@ public class PatternParserUtils {
 		if (createdEntity == null) {
 			VariableTypeVisitorEx<OWLEntityCreationSet<? extends OWLEntity>> owlSetVisitor = new VariableTypeVisitorEx<OWLEntityCreationSet<? extends OWLEntity>>() {
 				public OWLEntityCreationSet<? extends OWLEntity> visit(
-						GeneratedVariable<?> v) {
+						SingleValueGeneratedVariable<?> v) {
 					switch (v.getType()) {
 						case CLASS:
 							try {

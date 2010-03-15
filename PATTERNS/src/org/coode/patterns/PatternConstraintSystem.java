@@ -36,8 +36,8 @@ import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.generated.AbstractCollectionGeneratedValue;
-import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLClass;
@@ -52,7 +52,7 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 public class PatternConstraintSystem extends ConstraintSystem {
 	public static final String THIS_CLASS_VARIABLE_NAME = "?_thisClass";
 	public static final String THIS_CLASS_VARIABLE_CONSTANT_SYMBOL = "$thisClass";
-	private Map<String, GeneratedVariable<?>> specialVariables = new HashMap<String, GeneratedVariable<?>>();
+	private Map<String, SingleValueGeneratedVariable<?>> specialVariables = new HashMap<String, SingleValueGeneratedVariable<?>>();
 	private final ConstraintSystem constraintSystem;
 	private Map<String, String> specialVariableRenderings = new HashMap<String, String>();
 	private final AbstractPatternModelFactory factory;
@@ -110,7 +110,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 		if (variable == null) {
 			Iterator<String> it = this.specialVariables.keySet().iterator();
 			boolean found = false;
-			GeneratedVariable<?> specialVariable = null;
+			SingleValueGeneratedVariable<?> specialVariable = null;
 			while (!found && it.hasNext()) {
 				String referenceName = it.next();
 				specialVariable = this.specialVariables.get(referenceName);
@@ -165,7 +165,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	public String resolvePatternConstants(String s) {
 		String toReturn = s;
 		for (String specialVariableName : this.specialVariables.keySet()) {
-			GeneratedVariable<?> variable = this.specialVariables
+			SingleValueGeneratedVariable<?> variable = this.specialVariables
 					.get(specialVariableName);
 			if (variable != null) {
 				toReturn = toReturn.replaceAll("\\" + specialVariableName,
@@ -205,7 +205,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 		List<Variable> referenceVariables = patternReference
 				.getExtractedPattern().getVariables();
 		for (Variable variable : referenceVariables) {
-			if (variable instanceof GeneratedVariable<?>) {
+			if (variable instanceof SingleValueGeneratedVariable<?>) {
 				this.importVariable(variable);
 			}
 		}
@@ -228,8 +228,8 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	}
 
 	@Override
-	public GeneratedVariable<String> createStringGeneratedVariable(String name,
-			VariableType type, GeneratedValue<String> value) {
+	public SingleValueGeneratedVariable<String> createStringGeneratedVariable(String name,
+			VariableType type, SingleValueGeneratedValue<String> value) {
 		return this.constraintSystem.createStringGeneratedVariable(name, type,
 				value);
 	}
@@ -240,7 +240,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	}
 
 	@Override
-	public GeneratedVariable<Collection<OWLClass>> createIntersectionGeneratedVariable(
+	public SingleValueGeneratedVariable<Collection<OWLClass>> createIntersectionGeneratedVariable(
 			String name, VariableType type,
 			AbstractCollectionGeneratedValue<OWLClass> collection) {
 		return this.constraintSystem.createIntersectionGeneratedVariable(name,
@@ -248,7 +248,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	}
 
 	@Override
-	public GeneratedVariable<Collection<OWLClass>> createUnionGeneratedVariable(
+	public SingleValueGeneratedVariable<Collection<OWLClass>> createUnionGeneratedVariable(
 			String name, VariableType type,
 			AbstractCollectionGeneratedValue<OWLClass> collection) {
 		return this.constraintSystem.createUnionGeneratedVariable(name, type,
@@ -262,7 +262,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 
 	@Override
 	public String render(Variable variable) {
-		GeneratedVariable<?> specialVariable = this.specialVariables
+		SingleValueGeneratedVariable<?> specialVariable = this.specialVariables
 				.get(variable.getName());
 		boolean specialRenderingPresent = specialVariable != null
 				&& this.specialVariableRenderings
@@ -274,7 +274,7 @@ public class PatternConstraintSystem extends ConstraintSystem {
 	}
 
 	private void createSpecialVariable(String name, String renderedName,
-			GeneratedVariable<?> variable) {
+			SingleValueGeneratedVariable<?> variable) {
 		this.specialVariables.put(name, variable);
 		this.specialVariableRenderings.put(name, renderedName);
 	}

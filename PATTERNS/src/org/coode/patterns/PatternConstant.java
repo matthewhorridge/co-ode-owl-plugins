@@ -32,8 +32,8 @@ import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.generated.AbstractGeneratedVariable;
-import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
@@ -46,7 +46,7 @@ import org.semanticweb.owl.model.OWLObject;
 public class PatternConstant<P extends OWLEntity> extends
 		AbstractGeneratedVariable<OWLObject> {
 	private class EmptyConstantGeratedValue implements
-			GeneratedValue<OWLObject> {
+			SingleValueGeneratedValue<OWLObject> {
 		private final OWLDataFactory dataFactory;
 
 		/**
@@ -98,7 +98,7 @@ public class PatternConstant<P extends OWLEntity> extends
 	}
 
 	private static class ConstantGeneratedValue<P extends OWLObject> implements
-			GeneratedValue<OWLObject> {
+			SingleValueGeneratedValue<OWLObject> {
 		private final P constantValue;
 
 		/**
@@ -119,7 +119,7 @@ public class PatternConstant<P extends OWLEntity> extends
 	}
 
 	public PatternConstant(String name, VariableType type,
-			GeneratedValue<OWLObject> value) {
+			SingleValueGeneratedValue<OWLObject> value) {
 		super(name, type, value);
 	}
 
@@ -129,7 +129,7 @@ public class PatternConstant<P extends OWLEntity> extends
 		this.setValue(new EmptyConstantGeratedValue(dataFactory));
 	}
 
-	public static GeneratedValue<OWLObject> createConstantGeneratedValue(
+	public static SingleValueGeneratedValue<OWLObject> createConstantGeneratedValue(
 			OWLObject owlObject) {
 		return new ConstantGeneratedValue<OWLObject>(owlObject);
 	}
@@ -140,7 +140,7 @@ public class PatternConstant<P extends OWLEntity> extends
 	}
 
 	@Override
-	protected GeneratedVariable<OWLObject> replace(GeneratedValue<OWLObject> v) {
+	protected SingleValueGeneratedVariable<OWLObject> replace(SingleValueGeneratedValue<OWLObject> v) {
 		return this;
 	}
 
