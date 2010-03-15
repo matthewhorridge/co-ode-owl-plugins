@@ -56,6 +56,7 @@ public class OPPLFactory implements OPPLAbstractFactory {
 	private VariableScopeChecker variableScopeChecker = null;
 	private final OWLReasoner reasoner;
 	private final OWLOntology ontology;
+	private OWLEntityChecker entityChecker = null;
 
 	/**
 	 * @param ontologyManager
@@ -67,13 +68,10 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		this.ontologyManager = ontologyManager;
 		this.ontology = ontology;
 		this.reasoner = reasoner;
+		this.entityChecker = this.defaultEntityChecker();
 	}
 
-	/**
-	 * 
-	 * @see org.coode.oppl.OPPLAbstractFactory#getOWLEntityChecker()
-	 */
-	public OWLEntityChecker getOWLEntityChecker() {
+	private OWLEntityChecker defaultEntityChecker() {
 		BidirectionalShortFormProviderAdapter bshp = new BidirectionalShortFormProviderAdapter(
 				this.ontologyManager.getOntologies(),
 				new SimpleShortFormProvider());
@@ -81,6 +79,18 @@ public class OPPLFactory implements OPPLAbstractFactory {
 		bshp.add(this.ontologyManager.getOWLDataFactory().getOWLThing());
 		bshp.add(this.ontologyManager.getOWLDataFactory().getOWLNothing());
 		return new ShortFormEntityChecker(bshp);
+	}
+
+	/**
+	 * 
+	 * @see org.coode.oppl.OPPLAbstractFactory#getOWLEntityChecker()
+	 */
+	public OWLEntityChecker getOWLEntityChecker() {
+		return this.entityChecker;
+	}
+
+	public void setOWLEntityChecker(OWLEntityChecker c) {
+		this.entityChecker = c;
 	}
 
 	/**
