@@ -34,7 +34,7 @@ import javax.swing.ListCellRenderer;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.owl.OWLEditorKit;
 
@@ -76,7 +76,7 @@ public class VariableList extends MList {
 										.getClass()
 										.getClassLoader()
 										.getResource(
-												variable instanceof GeneratedVariable<?> ? "cog.png"
+												variable instanceof SingleValueGeneratedVariable<?> ? "cog.png"
 														: "user-icon.gif")));
 				label.setText(VariableList.this.constraintSystem
 						.render(variable)

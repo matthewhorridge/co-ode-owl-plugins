@@ -55,31 +55,29 @@ import org.semanticweb.owl.model.OWLException;
  * @author Luigi Iannone
  * 
  */
-public class GeneratedVariableEditor extends AbstractVariableEditor {
+public class RegExpVariableEditor extends AbstractVariableEditor {
 	private final class VariableOWLExpressionChecker implements
-			OWLExpressionChecker<SingleValueGeneratedVariable<?>> {
+			OWLExpressionChecker<RegExpGenerated> {
 		public VariableOWLExpressionChecker() {
 		}
 
-		private SingleValueGeneratedVariable<?> lastEditedObject = null;
+		private RegExpGenerated lastEditedObject = null;
 
 		public void check(String text) throws OWLExpressionParserException {
 			this.lastEditedObject = null;
-			ProtegeParserFactory
-					.initParser(text, GeneratedVariableEditor.this.owlEditorKit
-							.getModelManager(), null);
+			ProtegeParserFactory.initParser(text,
+					RegExpVariableEditor.this.owlEditorKit.getModelManager(),
+					null);
 			try {
-				String variableName = GeneratedVariableEditor.this.variableNameExpressionEditor
+				String variableName = RegExpVariableEditor.this.variableNameExpressionEditor
 						.createObject();
-				Object selectedValue = GeneratedVariableEditor.this.jRadioButtonTypeMap
-						.get(GeneratedVariableEditor.this.findSelectedButton());
+				Object selectedValue = RegExpVariableEditor.this.jRadioButtonTypeMap
+						.get(RegExpVariableEditor.this.findSelectedButton());
 				if (selectedValue instanceof VariableType) {
-					SingleValueGeneratedVariable<?> variableDefinition = (SingleValueGeneratedVariable<?>) ParserFactory
-							.getInstance()
-							.opplFunction(
-									variableName,
+					RegExpGenerated variableDefinition = (RegExpGenerated) ParserFactory
+							.getInstance().opplFunction(variableName,
 									(VariableType) selectedValue,
-									GeneratedVariableEditor.this.constraintSystem);
+									RegExpVariableEditor.this.constraintSystem);
 					this.lastEditedObject = variableDefinition;
 				} else {
 					this.lastEditedObject = null;
@@ -98,7 +96,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 			}
 		}
 
-		public SingleValueGeneratedVariable<?> createObject(String text)
+		public RegExpGenerated createObject(String text)
 				throws OWLExpressionParserException {
 			this.check(text);
 			return this.lastEditedObject;
@@ -111,7 +109,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 
 		@SuppressWarnings("unused")
 		public void actionPerformed(ActionEvent e) {
-			GeneratedVariableEditor.this.handleChange();
+			RegExpVariableEditor.this.handleChange();
 		}
 	}
 
@@ -120,9 +118,9 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 	protected final ConstraintSystem constraintSystem;
 	protected final Map<JRadioButton, VariableType> jRadioButtonTypeMap = new HashMap<JRadioButton, VariableType>();
 	private final Map<VariableType, JRadioButton> typeJRadioButonMap = new HashMap<VariableType, JRadioButton>();
-	private final ExpressionEditor<SingleValueGeneratedVariable<?>> opplFunctionEditor;
+	private final ExpressionEditor<RegExpGenerated> opplFunctionEditor;
 
-	public GeneratedVariableEditor(OWLEditorKit owlEditorKit,
+	public RegExpVariableEditor(OWLEditorKit owlEditorKit,
 			ConstraintSystem constraintSystem) {
 		this.setLayout(new BorderLayout());
 		this.owlEditorKit = owlEditorKit;
@@ -156,7 +154,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
 					public void verifiedStatusChanged(boolean newState) {
 						if (newState) {
-							GeneratedVariableEditor.this.handleChange();
+							RegExpVariableEditor.this.handleChange();
 						}
 					}
 				});
@@ -183,13 +181,13 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 		variableTypeAndScopePanel.setBorder(ComponentFactory
 				.createTitledBorder("Variable Type"));
 		this.add(variableTypeAndScopePanel, BorderLayout.CENTER);
-		this.opplFunctionEditor = new ExpressionEditor<SingleValueGeneratedVariable<?>>(
+		this.opplFunctionEditor = new ExpressionEditor<RegExpGenerated>(
 				this.owlEditorKit, new VariableOWLExpressionChecker());
 		this.opplFunctionEditor
 				.addStatusChangedListener(new InputVerificationStatusChangedListener() {
 					@SuppressWarnings("unused")
 					public void verifiedStatusChanged(boolean newState) {
-						GeneratedVariableEditor.this.handleChange();
+						RegExpVariableEditor.this.handleChange();
 					}
 				});
 		JPanel opplFunctionEditorPanel = new JPanel(new BorderLayout());
@@ -236,7 +234,7 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 	}
 
 	@Override
-	public void setVariable(SingleValueGeneratedVariable<?> v) {
+	public void setVariable(RegExpGenerated v) {
 		this.clear();
 		this.variableNameExpressionEditor.setText(v.getName());
 		this.typeJRadioButonMap.get(v.getType()).setSelected(true);
@@ -245,11 +243,11 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 
 	@Override
 	public void setVariable(Variable variable) {
-		if (variable instanceof SingleValueGeneratedVariable<?>) {
-			this.setVariable((SingleValueGeneratedVariable<?>) variable);
+		if (variable instanceof RegExpGenerated) {
+			this.setVariable((RegExpGenerated) variable);
 		}
 		throw new RuntimeException(
-				"Regular InputVariables not allowed on a GeneratedVariableEditor!");
+				"Regular InputVariables not allowed on a RegExpVariableEditor!");
 	}
 
 	@Override
@@ -258,8 +256,8 @@ public class GeneratedVariableEditor extends AbstractVariableEditor {
 	}
 
 	@Override
-	public void setVariable(RegExpGenerated variable) {
+	public void setVariable(SingleValueGeneratedVariable<?> variable) {
 		throw new RuntimeException(
-				"RegExpGeneratedVariables not allowed on a regular VariableEditor!");
+				"Regular GeneratedVariables not allowed on a RegExpVariableEditor!");
 	}
 }
