@@ -1,9 +1,9 @@
 package org.coode.oppl.variablemansyntax;
 
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 
 public interface VariableVisitor<P extends Object> {
 	P visit(Variable v);
 
-	P visit(GeneratedVariable<?> v);
+	P visit(SingleValueGeneratedVariable<?> v);
 }

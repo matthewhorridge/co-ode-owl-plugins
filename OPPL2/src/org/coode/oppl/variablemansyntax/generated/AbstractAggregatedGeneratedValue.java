@@ -35,13 +35,13 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
  * 
  */
 public abstract class AbstractAggregatedGeneratedValue<N> implements
-		GeneratedValue<N> {
-	private final List<GeneratedValue<N>> values2Aggregate;
+		SingleValueGeneratedValue<N> {
+	private final List<SingleValueGeneratedValue<N>> values2Aggregate;
 
 	/**
 	 * @param values
 	 */
-	protected AbstractAggregatedGeneratedValue(List<GeneratedValue<N>> values) {
+	protected AbstractAggregatedGeneratedValue(List<SingleValueGeneratedValue<N>> values) {
 		this.values2Aggregate = values;
 	}
 
@@ -57,7 +57,7 @@ public abstract class AbstractAggregatedGeneratedValue<N> implements
 
 	public N getGeneratedValue(BindingNode node) {
 		List<N> toAggregate = new ArrayList<N>();
-		for (GeneratedValue<N> value : this.values2Aggregate) {
+		for (SingleValueGeneratedValue<N> value : this.values2Aggregate) {
 			toAggregate.add(value.getGeneratedValue(node));
 		}
 		// if any of the items is null, then null should be returned
@@ -75,7 +75,7 @@ public abstract class AbstractAggregatedGeneratedValue<N> implements
 	public String toString() {
 		StringBuilder buffer = new StringBuilder();
 		boolean first = true;
-		for (GeneratedValue<N> value2Aggregate : this.values2Aggregate) {
+		for (SingleValueGeneratedValue<N> value2Aggregate : this.values2Aggregate) {
 			String aggregator = first ? "" : this.getAggregatorSymbol() + " ";
 			first = false;
 			buffer.append(aggregator);
@@ -116,9 +116,9 @@ public abstract class AbstractAggregatedGeneratedValue<N> implements
 	private static class ValueTree<N> {
 		private final ValueTreeNode<N> rootNode;
 
-		ValueTree(List<GeneratedValue<N>> root) {
+		ValueTree(List<SingleValueGeneratedValue<N>> root) {
 			List<List<N>> rootNode2Assign = new ArrayList<List<N>>();
-			for (GeneratedValue<N> generatedValue : root) {
+			for (SingleValueGeneratedValue<N> generatedValue : root) {
 				List<N> computePossibleValues = generatedValue.computePossibleValues();
 				rootNode2Assign.add(computePossibleValues);
 			}

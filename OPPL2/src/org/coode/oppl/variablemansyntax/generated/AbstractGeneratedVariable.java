@@ -41,10 +41,10 @@ import org.semanticweb.owl.model.OWLObject;
  * 
  */
 public abstract class AbstractGeneratedVariable<N> implements
-		GeneratedVariable<N> {
+		SingleValueGeneratedVariable<N> {
 	protected final String name;
 	protected final VariableType type;
-	protected GeneratedValue<N> value;
+	protected SingleValueGeneratedValue<N> value;
 
 	/**
 	 * @param name
@@ -52,7 +52,7 @@ public abstract class AbstractGeneratedVariable<N> implements
 	 * @param value
 	 */
 	protected AbstractGeneratedVariable(String name, VariableType type,
-			GeneratedValue<N> value) {
+			SingleValueGeneratedValue<N> value) {
 		this.name = name;
 		this.type = type;
 		this.value = value;
@@ -111,6 +111,15 @@ public abstract class AbstractGeneratedVariable<N> implements
 		return toReturn;
 	}
 
+	public Set<OWLObject> getPossibleBindings(BindingNode node) {
+		// node is not used in this kind of variable
+		Set<OWLObject> toReturn = new HashSet<OWLObject>();
+		for (N value1 : this.value.computePossibleValues()) {
+			toReturn.add(this.generateObject(value1));
+		}
+		return toReturn;
+	}
+
 	/**
 	 * @param bindingNode
 	 * @return the OWLObject that is generated as value for this Variable for
@@ -135,7 +144,7 @@ public abstract class AbstractGeneratedVariable<N> implements
 	/**
 	 * @return the value
 	 */
-	public GeneratedValue<N> getValue() {
+	public SingleValueGeneratedValue<N> getValue() {
 		return this.value;
 	}
 
@@ -143,19 +152,21 @@ public abstract class AbstractGeneratedVariable<N> implements
 		visitor.visit(this);
 	}
 
-	protected abstract GeneratedVariable<N> replace(GeneratedValue<N> value1);
+	protected abstract SingleValueGeneratedVariable<N> replace(
+			SingleValueGeneratedValue<N> value1);
 
 	@SuppressWarnings("unchecked")
-	public <P> GeneratedVariable<P> replaceValue(GeneratedValue<P> replaceValue) {
-		return (GeneratedVariable<P>) this
-				.replace((GeneratedValue<N>) replaceValue);
+	public <P> SingleValueGeneratedVariable<P> replaceValue(
+			SingleValueGeneratedValue<P> replaceValue) {
+		return (SingleValueGeneratedVariable<P>) this
+				.replace((SingleValueGeneratedValue<N>) replaceValue);
 	}
 
 	/**
 	 * @param value
 	 *            the value to set
 	 */
-	public void setValue(GeneratedValue<N> value) {
+	public void setValue(SingleValueGeneratedValue<N> value) {
 		this.value = value;
 	}
 

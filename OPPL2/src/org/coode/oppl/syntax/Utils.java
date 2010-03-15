@@ -22,7 +22,6 @@
  */
 package org.coode.oppl.syntax;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -31,13 +30,12 @@ import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.VariableManchesterOWLSyntaxParser;
 import org.coode.oppl.variablemansyntax.VariableType;
-import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.RegExpGenerated;
 import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedValue;
-import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.VariableExpressionGeneratedVariable;
 import org.semanticweb.owl.expression.ParserException;
-import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
 /**
@@ -94,7 +92,7 @@ public class Utils {
 		return s;
 	}
 
-	public static GeneratedVariable<OWLObject> parseVariableExpressionGeneratedVariable(
+	public static SingleValueGeneratedVariable<OWLObject> parseVariableExpressionGeneratedVariable(
 			String name, VariableType type, String string,
 			ConstraintSystem constraintSystem) throws ParserException {
 		VariableManchesterOWLSyntaxParser parser = new VariableManchesterOWLSyntaxParser(
@@ -127,8 +125,8 @@ public class Utils {
 		return variableExpressionGeneratedVariable;
 	}
 
-	public static GeneratedVariable<Collection<OWLEntity>> parseRegexpGeneratedVariable(
-			String name, VariableType type, GeneratedValue<String> string,
+	public static RegExpGenerated parseRegexpGeneratedVariable(String name,
+			VariableType type, SingleValueGeneratedValue<String> string,
 			ConstraintSystem constraintSystem) throws ParserException {
 		Set<? extends OWLObject> referencedValues = type
 				.getReferencedValues(constraintSystem.getOntologyManager()
@@ -137,8 +135,7 @@ public class Utils {
 				.getOPPLFactory().getOWLEntityRenderer(constraintSystem);
 		RegExpGeneratedValue val = new RegExpGeneratedValue(referencedValues,
 				string, renderer);
-		RegExpGeneratedVariable v = new RegExpGeneratedVariable(name, type,
-				constraintSystem, val);
+		RegExpGenerated v = type.instantiateRegexpVariable(name, val);
 		constraintSystem.importVariable(v);
 		return v;
 	}

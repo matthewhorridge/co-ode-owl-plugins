@@ -25,7 +25,8 @@ package org.coode.oppl.variablemansyntax;
 import java.net.URI;
 import java.util.Set;
 
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -33,7 +34,7 @@ import org.semanticweb.owl.model.OWLObject;
  * Any variable not generated implements this interface; generated variables
  * implement Variable
  * 
- * @see GeneratedVariable
+ * @see SingleValueGeneratedVariable
  * 
  * @author Luigi Iannone
  * 
@@ -64,6 +65,15 @@ public interface Variable {
 	@Deprecated
 	public boolean addPossibleBinding(OWLObject object)
 			throws OWLReasonerException;
+
+	/**
+	 * @param node
+	 *            the BindingNode to be used to solve dependencies on other
+	 *            variables
+	 * @return the currently possible values that a Variable can assume
+	 */
+	@Deprecated
+	public Set<OWLObject> getPossibleBindings(BindingNode node);
 
 	/**
 	 * @return the currently possible values that a Variable can assume

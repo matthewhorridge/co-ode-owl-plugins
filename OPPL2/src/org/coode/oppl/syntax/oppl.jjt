@@ -47,11 +47,11 @@ import org.coode.oppl.variablemansyntax.VariableScopes.Direction;
 import org.coode.oppl.variablemansyntax.generated.Attribute;
 import org.coode.oppl.variablemansyntax.generated.AbstractCollectionGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.ConcatGeneratedValues;
-import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.RegExpGenerated;
 import org.coode.oppl.variablemansyntax.generated.VariableIndexGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.StringGeneratedValue;
-import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.factory.AttributeFactory;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.expression.ParserException;
@@ -346,12 +346,12 @@ Variable VariableDefinition(ConstraintSystem constraintSystem):
 }
 
 
-GeneratedVariable opplFunction(String name,VariableType type, ConstraintSystem constraintSystem) #void:
-{	GeneratedValue<String> value=null;
+Variable opplFunction(String name,VariableType type, ConstraintSystem constraintSystem) #void:
+{	SingleValueGeneratedValue<String> value=null;
 	AbstractCollectionGeneratedValue<? extends OWLObject> collection=null;
-	GeneratedVariable expressionVariable;
-	GeneratedValue<String> expression;
-	GeneratedVariable regexpVariable;
+	SingleValueGeneratedVariable expressionVariable;
+	SingleValueGeneratedValue<String> expression;
+	Variable regexpVariable;
 }
 {
 	<MATCH><OPENPARENTHESYS>expression=stringOperation(constraintSystem, true)<CLOSEDPARENTHESYS>
@@ -371,7 +371,7 @@ GeneratedVariable opplFunction(String name,VariableType type, ConstraintSystem c
 }
 
 JAVACODE
-GeneratedVariable expressionGeneratedVariable(String name,VariableType type, ConstraintSystem constraintSystem){
+SingleValueGeneratedVariable expressionGeneratedVariable(String name,VariableType type, ConstraintSystem constraintSystem){
 int beginningSubSection = token.beginColumn;
 int beginningSubSectionLine = token.beginLine;
 String expression = Utils.readString(this, false, COMMA, SELECT);
@@ -383,7 +383,7 @@ throw new ParseException(temp.getMessage(), temp);}
 }
 
 JAVACODE
-GeneratedVariable regexpOperation(String name,VariableType type, GeneratedValue<String> expression, ConstraintSystem constraintSystem){
+Variable regexpOperation(String name,VariableType type, SingleValueGeneratedValue<String> expression, ConstraintSystem constraintSystem){
 int beginningSubSection = token.beginColumn;
 int beginningSubSectionLine = token.beginLine;
 
@@ -416,16 +416,16 @@ AbstractCollectionGeneratedValue<? extends OWLObject> set(VariableType type,Cons
 		}
 }
 
-GeneratedValue<String> stringOperation(ConstraintSystem constraintSystem, boolean spacesAdded) #void:
-{GeneratedValue result=null;}
+SingleValueGeneratedValue<String> stringOperation(ConstraintSystem constraintSystem, boolean spacesAdded) #void:
+{SingleValueGeneratedValue result=null;}
 {
 	result = stringConcat(constraintSystem, spacesAdded)
 		{return result;}
 }
 
-GeneratedValue<String> stringConcat(ConstraintSystem constraintSystem, boolean spacesAdded) #void:
-{	GeneratedValue aGeneratedValue;
-	List<GeneratedValue<String>> components = new ArrayList<GeneratedValue<String>>();
+SingleValueGeneratedValue<String> stringConcat(ConstraintSystem constraintSystem, boolean spacesAdded) #void:
+{	SingleValueGeneratedValue aGeneratedValue;
+	List<SingleValueGeneratedValue<String>> components = new ArrayList<SingleValueGeneratedValue<String>>();
 }
 {
 	aGeneratedValue = generatedValue(constraintSystem, spacesAdded)
@@ -436,7 +436,7 @@ GeneratedValue<String> stringConcat(ConstraintSystem constraintSystem, boolean s
 		{if(components.size()==1){return aGeneratedValue;}else{return new ConcatGeneratedValues(components);}}
 }
 
-GeneratedValue generatedValue(ConstraintSystem constraintSystem, boolean spacesAdded) #void:
+SingleValueGeneratedValue generatedValue(ConstraintSystem constraintSystem, boolean spacesAdded) #void:
 {	String valueToken;
 	Token variableNameToken;
 	Token variableAttributeToken;
@@ -464,10 +464,10 @@ GeneratedValue generatedValue(ConstraintSystem constraintSystem, boolean spacesA
 		Variable v = constraintSystem.getVariable(variableName);
 		if (v != null) {
 			int index = Integer.parseInt(attributeString);
-			RegExpGeneratedVariable gv = (RegExpGeneratedVariable) v;
+			RegExpGenerated gv = (RegExpGenerated) v;
 			Set<OWLObject> bindings = gv.getPossibleBindings();
 			if (bindings.size() > 0) {
-				VariableIndexGeneratedValue toReturn=new VariableIndexGeneratedValue(gv, index, (OWLEntity) bindings.iterator().next());
+				VariableIndexGeneratedValue toReturn=new VariableIndexGeneratedValue(gv, index, bindings);
 				return toReturn;
 			}
 			throw new ParseException("No matches found for variable: " + v);
@@ -576,7 +576,7 @@ InCollectionRegExpConstraint regexpConstraint;
 }
 
 JAVACODE
-InCollectionRegExpConstraint matchConstraint(Variable variable, ConstraintSystem cs, GeneratedValue expression){
+InCollectionRegExpConstraint matchConstraint(Variable variable, ConstraintSystem cs, SingleValueGeneratedValue expression){
 int beginningSubSection = getToken(1).beginColumn;
 int beginningSubSectionLine = getToken(1).beginLine;
 //String expression = Utils.readString(this, true, QUOTE);

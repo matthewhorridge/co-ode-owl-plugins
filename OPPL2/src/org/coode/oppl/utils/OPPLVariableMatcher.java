@@ -28,7 +28,7 @@ import java.util.Set;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -62,7 +62,7 @@ public class OPPLVariableMatcher {
 		Set<Variable> variables = constraintSystem.getVariables();
 		Set<Variable> toReturn = new HashSet<Variable>(variables.size());
 		VariableTypeVisitorEx<Variable> visitor = new VariableTypeVisitorEx<Variable>() {
-			public Variable visit(GeneratedVariable<?> v) {
+			public Variable visit(SingleValueGeneratedVariable<?> v) {
 				if (v.getName().startsWith(name)) {
 					return v;
 				}

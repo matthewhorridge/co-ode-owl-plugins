@@ -35,6 +35,7 @@ import org.coode.oppl.variablemansyntax.VariableScopeChecker;
 import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.VariableVisitor;
+import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -95,6 +96,11 @@ public abstract class VariableImpl implements Variable {
 	}
 
 	public Set<OWLObject> getPossibleBindings() {
+		return this.possibleBindings;
+	}
+
+	public Set<OWLObject> getPossibleBindings(BindingNode node) {
+		//node is not used in this kind of variable
 		return this.possibleBindings;
 	}
 

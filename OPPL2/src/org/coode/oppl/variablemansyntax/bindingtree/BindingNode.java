@@ -32,7 +32,7 @@ import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableVisitor;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -53,7 +53,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 		}
 
 		@SuppressWarnings("unused")
-		public void visit(GeneratedVariable<?> v) {
+		public void visit(SingleValueGeneratedVariable<?> v) {
 		}
 	}
 
@@ -204,7 +204,7 @@ public class BindingNode implements VariableVisitor<OWLObject> {
 		return null;
 	}
 
-	public OWLObject visit(GeneratedVariable<?> v) {
+	public OWLObject visit(SingleValueGeneratedVariable<?> v) {
 		OWLObject toReturn = this.visit((Variable) v);
 		if (toReturn == null) {
 			toReturn = v.getGeneratedOWLObject(this);

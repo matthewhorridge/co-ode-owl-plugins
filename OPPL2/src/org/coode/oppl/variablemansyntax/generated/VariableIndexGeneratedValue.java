@@ -22,32 +22,43 @@
  */
 package org.coode.oppl.variablemansyntax.generated;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.model.OWLEntity;
+import org.semanticweb.owl.model.OWLObject;
 
 /**
  * @author Luigi Iannone
  * 
  */
-public class VariableIndexGeneratedValue implements GeneratedValue<String> {
-	private final RegExpGeneratedVariable variable;
+public class VariableIndexGeneratedValue implements
+		SingleValueGeneratedValue<String> {
+	private final RegExpGenerated variable;
 	private final RegExpGeneratedValue value;
 	private final int index;
-	private OWLEntity entity;
+	private Collection<OWLEntity> entities;
 
 	/**
 	 * @param variable
 	 * @param attribute
 	 */
-	public VariableIndexGeneratedValue(RegExpGeneratedVariable variable, int i,
-			OWLEntity e) {
+	public VariableIndexGeneratedValue(RegExpGenerated variable, int i,
+			Collection<OWLObject> e) {
 		this.variable = variable;
 		this.value = variable.getValue();
 		this.index = i;
-		this.entity = e;
+		this.entities = new HashSet<OWLEntity>();
+		for (OWLObject o : e) {
+			if (o instanceof OWLEntity) {
+				this.entities.add((OWLEntity) o);
+			}
+		}
 	}
 
 	@Override
@@ -70,14 +81,26 @@ public class VariableIndexGeneratedValue implements GeneratedValue<String> {
 	}
 
 	public List<String> computePossibleValues() {
-		return this.entity.accept(this.variable.getValue());
+		Set<String> set = new HashSet<String>();
+		for (OWLEntity entity : this.entities) {
+			set.addAll(entity.accept(this.value));
+		}
+		return new ArrayList<String>(set);
 	}
 
 	public String getGeneratedValue(BindingNode node) {
-		this.value.getGeneratedValue(node);
-		List<String> l = this.entity.accept(this.value);
-		if (l.size() > this.index) {
-			return l.get(this.index);
+		if (!this.value.isMatched()) {
+			this.value.getGeneratedValue(node);
+		}
+		OWLObject o = node.getAssignmentValue(this.variable);
+		if (o == null || !(o instanceof OWLEntity)) {
+			return null;
+		}
+		if (this.entities.contains(o)) {
+			List<String> l = ((OWLEntity) o).accept(this.value);
+			if (l.size() > this.index) {
+				return l.get(this.index);
+			}
 		}
 		return null;
 	}

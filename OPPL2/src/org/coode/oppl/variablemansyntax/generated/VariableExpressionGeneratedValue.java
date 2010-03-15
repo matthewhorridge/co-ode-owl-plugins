@@ -10,7 +10,7 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.semanticweb.owl.model.OWLObject;
 
 public class VariableExpressionGeneratedValue implements
-		GeneratedValue<OWLObject> {
+		SingleValueGeneratedValue<OWLObject> {
 	private final OWLObject owlObject;
 	private final ConstraintSystem constraintSystem;
 

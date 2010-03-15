@@ -30,7 +30,7 @@ import org.coode.oppl.variablemansyntax.generated.factory.AttributeFactory;
  * @author Luigi Iannone
  * 
  */
-public abstract class VariableGeneratedValue<N> implements GeneratedValue<N> {
+public abstract class VariableGeneratedValue<N> implements SingleValueGeneratedValue<N> {
 	private final Variable variable;
 	private final Attribute attribute;
 

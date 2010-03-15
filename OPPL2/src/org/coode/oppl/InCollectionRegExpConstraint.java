@@ -33,8 +33,8 @@ import org.coode.oppl.utils.ParserFactory;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
-import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedValue;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
@@ -48,7 +48,7 @@ import org.semanticweb.owl.model.OWLObject;
 public class InCollectionRegExpConstraint implements AbstractConstraint {
 	private final Variable variable;
 	private final Map<OWLEntity, List<String>> collection = new HashMap<OWLEntity, List<String>>();
-	private final GeneratedValue<String> expression;
+	private final SingleValueGeneratedValue<String> expression;
 	private ConstraintSystem cs;
 
 	/**
@@ -57,7 +57,7 @@ public class InCollectionRegExpConstraint implements AbstractConstraint {
 	 * @param constraintSystem
 	 */
 	public InCollectionRegExpConstraint(Variable variable,
-			GeneratedValue<String> exp, ConstraintSystem cs) {
+			SingleValueGeneratedValue<String> exp, ConstraintSystem cs) {
 		this.variable = variable;
 		this.cs = cs;
 		this.expression = exp;
@@ -131,49 +131,11 @@ public class InCollectionRegExpConstraint implements AbstractConstraint {
 
 	@Override
 	public String toString() {
-		return "Match \"" + this.expression + "\"";
-		// StringBuffer buffer = new StringBuffer();
-		// buffer.append(this.variable.getName());
-		// buffer.append(" IN {");
-		// boolean first = true;
-		// String comma;
-		// SimpleVariableShortFormProvider simpleVariableShortFormProvider = new
-		// SimpleVariableShortFormProvider(
-		// this.constraintSystem);
-		// for (P p : this.collection) {
-		// comma = !first ? ", " : "";
-		// first = false;
-		// buffer.append(comma);
-		// if (p instanceof OWLEntity) {
-		// buffer.append(simpleVariableShortFormProvider
-		// .getShortForm((OWLEntity) p));
-		// } else {
-		// buffer.append(p.toString());
-		// }
-		// }
-		// buffer.append('}');
-		// return buffer.toString();
+		return this.variable.getName() + " Match(" + this.expression + ")";
 	}
 
 	public String render() {
-		return "Match \"" + this.expression + "\"";
-		// StringBuffer buffer = new StringBuffer();
-		// buffer.append(this.variable.getName());
-		// buffer.append(" IN {");
-		// boolean first = true;
-		// String comma;
-		// for (P p : this.collection) {
-		// comma = !first ? ", " : "";
-		// first = false;
-		// buffer.append(comma);
-		// ManchesterSyntaxRenderer renderer = ParserFactory.getInstance()
-		// .getOPPLFactory().getManchesterSyntaxRenderer(
-		// this.constraintSystem);
-		// p.accept(renderer);
-		// buffer.append(renderer.toString());
-		// }
-		// buffer.append('}');
-		// return buffer.toString();
+		return this.toString();
 	}
 
 	public void accept(ConstraintVisitor visitor) {

@@ -38,7 +38,7 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
  * @author Luigi Iannone
  * 
  */
-public interface GeneratedValue<O> {
+public interface SingleValueGeneratedValue<O> {
 	/**
 	 * @param node
 	 * @return the generated value determined by the assignments in the input

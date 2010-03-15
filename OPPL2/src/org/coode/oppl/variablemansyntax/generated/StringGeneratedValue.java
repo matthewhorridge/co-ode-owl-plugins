@@ -35,7 +35,7 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
  * @author Luigi Iannone
  * 
  */
-public class StringGeneratedValue implements GeneratedValue<String> {
+public class StringGeneratedValue implements SingleValueGeneratedValue<String> {
 	private final String constant;
 
 	public StringGeneratedValue(String constant) {
@@ -43,7 +43,7 @@ public class StringGeneratedValue implements GeneratedValue<String> {
 	}
 
 	/**
-	 * @see org.coode.oppl.variablemansyntax.generated.GeneratedValue#getGeneratedValues()
+	 * @see org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedValue#getGeneratedValues()
 	 */
 	public List<String> computePossibleValues() {
 		// no need to return an unmodifiable list: the only element in the list

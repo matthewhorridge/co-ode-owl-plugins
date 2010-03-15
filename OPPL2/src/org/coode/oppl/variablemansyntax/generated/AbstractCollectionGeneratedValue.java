@@ -33,7 +33,7 @@ import org.coode.oppl.variablemansyntax.Variable;
  */
 public abstract class AbstractCollectionGeneratedValue<N> extends
 		VariableGeneratedValue<Collection<N>> implements
-		GeneratedValue<Collection<N>> {
+		SingleValueGeneratedValue<Collection<N>> {
 	private final ConstraintSystem constraintSystem;
 
 	public AbstractCollectionGeneratedValue(Variable variable,

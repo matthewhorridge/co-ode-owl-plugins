@@ -37,8 +37,8 @@ import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.generated.AbstractCollectionGeneratedValue;
 import org.coode.oppl.variablemansyntax.generated.AbstractGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.AbstractOWLObjectCollectionGeneratedVariable;
-import org.coode.oppl.variablemansyntax.generated.GeneratedValue;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.generated.StringGeneratedVariable;
 import org.coode.oppl.visitors.GeneratedVariableCollector;
 import org.coode.oppl.visitors.InputVariableCollector;
@@ -95,12 +95,12 @@ public class ConstraintSystem {
 			return new HashSet<Variable>(this.map.values());
 		}
 
-		public Set<GeneratedVariable<?>> getGeneratedVariables() {
+		public Set<SingleValueGeneratedVariable<?>> getGeneratedVariables() {
 			GeneratedVariableCollector visitor = new GeneratedVariableCollector();
 			for (Variable v : this.map.values()) {
 				v.accept(visitor);
 			}
-			return new HashSet<GeneratedVariable<?>>(visitor
+			return new HashSet<SingleValueGeneratedVariable<?>>(visitor
 					.getCollectedVariables());
 		}
 
@@ -275,8 +275,8 @@ public class ConstraintSystem {
 		return this.reasoner;
 	}
 
-	public GeneratedVariable<String> createStringGeneratedVariable(String name,
-			VariableType type, GeneratedValue<String> value) {
+	public SingleValueGeneratedVariable<String> createStringGeneratedVariable(String name,
+			VariableType type, SingleValueGeneratedValue<String> value) {
 		AbstractGeneratedVariable<String> generatedVariable = StringGeneratedVariable
 				.buildGeneratedVariable(name, type, value, this.getOntology());
 		this.variables.store(generatedVariable);
@@ -290,7 +290,7 @@ public class ConstraintSystem {
 		return this.ontology;
 	}
 
-	public Set<GeneratedVariable<?>> getGeneratedVariables() {
+	public Set<SingleValueGeneratedVariable<?>> getGeneratedVariables() {
 		return this.variables.getGeneratedVariables();
 	}
 
@@ -302,10 +302,10 @@ public class ConstraintSystem {
 		this.variables.remove(variable.getName());
 	}
 
-	public GeneratedVariable<Collection<OWLClass>> createIntersectionGeneratedVariable(
+	public SingleValueGeneratedVariable<Collection<OWLClass>> createIntersectionGeneratedVariable(
 			String name, VariableType type,
 			AbstractCollectionGeneratedValue<OWLClass> collection) {
-		GeneratedVariable<Collection<OWLClass>> toReturn = null;
+		SingleValueGeneratedVariable<Collection<OWLClass>> toReturn = null;
 		if (type.equals(VariableType.CLASS)) {
 			toReturn = AbstractOWLObjectCollectionGeneratedVariable
 					.getConjunction(name, type, collection, this
@@ -318,10 +318,10 @@ public class ConstraintSystem {
 		return toReturn;
 	}
 
-	public GeneratedVariable<Collection<OWLClass>> createUnionGeneratedVariable(
+	public SingleValueGeneratedVariable<Collection<OWLClass>> createUnionGeneratedVariable(
 			String name, VariableType type,
 			AbstractCollectionGeneratedValue<OWLClass> collection) {
-		GeneratedVariable<Collection<OWLClass>> toReturn = null;
+		SingleValueGeneratedVariable<Collection<OWLClass>> toReturn = null;
 		if (type.equals(VariableType.CLASS)) {
 			toReturn = AbstractOWLObjectCollectionGeneratedVariable
 					.getDisjunction(name, type, collection, this

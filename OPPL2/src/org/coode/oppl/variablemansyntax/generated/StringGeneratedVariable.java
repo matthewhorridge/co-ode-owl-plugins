@@ -24,7 +24,7 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 	private final OWLOntology ontology;
 
 	protected StringGeneratedVariable(String name, VariableType type,
-			GeneratedValue<String> value, OWLOntology ontology) {
+			SingleValueGeneratedValue<String> value, OWLOntology ontology) {
 		super(name, type, value);
 		this.ontology = ontology;
 	}
@@ -39,7 +39,7 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 		final OWLDataFactory df = ParserFactory.getInstance().getOPPLFactory()
 				.getOWLDataFactory();
 		VariableTypeVisitorEx<OWLObject> visitor = new VariableTypeVisitorEx<OWLObject>() {
-			public OWLObject visit(GeneratedVariable<?> v) {
+			public OWLObject visit(SingleValueGeneratedVariable<?> v) {
 				// TODO not nice
 				switch (v.getType()) {
 					case CLASS:
@@ -270,13 +270,13 @@ public class StringGeneratedVariable extends AbstractGeneratedVariable<String> {
 	}
 
 	public static StringGeneratedVariable buildGeneratedVariable(String name,
-			VariableType type, GeneratedValue<String> value,
+			VariableType type, SingleValueGeneratedValue<String> value,
 			OWLOntology ontology) {
 		return new StringGeneratedVariable(name, type, value, ontology);
 	}
 
 	@Override
-	protected GeneratedVariable<String> replace(GeneratedValue<String> v) {
+	protected SingleValueGeneratedVariable<String> replace(SingleValueGeneratedValue<String> v) {
 		return buildGeneratedVariable(this.getName(), this.getType(), v,
 				this.ontology);
 	}

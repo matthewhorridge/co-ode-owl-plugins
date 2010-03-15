@@ -23,14 +23,16 @@ import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLObjectProperty;
 
 public class RegExpGeneratedValue implements
-		GeneratedValue<Collection<OWLEntity>>, OWLEntityVisitorEx<List<String>> {
+		SingleValueGeneratedValue<Collection<OWLEntity>>,
+		OWLEntityVisitorEx<List<String>> {
 	private final OWLEntityRenderer renderer;
-	private final GeneratedValue<String> expression;
+	private final SingleValueGeneratedValue<String> expression;
 	private final Collection<OWLEntity> candidates = new ArrayList<OWLEntity>();
 	private final Map<OWLEntity, List<String>> matches = new HashMap<OWLEntity, List<String>>();
+	private boolean matched = false;
 
 	public RegExpGeneratedValue(Collection<? extends OWLObject> candidates,
-			GeneratedValue<String> exp, OWLEntityRenderer r) {
+			SingleValueGeneratedValue<String> exp, OWLEntityRenderer r) {
 		for (OWLObject o : candidates) {
 			if (o instanceof OWLEntity) {
 				this.candidates.add((OWLEntity) o);
@@ -51,6 +53,7 @@ public class RegExpGeneratedValue implements
 	}
 
 	private Collection<OWLEntity> getMatches(String exp) {
+		this.matched = true;
 		if (exp != null) {
 			Pattern regExpression = Pattern.compile(exp);
 			List<OWLEntity> toReturn = new ArrayList<OWLEntity>();
@@ -86,6 +89,11 @@ public class RegExpGeneratedValue implements
 	}
 
 	private List<String> retrieve(OWLEntity e) {
+		if (!this.matched) {
+			new RuntimeException(
+					"Error: matches have not been made yet. Call getGeneratedValue(BindingNode) first. Empty list returned.")
+					.printStackTrace();
+		}
 		if (this.matches.containsKey(e)) {
 			return this.matches.get(e);
 		}
@@ -115,5 +123,9 @@ public class RegExpGeneratedValue implements
 	@Override
 	public String toString() {
 		return this.expression.toString();
+	}
+
+	public boolean isMatched() {
+		return this.matched;
 	}
 }
