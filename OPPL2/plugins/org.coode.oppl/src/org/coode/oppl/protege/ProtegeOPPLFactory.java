@@ -74,6 +74,7 @@ public final class ProtegeOPPLFactory implements OPPLAbstractFactory {
 	private ProtegeScopeVariableChecker variableScopeVariableChecker = null;
 	private final ProtegeOWLEntityFactory entityFactory;
 	private final ProtegeOWLEntityRenderer entityRenderer;
+	private OWLEntityChecker entityChecker;
 
 	/**
 	 * @param modelManager
@@ -87,13 +88,18 @@ public final class ProtegeOPPLFactory implements OPPLAbstractFactory {
 		this.modelManager = modelManager;
 		this.entityFactory = new ProtegeOWLEntityFactory(this);
 		this.entityRenderer = new ProtegeOWLEntityRenderer();
+		this.entityChecker = new RenderingOWLEntityChecker(this.modelManager);
 	}
 
 	/**
 	 * @see org.coode.oppl.OPPLAbstractFactory#getOWLEntityChecker()
 	 */
 	public OWLEntityChecker getOWLEntityChecker() {
-		return new RenderingOWLEntityChecker(this.modelManager);
+		return this.entityChecker;
+	}
+
+	public void setOWLEntityChecker(OWLEntityChecker c) {
+		this.entityChecker = c;
 	}
 
 	/**
