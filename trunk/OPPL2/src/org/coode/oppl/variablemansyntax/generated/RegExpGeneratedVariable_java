@@ -15,12 +15,12 @@ import org.coode.oppl.variablemansyntax.VariableType;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.VariableVisitor;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.variablemansyntax.variabletypes.VariableImpl;
 import org.semanticweb.owl.inference.OWLReasonerException;
 import org.semanticweb.owl.model.OWLEntity;
 import org.semanticweb.owl.model.OWLObject;
 
-public class RegExpGeneratedVariable implements
-		GeneratedVariable<Collection<OWLEntity>> {
+public class RegExpGeneratedVariable extends VariableImpl {
 	private final String name;
 	private final VariableType type;
 	private RegExpGeneratedValue value;
@@ -65,9 +65,19 @@ public class RegExpGeneratedVariable implements
 				.getGeneratedValue(bindingNode);
 		//XXX this requires a single result but it's really a set
 		if (entities.size() > 0) {
+			if (entities.size() > 1) {
+				System.out
+						.println("RegExpGeneratedVariable.getGeneratedOWLObject() incompleteness bug: only one result returned but more than one available: "
+								+ entities);
+			}
 			return entities.iterator().next();
 		}
 		return null;
+	}
+
+	public Collection<OWLEntity> getGeneratedOWLObjectCollection(
+			BindingNode bindingNode) {
+		return this.value.getGeneratedValue(bindingNode);
 	}
 
 	public String getName() {
@@ -101,7 +111,7 @@ public class RegExpGeneratedVariable implements
 		return false;
 	}
 
-	public void setValue(GeneratedValue<Collection<OWLEntity>> value) {
+	public void setValue(SingleValueGeneratedValue<Collection<OWLEntity>> value) {
 		this.value = (RegExpGeneratedValue) value;
 	}
 
@@ -110,7 +120,8 @@ public class RegExpGeneratedVariable implements
 		// TODO Auto-generated method stub
 	}
 
-	public <P> GeneratedVariable<P> replaceValue(GeneratedValue<P> replaceValue) {
+	public <P> SingleValueGeneratedVariable<P> replaceValue(
+			SingleValueGeneratedValue<P> replaceValue) {
 		return null;
 	}
 

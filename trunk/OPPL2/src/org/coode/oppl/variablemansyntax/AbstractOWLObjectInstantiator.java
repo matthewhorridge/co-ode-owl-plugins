@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLAxiomAnnotationAxiom;
 import org.semanticweb.owl.model.OWLClass;
@@ -131,8 +131,8 @@ abstract class AbstractOWLObjectInstantiator implements
 			OWLDescription assignmentValue = (OWLDescription) this.bindingNode
 					.getAssignmentValue(variable);
 			if (assignmentValue == null
-					&& variable instanceof GeneratedVariable<?>) {
-				assignmentValue = (OWLDescription) ((GeneratedVariable<?>) variable)
+					&& variable instanceof SingleValueGeneratedVariable<?>) {
+				assignmentValue = (OWLDescription) ((SingleValueGeneratedVariable<?>) variable)
 						.getGeneratedOWLObject(this.bindingNode);
 				// (OWLDescription) this.bindingNode
 				// .getAssignmentValue((GeneratedVariable<?>) variable);

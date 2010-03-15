@@ -26,7 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -109,7 +109,7 @@ public class ValueExtractor implements VariableTypeVisitorEx<Set<OWLObject>> {
 		return toReturn;
 	}
 
-	public Set<OWLObject> visit(GeneratedVariable<?> v) {
+	public Set<OWLObject> visit(SingleValueGeneratedVariable<?> v) {
 		return v.getPossibleBindings();
 		// if (v instanceof CLASSVariable) {
 		// this.visit((CLASSVariable) v);

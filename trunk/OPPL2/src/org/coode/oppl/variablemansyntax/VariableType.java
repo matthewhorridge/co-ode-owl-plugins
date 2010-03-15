@@ -31,6 +31,13 @@ import java.util.Set;
 
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
 import org.coode.oppl.variablemansyntax.VariableScopes.Direction;
+import org.coode.oppl.variablemansyntax.generated.RegExpCLASSVariable;
+import org.coode.oppl.variablemansyntax.generated.RegExpCONSTANTVariable;
+import org.coode.oppl.variablemansyntax.generated.RegExpDATAPROPERTYVariable;
+import org.coode.oppl.variablemansyntax.generated.RegExpGenerated;
+import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedValue;
+import org.coode.oppl.variablemansyntax.generated.RegExpINDIVIDUALVariable;
+import org.coode.oppl.variablemansyntax.generated.RegExpOBJECTPROPERTYVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariableImpl;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariableImpl;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariableImpl;
@@ -143,6 +150,12 @@ public enum VariableType {
 		}
 
 		@Override
+		public RegExpGenerated instantiateRegexpVariable(String name,
+				RegExpGeneratedValue v) {
+			return new RegExpCLASSVariable(name, v);
+		}
+
+		@Override
 		public VariableScope parseVariable(VariableScopes.Direction direction,
 				ManchesterOWLSyntaxEditorParser parser) throws ParserException {
 			OWLDescription description = parser.parseDescription();
@@ -180,6 +193,12 @@ public enum VariableType {
 		@Override
 		public Variable instantiateVariable(String name) {
 			return new DATAPROPERTYVariableImpl(name);
+		}
+
+		@Override
+		public RegExpGenerated instantiateRegexpVariable(String name,
+				RegExpGeneratedValue v) {
+			return new RegExpDATAPROPERTYVariable(name, v);
 		}
 
 		@Override
@@ -225,6 +244,12 @@ public enum VariableType {
 		}
 
 		@Override
+		public RegExpGenerated instantiateRegexpVariable(String name,
+				RegExpGeneratedValue v) {
+			return new RegExpOBJECTPROPERTYVariable(name, v);
+		}
+
+		@Override
 		public VariableScope parseVariable(Direction direction,
 				ManchesterOWLSyntaxEditorParser parser) throws ParserException {
 			OWLObjectProperty objectProperty = (OWLObjectProperty) parser
@@ -267,6 +292,12 @@ public enum VariableType {
 		}
 
 		@Override
+		public RegExpGenerated instantiateRegexpVariable(String name,
+				RegExpGeneratedValue v) {
+			return new RegExpINDIVIDUALVariable(name, v);
+		}
+
+		@Override
 		public VariableScope parseVariable(Direction direction,
 				ManchesterOWLSyntaxEditorParser parser) throws ParserException {
 			OWLDescription description = parser.parseDescription();
@@ -299,6 +330,12 @@ public enum VariableType {
 		@Override
 		public Variable instantiateVariable(String name) {
 			return new CONSTANTVariableImpl(name);
+		}
+
+		@Override
+		public RegExpGenerated instantiateRegexpVariable(String name,
+				RegExpGeneratedValue v) {
+			return new RegExpCONSTANTVariable(name, v);
 		}
 
 		@Override
@@ -338,6 +375,9 @@ public enum VariableType {
 	}
 
 	public abstract Variable instantiateVariable(String name);
+
+	public abstract RegExpGenerated instantiateRegexpVariable(String name,
+			RegExpGeneratedValue v);
 
 	public abstract VariableScope parseVariable(
 			VariableScopes.Direction direction,

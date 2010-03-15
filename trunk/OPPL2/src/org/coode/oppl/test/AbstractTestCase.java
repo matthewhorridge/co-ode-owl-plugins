@@ -96,7 +96,7 @@ public abstract class AbstractTestCase extends TestCase {
 		} catch (Exception e) {
 			this.log(e);
 		}
-		//		this.testQueries.genericTestQuery(script);
+		this.testQueries.genericTestQuery(script);
 	}
 
 	private void init() {

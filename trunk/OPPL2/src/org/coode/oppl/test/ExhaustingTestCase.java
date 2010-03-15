@@ -1,7 +1,6 @@
 package org.coode.oppl.test;
 
 import java.io.File;
-import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -15,10 +14,6 @@ import net.sf.saxon.xqj.SaxonXQDataSource;
 
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.rendering.xquery.XQueryRenderer;
-import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.generated.RegExpGeneratedVariable;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLObject;
 import org.w3c.dom.Document;
 
 public class ExhaustingTestCase extends AbstractTestCase {
@@ -304,15 +299,6 @@ public class ExhaustingTestCase extends AbstractTestCase {
 		OPPLScript result = this.parse(correct);
 		this.expectedCorrect(result);
 		this.execute(result);
-		for (Variable v : result.getVariables()) {
-			if (v instanceof RegExpGeneratedVariable) {
-				RegExpGeneratedVariable rgv = (RegExpGeneratedVariable) v;
-				for (OWLObject e : rgv.getPossibleBindings()) {
-					List<String> l = ((OWLEntity) e).accept(rgv.getValue());
-					System.out.println(l);
-				}
-			}
-		}
 	}
 
 	public void testRobertsScripts1() {

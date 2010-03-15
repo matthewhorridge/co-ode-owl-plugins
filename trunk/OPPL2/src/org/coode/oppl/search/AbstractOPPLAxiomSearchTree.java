@@ -15,7 +15,7 @@ import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -325,10 +325,10 @@ public abstract class AbstractOPPLAxiomSearchTree extends
 			return AbstractOPPLAxiomSearchTree.this.allClasses;
 		}
 
-		public Set<? extends OWLObject> visit(GeneratedVariable<?> v) {
+		public Set<? extends OWLObject> visit(SingleValueGeneratedVariable<?> v) {
 			// TODO this needs verification: is this the expected behaviour?
 			Set<OWLObject> toReturn = new HashSet<OWLObject>();
-			for (GeneratedVariable<?> g : AbstractOPPLAxiomSearchTree.this.constraintSystem
+			for (SingleValueGeneratedVariable<?> g : AbstractOPPLAxiomSearchTree.this.constraintSystem
 					.getGeneratedVariables()) {
 				toReturn.addAll(g.getPossibleBindings());
 			}

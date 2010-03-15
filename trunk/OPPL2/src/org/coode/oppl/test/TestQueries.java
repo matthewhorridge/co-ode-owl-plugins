@@ -31,7 +31,7 @@ import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
 import org.coode.oppl.variablemansyntax.bindingtree.LeafBrusher;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -139,7 +139,7 @@ public class TestQueries extends TestCase {
 	private OWLObject generateValue(final String string, Variable variable,
 			final OWLDataFactory dataFactory) {
 		VariableTypeVisitorEx<OWLObject> visitor = new VariableTypeVisitorEx<OWLObject>() {
-			public OWLObject visit(GeneratedVariable<?> v) {
+			public OWLObject visit(SingleValueGeneratedVariable<?> v) {
 				return v.getType().buildOWLObject(dataFactory,
 						URI.create(TEST_NS.toString() + string), null);
 			}

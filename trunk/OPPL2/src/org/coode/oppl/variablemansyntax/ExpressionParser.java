@@ -23,7 +23,7 @@
 package org.coode.oppl.variablemansyntax;
 
 import org.coode.oppl.utils.ParserFactory;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -110,7 +110,7 @@ public class ExpressionParser implements VariableTypeVisitorEx<OWLObject> {
 		return null;
 	}
 
-	public OWLObject visit(GeneratedVariable<?> v) {
+	public OWLObject visit(SingleValueGeneratedVariable<?> v) {
 		try {
 			switch (v.getType()) {
 				case CLASS:

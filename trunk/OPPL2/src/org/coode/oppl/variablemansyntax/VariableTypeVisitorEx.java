@@ -22,7 +22,7 @@
  */
 package org.coode.oppl.variablemansyntax;
 
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -53,5 +53,5 @@ public interface VariableTypeVisitorEx<O> {
 	 */
 	// @Deprecated
 	// O visit(Variable v);
-	O visit(GeneratedVariable<?> v);
+	O visit(SingleValueGeneratedVariable<?> v);
 }

@@ -30,7 +30,7 @@ import java.util.List;
  */
 public class ConcatGeneratedValues extends
 		AbstractAggregatedGeneratedValue<String> {
-	public ConcatGeneratedValues(List<GeneratedValue<String>> values2Aggregate) {
+	public ConcatGeneratedValues(List<SingleValueGeneratedValue<String>> values2Aggregate) {
 		super(values2Aggregate);
 	}
 

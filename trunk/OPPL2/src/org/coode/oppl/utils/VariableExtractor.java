@@ -29,7 +29,7 @@ import java.util.Set;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.semanticweb.owl.model.OWLAntiSymmetricObjectPropertyAxiom;
 import org.semanticweb.owl.model.OWLAxiomAnnotationAxiom;
 import org.semanticweb.owl.model.OWLClass;
@@ -453,7 +453,7 @@ public class VariableExtractor implements OWLObjectVisitorEx<Set<Variable>> {
 	private void vetoVariableIntoCollection(final Set<Variable> collection,
 			Variable variable) {
 		variable.accept(new PlainVariableVisitor() {
-			public void visit(GeneratedVariable<?> v) {
+			public void visit(SingleValueGeneratedVariable<?> v) {
 				if (VariableExtractor.this.includeGenerated) {
 					collection.add(v);
 				}

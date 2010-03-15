@@ -42,7 +42,7 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 	private static final class DisjunctionImpl extends
 			AbstractOWLObjectCollectionGeneratedVariable<OWLClass> {
 		DisjunctionImpl(String name, VariableType type,
-				GeneratedValue<Collection<OWLClass>> value,
+				SingleValueGeneratedValue<Collection<OWLClass>> value,
 				OWLDataFactory dataFactory) {
 			super(name, type, value, dataFactory);
 		}
@@ -62,7 +62,7 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 
 		@Override
 		protected AbstractGeneratedVariable<Collection<OWLClass>> replace(
-				GeneratedValue<Collection<OWLClass>> value1) {
+				SingleValueGeneratedValue<Collection<OWLClass>> value1) {
 			return this.replaceValue(true, value1);
 		}
 
@@ -82,7 +82,7 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 	private static final class ConjunctionImpl extends
 			AbstractOWLObjectCollectionGeneratedVariable<OWLClass> {
 		ConjunctionImpl(String name, VariableType type,
-				GeneratedValue<Collection<OWLClass>> value,
+				SingleValueGeneratedValue<Collection<OWLClass>> value,
 				OWLDataFactory dataFactory) {
 			super(name, type, value, dataFactory);
 		}
@@ -103,7 +103,7 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 
 		@Override
 		protected AbstractGeneratedVariable<Collection<OWLClass>> replace(
-				GeneratedValue<Collection<OWLClass>> value1) {
+				SingleValueGeneratedValue<Collection<OWLClass>> value1) {
 			return this.replaceValue(false, value1);
 		}
 
@@ -123,7 +123,7 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 	private final OWLDataFactory dataFactory;
 
 	protected AbstractOWLObjectCollectionGeneratedVariable(String name,
-			VariableType type, GeneratedValue<Collection<P>> value,
+			VariableType type, SingleValueGeneratedValue<Collection<P>> value,
 			OWLDataFactory dataFactory) {
 		super(name, type, value);
 		this.dataFactory = dataFactory;
@@ -134,14 +134,14 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 
 	public static AbstractGeneratedVariable<Collection<OWLClass>> getConjunction(
 			String name, VariableType type,
-			GeneratedValue<Collection<OWLClass>> value,
+			SingleValueGeneratedValue<Collection<OWLClass>> value,
 			OWLDataFactory dataFactory) {
 		return new ConjunctionImpl(name, type, value, dataFactory);
 	}
 
 	public static AbstractGeneratedVariable<Collection<OWLClass>> getDisjunction(
 			String name, VariableType type,
-			GeneratedValue<Collection<OWLClass>> value,
+			SingleValueGeneratedValue<Collection<OWLClass>> value,
 			OWLDataFactory dataFactory) {
 		return new DisjunctionImpl(name, type, value, dataFactory);
 	}
@@ -154,7 +154,7 @@ public abstract class AbstractOWLObjectCollectionGeneratedVariable<P extends OWL
 	}
 
 	protected AbstractGeneratedVariable<Collection<OWLClass>> replaceValue(
-			boolean isUnion, GeneratedValue<Collection<OWLClass>> v) {
+			boolean isUnion, SingleValueGeneratedValue<Collection<OWLClass>> v) {
 		if (isUnion) {
 			return getDisjunction(this.getName(), this.getType(), v,
 					this.dataFactory);

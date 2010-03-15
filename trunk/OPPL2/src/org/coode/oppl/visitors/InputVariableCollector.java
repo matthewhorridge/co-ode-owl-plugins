@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 
 public class InputVariableCollector implements PlainVariableVisitor {
 	private final List<Variable> toReturn;
@@ -19,7 +19,7 @@ public class InputVariableCollector implements PlainVariableVisitor {
 	}
 
 	@SuppressWarnings("unused")
-	public void visit(GeneratedVariable<?> v) {
+	public void visit(SingleValueGeneratedVariable<?> v) {
 		// empty, does not return generated variables
 	}
 

@@ -64,8 +64,8 @@ public class VariableExpressionGeneratedVariable extends
 	}
 
 	@Override
-	protected GeneratedVariable<OWLObject> replace(
-			GeneratedValue<OWLObject> unusedValue) {
+	protected SingleValueGeneratedVariable<OWLObject> replace(
+			SingleValueGeneratedValue<OWLObject> unusedValue) {
 		// TODO check that the unused parameter is legit
 		return this;
 	}

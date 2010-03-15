@@ -18,7 +18,7 @@ import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableTypeVisitorEx;
 import org.coode.oppl.variablemansyntax.bindingtree.Assignment;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CLASSVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.CONSTANTVariable;
 import org.coode.oppl.variablemansyntax.variabletypes.DATAPROPERTYVariable;
@@ -148,7 +148,7 @@ public class OWLAxiomSearchTree extends SearchTree<OWLAxiom> {
 	}
 
 	private final VariableTypeVisitorEx<Collection<? extends OWLObject>> assignableValuesVisitor = new VariableTypeVisitorEx<Collection<? extends OWLObject>>() {
-		public Collection<? extends OWLObject> visit(GeneratedVariable<?> v) {
+		public Collection<? extends OWLObject> visit(SingleValueGeneratedVariable<?> v) {
 			return v.getPossibleBindings();
 		}
 
