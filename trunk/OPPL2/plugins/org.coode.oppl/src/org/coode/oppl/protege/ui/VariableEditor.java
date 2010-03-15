@@ -47,7 +47,8 @@ import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
 import org.coode.oppl.variablemansyntax.VariableType;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.RegExpGenerated;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifyingOptionPane;
@@ -342,8 +343,14 @@ public class VariableEditor extends AbstractVariableEditor {
 
 	@Override
 	@SuppressWarnings("unused")
-	public void setVariable(GeneratedVariable<?> variable) {
+	public void setVariable(SingleValueGeneratedVariable<?> variable) {
 		throw new RuntimeException(
 				"GeneratedVariables not allowed on a regular VariableEditor!");
+	}
+
+	@Override
+	public void setVariable(RegExpGenerated variable) {
+		throw new RuntimeException(
+				"RegExpGeneratedVariables not allowed on a regular VariableEditor!");
 	}
 }

@@ -35,7 +35,7 @@ import org.coode.oppl.validation.OPPLScriptValidator;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.protege.editor.core.ui.list.MList;
 import org.protege.editor.core.ui.list.MListSectionHeader;
 import org.protege.editor.core.ui.util.ComponentFactory;
@@ -801,7 +801,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 		@Override
 		public void handleEdit() {
 			ConstraintSystem cs = this.model.getConstraintSystem();
-			final AbstractVariableEditor variableEditor = this.getVariable() instanceof GeneratedVariable<?> ? new GeneratedVariableEditor(
+			final AbstractVariableEditor variableEditor = this.getVariable() instanceof SingleValueGeneratedVariable<?> ? new GeneratedVariableEditor(
 					this.getOwlEditorKit(), cs)
 					: new VariableEditor(this.getOwlEditorKit(), cs);
 			variableEditor.setVariable(this.getVariable());
@@ -922,7 +922,7 @@ public class OPPLBuilder extends JSplitPane implements VerifiedInputEditor,
 			DefaultListModel m = (DefaultListModel) OPPLVariableList.this
 					.getModel();
 			int i = -1;
-			if (listItem.getVariable() instanceof GeneratedVariable<?>) {
+			if (listItem.getVariable() instanceof SingleValueGeneratedVariable<?>) {
 				i = m.getSize();
 			} else {
 				Enumeration<?> elements = m.elements();
