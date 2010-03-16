@@ -30,9 +30,10 @@ import org.coode.oppl.lint.LintOPPLScriptValidator;
 import org.coode.oppl.lint.OPPLLintScript;
 import org.coode.oppl.lint.syntax.OPPLLintParser;
 import org.coode.oppl.variablemansyntax.ConstraintSystem;
+import org.coode.oppl.variablemansyntax.PlainVariableVisitor;
 import org.coode.oppl.variablemansyntax.Variable;
 import org.coode.oppl.variablemansyntax.VariableScope;
-import org.coode.oppl.variablemansyntax.generated.GeneratedVariable;
+import org.coode.oppl.variablemansyntax.generated.SingleValueGeneratedVariable;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
@@ -59,8 +60,8 @@ public class OPPLLintEditor extends
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value,
 				int index, boolean isSelected, boolean cellHasFocus) {
-			JLabel label = (JLabel) super.getListCellRendererComponent(list,
-					value, index, isSelected, cellHasFocus);
+			final JLabel label = (JLabel) super.getListCellRendererComponent(
+					list, value, index, isSelected, cellHasFocus);
 			if (value instanceof VariableListItem) {
 				OPPLScript script = OPPLLintEditor.this.editor.getOPPLScript();
 				if (script != null) {
@@ -81,14 +82,19 @@ public class OPPLLintEditor extends
 																	variableScope
 																			.getScopingObject()))
 											.append("] ").toString();
-					label
-							.setIcon(new ImageIcon(
-									this
-											.getClass()
-											.getClassLoader()
-											.getResource(
-													variable instanceof GeneratedVariable ? "cog.png"
-															: "user-icon.gif")));
+					PlainVariableVisitor iconDecision = new PlainVariableVisitor() {
+						public void visit(SingleValueGeneratedVariable<?> v) {
+							label.setIcon(new ImageIcon(this.getClass()
+									.getClassLoader().getResource("cog.png")));
+						}
+
+						public void visit(Variable v) {
+							label.setIcon(new ImageIcon(this.getClass()
+									.getClassLoader().getResource(
+											"user-icon.gif")));
+						}
+					};
+					variable.accept(iconDecision);
 					ConstraintSystem constraintSystem = script
 							.getConstraintSystem();
 					label.setText(constraintSystem.render(variable) + ":"
@@ -199,6 +205,7 @@ public class OPPLLintEditor extends
 
 	public void dispose() {
 		this.editor.removeStatusChangedListener(this);
+		this.editor.dispose();
 	}
 
 	public OPPLLintScript getEditedObject() {
