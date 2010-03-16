@@ -54,6 +54,7 @@ import org.semanticweb.owl.model.OWLAxiom;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLException;
 import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyAnnotationAxiom;
 import org.semanticweb.owl.model.OWLOntologyChange;
 import org.semanticweb.owl.model.OWLOntologyChangeListener;
@@ -117,37 +118,42 @@ public class LintRollPreferences {
 	}
 
 	public static final String OPPL_LINT_NAMESPACE_URI_STRING = "http://www.co-orde.org/lints/oppl#";
-	private static Set<Lint> loadedLints;
-	private static Set<Lint> selectedLints;
+	private final static Set<Lint> loadedLints = new HashSet<Lint>();
+	private final static Set<Lint> ontologyLints = new HashSet<Lint>();
+	private final static Set<Lint> selectedLints = new HashSet<Lint>();
 	private static PreferencesManager preferencesManager;
-	static Set<String> wellKnownLintClassNames;
-	private static Map<Lint, String> lintJarMap = new HashMap<Lint, String>();
-	private static Set<LintRollPreferenceChangeListener> listeners = new HashSet<LintRollPreferenceChangeListener>();
-	private static Set<String> loadedJars;
+	private final static Set<String> wellKnownLintClassNames = new HashSet<String>();
+	private final static Map<Lint, String> lintJarMap = new HashMap<Lint, String>();
+	private final static Set<LintRollPreferenceChangeListener> listeners = new HashSet<LintRollPreferenceChangeListener>();
+	private final static Set<String> loadedJars = new HashSet<String>();
 	private static OWLOntologyManager ontologyManager = OWLManager
 			.createOWLOntologyManager();
-	private static List<String> invalidJars;
-	private static List<String> loadedJarPrefList;
+	private final static List<String> invalidJars = new ArrayList<String>();
+	private final static List<String> loadedJarPrefList = new ArrayList<String>();
 	private static OPPLLintManager opplLintManager;
 	private static List<String> personalOPPLLints;
 	private static Preferences prefs;
 	public static final URI OPPL_LINT_NAMESPACE_URI = URI
 			.create(OPPL_LINT_NAMESPACE_URI_STRING);
 	static {
-		LintRollPreferences.wellKnownLintClassNames = new HashSet<String>();
 		LintRollPreferences.wellKnownLintClassNames.add(Lint.class.getName());
 		LintRollPreferences.wellKnownLintClassNames.add(PatternBasedLint.class
 				.getName());
-		loadedLints = new HashSet<Lint>();
-		selectedLints = new HashSet<Lint>();
-		invalidJars = new ArrayList<String>();
 		preferencesManager = PreferencesManager.getInstance();
 		opplLintManager = new OPPLLintManager();
 		initPreferences();
 	}
 
 	public static Set<Lint> getLoadedLints() {
-		return new HashSet<Lint>(loadedLints);
+		Set<Lint> toReturn = new HashSet<Lint>(loadedLints);
+		return toReturn;
+	}
+
+	public static void loadOntologyLints(OWLOntology ontology) {
+		removeAllLoaded(ontologyLints);
+		ontologyLints.clear();
+		ontologyLints.addAll(getOPPLLint(ontology));
+		addAllLoaded(ontologyLints);
 	}
 
 	/**
@@ -156,10 +162,12 @@ public class LintRollPreferences {
 	private static void initPreferences() {
 		prefs = preferencesManager.getPreferencesForSet("LINTROLL",
 				"panelPrefs");
-		loadedJarPrefList = prefs.getStringList(
+		loadedJarPrefList.clear();
+		loadedJarPrefList.addAll(prefs.getStringList(
 				LintRollPreferences.LOADED_JARS_PREF_NAME,
-				new ArrayList<String>());
-		loadedJars = new HashSet<String>(loadedJarPrefList);
+				new ArrayList<String>()));
+		loadedJars.clear();
+		loadedJars.addAll(loadedJarPrefList);
 		// Just to avoid duplicates
 		for (String loadedString : loadedJars) {
 			System.out.println("Loading jar " + loadedString);
@@ -171,35 +179,42 @@ public class LintRollPreferences {
 		personalOPPLLints = prefs.getStringList(
 				LintRollPreferences.OPPL_LINTS_PREF_NAME,
 				new ArrayList<String>());
-		// Set<Lint> opplLoadedLint = loadOPPLLint();
-		// for (Lint lint : opplLoadedLint) {
-		// addLoadedLint(lint);
-		// }
 	}
 
-	// private static Set<Lint> loadOPPLLint() {
-	// // OPPLLintRepository repository = getOPPLLintRepository();
-	// // Set<OPPLLintScript> lintScripts = repository.getOPPLLintScripts();
-	// // Set<Lint> toReturn = new HashSet<Lint>(lintScripts);
-	// // // toReturn.addAll(getPersonalLints());
-	// // return toReturn;
-	// }
-	// public static Collection<? extends OPPLLintScript> getPersonalLints() {
-	// Set<OPPLLintScript> toReturn = new HashSet<OPPLLintScript>();
-	// for (String personalLintString : personalOPPLLints) {
-	// ParserFactory.initParser(personalLintString);
-	// try {
-	// OPPLLintScript personalLint = OPPLLintParser.Start();
-	// toReturn.add(personalLint);
-	// } catch (ParseException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// return toReturn;
-	// }
-	// public static OPPLLintRepository getOPPLLintRepository() {
-	// return new TextFileOPPLLintRepository();
-	// }
+	public static Set<OPPLLintScript> getOPPLLint(OWLOntology ontology) {
+		if (ontology == null) {
+			throw new NullPointerException("The ontology cannot be null");
+		}
+		Set<OWLOntologyAnnotationAxiom> ontologyAnnotationAxioms = ontology
+				.getOntologyAnnotationAxioms();
+		// The Lints can be at most as many as the ontology annotations.
+		Set<OPPLLintScript> toReturn = new HashSet<OPPLLintScript>(
+				ontologyAnnotationAxioms.size());
+		for (OWLOntologyAnnotationAxiom ontologyAnnotationAxiom : ontologyAnnotationAxioms) {
+			OWLAnnotation<? extends OWLObject> annotation = ontologyAnnotationAxiom
+					.getAnnotation();
+			URI annotationURI = annotation.getAnnotationURI();
+			NamespaceUtil nsUtil = new NamespaceUtil();
+			String[] split = nsUtil.split(annotationURI.toString(), null);
+			if (split != null
+					&& split.length == 2
+					&& split[0]
+							.compareTo(LintRollPreferences.OPPL_LINT_NAMESPACE_URI_STRING) == 0) {
+				String value = annotation.getAnnotationValueAsConstant()
+						.getLiteral();
+				AbstractParserFactory.getInstance().initParser(value);
+				try {
+					OPPLLintScript lint = OPPLLintParser.Start();
+					toReturn.add(lint);
+					LintRollPreferences.addLoadedLint(lint);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return toReturn;
+	}
+
 	/**
 	 * @return the selectedLints
 	 */

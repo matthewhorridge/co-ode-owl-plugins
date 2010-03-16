@@ -31,6 +31,7 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -48,10 +49,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.border.Border;
 
+import org.coode.oppl.lint.AbstractParserFactory;
+import org.coode.oppl.lint.protege.ParserFactory;
 import org.coode.oppl.lint.protege.ProtegeOPPLLintFactory;
 import org.coode.oppl.lint.syntax.OPPLLintParser;
 import org.coode.oppl.protege.ui.OPPLLintListCellRederer;
+import org.coode.oppl.utils.ProtegeParserFactory;
 import org.protege.editor.core.ui.util.ComponentFactory;
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.protege.editor.owl.ui.framelist.OWLFrameList2;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.owl.lint.Lint;
@@ -68,7 +75,7 @@ import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
  * 
  */
 public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
-		LintRollPreferenceChangeListener {
+		LintRollPreferenceChangeListener, OWLModelManagerListener {
 	private class OntologyOPPLLintList extends OWLFrameList2<OWLOntology> {
 		/**
 		 *
@@ -154,6 +161,7 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 			this.ontologyOPPLLint.dispose();
 		}
 		LintRollPreferences.stopListening();
+		this.getOWLEditorKit().getOWLModelManager().removeListener(this);
 	}
 
 	/**
@@ -162,6 +170,9 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 	public void initialise() throws Exception {
 		// The following line must be the first thing or at least must appear
 		// before the setOntologyManager method
+		ProtegeParserFactory.initParser("", this.getOWLModelManager(), null);
+		AbstractParserFactory.setAbstractParserFactory(new ParserFactory(this
+				.getOWLModelManager()));
 		LintManagerFactory.setPreferredLintManager(new ProtegeLintManager(this
 				.getOWLModelManager()));
 		OPPLLintParser.setOPPLLintAbstractFactory(new ProtegeOPPLLintFactory(
@@ -170,23 +181,18 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 				.getModelManager().getOWLOntologyManager());
 		LintRollPreferences.startListenting();
 		this.setLayout(new BorderLayout());
+		LintRollPreferences.loadOntologyLints(this.getOWLEditorKit()
+				.getModelManager().getActiveOntology());
 		Set<Lint> loadedLints = LintRollPreferences.getLoadedLints();
 		Set<Lint> selectedLints = LintRollPreferences.getSelectedLints();
+		this.getOWLEditorKit().getModelManager().addListener(this);
 		JToolBar toolBar = new JToolBar();
-		// toolBar.add(this.openJarButton);
 		toolBar.add(this.selectAllButton);
 		toolBar.add(this.deSelectAllButton);
 		toolBar.add(this.invertSelection);
 		toolBar.setFloatable(false);
 		this.initButtons();
-		for (Lint lint : loadedLints) {
-			JCheckBox checkBox = new JCheckBox(lint.getName(), selectedLints
-					.contains(lint));
-			this.map.put(checkBox, lint);
-			this.box.add(checkBox);
-			this.box.add(Box.createVerticalStrut(4));
-			checkBox.setOpaque(false);
-		}
+		this.initAvailableLintPanel(loadedLints, selectedLints);
 		this.jarList = new JarList(this.getOWLEditorKit());
 		this.jarList.setCellRenderer(new JarListRenderer());
 		for (String jarName : LintRollPreferences.getLoadedJars()) {
@@ -223,6 +229,24 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 		this.setPreferredSize(new Dimension(800, 500));
 	}
 
+	/**
+	 * @param loadedLints
+	 * @param selectedLints
+	 */
+	private void initAvailableLintPanel(Collection<? extends Lint> loadedLints,
+			Collection<? extends Lint> selectedLints) {
+		this.map.clear();
+		this.box.removeAll();
+		for (Lint lint : loadedLints) {
+			JCheckBox checkBox = new JCheckBox(lint.getName(), selectedLints
+					.contains(lint));
+			this.map.put(checkBox, lint);
+			this.box.add(checkBox);
+			this.box.add(Box.createVerticalStrut(4));
+			checkBox.setOpaque(false);
+		}
+	}
+
 	private void initButtons() {
 		this.selectAllButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -249,7 +273,10 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 
 	@SuppressWarnings("unchecked")
 	public void handleChange(LintRollPreferenceChangeEvent e) {
-		if (e.getType().equals(EventType.LOADED_LINT_CHANGE)) {
+		if (e
+				.getType()
+				.equals(
+						uk.ac.manchester.cs.lintroll.ui.preference.EventType.LOADED_LINT_CHANGE)) {
 			Set<Lint> loadedLints = (Set<Lint>) e.getSource();
 			Set<String> previouslySeectedLintNames = new HashSet<String>(
 					this.map.keySet().size());
@@ -273,6 +300,20 @@ public class LintRollPreferencesPanel extends OWLPreferencesPanel implements
 			this.boxPane = new JScrollPane(this.box);
 			this.holder.add(this.boxPane);
 			this.holder.revalidate();
+		}
+	}
+
+	public void handleChange(OWLModelManagerChangeEvent event) {
+		EventType eventType = event.getType();
+		switch (eventType) {
+		case ACTIVE_ONTOLOGY_CHANGED:
+			LintRollPreferences.loadOntologyLints(this.getOWLEditorKit()
+					.getModelManager().getActiveOntology());
+			this.initAvailableLintPanel(LintRollPreferences.getLoadedLints(),
+					LintRollPreferences.getSelectedLints());
+			break;
+		default:
+			break;
 		}
 	}
 }

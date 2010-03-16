@@ -70,10 +70,10 @@ import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
  * @author Luigi Iannone
  * 
  * 
- * http://www.cs.man.ac.uk/~iannonel
+ *         http://www.cs.man.ac.uk/~iannonel
  * 
- * The University Of Manchester Bio Health Informatics Group Date: February 11,
- * 2008
+ *         The University Of Manchester Bio Health Informatics Group Date:
+ *         February 11, 2008
  * 
  */
 public class LintRollView extends AbstractOWLViewComponent implements
@@ -83,10 +83,10 @@ public class LintRollView extends AbstractOWLViewComponent implements
 			.getLogger(OWLOntologyAnnotationViewComponent.class);
 	private JButton fixButton = new JButton("Fix");
 	private static final long serialVersionUID = 2527582629024593024L;
-	OWLLinkedObjectTree lintReportTree = null;
-	JTextArea lintDescriptionTextArea = new JTextArea();
-	JTextArea explanationTextArea = new JTextArea();
-	DefaultTreeModel lintReportTreeModel;
+	private OWLLinkedObjectTree lintReportTree = null;
+	private JTextArea lintDescriptionTextArea = new JTextArea();
+	private JTextArea explanationTextArea = new JTextArea();
+	private DefaultTreeModel lintReportTreeModel;
 	private LintManager lintManager;
 	private boolean isDirty = false;
 
@@ -95,8 +95,8 @@ public class LintRollView extends AbstractOWLViewComponent implements
 		OPPLLintParser.setOPPLLintAbstractFactory(new ProtegeOPPLLintFactory(
 				this.getOWLModelManager()));
 		LintRollPreferences.addLintRollPreferenceChangeListener(this);
-		this.getOWLModelManager().getOWLOntologyManager()
-				.addOntologyChangeListener(this);
+		this.getOWLEditorKit().getOWLModelManager().addOntologyChangeListener(
+				this);
 		this.setLayout(new BorderLayout());
 		this.lintReportTree = new OWLLinkedObjectTree(this.getOWLEditorKit());
 		this.lintReportTree.setModel(this.lintReportTreeModel);
@@ -105,9 +105,6 @@ public class LintRollView extends AbstractOWLViewComponent implements
 		this.lintReportTree.addTreeSelectionListener(this);
 		this.lintManager = LintManagerFactory.getLintManager(this
 				.getOWLEditorKit().getModelManager().getOWLOntologyManager());
-		// Set<LintReport> reports = this.lintManager.run(LintRollPreferences
-		// .getSelectedLints(), this.getOWLModelManager().getOntologies());
-		// this.displayReport(reports);
 		JScrollPane treePane = new JScrollPane(this.lintReportTree);
 		JPanel treePanel = new JPanel(new BorderLayout());
 		treePanel.add(treePane, BorderLayout.NORTH);
@@ -202,7 +199,8 @@ public class LintRollView extends AbstractOWLViewComponent implements
 
 	@Override
 	protected void disposeOWLView() {
-		// TODO Auto-generated method stub
+		this.getOWLEditorKit().getModelManager().removeOntologyChangeListener(
+				this);
 	}
 
 	public void ontologiesChanged(List<? extends OWLOntologyChange> changes)
