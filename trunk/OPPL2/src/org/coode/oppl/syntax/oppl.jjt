@@ -374,7 +374,7 @@ JAVACODE
 SingleValueGeneratedVariable expressionGeneratedVariable(String name,VariableType type, ConstraintSystem constraintSystem){
 int beginningSubSection = token.beginColumn;
 int beginningSubSectionLine = token.beginLine;
-String expression = Utils.readString(this, false, COMMA, SELECT);
+String expression = Utils.readString(this, true, COMMA, SELECT);
 try {
 	return Utils.parseVariableExpressionGeneratedVariable(name,	type, expression, constraintSystem);
 } catch (ParserException e) {
