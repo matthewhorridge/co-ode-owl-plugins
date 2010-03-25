@@ -10,10 +10,10 @@ public class ExhaustingTestCase_TestQueries extends AbstractTestCase {
 		result = this.parse("?island:CLASS=Match(\"[iI]s*land\");");
 		this.expectedCorrect(result);
 		this.execute(result);
-		//		result = this.parse("?island:CLASS=Match(\"[iI]s**land\");");
+		// result = this.parse("?island:CLASS=Match(\"[iI]s**land\");");
 		//
-		//		assertNull("the reg expr is broken, should not be allowed", result);
-		//		this.checkProperStackTrace("Encountered [iI]s**land", 22);
+		// assertNull("the reg expr is broken, should not be allowed", result);
+		// this.checkProperStackTrace("Encountered [iI]s**land", 22);
 	}
 
 	public void testRegExpGroupUse() {
@@ -21,6 +21,11 @@ public class ExhaustingTestCase_TestQueries extends AbstractTestCase {
 				.parse("?island:CLASS=Match(\"([iI]sland)\"), ?newIsland:CLASS=create(\"Test\"+?island.GROUPS(0)) BEGIN ADD ?newIsland subClassOf ?island END;");
 		this.expectedCorrect(result);
 		this.execute(result);
+	}
+
+	public void testZamazalQuery() {
+		this
+				.parse("?a:CLASS, ?c:CLASS, ?p:OBJECTPROPERTY, ?b:CLASS = ?p some ?c SELECT ASSERTED ?a equivalentTo ?b BEGIN REMOVE ?a equivalentTo ?b, ADD ?a subClassOf ?b END;");
 	}
 
 	public void testAssembleVariables() {
@@ -82,9 +87,9 @@ public class ExhaustingTestCase_TestQueries extends AbstractTestCase {
 						+ " \"(([\\w]*))Island\") BEGIN ADD ?island subClassOf Thing END;");
 		this.expectedCorrect(result);
 		this.execute(result);
-		//		result = this.parse(correct + " \"Is**land\");");
-		//		assertNull("the reg expr is broken, should not be allowed", result);
-		//		this.checkProperStackTrace("Encountered Is**land", correct.length());
+		// result = this.parse(correct + " \"Is**land\");");
+		// assertNull("the reg expr is broken, should not be allowed", result);
+		// this.checkProperStackTrace("Encountered Is**land", correct.length());
 	}
 
 	public void testRegExpGroupConstraints() {
