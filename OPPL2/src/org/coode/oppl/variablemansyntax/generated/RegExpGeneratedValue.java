@@ -43,8 +43,11 @@ public class RegExpGeneratedValue implements
 	}
 
 	public List<Collection<OWLEntity>> computePossibleValues() {
-		return Arrays.asList(Collections
-				.unmodifiableCollection(this.candidates));
+		Collection<OWLEntity> unmodifiableCollection = Collections
+				.unmodifiableCollection(this.candidates);
+		List<Collection<OWLEntity>> toReturn = Arrays
+				.asList(unmodifiableCollection);
+		return toReturn;
 	}
 
 	public Collection<OWLEntity> getGeneratedValue(BindingNode node) {
@@ -80,10 +83,10 @@ public class RegExpGeneratedValue implements
 				group.add(mr.group(i));
 			}
 		} catch (IllegalStateException e) {
-			//XXX needs logging or something
-			//			System.out.println("RegExpGeneratedValue.actualMatch() Matching \""
-			//					+ regExpression + "\" to \"" + toMatch
-			//					+ "\": no match found");
+			// XXX needs logging or something
+			// System.out.println("RegExpGeneratedValue.actualMatch() Matching \""
+			// + regExpression + "\" to \"" + toMatch
+			// + "\": no match found");
 		}
 		return group;
 	}
@@ -127,5 +130,20 @@ public class RegExpGeneratedValue implements
 
 	public boolean isMatched() {
 		return this.matched;
+	}
+
+	public void accept(SingleValueGeneratedValueVisitor visitor) {
+		visitor.visitRegExpGeneratedValue(this);
+	}
+
+	public <O> O accept(SingleValueGeneratedValueVisitorEx<O> visitor) {
+		return visitor.visitStringGeneratedValue(this);
+	}
+
+	/**
+	 * @return the expression
+	 */
+	public SingleValueGeneratedValue<String> getExpression() {
+		return this.expression;
 	}
 }
