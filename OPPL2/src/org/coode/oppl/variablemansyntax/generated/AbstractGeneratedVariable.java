@@ -76,8 +76,9 @@ public abstract class AbstractGeneratedVariable<N> implements
 	 * @see org.coode.oppl.variablemansyntax.GeneratedVariable#getURI()
 	 */
 	public URI getURI() {
-		String fragment = this.name.substring(this.name.indexOf('?') + 1);
-		return URI.create(ManchesterVariableSyntax.NAMESPACE + fragment);
+		//String fragment = this.name.substring(this.name.indexOf('?') + 1);
+		//return URI.create(ManchesterVariableSyntax.NAMESPACE + fragment);
+		return URI.create(ManchesterVariableSyntax.NAMESPACE + this.name);
 	}
 
 	/**
