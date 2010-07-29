@@ -3,11 +3,12 @@
  */
 package org.coode.oppl.lint;
 
+import java.util.Formatter;
 import java.util.List;
 import java.util.Set;
 
 import org.coode.oppl.OPPLScript;
-import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.Variable;
 import org.semanticweb.owl.lint.ActingLint;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLObject;
@@ -20,7 +21,7 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  * @author Luigi Iannone
  * 
  */
-public abstract class OPPLLintScript implements OPPLScript, ActingLint {
+public abstract class OPPLLintScript implements OPPLScript, ActingLint<OWLObject> {
 	public abstract Set<OWLObject> getDetectedObjects(OWLOntology ontology,
 			OWLOntologyManager ontologyManager);
 
@@ -38,14 +39,13 @@ public abstract class OPPLLintScript implements OPPLScript, ActingLint {
 
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer();
-		buffer.append(this.getName());
-		buffer.append("; ");
-		buffer.append(this.getOPPLScript().render());
-		buffer.append("RETURN ");
-		buffer.append(this.getReturnVariable().getName());
-		buffer.append("; ");
-		buffer.append(this.getDescription());
-		return buffer.toString();
+		Formatter formatter = new Formatter();
+		formatter.format(
+				"%s; %s RETURN %s; %s ",
+				this.getName(),
+				this.getOPPLScript().render(),
+				this.getReturnVariable().getName(),
+				this.getDescription());
+		return formatter.out().toString();
 	}
 }

@@ -24,18 +24,20 @@ package org.semanticweb.owl.lint;
 
 import java.util.Set;
 
+import org.semanticweb.owl.model.OWLObject;
+
 /**
  * A Pattern Based Lint
  * 
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 15, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 15, 2008
  */
-public interface PatternBasedLint extends Lint {
+public interface PatternBasedLint<O extends OWLObject> extends Lint<O> {
 	/**
 	 * @return the patterns
 	 */
-	public Set<LintPattern> getPatterns();
+	public Set<LintPattern<O>> getPatterns();
 }

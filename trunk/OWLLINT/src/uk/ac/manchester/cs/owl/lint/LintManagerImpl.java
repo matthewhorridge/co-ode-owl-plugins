@@ -22,9 +22,11 @@
  */
 package uk.ac.manchester.cs.owl.lint;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintFactory;
@@ -36,26 +38,33 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 13, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 13, 2008
  */
-public class LintManagerImpl implements LintManager {
-	private OWLOntologyManager ontologyManager;
+public final class LintManagerImpl implements LintManager {
+	private final OWLOntologyManager ontologyManager;
+	private final OWLReasoner reasoner;
 
-	public LintManagerImpl(OWLOntologyManager ontologyManager) {
+	/**
+	 * @param ontologyManager
+	 * @param reasoner
+	 */
+	public LintManagerImpl(OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
+		assert ontologyManager != null;
 		this.ontologyManager = ontologyManager;
+		this.reasoner = reasoner;
 	}
 
 	/**
 	 * @see org.semanticweb.owl.lint.LintManager#run(java.util.Set,
 	 *      java.util.Set)
 	 */
-	public Set<LintReport> run(Set<Lint> lints, Set<OWLOntology> targets)
-			throws LintException {
-		Set<LintReport> toReturn = new HashSet<LintReport>();
-		for (Lint lint : lints) {
-			LintReport lintReport = lint.detected(targets);
+	public Set<LintReport<?>> run(Collection<? extends Lint<?>> lints,
+			Collection<? extends OWLOntology> targets) throws LintException {
+		Set<LintReport<?>> toReturn = new HashSet<LintReport<?>>();
+		for (Lint<?> lint : lints) {
+			LintReport<?> lintReport = lint.detected(targets);
 			if (!lintReport.getAffectedOntologies().isEmpty()) {
 				toReturn.add(lintReport);
 			}
@@ -64,6 +73,6 @@ public class LintManagerImpl implements LintManager {
 	}
 
 	public LintFactory getLintFactory() {
-		return new LintFactoryImpl(this.ontologyManager);
+		return new LintFactoryImpl(this.ontologyManager, this.reasoner);
 	}
 }

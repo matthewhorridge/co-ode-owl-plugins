@@ -22,7 +22,12 @@
  */
 package org.coode.oppl.lint;
 
-import org.coode.oppl.lint.syntax.OPPLLintParser;
+import org.coode.oppl.lint.OPPLLintParser.AbstractParserFactory;
+import org.coode.parsers.ErrorListener;
+import org.coode.parsers.factory.SymbolTableFactory;
+import org.coode.parsers.oppl.OPPLSymbolTable;
+import org.coode.parsers.oppl.factory.SimpleSymbolTableFactory;
+import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
@@ -30,25 +35,30 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  * @author Luigi Iannone
  * 
  */
-public class ParserFactory extends AbstractParserFactory {
+public class ParserFactory implements AbstractParserFactory {
 	private final OWLOntologyManager ontologyManager;
 	private final OWLOntology ontology;
+	private final OWLReasoner reasoner;
 
 	/**
 	 * @param ontology
 	 * @param ontologyManager
 	 */
-	public ParserFactory(OWLOntology ontology,
-			OWLOntologyManager ontologyManager) {
+	public ParserFactory(OWLOntology ontology, OWLOntologyManager ontologyManager,
+			OWLReasoner reasoner) {
+		if (ontologyManager == null) {
+			throw new NullPointerException("The ontology manager cannot be null");
+		}
 		if (ontology == null) {
 			throw new NullPointerException("The ontology cannot be null");
 		}
-		if (ontologyManager == null) {
-			throw new NullPointerException(
-					"The ontology manager cannot be null");
-		}
-		this.ontology = ontology;
 		this.ontologyManager = ontologyManager;
+		this.ontology = ontology;
+		this.reasoner = reasoner;
+	}
+
+	public ParserFactory(OWLOntology ontology, OWLOntologyManager ontologyManager) {
+		this(ontology, ontologyManager, null);
 	}
 
 	/**
@@ -58,6 +68,18 @@ public class ParserFactory extends AbstractParserFactory {
 		return this.ontologyManager;
 	}
 
+	public OPPLLintParser build(ErrorListener errorListener) {
+		SymbolTableFactory<OPPLSymbolTable> symbolTableFactory = new SimpleSymbolTableFactory(
+				this.getOntologyManager());
+		return new OPPLLintParser(this.getOPPLLintAbstractFactory(), errorListener,
+				symbolTableFactory);
+	}
+
+	public OPPLLintAbstractFactory getOPPLLintAbstractFactory() {
+		return new OPPLLintFactory(this.getOntology(), this.getOntologyManager(),
+				this.getReasoner());
+	}
+
 	/**
 	 * @return the ontology
 	 */
@@ -65,9 +87,10 @@ public class ParserFactory extends AbstractParserFactory {
 		return this.ontology;
 	}
 
-	@Override
-	protected void initOPPLLintFactory() {
-		OPPLLintParser.setOPPLLintAbstractFactory(new OPPLLintFactory(this
-				.getOntology(), this.getOntologyManager()));
+	/**
+	 * @return the reasoner
+	 */
+	public OWLReasoner getReasoner() {
+		return this.reasoner;
 	}
 }

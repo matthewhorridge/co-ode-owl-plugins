@@ -22,6 +22,7 @@
  */
 package org.semanticweb.owl.lint;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.semanticweb.owl.model.OWLOntology;
@@ -29,9 +30,9 @@ import org.semanticweb.owl.model.OWLOntology;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 12, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 12, 2008
  */
 public interface LintManager {
 	/**
@@ -41,8 +42,8 @@ public interface LintManager {
 	 *         {@link Lint} amongst the input ones
 	 * @throws LintException
 	 */
-	public Set<LintReport> run(Set<Lint> lints, Set<OWLOntology> targets)
-			throws LintException;
+	public Set<LintReport<?>> run(Collection<? extends Lint<?>> lints,
+			Collection<? extends OWLOntology> targets) throws LintException;
 
 	public LintFactory getLintFactory();
 }

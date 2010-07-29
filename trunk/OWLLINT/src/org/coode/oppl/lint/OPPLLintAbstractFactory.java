@@ -1,8 +1,8 @@
 package org.coode.oppl.lint;
 
+import org.coode.oppl.OPPLAbstractFactory;
 import org.coode.oppl.OPPLScript;
-import org.coode.oppl.syntax.OPPLParser;
-import org.coode.oppl.variablemansyntax.Variable;
+import org.coode.oppl.Variable;
 
 public interface OPPLLintAbstractFactory {
 	/**
@@ -11,8 +11,8 @@ public interface OPPLLintAbstractFactory {
 	 * @param string
 	 * 
 	 */
-	OPPLParser initOPPLParser(String string);
+	OPPLLintScript buildOPPLLintScript(String name, OPPLScript opplScript, Variable v,
+			String description);
 
-	OPPLLintScript buildOPPLLintScript(String name, OPPLScript opplScript,
-			Variable v, String description);
+	OPPLAbstractFactory getOPPLFactory();
 }

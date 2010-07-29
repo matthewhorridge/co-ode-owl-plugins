@@ -1,5 +1,11 @@
 <?xml version="1.0" ?>
   <plugin>
+    <extension-point id="lint"
+                     name="Lint"
+                     schema="schema/Lint.exsd"/>
+ 	<extension-point id="oppllint"
+                     name="Lint"
+                     schema="schema/OPPLLint.exsd"/>                     
   	<extension id="LintRollView"
 			point="org.protege.editor.core.application.ViewComponent">
   		<label value="Lint Roll"/>
@@ -7,19 +13,25 @@
 		<headerColor value="@org.protege.ontologycolor"/>
         <category value="@org.protege.ontologycategory"/>
   	</extension>
-  	<!-- TABS -->
-  	<extension id="LintRollTab"
-                point="org.protege.editor.core.application.WorkspaceTab">
-        <label value="Lint Roll"/>
-        <class value="uk.ac.manchester.cs.lintroll.ui.LintRollTab"/>
-        <editorKitId value="OWLEditorKit"/>
-        <index value="L"/>
-        <defaultViewConfigFileName value="viewconfig-lintrolltab.xml"/>
-    </extension>
-    <!-- Preference panel-->
-    <extension id="ui.preferences.renderer" 
-               point="org.protege.editor.core.application.preferencespanel">
-        <label value="Lint Roll"/>
-        <class value="uk.ac.manchester.cs.lintroll.ui.preference.LintRollPreferencesPanel"/>
-    </extension>
+ 	<!-- Example Lints -->
+ 	<extension id="SingleSubClassLint" point="uk.ac.manchester.cs.lintroll.lint">
+ 		<label value="Single sub-class"/>
+ 		<class value="uk.ac.manchester.cs.owl.lint.examples.SingleSubClassLint"/> 		
+ 	</extension>
+ 	<extension id="NonLeafNoInfoLint" point="uk.ac.manchester.cs.lintroll.lint">
+ 		<label value="Non leaf classes with no additional information"/>
+ 		<class value="uk.ac.manchester.cs.owl.lint.examples.NonLeafNoInfoLint"/> 		
+ 	</extension>
+ 	<extension id="Wait20sec" point="uk.ac.manchester.cs.lintroll.lint">
+ 		<label value="Wait for 20 seconds"/>
+ 		<class value="uk.ac.manchester.cs.owl.lint.examples.WaitFor20secondsLint"/> 		
+ 	</extension>
+ 	<extension id="TransitiveObjectPropertyHierarchy" point="uk.ac.manchester.cs.lintroll.lint">
+ 		<label value="Transitive Object Property Hierarchy"/>
+ 		<class value=" 	uk.ac.manchester.cs.owl.lint.examples.TransitiveObjectPropertyLint"/> 		
+ 	</extension>
+ 	<extension id="TransitiveObjectPropertyHierarchy" point="uk.ac.manchester.cs.lintroll.oppllint">
+ 		<label value="OPPL Transitive Object Property Hierarchy"/>
+ 		<script value="Transitivity in property hierarchies lint; ?x:OBJECTPROPERTY, ?y:OBJECTPROPERTY SELECT ?y subPropertyOf ?x, Transitive ?y, Transitive ?x  WHERE ?x!= ?y BEGIN REMOVE Transitive ?y END; RETURN ?y; Lint that corrects the undesirable situation in which a transitive object property is sub-property of another transitive object property"/> 		
+ 	</extension> 	  
   </plugin>

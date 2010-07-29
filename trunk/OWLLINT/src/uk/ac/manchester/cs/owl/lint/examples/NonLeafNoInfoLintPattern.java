@@ -28,9 +28,7 @@ import java.util.Set;
 
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
 
@@ -39,18 +37,14 @@ import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
  * 
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 13, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 13, 2008
  */
-public class NonLeafNoInfoLintPattern extends OntologyWiseLintPattern {
-	public NonLeafNoInfoLintPattern(OWLOntologyManager ontologyManager) {
-		super(ontologyManager);
-	}
-
+public class NonLeafNoInfoLintPattern extends OntologyWiseLintPattern<OWLClass> {
 	@Override
-	public Set<OWLObject> matches(OWLOntology target) {
-		Set<OWLObject> toReturn = new HashSet<OWLObject>();
+	public Set<OWLClass> matches(OWLOntology target) {
+		Set<OWLClass> toReturn = new HashSet<OWLClass>();
 		for (OWLClass owlClass : target.getReferencedClasses()) {
 			if (this.matches(owlClass, target)) {
 				toReturn.add(owlClass);

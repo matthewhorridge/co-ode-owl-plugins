@@ -22,6 +22,7 @@
  */
 package uk.ac.manchester.cs.owl.lint;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -30,27 +31,26 @@ import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintPattern;
 import org.semanticweb.owl.lint.LintReport;
+import org.semanticweb.owl.lint.LintVisitor;
+import org.semanticweb.owl.lint.LintVisitorEx;
 import org.semanticweb.owl.lint.PatternBasedLint;
 import org.semanticweb.owl.lint.PatternReport;
+import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 12, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 12, 2008
  */
-public class PatternBasedLintImpl implements PatternBasedLint {
-	protected Set<LintPattern> patterns = new HashSet<LintPattern>();
+public class PatternBasedLintImpl<O extends OWLObject> implements PatternBasedLint<O> {
+	protected Set<LintPattern<O>> patterns = new HashSet<LintPattern<O>>();
 	protected String name = null;
-	protected OWLOntologyManager ontologyManager;
 
-	protected PatternBasedLintImpl(OWLOntologyManager ontologyManager,
-			LintPattern... lintPatterns) {
-		this.ontologyManager = ontologyManager;
-		for (LintPattern lintPattern : lintPatterns) {
+	protected PatternBasedLintImpl(Collection<? extends LintPattern<O>> lintPatterns) {
+		for (LintPattern<O> lintPattern : lintPatterns) {
 			this.patterns.add(lintPattern);
 		}
 	}
@@ -58,7 +58,7 @@ public class PatternBasedLintImpl implements PatternBasedLint {
 	/**
 	 * @see org.semanticweb.owl.lint.PatternBasedLint#getPatterns()
 	 */
-	public Set<LintPattern> getPatterns() {
+	public Set<LintPattern<O>> getPatterns() {
 		return this.patterns;
 	}
 
@@ -72,18 +72,17 @@ public class PatternBasedLintImpl implements PatternBasedLint {
 	 * @throws LintException
 	 * @see org.semanticweb.owl.lint.Lint#detected(java.util.Set)
 	 */
-	public LintReport detected(Set<OWLOntology> targets) throws LintException {
-		Iterator<LintPattern> it = this.patterns.iterator();
-		LintPattern lintPattern;
+	public LintReport<O> detected(Collection<? extends OWLOntology> targets) throws LintException {
+		Iterator<LintPattern<O>> it = this.patterns.iterator();
+		LintPattern<O> lintPattern;
 		boolean unsatisfiablePatternConjunction = false;
-		PatternReport patternMatches;
-		LintReportImpl lintReport = new LintReportImpl(this);
+		PatternReport<O> patternMatches;
+		LintReportImpl<O> lintReport = new LintReportImpl<O>(this);
 		while (!unsatisfiablePatternConjunction && it.hasNext()) {
 			lintPattern = it.next();
 			patternMatches = lintPattern.matches(targets);
 			lintReport.chainPatternReport(patternMatches);
-			unsatisfiablePatternConjunction = lintReport
-					.getAffectedOntologies().isEmpty();
+			unsatisfiablePatternConjunction = lintReport.getAffectedOntologies().isEmpty();
 		}
 		return lintReport;
 	}
@@ -107,7 +106,7 @@ public class PatternBasedLintImpl implements PatternBasedLint {
 		String toReturn = "(Generic Pattern-based Lint Description)\nThis Lint is detected if "
 				+ "and only all its patterns are matched on the same OWLObject(s) "
 				+ "\nThe patterns are: \n";
-		for (LintPattern pattern : this.patterns) {
+		for (LintPattern<O> pattern : this.patterns) {
 			toReturn += pattern.getClass().getSimpleName() + "\n";
 		}
 		return toReturn;
@@ -117,7 +116,7 @@ public class PatternBasedLintImpl implements PatternBasedLint {
 	public String toString() {
 		String toReturn = PatternBasedLint.class.getSimpleName() + "(";
 		int i = 1;
-		for (LintPattern pattern : this.patterns) {
+		for (LintPattern<O> pattern : this.patterns) {
 			toReturn += pattern.getClass().getSimpleName();
 			if (i < this.patterns.size()) {
 				toReturn += ",";
@@ -128,10 +127,11 @@ public class PatternBasedLintImpl implements PatternBasedLint {
 		return toReturn;
 	}
 
-	/**
-	 * @return the ontologyManager
-	 */
-	public OWLOntologyManager getOntologyManager() {
-		return this.ontologyManager;
+	public void accept(LintVisitor visitor) {
+		visitor.visitPatternPasedLint(this);
+	}
+
+	public <P> P accept(LintVisitorEx<P> visitor) {
+		return visitor.visitPatternPasedLint(this);
 	}
 }

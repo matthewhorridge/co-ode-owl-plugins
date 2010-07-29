@@ -22,45 +22,47 @@
  */
 package uk.ac.manchester.cs.owl.lint.examples;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintPattern;
 import org.semanticweb.owl.lint.LintReport;
+import org.semanticweb.owl.lint.LintVisitor;
+import org.semanticweb.owl.lint.LintVisitorEx;
 import org.semanticweb.owl.lint.PatternBasedLint;
+import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 20, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 20, 2008
  */
-public class SingleSubClassLint implements PatternBasedLint {
-	private PatternBasedLint instance;
-	private OWLOntologyManager ontologyManager;
+public class SingleSubClassLint implements PatternBasedLint<OWLClass> {
+	private PatternBasedLint<OWLClass> instance;
 
-	public SingleSubClassLint(OWLOntologyManager ontologyManager) {
-		this.instance = (PatternBasedLint) LintManagerFactory.getLintManager(
-				ontologyManager).getLintFactory().createLint(
-				new SingleSubClassLintPattern(ontologyManager));
-		this.ontologyManager = ontologyManager;
+	public SingleSubClassLint() {
+		this.instance = LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
+				Collections.singleton(new SingleSubClassLintPattern()));
 	}
 
 	public String getDescription() {
 		return "This lint is detected when there is a class in the ontology with only one subclass";
 	}
 
-	public Set<LintPattern> getPatterns() {
+	public Set<LintPattern<OWLClass>> getPatterns() {
 		return this.instance.getPatterns();
 	}
 
-	public LintReport detected(Set<OWLOntology> targets) throws LintException {
-		LintReport instanceReport = this.instance.detected(targets);
+	public LintReport<OWLClass> detected(Collection<? extends OWLOntology> targets)
+			throws LintException {
+		LintReport<OWLClass> instanceReport = this.instance.detected(targets);
 		instanceReport.setLint(this);
 		return instanceReport;
 	}
@@ -69,11 +71,11 @@ public class SingleSubClassLint implements PatternBasedLint {
 		return this.instance.getName();
 	}
 
-	public void setName(String name) {
-		this.instance.setName(name);
+	public void accept(LintVisitor visitor) {
+		this.instance.accept(visitor);
 	}
 
-	public OWLOntologyManager getOntologyManager() {
-		return this.ontologyManager;
+	public <P> P accept(LintVisitorEx<P> visitor) {
+		return this.instance.accept(visitor);
 	}
 }

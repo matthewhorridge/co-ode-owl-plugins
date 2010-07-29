@@ -22,19 +22,16 @@
  */
 package uk.ac.manchester.cs.owl.lint;
 
-import java.lang.reflect.Constructor;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Collection;
 
-import org.protege.editor.owl.model.inference.NoOpReasoner;
-import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.lint.InferenceLintPattern;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintFactory;
 import org.semanticweb.owl.lint.LintPattern;
 import org.semanticweb.owl.lint.LintReport;
+import org.semanticweb.owl.lint.PatternBasedLint;
 import org.semanticweb.owl.lint.PatternReport;
+import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
@@ -45,11 +42,17 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  *         Feb 14, 2008
  */
 public class LintFactoryImpl implements LintFactory {
-	protected OWLReasoner reasoner;
-	protected OWLOntologyManager ontologyManager;
+	private final OWLOntologyManager ontologyManager;
+	private final OWLReasoner reasoner;
 
-	public LintFactoryImpl(OWLOntologyManager ontologyManager) {
+	/**
+	 * @param ontologyManager
+	 * @param reasoner
+	 */
+	public LintFactoryImpl(OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
+		assert ontologyManager != null;
 		this.ontologyManager = ontologyManager;
+		this.reasoner = reasoner;
 	}
 
 	/**
@@ -60,47 +63,30 @@ public class LintFactoryImpl implements LintFactory {
 	 * @param lintPatterns
 	 * @return a {@link PatternBasedLintImpl}
 	 */
-	public Lint createLint(LintPattern... lintPatterns) {
-		return new PatternBasedLintImpl(this.ontologyManager, lintPatterns);
+	public <O extends OWLObject> PatternBasedLint<O> createLint(
+			Collection<? extends LintPattern<O>> lintPatterns) {
+		return new PatternBasedLintImpl<O>(lintPatterns);
 	}
 
 	/**
 	 * @see org.semanticweb.owl.lint.LintFactory#createPatternReport(org.semanticweb.owl.lint.LintPattern)
 	 */
-	public PatternReport createPatternReport(LintPattern pattern) {
-		return new PatternReportImpl(pattern);
+	public <O extends OWLObject> PatternReport<O> createPatternReport(LintPattern<O> pattern) {
+		return new PatternReportImpl<O>(pattern);
 	}
 
 	/**
 	 * @see org.semanticweb.owl.lint.LintFactory#createLintReport(org.semanticweb.owl.lint.Lint)
 	 */
-	public LintReport createLintReport(Lint lint) {
-		return new LintReportImpl(lint);
+	public <O extends OWLObject> LintReport<O> createLintReport(Lint<O> lint) {
+		return new LintReportImpl<O>(lint);
 	}
 
-	@SuppressWarnings("unchecked")
-	public InferenceLintPattern createInferenceLintPattern() {
-		if (this.reasoner == null) {
-			String reasonerClassName = "org.mindswap.pellet.owlapi.Reasoner";
-			Class reasonerClass;
-			try {
-				reasonerClass = Class.forName(reasonerClassName);
-				Constructor<OWLReasoner> con = reasonerClass
-						.getConstructor(OWLOntologyManager.class);
-				this.reasoner = con.newInstance(OWLManager
-						.createOWLOntologyManager());
-			} catch (Exception e) {
-				Logger
-						.getLogger(this.getClass().toString())
-						.log(
-								Level.WARNING,
-								"Unable to load the default reasoner - NoOpReasoner will be used",
-								e);
-				NoOpReasoner noOpReasoner = new NoOpReasoner(OWLManager
-						.createOWLOntologyManager());
-				this.reasoner = noOpReasoner;
-			}
-		}
-		return new InferenceLintPatternImpl(this.reasoner);
+	public OWLOntologyManager getOntologyManager() {
+		return this.ontologyManager;
+	}
+
+	public OWLReasoner getOWLReasoner() {
+		return this.reasoner;
 	}
 }

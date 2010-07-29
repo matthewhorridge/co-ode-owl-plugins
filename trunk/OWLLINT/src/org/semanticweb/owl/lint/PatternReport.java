@@ -30,11 +30,11 @@ import org.semanticweb.owl.model.OWLOntology;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 18, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 18, 2008
  */
-public interface PatternReport {
+public interface PatternReport<O extends OWLObject> {
 	/**
 	 * @return the set of affected OWLOntology elements
 	 */
@@ -44,7 +44,7 @@ public interface PatternReport {
 	 * @param ontology
 	 * @return the Set of affected OWLObject elements for the input ontology
 	 */
-	Set<OWLObject> getAffectedOWLObjects(OWLOntology ontology);
+	Set<O> getAffectedOWLObjects(OWLOntology ontology);
 
 	/**
 	 * @param ontology
@@ -56,5 +56,5 @@ public interface PatternReport {
 	/**
 	 * @return the LintPattern that generated this PatternReport
 	 */
-	public LintPattern getLintPattern();
+	public LintPattern<O> getLintPattern();
 }

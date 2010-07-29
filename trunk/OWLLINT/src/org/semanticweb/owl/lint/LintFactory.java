@@ -22,7 +22,11 @@
  */
 package org.semanticweb.owl.lint;
 
-import uk.ac.manchester.cs.owl.lint.PatternBasedLintImpl;
+import java.util.Collection;
+
+import org.semanticweb.owl.inference.OWLReasoner;
+import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -33,24 +37,27 @@ import uk.ac.manchester.cs.owl.lint.PatternBasedLintImpl;
  */
 public interface LintFactory {
 	/**
-	 * Creates a {@link PatternBasedLintImpl} starting from a variable number of
+	 * Creates a {@link PatternBasedLint} starting from a variable number of
 	 * {@link LintPattern}
 	 * 
 	 * @param lintPatterns
 	 * @return the created Lint.
 	 */
-	public Lint createLint(LintPattern... lintPatterns);
+	public <O extends OWLObject> PatternBasedLint<O> createLint(
+			Collection<? extends LintPattern<O>> lintPatterns);
 
 	/**
 	 * @return an new {@link PatternReport} for the input {@link LintPattern}
 	 */
-	public PatternReport createPatternReport(LintPattern pattern);
+	public <O extends OWLObject> PatternReport<O> createPatternReport(LintPattern<O> pattern);
 
 	/**
 	 * @param lint
 	 * @return a new {@link LintReport} for the input {@link Lint}
 	 */
-	public LintReport createLintReport(Lint lint);
+	public <O extends OWLObject> LintReport<O> createLintReport(Lint<O> lint);
 
-	public InferenceLintPattern createInferenceLintPattern();
+	public OWLOntologyManager getOntologyManager();
+
+	public OWLReasoner getOWLReasoner();
 }

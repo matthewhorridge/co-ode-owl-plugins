@@ -35,22 +35,22 @@ import org.semanticweb.owl.model.OWLOntology;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 18, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 18, 2008
  */
-public class PatternReportImpl implements PatternReport {
-	protected Map<OWLOntology, Set<OWLObject>> matches = new HashMap<OWLOntology, Set<OWLObject>>();
-	protected LintPattern lintPattern;
+public class PatternReportImpl<O extends OWLObject> implements PatternReport<O> {
+	protected Map<OWLOntology, Set<O>> matches = new HashMap<OWLOntology, Set<O>>();
+	protected LintPattern<O> lintPattern;
 
-	PatternReportImpl(LintPattern pattern) {
+	PatternReportImpl(LintPattern<O> pattern) {
 		this.lintPattern = pattern;
 	}
 
 	/**
 	 * @see org.semanticweb.owl.lint.PatternReport#getAffectedOWLObjects(org.semanticweb.owl.model.OWLOntology)
 	 */
-	public Set<OWLObject> getAffectedOWLObjects(OWLOntology ontology) {
+	public Set<O> getAffectedOWLObjects(OWLOntology ontology) {
 		return this.matches.get(ontology);
 	}
 
@@ -75,10 +75,10 @@ public class PatternReportImpl implements PatternReport {
 	 * @param ontology
 	 * @param objects
 	 */
-	public void add(OWLOntology ontology, Set<OWLObject> objects) {
-		Set<OWLObject> previousMatches = this.matches.get(ontology);
+	public void add(OWLOntology ontology, Set<O> objects) {
+		Set<O> previousMatches = this.matches.get(ontology);
 		if (previousMatches == null) {
-			previousMatches = new HashSet<OWLObject>();
+			previousMatches = new HashSet<O>();
 		}
 		previousMatches.addAll(objects);
 		this.matches.put(ontology, previousMatches);
@@ -87,7 +87,7 @@ public class PatternReportImpl implements PatternReport {
 	/**
 	 * @see org.semanticweb.owl.lint.PatternReport#getLintPattern()
 	 */
-	public LintPattern getLintPattern() {
+	public LintPattern<O> getLintPattern() {
 		return this.lintPattern;
 	}
 }

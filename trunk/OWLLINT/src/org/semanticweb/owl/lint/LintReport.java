@@ -30,16 +30,16 @@ import org.semanticweb.owl.model.OWLOntology;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 15, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 15, 2008
  */
-public interface LintReport {
+public interface LintReport<O extends OWLObject> {
 	/**
 	 * @param ontology
 	 * @return the Set of affected OWLObject elements for the input ontology
 	 */
-	Set<OWLObject> getAffectedOWLObjects(OWLOntology ontology);
+	Set<O> getAffectedOWLObjects(OWLOntology ontology);
 
 	/**
 	 * @return the set of affected OWLOntology elements
@@ -56,14 +56,14 @@ public interface LintReport {
 	/**
 	 * @return the Lint that generated this Report
 	 */
-	Lint getLint();
+	Lint<O> getLint();
 
 	/**
 	 * Sets the Lint originating this report
 	 * 
 	 * @param lint
 	 */
-	void setLint(Lint lint);
+	void setLint(Lint<O> lint);
 
 	/**
 	 * Adds the input OWLObject to the this LintReport for the input ontology
@@ -71,7 +71,7 @@ public interface LintReport {
 	 * @param object
 	 * @param affectedOntology
 	 */
-	void add(OWLObject object, OWLOntology affectedOntology);
+	void add(O object, OWLOntology affectedOntology);
 
 	/**
 	 * Adds the input OWLObject to the this LintReport for the input ontology
@@ -81,7 +81,7 @@ public interface LintReport {
 	 * @param affectedOntology
 	 * @param explanation
 	 */
-	void add(OWLObject object, OWLOntology affectedOntology, String explanation);
+	void add(O object, OWLOntology affectedOntology, String explanation);
 
 	/**
 	 * 

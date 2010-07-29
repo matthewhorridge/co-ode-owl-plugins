@@ -1,20 +1,24 @@
 package org.coode.oppl.lint;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.coode.oppl.ChangeExtractor;
+import org.coode.oppl.ConstraintSystem;
 import org.coode.oppl.OPPLQuery;
 import org.coode.oppl.OPPLScript;
 import org.coode.oppl.OPPLScriptVisitor;
 import org.coode.oppl.OPPLScriptVisitorEx;
-import org.coode.oppl.variablemansyntax.ConstraintSystem;
-import org.coode.oppl.variablemansyntax.Variable;
-import org.coode.oppl.variablemansyntax.bindingtree.BindingNode;
+import org.coode.oppl.Variable;
+import org.coode.oppl.bindingtree.BindingNode;
+import org.semanticweb.owl.lint.LintActionException;
 import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintReport;
+import org.semanticweb.owl.lint.LintVisitor;
+import org.semanticweb.owl.lint.LintVisitorEx;
 import org.semanticweb.owl.model.OWLAxiomChange;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
@@ -34,9 +38,8 @@ public class OPPLLintScriptImpl extends OPPLLintScript {
 	 * @param opplScript
 	 * @param returnVariable
 	 */
-	public OPPLLintScriptImpl(String name, OPPLScript opplScript,
-			Variable returnVariable, String description,
-			OWLOntologyManager ontologyManager) {
+	public OPPLLintScriptImpl(String name, OPPLScript opplScript, Variable returnVariable,
+			String description, OWLOntologyManager ontologyManager) {
 		this.name = name;
 		this.opplScript = opplScript;
 		this.returnVariable = returnVariable;
@@ -45,10 +48,9 @@ public class OPPLLintScriptImpl extends OPPLLintScript {
 	}
 
 	@Override
-	public List<OWLAxiomChange> getChanges(OWLOntology ontology,
-			OWLOntologyManager ontologyManager) {
-		ChangeExtractor changeExtractor = new ChangeExtractor(this.opplScript
-				.getConstraintSystem(), true);
+	public List<OWLAxiomChange> getChanges(OWLOntology ontology, OWLOntologyManager ontologyManager) {
+		ChangeExtractor changeExtractor = new ChangeExtractor(
+				this.opplScript.getConstraintSystem(), true);
 		List<OWLAxiomChange> changes = this.opplScript.accept(changeExtractor);
 		return changes;
 	}
@@ -57,12 +59,10 @@ public class OPPLLintScriptImpl extends OPPLLintScript {
 	public Set<OWLObject> getDetectedObjects(OWLOntology ontology,
 			OWLOntologyManager ontologyManager) {
 		this.getChanges(ontology, ontologyManager);
-		Set<BindingNode> leaves = this.opplScript.getConstraintSystem()
-				.getLeaves();
+		Set<BindingNode> leaves = this.opplScript.getConstraintSystem().getLeaves();
 		Set<OWLObject> toReturn = new HashSet<OWLObject>();
 		for (BindingNode leaf : leaves) {
-			OWLObject assignmentValue = leaf.getAssignmentValue(this
-					.getReturnVariable());
+			OWLObject assignmentValue = leaf.getAssignmentValue(this.getReturnVariable());
 			toReturn.add(assignmentValue);
 		}
 		return toReturn;
@@ -138,18 +138,16 @@ public class OPPLLintScriptImpl extends OPPLLintScript {
 	/**
 	 * @see org.semanticweb.owl.lint.ActingLint#executeActions(org.semanticweb.owl.lint.LintReport)
 	 */
-	public void executeActions(LintReport report) throws LintException {
-		Set<OWLOntology> affectedOntologies = report.getAffectedOntologies();
+	public void executeActions(Collection<? extends OWLOntology> ontologies)
+			throws LintActionException {
 		List<OWLAxiomChange> changes = new ArrayList<OWLAxiomChange>();
-		for (OWLOntology ontology : affectedOntologies) {
-			changes
-					.addAll(this
-							.getChanges(ontology, this.getOntologyManager()));
+		for (OWLOntology ontology : ontologies) {
+			changes.addAll(this.getChanges(ontology, this.getOntologyManager()));
 		}
 		try {
 			this.getOntologyManager().applyChanges(changes);
 		} catch (OWLOntologyChangeException e) {
-			throw new LintException(e);
+			throw new LintActionException(e);
 		}
 	}
 
@@ -163,12 +161,13 @@ public class OPPLLintScriptImpl extends OPPLLintScript {
 	/**
 	 * @see org.semanticweb.owl.lint.Lint#detected(java.util.Set)
 	 */
-	public LintReport detected(Set<OWLOntology> targets) throws LintException {
-		LintReport toReturn = LintManagerFactory.getLintManager(
-				this.getOntologyManager()).getLintFactory().createLintReport(
+	public LintReport<OWLObject> detected(Collection<? extends OWLOntology> targets)
+			throws LintException {
+		LintReport<OWLObject> toReturn = LintManagerFactory.getInstance().getLintManager().getLintFactory().createLintReport(
 				this);
 		for (OWLOntology ontology : targets) {
-			Set<OWLObject> detectedObjects = this.getDetectedObjects(ontology,
+			Set<OWLObject> detectedObjects = this.getDetectedObjects(
+					ontology,
 					this.getOntologyManager());
 			for (OWLObject object : detectedObjects) {
 				toReturn.add(object, ontology);
@@ -197,5 +196,13 @@ public class OPPLLintScriptImpl extends OPPLLintScript {
 	@Override
 	public OPPLScript getOPPLScript() {
 		return this.opplScript;
+	}
+
+	public void accept(LintVisitor visitor) {
+		visitor.visitActingLint(this);
+	}
+
+	public <P> P accept(LintVisitorEx<P> visitor) {
+		return visitor.visitActingLint(this);
 	}
 }
