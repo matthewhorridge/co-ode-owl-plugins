@@ -33,33 +33,38 @@ import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
-
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 14, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 14, 2008
  */
 public abstract class LintTestCase extends TestCase {
-	protected OWLOntologyManager manager;
+	private OWLOntologyManager manager;
 	protected Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
-	protected Lint lint;
+	protected Lint<?> lint;
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.manager = OWLManager.createOWLOntologyManager();
 		URI physicalURI = URI.create(this.getPhysicalOntologyURI());
-		OWLOntology ontology = this.manager
-				.loadOntologyFromPhysicalURI(physicalURI);
+		OWLOntology ontology = this.manager.loadOntologyFromPhysicalURI(physicalURI);
 		this.ontologies.add(ontology);
 		this.lint = this.createLint();
 	}
 
-	protected abstract Lint createLint();
+	protected abstract Lint<?> createLint();
 
 	protected abstract String getPhysicalOntologyURI();
 
 	public abstract void testDetected() throws Exception;
+
+	/**
+	 * @return the manager
+	 */
+	public OWLOntologyManager getManager() {
+		return this.manager;
+	}
 }

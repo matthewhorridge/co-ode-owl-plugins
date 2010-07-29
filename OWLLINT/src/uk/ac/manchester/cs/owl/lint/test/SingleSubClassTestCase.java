@@ -23,6 +23,7 @@
 package uk.ac.manchester.cs.owl.lint.test;
 
 import java.net.URI;
+import java.util.Collections;
 
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintReport;
@@ -36,35 +37,36 @@ import uk.ac.manchester.cs.owl.lint.examples.SingleSubClassLintPattern;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 13, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 13, 2008
  */
 public class SingleSubClassTestCase extends LintTestCase {
 	private static final String ONTOLOGY_URI = "http://www.cs.man.ac.uk/owlapi/lint/test/SingleSubClass.owl";
 
 	@Override
 	public void testDetected() throws Exception {
-		LintReport detected = this.lint.detected(this.ontologies);
+		LintReport<?> detected = this.lint.detected(this.ontologies);
 		OWLOntology ontology = this.ontologies.iterator().next();
 		assertTrue(
 				"Lint does not detect anything and it really shoud not happen",
 				!detected.getAffectedOntologies().isEmpty());
-		OWLDataFactory factory = this.manager.getOWLDataFactory();
+		OWLDataFactory factory = this.getManager().getOWLDataFactory();
 		OWLClass clsA = factory.getOWLClass(URI.create(ONTOLOGY_URI + "#A"));
 		OWLClass clsB = factory.getOWLClass(URI.create(ONTOLOGY_URI + "#B"));
 		OWLClass clsC = factory.getOWLClass(URI.create(ONTOLOGY_URI + "#C"));
 		System.out.println(detected);
-		assertTrue("The result content is not the one expected", detected
-				.getAffectedOWLObjects(ontology).contains(clsA)
-				&& detected.getAffectedOWLObjects(ontology).contains(clsB)
-				&& !detected.getAffectedOWLObjects(ontology).contains(clsC));
+		assertTrue(
+				"The result content is not the one expected",
+				detected.getAffectedOWLObjects(ontology).contains(clsA)
+						&& detected.getAffectedOWLObjects(ontology).contains(clsB)
+						&& !detected.getAffectedOWLObjects(ontology).contains(clsC));
 	}
 
 	@Override
-	protected Lint createLint() {
-		return LintManagerFactory.getLintManager(this.manager).getLintFactory()
-				.createLint(new SingleSubClassLintPattern(this.manager));
+	protected Lint<?> createLint() {
+		return LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
+				Collections.singleton(new SingleSubClassLintPattern()));
 	}
 
 	@Override

@@ -61,7 +61,7 @@
 		target: bundle
 		Creates the Protege 4 bundle
 	====================================-->
-	<target name="bundle" depends="init, javacc">
+	<target name="bundle" depends="init">
 
 		<delete dir="${dist}/configuration/org.eclipse.core.runtime" />
 		<delete dir="${dist}/configuration/org.eclipse.osgi" />
@@ -91,18 +91,7 @@
 
 	</target>
 
-	<!-- ====================================
-		target: javaCC
-		builds the JavaCC java files.
-	=========================================-->
-	<target name="javacc">
-		<exec executable="sh" dir="${basedir}/src/org/coode/oppl/lint/syntax">
-			<arg line="${javaccpath}jjtree oppllint.jjt" />
-		</exec>
-		<exec executable="sh" dir="${basedir}/src/org/coode/oppl/lint/syntax">
-			<arg line="${javaccpath}javacc oppllint.jj" />
-		</exec>
-	</target>
+
 
 	<!-- ====================================
 		target: compileAPI

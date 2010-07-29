@@ -22,6 +22,8 @@
  */
 package uk.ac.manchester.cs.owl.lint.test;
 
+import java.util.Collections;
+
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintReport;
 
@@ -31,15 +33,16 @@ import uk.ac.manchester.cs.owl.lint.examples.RedundantInfoInSubClassesLintPatter
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 14, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 14, 2008
  */
 public class RedundantInfoInSubClassesTestCase extends LintTestCase {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see uk.ac.manchester.cs.owl.lint.test.LintTestCase#getPhysicalOntologyURI()
+	 * @see
+	 * uk.ac.manchester.cs.owl.lint.test.LintTestCase#getPhysicalOntologyURI()
 	 */
 	@Override
 	protected String getPhysicalOntologyURI() {
@@ -48,7 +51,7 @@ public class RedundantInfoInSubClassesTestCase extends LintTestCase {
 
 	@Override
 	public void testDetected() throws Exception {
-		LintReport detected = this.lint.detected(this.ontologies);
+		LintReport<?> detected = this.lint.detected(this.ontologies);
 		assertTrue(
 				"Lint does not detect anything and it really shoud not happen",
 				!detected.getAffectedOntologies().isEmpty());
@@ -56,9 +59,8 @@ public class RedundantInfoInSubClassesTestCase extends LintTestCase {
 	}
 
 	@Override
-	protected Lint createLint() {
-		return LintManagerFactory.getLintManager(this.manager).getLintFactory()
-				.createLint(
-						new RedundantInfoInSubClassesLintPattern(this.manager));
+	protected Lint<?> createLint() {
+		return LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
+				Collections.singleton(new RedundantInfoInSubClassesLintPattern()));
 	}
 }

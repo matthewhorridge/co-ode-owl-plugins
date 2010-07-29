@@ -7,7 +7,7 @@ Bundle-Description: OWL Lint plug-in
 Update-Url: http://www.cs.man.ac.uk/~iannonel/lintRoll/downloads/update.properties
 Bundle-Vendor: The CO-ODE Group
 Bundle-DocURL: http://www.co-ode.org
-Bundle-ClassPath: .
+Bundle-ClassPath: .,lib/antlr-3.2.jar,lib/swing-worker-1.2.jar
 Import-Package: org.osgi.framework,
  org.apache.log4j,
  javax.swing,

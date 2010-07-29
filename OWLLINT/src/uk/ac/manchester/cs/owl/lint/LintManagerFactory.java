@@ -22,25 +22,73 @@
  */
 package uk.ac.manchester.cs.owl.lint;
 
+import org.semanticweb.owl.apibinding.OWLManager;
+import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.lint.LintManager;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 13, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 13, 2008
  */
 public class LintManagerFactory {
-	protected static LintManager preferredLintManager;
+	private final OWLOntologyManager ontologyManager;
+	private final OWLReasoner reasoner;
+	private static LintManagerFactory instance = new LintManagerFactory(
+			OWLManager.createOWLOntologyManager(), null);
 
-	public static LintManager getLintManager(OWLOntologyManager ontologyManager) {
-		return preferredLintManager != null ? preferredLintManager
-				: new LintManagerImpl(ontologyManager);
+	/**
+	 * @param ontologyManager
+	 * @param reasoner
+	 */
+	private LintManagerFactory(OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
+		assert ontologyManager != null;
+		this.ontologyManager = ontologyManager;
+		this.reasoner = reasoner;
 	}
 
-	public static void setPreferredLintManager(LintManager lintManager) {
-		preferredLintManager = lintManager;
+	public LintManager getLintManager() {
+		return new LintManagerImpl(this.getOntologyManager(), this.getReasoner());
+	}
+
+	/**
+	 * @return the ontologyManager
+	 */
+	public OWLOntologyManager getOntologyManager() {
+		return this.ontologyManager;
+	}
+
+	/**
+	 * @return the reasoner
+	 */
+	public OWLReasoner getReasoner() {
+		return this.reasoner;
+	}
+
+	/**
+	 * @return the instance
+	 */
+	public static LintManagerFactory getInstance() {
+		return instance;
+	}
+
+	/**
+	 * @param instance
+	 *            the instance to set
+	 */
+	public static LintManagerFactory getInstance(OWLOntologyManager ontologyManager,
+			OWLReasoner reasoner) {
+		return new LintManagerFactory(ontologyManager, reasoner);
+	}
+
+	/**
+	 * @param instance
+	 *            the instance to set
+	 */
+	public static void setInstance(LintManagerFactory instance) {
+		LintManagerFactory.instance = instance;
 	}
 }

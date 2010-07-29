@@ -22,6 +22,8 @@
  */
 package uk.ac.manchester.cs.owl.lint.test;
 
+import java.util.Collections;
+
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintReport;
 
@@ -31,17 +33,17 @@ import uk.ac.manchester.cs.owl.lint.examples.NonLeafNoInfoLintPattern;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 14, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 14, 2008
  */
 public class NonLeafNoInfoTestCase extends LintTestCase {
 	/**
 	 */
 	@Override
-	protected Lint createLint() {
-		return LintManagerFactory.getLintManager(this.manager).getLintFactory()
-				.createLint(new NonLeafNoInfoLintPattern(this.manager));
+	protected Lint<?> createLint() {
+		return LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
+				Collections.singleton(new NonLeafNoInfoLintPattern()));
 	}
 
 	/**
@@ -57,7 +59,7 @@ public class NonLeafNoInfoTestCase extends LintTestCase {
 	 */
 	@Override
 	public void testDetected() throws Exception {
-		LintReport detected = this.lint.detected(this.ontologies);
+		LintReport<?> detected = this.lint.detected(this.ontologies);
 		assertTrue(
 				"Lint does not detect anything and it really shoud not happen",
 				!detected.getAffectedOntologies().isEmpty());

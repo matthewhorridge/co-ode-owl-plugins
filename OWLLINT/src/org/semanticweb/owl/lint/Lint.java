@@ -22,26 +22,26 @@
  */
 package org.semanticweb.owl.lint;
 
-import java.util.Set;
+import java.util.Collection;
 
+import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 15, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 15, 2008
  */
-public interface Lint {
+public interface Lint<O extends OWLObject> {
 	/**
 	 * @param targets
 	 * @return the {@link LintReport} after the execution of this {@link Lint}
 	 *         on the input Set of OWLOntology
 	 * @throws LintException
 	 */
-	public LintReport detected(Set<OWLOntology> targets) throws LintException;
+	public LintReport<O> detected(Collection<? extends OWLOntology> targets) throws LintException;
 
 	/**
 	 * @return this Lint name
@@ -49,19 +49,11 @@ public interface Lint {
 	public String getName();
 
 	/**
-	 * Sets this Lint name
-	 * 
-	 * @param name
-	 */
-	public void setName(String name);
-
-	/**
 	 * @return a human readable description for this Lint
 	 */
 	public String getDescription();
 
-	/**
-	 * @return the ontology manager
-	 */
-	public OWLOntologyManager getOntologyManager();
+	public void accept(LintVisitor visitor);
+
+	public <P> P accept(LintVisitorEx<P> visitor);
 }

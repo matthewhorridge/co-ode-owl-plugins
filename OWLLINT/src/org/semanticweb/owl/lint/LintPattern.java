@@ -22,18 +22,19 @@
  */
 package org.semanticweb.owl.lint;
 
-import java.util.Set;
+import java.util.Collection;
 
+import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 12, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 12, 2008
  */
-public interface LintPattern {
+public interface LintPattern<O extends OWLObject> {
 	/**
 	 * Matches the pattern against a Set of OWLOntology and returns a report
 	 * 
@@ -41,5 +42,5 @@ public interface LintPattern {
 	 * @return the relative {@link PatternReport}
 	 * @throws LintException
 	 */
-	PatternReport matches(Set<OWLOntology> targets) throws LintException;
+	PatternReport<O> matches(Collection<? extends OWLOntology> targets) throws LintException;
 }

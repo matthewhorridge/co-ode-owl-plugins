@@ -25,19 +25,14 @@ package uk.ac.manchester.cs.owl.lint.examples;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.semanticweb.owl.inference.OWLReasoner;
 import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.lint.InferenceLintPattern;
 import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
@@ -49,20 +44,7 @@ import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
  *         Bio-Health Informatics Group<br>
  *         Feb 13, 2008
  */
-public class SingleSubClassLintPattern extends OntologyWiseLintPattern {
-	protected InferenceLintPattern inferenceLintPattern;
-
-	public SingleSubClassLintPattern(OWLOntologyManager ontologyManager) {
-		super(ontologyManager);
-		try {
-			this.inferenceLintPattern = LintManagerFactory.getLintManager(
-					ontologyManager).getLintFactory()
-					.createInferenceLintPattern();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
+public class SingleSubClassLintPattern extends OntologyWiseLintPattern<OWLClass> {
 	/**
 	 * @return the set of {@link OWLClass} that have just one <b>asserted</b>
 	 *         subclass in the input {@link OWLOntology}
@@ -70,24 +52,14 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern {
 	 * @see org.semanticweb.owl.lint.LintPattern#matches(org.semanticweb.owl.model.OWLOntology)
 	 */
 	@Override
-	public Set<OWLObject> matches(OWLOntology ontology) throws LintException {
-		Set<OWLObject> toReturn = new HashSet<OWLObject>();
+	public Set<OWLClass> matches(OWLOntology ontology) throws LintException {
+		Set<OWLClass> toReturn = new HashSet<OWLClass>();
 		Set<OWLClass> nothing = new HashSet<OWLClass>();
 		try {
-			OWLReasoner reasoner = this.inferenceLintPattern.getOWLReasoner();
-			reasoner.loadOntologies(this.ontologyManager
-					.getImportsClosure(ontology));
-			if (!reasoner.isClassified()) {
-				reasoner.classify();
-			}
-			nothing.add(this.ontologyManager.getOWLDataFactory()
-					.getOWLNothing());
-			nothing.addAll(reasoner.getEquivalentClasses(this.ontologyManager
-					.getOWLDataFactory().getOWLNothing()));
-			if (reasoner instanceof NoOpReasoner) {
+			OWLReasoner reasoner = LintManagerFactory.getInstance().getReasoner();
+			if (reasoner instanceof NoOpReasoner || reasoner == null) {
 				for (OWLClass cls : ontology.getReferencedClasses()) {
-					Set<OWLDescription> subClasses = cls
-							.getSubClasses(ontology);
+					Set<OWLDescription> subClasses = cls.getSubClasses(ontology);
 					int count = 0;
 					Iterator<OWLDescription> it = subClasses.iterator();
 					while (count <= 1 && it.hasNext()) {
@@ -101,6 +73,9 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern {
 					}
 				}
 			} else {
+				if (!reasoner.isClassified()) {
+					reasoner.classify();
+				}
 				// Subclasses are equivalence classes rather than OWLClass
 				// therefore
 				// they are presented in sets
@@ -108,22 +83,11 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern {
 					Set<Set<OWLClass>> subClasses = reasoner.getSubClasses(cls);
 					subClasses.remove(nothing);
 					if (subClasses.size() == 1) {
-						Set<OWLClass> subclassEquivalenceClass = subClasses
-								.iterator().next();
+						Set<OWLClass> subclassEquivalenceClass = subClasses.iterator().next();
 						if (subclassEquivalenceClass.size() == 1) {
 							toReturn.add(cls);
 						}
 					}
-				}
-			}
-		} catch (LintException e) {
-			Logger logger = Logger.getLogger(this.getClass().getName());
-			logger
-					.log(Level.WARNING,
-							"Unable to create reasoner... only asserted taxonomy will be used");
-			for (OWLClass cls : ontology.getReferencedClasses()) {
-				if (cls.getSubClasses(ontology).size() == 1) {
-					toReturn.add(cls);
 				}
 			}
 		} catch (OWLReasonerException e) {

@@ -22,6 +22,10 @@
  */
 package uk.ac.manchester.cs.owl.lint.commons;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owl.lint.LintException;
@@ -29,42 +33,46 @@ import org.semanticweb.owl.lint.LintPattern;
 import org.semanticweb.owl.lint.PatternReport;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-
-import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
-import uk.ac.manchester.cs.owl.lint.PatternReportImpl;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 15, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 15, 2008
  */
-public abstract class OntologyWiseLintPattern implements LintPattern {
-	protected PatternReportImpl patternReport = null;
-	protected OWLOntologyManager ontologyManager;
-
-	public OntologyWiseLintPattern(OWLOntologyManager ontologyManager) {
-		this.ontologyManager = ontologyManager;
-	}
-
+public abstract class OntologyWiseLintPattern<O extends OWLObject> implements LintPattern<O> {
 	/**
 	 * Executes the match one OWLOntology at time
 	 * 
 	 * @see org.semanticweb.owl.lint.LintPattern#matches(java.util.Set)
 	 */
-	public PatternReport matches(Set<OWLOntology> targets) throws LintException {
-		this.patternReport = (PatternReportImpl) LintManagerFactory
-				.getLintManager(this.ontologyManager).getLintFactory()
-				.createPatternReport(this);
+	public PatternReport<O> matches(Collection<? extends OWLOntology> targets) throws LintException {
+		final Map<OWLOntology, Set<O>> map = new HashMap<OWLOntology, Set<O>>();
 		for (OWLOntology ontology : targets) {
-			Set<OWLObject> matches = this.matches(ontology);
+			Set<O> matches = this.matches(ontology);
 			if (!matches.isEmpty()) {
-				this.patternReport.add(ontology, matches);
+				map.put(ontology, matches);
 			}
 		}
-		return this.patternReport;
+		return new PatternReport<O>() {
+			public Set<OWLOntology> getAffectedOntologies() {
+				return new HashSet<OWLOntology>(map.keySet());
+			}
+
+			public Set<O> getAffectedOWLObjects(OWLOntology ontology) {
+				Set<O> values = map.get(ontology);
+				return values.isEmpty() ? new HashSet<O>() : new HashSet<O>(values);
+			}
+
+			public LintPattern<O> getLintPattern() {
+				return OntologyWiseLintPattern.this;
+			}
+
+			public boolean isAffected(OWLOntology ontology) {
+				return map.containsKey(ontology);
+			}
+		};
 	}
 
 	/**
@@ -72,6 +80,5 @@ public abstract class OntologyWiseLintPattern implements LintPattern {
 	 * @return the Set of OWLObject elements matching in the input OWLOntology
 	 * @throws LintException
 	 */
-	protected abstract Set<OWLObject> matches(OWLOntology ontology)
-			throws LintException;
+	protected abstract Set<O> matches(OWLOntology ontology) throws LintException;
 }

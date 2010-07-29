@@ -35,18 +35,18 @@ import org.semanticweb.owl.model.OWLOntology;
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 18, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 18, 2008
  */
-public class LintReportImpl implements LintReport {
-	private Set<Match> matches = new HashSet<Match>();
-	protected Lint lint;
+public class LintReportImpl<O extends OWLObject> implements LintReport<O> {
+	private Set<Match<O>> matches = new HashSet<Match<O>>();
+	protected Lint<O> lint;
 
 	/**
 	 * @param lint
 	 */
-	public LintReportImpl(Lint lint) {
+	public LintReportImpl(Lint<O> lint) {
 		this.lint = lint;
 	}
 
@@ -55,7 +55,7 @@ public class LintReportImpl implements LintReport {
 	 */
 	public Set<OWLOntology> getAffectedOntologies() {
 		Set<OWLOntology> toReturn = new HashSet<OWLOntology>();
-		for (Match match : this.matches) {
+		for (Match<O> match : this.matches) {
 			toReturn.add(match.getOntology());
 		}
 		return toReturn;
@@ -65,9 +65,9 @@ public class LintReportImpl implements LintReport {
 	 * 
 	 * @see org.semanticweb.owl.lint.LintReport#getAffectedOWLObjects(org.semanticweb.owl.model.OWLOntology)
 	 */
-	public Set<OWLObject> getAffectedOWLObjects(OWLOntology ontology) {
-		Set<OWLObject> toReturn = new HashSet<OWLObject>();
-		for (Match match : this.matches) {
+	public Set<O> getAffectedOWLObjects(OWLOntology ontology) {
+		Set<O> toReturn = new HashSet<O>();
+		for (Match<O> match : this.matches) {
 			if (match.getOntology().equals(ontology)) {
 				toReturn.add(match.getOWLObject());
 			}
@@ -90,24 +90,21 @@ public class LintReportImpl implements LintReport {
 	 * 
 	 * @param patternReport
 	 */
-	public void chainPatternReport(PatternReport patternReport) {
+	public void chainPatternReport(PatternReport<O> patternReport) {
 		Set<OWLOntology> ontologies = patternReport.getAffectedOntologies();
 		if (this.matches.isEmpty()) {
 			for (OWLOntology ontology : ontologies) {
-				Set<OWLObject> affectedOWLObjects = patternReport
-						.getAffectedOWLObjects(ontology);
-				for (OWLObject object : affectedOWLObjects) {
-					this.matches.add(new Match(object, ontology));
+				Set<O> affectedOWLObjects = patternReport.getAffectedOWLObjects(ontology);
+				for (O object : affectedOWLObjects) {
+					this.matches.add(new Match<O>(object, ontology));
 				}
 			}
 		} else {
 			for (OWLOntology ontology : ontologies) {
-				Set<OWLObject> affectedOWLObjects = patternReport
-						.getAffectedOWLObjects(ontology);
-				for (Match match : new HashSet<Match>(this.matches)) {
+				Set<O> affectedOWLObjects = patternReport.getAffectedOWLObjects(ontology);
+				for (Match<O> match : new HashSet<Match<O>>(this.matches)) {
 					if (match.getOntology().equals(ontology)
-							&& !affectedOWLObjects.contains(match
-									.getOWLObject())) {
+							&& !affectedOWLObjects.contains(match.getOWLObject())) {
 						this.matches.remove(match);
 					}
 				}
@@ -123,13 +120,12 @@ public class LintReportImpl implements LintReport {
 	 * 
 	 * @param patternReport
 	 */
-	public void addPatternReport(PatternReport patternReport) {
+	public void addPatternReport(PatternReport<O> patternReport) {
 		Set<OWLOntology> ontologies = patternReport.getAffectedOntologies();
 		for (OWLOntology ontology : ontologies) {
-			Set<OWLObject> affectedOWLObjects = patternReport
-					.getAffectedOWLObjects(ontology);
-			for (OWLObject object : affectedOWLObjects) {
-				this.matches.add(new Match(object, ontology));
+			Set<O> affectedOWLObjects = patternReport.getAffectedOWLObjects(ontology);
+			for (O object : affectedOWLObjects) {
+				this.matches.add(new Match<O>(object, ontology));
 			}
 		}
 	}
@@ -142,28 +138,27 @@ public class LintReportImpl implements LintReport {
 	/**
 	 * @return the lint
 	 */
-	public Lint getLint() {
+	public Lint<O> getLint() {
 		return this.lint;
 	}
 
-	public void setLint(Lint lint) {
+	public void setLint(Lint<O> lint) {
 		this.lint = lint;
 	}
 
-	public void add(OWLObject object, OWLOntology affectedOntology) {
-		this.matches.add(new Match(object, affectedOntology));
+	public void add(O object, OWLOntology affectedOntology) {
+		this.matches.add(new Match<O>(object, affectedOntology));
 	}
 
-	public void add(OWLObject object, OWLOntology affectedOntology,
-			String explanation) {
-		this.matches.add(new Match(object, affectedOntology, explanation));
+	public void add(O object, OWLOntology affectedOntology, String explanation) {
+		this.matches.add(new Match<O>(object, affectedOntology, explanation));
 	}
 
 	public String getExplanation(OWLObject object, OWLOntology affectedOntology) {
 		String toReturn = null;
-		Iterator<Match> it = this.matches.iterator();
+		Iterator<Match<O>> it = this.matches.iterator();
 		boolean found = false;
-		Match match = null;
+		Match<O> match = null;
 		while (!found & it.hasNext()) {
 			match = it.next();
 			found = match.getOntology().equals(affectedOntology)

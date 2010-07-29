@@ -28,37 +28,28 @@ import java.util.Set;
 
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
 
 /**
  * @author Luigi Iannone
  * 
- * The University Of Manchester<br>
- * Bio-Health Informatics Group<br>
- * Feb 13, 2008
+ *         The University Of Manchester<br>
+ *         Bio-Health Informatics Group<br>
+ *         Feb 13, 2008
  */
-public class RedundantInfoInSubClassesLintPattern extends
-		OntologyWiseLintPattern {
-	public RedundantInfoInSubClassesLintPattern(
-			OWLOntologyManager ontologyManager) {
-		super(ontologyManager);
-	}
-
+public class RedundantInfoInSubClassesLintPattern extends OntologyWiseLintPattern<OWLClass> {
 	/**
 	 * @return the Set of OWLObject that have redundant information in their
 	 *         subclasses
 	 * @see org.semanticweb.owl.lint.LintPattern#matches(org.semanticweb.owl.model.OWLOntology)
 	 */
 	@Override
-	public Set<OWLObject> matches(OWLOntology target) {
-		Set<OWLObject> toReturn = new HashSet<OWLObject>();
+	public Set<OWLClass> matches(OWLOntology target) {
+		Set<OWLClass> toReturn = new HashSet<OWLClass>();
 		for (OWLClass owlClass : target.getReferencedClasses()) {
-			boolean hasRedundancy = this.hasRedundantInfoInSubclasses(owlClass,
-					target);
+			boolean hasRedundancy = this.hasRedundantInfoInSubclasses(owlClass, target);
 			if (hasRedundancy) {
 				toReturn.add(owlClass);
 			}
@@ -77,8 +68,7 @@ public class RedundantInfoInSubClassesLintPattern extends
 			firstsuperS.remove(c);
 			while (csubSIT.hasNext()) {
 				OWLClass csubC = csubSIT.next().asOWLClass();
-				Set<OWLDescription> nextsuperS = csubC.asOWLClass()
-						.getSuperClasses(ont);
+				Set<OWLDescription> nextsuperS = csubC.asOWLClass().getSuperClasses(ont);
 				Iterator<OWLDescription> firstsuperSIT = firstsuperS.iterator();
 				while (firstsuperSIT.hasNext() && !firstsuperS.isEmpty()) {
 					OWLDescription firstsuperC = firstsuperSIT.next();
