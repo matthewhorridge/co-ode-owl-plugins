@@ -44,14 +44,16 @@ public class LintManagerFactory {
 	 * @param ontologyManager
 	 * @param reasoner
 	 */
-	private LintManagerFactory(OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
+	private LintManagerFactory(OWLOntologyManager ontologyManager,
+			OWLReasoner reasoner) {
 		assert ontologyManager != null;
 		this.ontologyManager = ontologyManager;
 		this.reasoner = reasoner;
 	}
 
 	public LintManager getLintManager() {
-		return new LintManagerImpl(this.getOntologyManager(), this.getReasoner());
+		return new LintManagerImpl(this.getOntologyManager(), this
+				.getReasoner());
 	}
 
 	/**
@@ -79,8 +81,8 @@ public class LintManagerFactory {
 	 * @param instance
 	 *            the instance to set
 	 */
-	public static LintManagerFactory getInstance(OWLOntologyManager ontologyManager,
-			OWLReasoner reasoner) {
+	public static LintManagerFactory getInstance(
+			OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
 		return new LintManagerFactory(ontologyManager, reasoner);
 	}
 

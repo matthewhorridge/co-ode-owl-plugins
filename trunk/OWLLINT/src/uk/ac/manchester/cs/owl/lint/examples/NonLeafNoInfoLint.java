@@ -21,12 +21,13 @@ import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
  * @author Luigi Iannone
  * 
  */
-public class NonLeafNoInfoLint implements Lint<OWLClass> {
+public final class NonLeafNoInfoLint implements Lint<OWLClass> {
 	private final PatternBasedLint<OWLClass> delegate;
 
 	public NonLeafNoInfoLint() {
-		this.delegate = LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
-				Collections.singleton(new NonLeafNoInfoLintPattern()));
+		this.delegate = LintManagerFactory.getInstance().getLintManager()
+				.getLintFactory().createLint(
+						Collections.singleton(new NonLeafNoInfoLintPattern()));
 	}
 
 	/**
@@ -35,8 +36,8 @@ public class NonLeafNoInfoLint implements Lint<OWLClass> {
 	 * @throws LintException
 	 * @see org.semanticweb.owl.lint.Lint#detected(java.util.Collection)
 	 */
-	public LintReport<OWLClass> detected(Collection<? extends OWLOntology> targets)
-			throws LintException {
+	public LintReport<OWLClass> detected(
+			Collection<? extends OWLOntology> targets) throws LintException {
 		return this.delegate.detected(targets);
 	}
 

@@ -44,12 +44,13 @@ import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
  *         Bio-Health Informatics Group<br>
  *         Feb 20, 2008
  */
-public class SingleSubClassLint implements PatternBasedLint<OWLClass> {
+public final class SingleSubClassLint implements PatternBasedLint<OWLClass> {
 	private PatternBasedLint<OWLClass> instance;
 
 	public SingleSubClassLint() {
-		this.instance = LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
-				Collections.singleton(new SingleSubClassLintPattern()));
+		this.instance = LintManagerFactory.getInstance().getLintManager()
+				.getLintFactory().createLint(
+						Collections.singleton(new SingleSubClassLintPattern()));
 	}
 
 	public String getDescription() {
@@ -60,8 +61,8 @@ public class SingleSubClassLint implements PatternBasedLint<OWLClass> {
 		return this.instance.getPatterns();
 	}
 
-	public LintReport<OWLClass> detected(Collection<? extends OWLOntology> targets)
-			throws LintException {
+	public LintReport<OWLClass> detected(
+			Collection<? extends OWLOntology> targets) throws LintException {
 		LintReport<OWLClass> instanceReport = this.instance.detected(targets);
 		instanceReport.setLint(this);
 		return instanceReport;

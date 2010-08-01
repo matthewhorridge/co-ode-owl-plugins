@@ -27,6 +27,8 @@ import java.util.Set;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
+import uk.ac.manchester.cs.owl.lint.commons.Match;
+
 /**
  * @author Luigi Iannone
  * 
@@ -34,7 +36,7 @@ import org.semanticweb.owl.model.OWLOntology;
  *         Bio-Health Informatics Group<br>
  *         Feb 18, 2008
  */
-public interface PatternReport<O extends OWLObject> {
+public interface PatternReport<O extends OWLObject> extends Set<Match<O>> {
 	/**
 	 * @return the set of affected OWLOntology elements
 	 */

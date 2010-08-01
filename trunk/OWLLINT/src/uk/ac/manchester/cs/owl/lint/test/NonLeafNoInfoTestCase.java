@@ -22,6 +22,8 @@
  */
 package uk.ac.manchester.cs.owl.lint.test;
 
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collections;
 
 import org.semanticweb.owl.lint.Lint;
@@ -42,8 +44,9 @@ public class NonLeafNoInfoTestCase extends LintTestCase {
 	 */
 	@Override
 	protected Lint<?> createLint() {
-		return LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
-				Collections.singleton(new NonLeafNoInfoLintPattern()));
+		return LintManagerFactory.getInstance().getLintManager()
+				.getLintFactory().createLint(
+						Collections.singleton(new NonLeafNoInfoLintPattern()));
 	}
 
 	/**
@@ -51,7 +54,18 @@ public class NonLeafNoInfoTestCase extends LintTestCase {
 	 */
 	@Override
 	protected String getPhysicalOntologyURI() {
-		return "file:./lint/src/test/ontologies/NonLeafNoInfo.owl";
+		URL resource = this.getClass().getResource("lintExamples.owl");
+		String toReturn = null;
+		if (resource == null) {
+			fail("Could not load the ontology");
+		} else {
+			try {
+				toReturn = resource.toURI().toString();
+			} catch (URISyntaxException e) {
+				fail(e.getMessage());
+			}
+		}
+		return toReturn;
 	}
 
 	/**
@@ -59,7 +73,7 @@ public class NonLeafNoInfoTestCase extends LintTestCase {
 	 */
 	@Override
 	public void testDetected() throws Exception {
-		LintReport<?> detected = this.lint.detected(this.ontologies);
+		LintReport<?> detected = this.lint.detected(this.getAllOntologies());
 		assertTrue(
 				"Lint does not detect anything and it really shoud not happen",
 				!detected.getAffectedOntologies().isEmpty());

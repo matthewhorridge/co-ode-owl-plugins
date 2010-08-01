@@ -30,6 +30,7 @@ import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLOntology;
 
+import uk.ac.manchester.cs.owl.lint.commons.Match;
 import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
 
 /**
@@ -41,13 +42,18 @@ import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
  *         Bio-Health Informatics Group<br>
  *         Feb 13, 2008
  */
-public class NonLeafNoInfoLintPattern extends OntologyWiseLintPattern<OWLClass> {
+public final class NonLeafNoInfoLintPattern extends
+		OntologyWiseLintPattern<OWLClass> {
 	@Override
-	public Set<OWLClass> matches(OWLOntology target) {
-		Set<OWLClass> toReturn = new HashSet<OWLClass>();
+	public Set<Match<OWLClass>> matches(OWLOntology target) {
+		Set<Match<OWLClass>> toReturn = new HashSet<Match<OWLClass>>();
 		for (OWLClass owlClass : target.getReferencedClasses()) {
 			if (this.matches(owlClass, target)) {
-				toReturn.add(owlClass);
+				toReturn
+						.add(new Match<OWLClass>(
+								owlClass,
+								target,
+								"The named class is not a leaf, yet it has got no relevant information (i.e: no anonymous super-classes nor anonymous equivalent classes )"));
 			}
 		}
 		return toReturn;

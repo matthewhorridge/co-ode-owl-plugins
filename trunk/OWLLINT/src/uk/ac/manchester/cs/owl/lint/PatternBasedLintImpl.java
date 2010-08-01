@@ -38,6 +38,8 @@ import org.semanticweb.owl.lint.PatternReport;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
+import uk.ac.manchester.cs.owl.lint.commons.SimpleMatchBasedLintReport;
+
 /**
  * @author Luigi Iannone
  * 
@@ -45,11 +47,13 @@ import org.semanticweb.owl.model.OWLOntology;
  *         Bio-Health Informatics Group<br>
  *         Feb 12, 2008
  */
-public class PatternBasedLintImpl<O extends OWLObject> implements PatternBasedLint<O> {
-	protected Set<LintPattern<O>> patterns = new HashSet<LintPattern<O>>();
-	protected String name = null;
+public class PatternBasedLintImpl<O extends OWLObject> implements
+		PatternBasedLint<O> {
+	private final Set<LintPattern<O>> patterns = new HashSet<LintPattern<O>>();
+	private final String name = null;
 
-	protected PatternBasedLintImpl(Collection<? extends LintPattern<O>> lintPatterns) {
+	protected PatternBasedLintImpl(
+			Collection<? extends LintPattern<O>> lintPatterns) {
 		for (LintPattern<O> lintPattern : lintPatterns) {
 			this.patterns.add(lintPattern);
 		}
@@ -72,18 +76,23 @@ public class PatternBasedLintImpl<O extends OWLObject> implements PatternBasedLi
 	 * @throws LintException
 	 * @see org.semanticweb.owl.lint.Lint#detected(java.util.Set)
 	 */
-	public LintReport<O> detected(Collection<? extends OWLOntology> targets) throws LintException {
+	public LintReport<O> detected(Collection<? extends OWLOntology> targets)
+			throws LintException {
 		Iterator<LintPattern<O>> it = this.patterns.iterator();
 		LintPattern<O> lintPattern;
 		boolean unsatisfiablePatternConjunction = false;
-		PatternReport<O> patternMatches;
-		LintReportImpl<O> lintReport = new LintReportImpl<O>(this);
+		PatternReport<O> patternMatches = null;
 		while (!unsatisfiablePatternConjunction && it.hasNext()) {
 			lintPattern = it.next();
-			patternMatches = lintPattern.matches(targets);
-			lintReport.chainPatternReport(patternMatches);
-			unsatisfiablePatternConjunction = lintReport.getAffectedOntologies().isEmpty();
+			if (patternMatches == null) {
+				patternMatches = lintPattern.matches(targets);
+			} else {
+				patternMatches.retainAll(lintPattern.matches(targets));
+			}
+			unsatisfiablePatternConjunction = patternMatches.isEmpty();
 		}
+		SimpleMatchBasedLintReport<O> lintReport = new SimpleMatchBasedLintReport<O>(
+				this, patternMatches);
 		return lintReport;
 	}
 
@@ -92,14 +101,6 @@ public class PatternBasedLintImpl<O extends OWLObject> implements PatternBasedLi
 	 */
 	public String getName() {
 		return this.name == null ? this.toString() : this.name;
-	}
-
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getDescription() {

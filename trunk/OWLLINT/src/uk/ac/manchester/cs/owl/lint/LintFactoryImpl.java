@@ -25,14 +25,14 @@ package uk.ac.manchester.cs.owl.lint;
 import java.util.Collection;
 
 import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintFactory;
 import org.semanticweb.owl.lint.LintPattern;
-import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.lint.PatternBasedLint;
 import org.semanticweb.owl.lint.PatternReport;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntologyManager;
+
+import uk.ac.manchester.cs.owl.lint.commons.SimpleMatchBasedPatternReport;
 
 /**
  * @author Luigi Iannone
@@ -41,7 +41,7 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  *         Bio-Health Informatics Group<br>
  *         Feb 14, 2008
  */
-public class LintFactoryImpl implements LintFactory {
+public final class LintFactoryImpl implements LintFactory {
 	private final OWLOntologyManager ontologyManager;
 	private final OWLReasoner reasoner;
 
@@ -49,7 +49,8 @@ public class LintFactoryImpl implements LintFactory {
 	 * @param ontologyManager
 	 * @param reasoner
 	 */
-	public LintFactoryImpl(OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
+	public LintFactoryImpl(OWLOntologyManager ontologyManager,
+			OWLReasoner reasoner) {
 		assert ontologyManager != null;
 		this.ontologyManager = ontologyManager;
 		this.reasoner = reasoner;
@@ -71,15 +72,9 @@ public class LintFactoryImpl implements LintFactory {
 	/**
 	 * @see org.semanticweb.owl.lint.LintFactory#createPatternReport(org.semanticweb.owl.lint.LintPattern)
 	 */
-	public <O extends OWLObject> PatternReport<O> createPatternReport(LintPattern<O> pattern) {
-		return new PatternReportImpl<O>(pattern);
-	}
-
-	/**
-	 * @see org.semanticweb.owl.lint.LintFactory#createLintReport(org.semanticweb.owl.lint.Lint)
-	 */
-	public <O extends OWLObject> LintReport<O> createLintReport(Lint<O> lint) {
-		return new LintReportImpl<O>(lint);
+	public <O extends OWLObject> PatternReport<O> createPatternReport(
+			LintPattern<O> pattern) {
+		return new SimpleMatchBasedPatternReport<O>(pattern);
 	}
 
 	public OWLOntologyManager getOntologyManager() {

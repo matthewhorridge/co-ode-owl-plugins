@@ -22,37 +22,32 @@
  */
 package org.semanticweb.owl.lint;
 
-import java.util.Collection;
-
-import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLOntologyManager;
 
 /**
+ * This {@link LintException} is thrown whenever the creation of an OWLReasoner
+ * is impossible in a {@link Lint} setup or matching process
+ * 
  * @author Luigi Iannone
  * 
- *         The University Of Manchester<br>
- *         Bio-Health Informatics Group<br>
- *         Feb 15, 2008
+ * The University Of Manchester<br>
+ * Bio-Health Informatics Group<br>
+ * Feb 15, 2008
  */
-public interface LintFactory {
+public class ReasonerCreationImpossibleException extends LintException {
+	public ReasonerCreationImpossibleException(String message) {
+		super(message);
+	}
+
+	public ReasonerCreationImpossibleException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public ReasonerCreationImpossibleException(Throwable cause) {
+		super(cause);
+	}
+
 	/**
-	 * Creates a {@link PatternBasedLint} starting from a variable number of
-	 * {@link LintPattern}
 	 * 
-	 * @param lintPatterns
-	 * @return the created Lint.
 	 */
-	public <O extends OWLObject> PatternBasedLint<O> createLint(
-			Collection<? extends LintPattern<O>> lintPatterns);
-
-	/**
-	 * @return an new {@link PatternReport} for the input {@link LintPattern}
-	 */
-	public <O extends OWLObject> PatternReport<O> createPatternReport(
-			LintPattern<O> pattern);
-
-	public OWLOntologyManager getOntologyManager();
-
-	public OWLReasoner getOWLReasoner();
+	private static final long serialVersionUID = -4311762201067665838L;
 }

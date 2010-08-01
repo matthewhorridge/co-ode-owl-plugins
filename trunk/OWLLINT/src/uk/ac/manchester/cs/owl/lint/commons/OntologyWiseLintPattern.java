@@ -23,9 +23,7 @@
 package uk.ac.manchester.cs.owl.lint.commons;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.semanticweb.owl.lint.LintException;
@@ -34,6 +32,7 @@ import org.semanticweb.owl.lint.PatternReport;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
+
 /**
  * @author Luigi Iannone
  * 
@@ -41,38 +40,20 @@ import org.semanticweb.owl.model.OWLOntology;
  *         Bio-Health Informatics Group<br>
  *         Feb 15, 2008
  */
-public abstract class OntologyWiseLintPattern<O extends OWLObject> implements LintPattern<O> {
+public abstract class OntologyWiseLintPattern<O extends OWLObject> implements
+		LintPattern<O> {
 	/**
 	 * Executes the match one OWLOntology at time
 	 * 
 	 * @see org.semanticweb.owl.lint.LintPattern#matches(java.util.Set)
 	 */
-	public PatternReport<O> matches(Collection<? extends OWLOntology> targets) throws LintException {
-		final Map<OWLOntology, Set<O>> map = new HashMap<OWLOntology, Set<O>>();
+	public PatternReport<O> matches(Collection<? extends OWLOntology> targets)
+			throws LintException {
+		Set<Match<O>> set = new HashSet<Match<O>>(targets.size());
 		for (OWLOntology ontology : targets) {
-			Set<O> matches = this.matches(ontology);
-			if (!matches.isEmpty()) {
-				map.put(ontology, matches);
-			}
+			set.addAll(this.matches(ontology));
 		}
-		return new PatternReport<O>() {
-			public Set<OWLOntology> getAffectedOntologies() {
-				return new HashSet<OWLOntology>(map.keySet());
-			}
-
-			public Set<O> getAffectedOWLObjects(OWLOntology ontology) {
-				Set<O> values = map.get(ontology);
-				return values.isEmpty() ? new HashSet<O>() : new HashSet<O>(values);
-			}
-
-			public LintPattern<O> getLintPattern() {
-				return OntologyWiseLintPattern.this;
-			}
-
-			public boolean isAffected(OWLOntology ontology) {
-				return map.containsKey(ontology);
-			}
-		};
+		return new SimpleMatchBasedPatternReport<O>(this, set);
 	}
 
 	/**
@@ -80,5 +61,6 @@ public abstract class OntologyWiseLintPattern<O extends OWLObject> implements Li
 	 * @return the Set of OWLObject elements matching in the input OWLOntology
 	 * @throws LintException
 	 */
-	protected abstract Set<O> matches(OWLOntology ontology) throws LintException;
+	protected abstract Set<Match<O>> matches(OWLOntology ontology)
+			throws LintException;
 }
