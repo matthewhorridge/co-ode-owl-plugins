@@ -79,7 +79,7 @@
 		<copy overwrite="true" todir="${classes}">
 			<fileset dir="${basedir}/plugins/uk.ac.manchester.cs.lintroll/resources" />
 		</copy>
-		<jar basedir="${classes}" jarfile="${jardest}" manifest="${basedir}/plugins/uk.ac.manchester.cs.lintroll/META-INF/MANIFEST.MF" update="true" />
+		<jar basedir="${classes}" jarfile="${jardest}" manifest="${basedir}/plugins/uk.ac.manchester.cs.lintroll/META-INF/MANIFEST.MF"  />
 		<delete dir="${classes}/lib" />
 	</target>
 

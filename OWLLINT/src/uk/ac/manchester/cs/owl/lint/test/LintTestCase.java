@@ -23,7 +23,6 @@
 package uk.ac.manchester.cs.owl.lint.test;
 
 import java.net.URI;
-import java.util.HashSet;
 import java.util.Set;
 
 import junit.framework.TestCase;
@@ -42,7 +41,6 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  */
 public abstract class LintTestCase extends TestCase {
 	private OWLOntologyManager manager;
-	protected Set<OWLOntology> ontologies = new HashSet<OWLOntology>();
 	protected Lint<?> lint;
 
 	@Override
@@ -50,9 +48,20 @@ public abstract class LintTestCase extends TestCase {
 		super.setUp();
 		this.manager = OWLManager.createOWLOntologyManager();
 		URI physicalURI = URI.create(this.getPhysicalOntologyURI());
-		OWLOntology ontology = this.manager.loadOntologyFromPhysicalURI(physicalURI);
-		this.ontologies.add(ontology);
+		this.manager.loadOntologyFromPhysicalURI(physicalURI);
 		this.lint = this.createLint();
+	}
+
+	protected final OWLOntology getOntology(URI uri) {
+		OWLOntology toReturn = this.manager.getOntology(uri);
+		if (toReturn == null) {
+			fail("Unavailble ontology");
+		}
+		return toReturn;
+	}
+
+	protected final Set<OWLOntology> getAllOntologies() {
+		return this.manager.getOntologies();
 	}
 
 	protected abstract Lint<?> createLint();

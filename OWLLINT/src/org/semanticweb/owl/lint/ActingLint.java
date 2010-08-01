@@ -21,5 +21,6 @@ public interface ActingLint<O extends OWLObject> extends Lint<O> {
 	 * @param report
 	 * @throws LintException
 	 */
-	void executeActions(Collection<? extends OWLOntology> ontologies) throws LintActionException;
+	void executeActions(Collection<? extends OWLOntology> ontologies)
+			throws LintActionException;
 }

@@ -23,7 +23,10 @@
 package uk.ac.manchester.cs.owl.lint.test;
 
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Collections;
+import java.util.Set;
 
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintReport;
@@ -46,8 +49,7 @@ public class SingleSubClassTestCase extends LintTestCase {
 
 	@Override
 	public void testDetected() throws Exception {
-		LintReport<?> detected = this.lint.detected(this.ontologies);
-		OWLOntology ontology = this.ontologies.iterator().next();
+		LintReport<?> detected = this.lint.detected(this.getAllOntologies());
 		assertTrue(
 				"Lint does not detect anything and it really shoud not happen",
 				!detected.getAffectedOntologies().isEmpty());
@@ -56,22 +58,34 @@ public class SingleSubClassTestCase extends LintTestCase {
 		OWLClass clsB = factory.getOWLClass(URI.create(ONTOLOGY_URI + "#B"));
 		OWLClass clsC = factory.getOWLClass(URI.create(ONTOLOGY_URI + "#C"));
 		System.out.println(detected);
-		assertTrue(
-				"The result content is not the one expected",
-				detected.getAffectedOWLObjects(ontology).contains(clsA)
-						&& detected.getAffectedOWLObjects(ontology).contains(clsB)
-						&& !detected.getAffectedOWLObjects(ontology).contains(clsC));
+		OWLOntology ontology = this.getOntology(URI.create(ONTOLOGY_URI));
+		Set<?> affectedOWLObjects = detected
+				.getAffectedOWLObjects(ontology);
+		assertTrue("The result content is not the one expected", affectedOWLObjects.contains(clsA));
+		assertFalse(detected.getAffectedOWLObjects(ontology).contains(clsB));
+		assertFalse(detected.getAffectedOWLObjects(ontology).contains(clsC));
 	}
 
 	@Override
 	protected Lint<?> createLint() {
-		return LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
-				Collections.singleton(new SingleSubClassLintPattern()));
+		return LintManagerFactory.getInstance().getLintManager()
+				.getLintFactory().createLint(
+						Collections.singleton(new SingleSubClassLintPattern()));
 	}
 
 	@Override
 	protected String getPhysicalOntologyURI() {
-		// TODO Auto-generated method stub
-		return "file:./lint/src/test/ontologies/SingleSubClass.owl";
+		URL resource = this.getClass().getResource("SingleSubClass.owl");
+		String toReturn = null;
+		if (resource == null) {
+			fail("Could not load the ontology");
+		} else {
+			try {
+				toReturn = resource.toURI().toString();
+			} catch (URISyntaxException e) {
+				fail(e.getMessage());
+			}
+		}
+		return toReturn;
 	}
 }

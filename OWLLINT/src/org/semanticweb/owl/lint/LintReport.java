@@ -35,6 +35,8 @@ import org.semanticweb.owl.model.OWLOntology;
  *         Feb 15, 2008
  */
 public interface LintReport<O extends OWLObject> {
+	public static final String NO_EXPLANATION_GIVEN = "No explanation given";
+
 	/**
 	 * @param ontology
 	 * @return the Set of affected OWLObject elements for the input ontology

@@ -35,6 +35,7 @@ import org.semanticweb.owl.model.OWLDescription;
 import org.semanticweb.owl.model.OWLOntology;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
+import uk.ac.manchester.cs.owl.lint.commons.Match;
 import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
 
 /**
@@ -44,7 +45,8 @@ import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
  *         Bio-Health Informatics Group<br>
  *         Feb 13, 2008
  */
-public class SingleSubClassLintPattern extends OntologyWiseLintPattern<OWLClass> {
+public final class SingleSubClassLintPattern extends
+		OntologyWiseLintPattern<OWLClass> {
 	/**
 	 * @return the set of {@link OWLClass} that have just one <b>asserted</b>
 	 *         subclass in the input {@link OWLOntology}
@@ -52,14 +54,17 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern<OWLClass>
 	 * @see org.semanticweb.owl.lint.LintPattern#matches(org.semanticweb.owl.model.OWLOntology)
 	 */
 	@Override
-	public Set<OWLClass> matches(OWLOntology ontology) throws LintException {
-		Set<OWLClass> toReturn = new HashSet<OWLClass>();
+	public Set<Match<OWLClass>> matches(OWLOntology ontology)
+			throws LintException {
+		Set<Match<OWLClass>> toReturn = new HashSet<Match<OWLClass>>();
 		Set<OWLClass> nothing = new HashSet<OWLClass>();
 		try {
-			OWLReasoner reasoner = LintManagerFactory.getInstance().getReasoner();
+			OWLReasoner reasoner = LintManagerFactory.getInstance()
+					.getReasoner();
 			if (reasoner instanceof NoOpReasoner || reasoner == null) {
 				for (OWLClass cls : ontology.getReferencedClasses()) {
-					Set<OWLDescription> subClasses = cls.getSubClasses(ontology);
+					Set<OWLDescription> subClasses = cls
+							.getSubClasses(ontology);
 					int count = 0;
 					Iterator<OWLDescription> it = subClasses.iterator();
 					while (count <= 1 && it.hasNext()) {
@@ -69,7 +74,8 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern<OWLClass>
 						}
 					}
 					if (count == 1) {
-						toReturn.add(cls);
+						toReturn.add(new Match<OWLClass>(cls, ontology,
+								"The class has only got one sub-class"));
 					}
 				}
 			} else {
@@ -83,9 +89,11 @@ public class SingleSubClassLintPattern extends OntologyWiseLintPattern<OWLClass>
 					Set<Set<OWLClass>> subClasses = reasoner.getSubClasses(cls);
 					subClasses.remove(nothing);
 					if (subClasses.size() == 1) {
-						Set<OWLClass> subclassEquivalenceClass = subClasses.iterator().next();
+						Set<OWLClass> subclassEquivalenceClass = subClasses
+								.iterator().next();
 						if (subclassEquivalenceClass.size() == 1) {
-							toReturn.add(cls);
+							toReturn.add(new Match<OWLClass>(cls, ontology,
+									"The class has only got one sub-class"));
 						}
 					}
 				}
