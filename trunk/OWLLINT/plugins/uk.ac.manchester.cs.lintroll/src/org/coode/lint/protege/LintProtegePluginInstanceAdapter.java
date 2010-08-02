@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.IExtension;
 import org.protege.editor.core.plugin.PluginProperties;
-import org.protege.editor.core.plugin.ProtegePluginInstance;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintReport;
@@ -13,8 +12,8 @@ import org.semanticweb.owl.lint.LintVisitorEx;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
-public final class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
-		ProtegePluginInstance, Lint<O> {
+public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
+		LintProtegePluginInstance<O> {
 	private static final String NAME_PARAM = "label";
 	private final Lint<O> delegate;
 	private final IExtension extension;
@@ -45,7 +44,7 @@ public final class LintProtegePluginInstanceAdapter<O extends OWLObject> impleme
 	 * @see org.semanticweb.owl.lint.Lint#detected(java.util.Collection)
 	 */
 	public LintReport<O> detected(Collection<? extends OWLOntology> targets) throws LintException {
-		return this.delegate.detected(targets);
+		return this.getDelegate().detected(targets);
 	}
 
 	/**
@@ -54,7 +53,7 @@ public final class LintProtegePluginInstanceAdapter<O extends OWLObject> impleme
 	 */
 	public String getName() {
 		return PluginProperties.getParameterValue(
-				this.extension,
+				this.getExtension(),
 				NAME_PARAM,
 				this.delegate.getName());
 	}
@@ -64,30 +63,44 @@ public final class LintProtegePluginInstanceAdapter<O extends OWLObject> impleme
 	 * @see org.semanticweb.owl.lint.Lint#getDescription()
 	 */
 	public String getDescription() {
-		return this.delegate.getDescription();
+		return this.getDelegate().getDescription();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return this.delegate.equals(obj);
+		return this.getDelegate().equals(obj);
 	}
 
 	public void accept(LintVisitor visitor) {
-		this.delegate.accept(visitor);
+		this.getDelegate().accept(visitor);
 	}
 
 	public <P> P accept(LintVisitorEx<P> visitor) {
-		return this.delegate.accept(visitor);
+		return this.getDelegate().accept(visitor);
 	}
 
 	@Override
 	public int hashCode() {
-		return this.delegate.hashCode();
+		return this.getDelegate().hashCode();
 	}
 
 	public void dispose() throws Exception {
 	}
 
 	public void initialise() throws Exception {
+	}
+
+	/**
+	 * @return the delegate
+	 */
+	public Lint<O> getDelegate() {
+		return this.delegate;
+	}
+
+	/**
+	 * @return the extension
+	 */
+	public IExtension getExtension() {
+		return this.extension;
 	}
 }

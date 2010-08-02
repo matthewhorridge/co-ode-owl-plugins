@@ -30,8 +30,11 @@ public final class ProtegeLintManager {
 	private final Set<Lint<?>> selectedLints = new HashSet<Lint<?>>();
 	private static ProtegeLintManager instance = null;
 	private final Set<LintSelectionListener> selectionListeners = new HashSet<ProtegeLintManager.LintSelectionListener>();
-	private final Set<AbstractPluginLoader<? extends ProtegePlugin<LintProtegePluginInstanceAdapter<?>>>> loaders = new HashSet<AbstractPluginLoader<? extends ProtegePlugin<LintProtegePluginInstanceAdapter<?>>>>();
+	private final Set<AbstractPluginLoader<? extends ProtegePlugin<? extends LintProtegePluginInstance<?>>>> loaders = new HashSet<AbstractPluginLoader<? extends ProtegePlugin<? extends LintProtegePluginInstance<?>>>>();
 
+	// private final Set<AbstractPluginLoader<? extends ProtegePlugin<? extends
+	// Lint<?>>>> loaders = new HashSet<AbstractPluginLoader<? extends
+	// ProtegePlugin<? extends Lint<?>>>>();
 	private ProtegeLintManager(OWLEditorKit owlEditorKit) {
 		assert owlEditorKit != null;
 		// Loading both the default and the other kinds of Lint extensions
@@ -48,15 +51,12 @@ public final class ProtegeLintManager {
 		this.loaders.add(new ProtegeLintPluginLoader());
 		// Now the others
 		LoaderFactoryPluginLoader loaderFactoryPluginLoader = new LoaderFactoryPluginLoader();
-		Set<LoaderFactoryPlugin> plugins = loaderFactoryPluginLoader
-				.getPlugins();
+		Set<LoaderFactoryPlugin> plugins = loaderFactoryPluginLoader.getPlugins();
 		for (LoaderFactoryPlugin loaderFactoryPlugin : plugins) {
 			try {
-				LoaderFactoryProtegePluginInstanceAdapter<?> factory = loaderFactoryPlugin
-						.newInstance();
+				LoaderFactoryProtegePluginInstanceAdapter<?> factory = loaderFactoryPlugin.newInstance();
 				if (factory != null) {
-					AbstractLintPluginLoader<?> pluginLoader = factory
-							.createLintPluginLoader(owlEditorKit);
+					AbstractLintPluginLoader<?> pluginLoader = factory.createLintPluginLoader(owlEditorKit);
 					if (pluginLoader != null) {
 						this.loaders.add(pluginLoader);
 					}
@@ -75,14 +75,12 @@ public final class ProtegeLintManager {
 
 	private void installFactories() {
 		this.loadedLints.clear();
-		for (AbstractPluginLoader<? extends ProtegePlugin<LintProtegePluginInstanceAdapter<?>>> loader : this.loaders) {
-			for (ProtegePlugin<LintProtegePluginInstanceAdapter<?>> protegePlugin : loader
-					.getPlugins()) {
-				LintProtegePluginInstanceAdapter<?> lint;
+		for (AbstractPluginLoader<? extends ProtegePlugin<? extends LintProtegePluginInstance<?>>> loader : this.loaders) {
+			for (ProtegePlugin<? extends Lint<?>> protegePlugin : loader.getPlugins()) {
+				Lint<?> lint;
 				try {
 					lint = protegePlugin.newInstance();
 					if (lint != null) {
-						lint.initialise();
 						this.loadedLints.add(lint);
 					}
 				} catch (ClassNotFoundException e) {

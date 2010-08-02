@@ -3,7 +3,7 @@
  */
 package org.coode.lint.protege.loader.extensions;
 
-import org.coode.lint.protege.LintProtegePluginInstanceAdapter;
+import org.coode.lint.protege.LintProtegePluginInstance;
 import org.coode.lint.protege.loader.AbstractLintPluginLoader;
 import org.eclipse.core.runtime.IExtension;
 import org.protege.editor.core.plugin.ProtegePlugin;
@@ -14,7 +14,7 @@ import org.protege.editor.owl.OWLEditorKit;
  * @author Luigi Iannone
  * 
  */
-public final class LoaderFactoryProtegePluginInstanceAdapter<O extends ProtegePlugin<LintProtegePluginInstanceAdapter<?>>>
+public final class LoaderFactoryProtegePluginInstanceAdapter<O extends ProtegePlugin<? extends LintProtegePluginInstance<?>>>
 		implements ProtegePluginInstance, LoaderFactory<O> {
 	private final LoaderFactory<O> delegate;
 
@@ -22,8 +22,7 @@ public final class LoaderFactoryProtegePluginInstanceAdapter<O extends ProtegePl
 	 * @param extension
 	 * @param delegate
 	 */
-	public LoaderFactoryProtegePluginInstanceAdapter(IExtension extension,
-			LoaderFactory<O> delegate) {
+	public LoaderFactoryProtegePluginInstanceAdapter(IExtension extension, LoaderFactory<O> delegate) {
 		if (delegate == null) {
 			throw new NullPointerException("The loader factory cannot be null");
 		}
@@ -54,14 +53,12 @@ public final class LoaderFactoryProtegePluginInstanceAdapter<O extends ProtegePl
 	 * @return
 	 * @see org.coode.lint.protege.loader.extensions.LoaderFactory#createLintPluginLoader(org.protege.editor.owl.OWLEditorKit)
 	 */
-	public AbstractLintPluginLoader<O> createLintPluginLoader(
-			OWLEditorKit owlEditorKit) {
+	public AbstractLintPluginLoader<O> createLintPluginLoader(OWLEditorKit owlEditorKit) {
 		return this.delegate.createLintPluginLoader(owlEditorKit);
 	}
 
-	public static <P extends ProtegePlugin<LintProtegePluginInstanceAdapter<?>>> LoaderFactoryProtegePluginInstanceAdapter<P> buildLoaderFactoryProtegePluginInstanceAdapter(
+	public static <P extends ProtegePlugin<? extends LintProtegePluginInstance<?>>> LoaderFactoryProtegePluginInstanceAdapter<P> buildLoaderFactoryProtegePluginInstanceAdapter(
 			LoaderFactory<P> delegate, IExtension extension) {
-		return new LoaderFactoryProtegePluginInstanceAdapter<P>(extension,
-				delegate);
+		return new LoaderFactoryProtegePluginInstanceAdapter<P>(extension, delegate);
 	}
 }
