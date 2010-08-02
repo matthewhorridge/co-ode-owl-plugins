@@ -61,7 +61,7 @@
       <annotation>
          <documentation>
             The class that should be instantiated to create the Lint.
-        This must implement the Lint interface
+        This must implement the org.semanticweb.owl.lint.Lint<O> interface
          </documentation>
       </annotation>
       <complexType>
@@ -71,7 +71,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.semanticweb.owl.lint.Lint:"/>
+                  <meta.attribute kind="java" basedOn="org.semanticweb.owl.lint.Lint<O>:"/>
                </appInfo>
             </annotation>
          </attribute>
