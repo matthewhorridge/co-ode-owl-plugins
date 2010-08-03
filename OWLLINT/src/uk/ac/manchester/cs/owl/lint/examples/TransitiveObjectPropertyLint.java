@@ -14,6 +14,7 @@ import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.lint.LintVisitor;
 import org.semanticweb.owl.lint.LintVisitorEx;
+import org.semanticweb.owl.lint.configuration.LintConfiguration;
 import org.semanticweb.owl.model.OWLDataFactory;
 import org.semanticweb.owl.model.OWLObjectProperty;
 import org.semanticweb.owl.model.OWLObjectPropertyExpression;
@@ -24,33 +25,29 @@ import org.semanticweb.owl.model.OWLOntologyManager;
 import org.semanticweb.owl.model.RemoveAxiom;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
+import uk.ac.manchester.cs.owl.lint.commons.NonConfigurableLintConfiguration;
 import uk.ac.manchester.cs.owl.lint.commons.SimpleMatchBasedLintReport;
 
 /**
  * @author Luigi Iannone
  * 
  */
-public final class TransitiveObjectPropertyLint implements
-		ActingLint<OWLObjectProperty> {
-	public LintReport<OWLObjectProperty> detected(
-			Collection<? extends OWLOntology> targets) throws LintException {
+public final class TransitiveObjectPropertyLint implements ActingLint<OWLObjectProperty> {
+	public LintReport<OWLObjectProperty> detected(Collection<? extends OWLOntology> targets)
+			throws LintException {
 		SimpleMatchBasedLintReport<OWLObjectProperty> report = new SimpleMatchBasedLintReport<OWLObjectProperty>(
 				this);
 		for (OWLOntology ontology : targets) {
-			for (OWLObjectProperty objectProperty : ontology
-					.getReferencedObjectProperties()) {
+			for (OWLObjectProperty objectProperty : ontology.getReferencedObjectProperties()) {
 				if (objectProperty.isTransitive(ontology)) {
-					Set<OWLObjectPropertyExpression> superProperties = objectProperty
-							.getSuperProperties(ontology);
+					Set<OWLObjectPropertyExpression> superProperties = objectProperty.getSuperProperties(ontology);
 					for (OWLObjectPropertyExpression objectPropertyExpression : superProperties) {
 						if (objectPropertyExpression.isTransitive(ontology)) {
-							report
-									.add(
-											objectProperty,
-											ontology,
-											"The property "
-													+ objectProperty.toString()
-													+ " is transitive and has a transitive super property");
+							report.add(
+									objectProperty,
+									ontology,
+									"The property " + objectProperty.toString()
+											+ " is transitive and has a transitive super property");
 						}
 					}
 				}
@@ -62,20 +59,15 @@ public final class TransitiveObjectPropertyLint implements
 	public void executeActions(Collection<? extends OWLOntology> ontologies)
 			throws LintActionException {
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
-		OWLOntologyManager ontologyManager = LintManagerFactory.getInstance()
-				.getOntologyManager();
+		OWLOntologyManager ontologyManager = LintManagerFactory.getInstance().getOntologyManager();
 		OWLDataFactory dataFactory = ontologyManager.getOWLDataFactory();
 		LintReport<OWLObjectProperty> report;
 		try {
 			report = this.detected(ontologies);
 			for (OWLOntology owlOntology : ontologies) {
-				for (OWLObjectProperty objectProperty : report
-						.getAffectedOWLObjects(owlOntology)) {
-					changes
-							.add(new RemoveAxiom(
-									owlOntology,
-									dataFactory
-											.getOWLTransitiveObjectPropertyAxiom(objectProperty)));
+				for (OWLObjectProperty objectProperty : report.getAffectedOWLObjects(owlOntology)) {
+					changes.add(new RemoveAxiom(owlOntology,
+							dataFactory.getOWLTransitiveObjectPropertyAxiom(objectProperty)));
 				}
 			}
 			ontologyManager.applyChanges(changes);
@@ -100,5 +92,9 @@ public final class TransitiveObjectPropertyLint implements
 
 	public <P> P accept(LintVisitorEx<P> visitor) {
 		return visitor.visitActingLint(this);
+	}
+
+	public LintConfiguration getLintConfiguration() {
+		return NonConfigurableLintConfiguration.getInstance();
 	}
 }

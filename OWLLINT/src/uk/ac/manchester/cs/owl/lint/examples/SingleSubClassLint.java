@@ -32,10 +32,12 @@ import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.lint.LintVisitor;
 import org.semanticweb.owl.lint.LintVisitorEx;
 import org.semanticweb.owl.lint.PatternBasedLint;
+import org.semanticweb.owl.lint.configuration.LintConfiguration;
 import org.semanticweb.owl.model.OWLClass;
 import org.semanticweb.owl.model.OWLOntology;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
+import uk.ac.manchester.cs.owl.lint.commons.NonConfigurableLintConfiguration;
 
 /**
  * @author Luigi Iannone
@@ -48,9 +50,8 @@ public final class SingleSubClassLint implements PatternBasedLint<OWLClass> {
 	private PatternBasedLint<OWLClass> instance;
 
 	public SingleSubClassLint() {
-		this.instance = LintManagerFactory.getInstance().getLintManager()
-				.getLintFactory().createLint(
-						Collections.singleton(new SingleSubClassLintPattern()));
+		this.instance = LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
+				Collections.singleton(new SingleSubClassLintPattern()));
 	}
 
 	public String getDescription() {
@@ -61,8 +62,8 @@ public final class SingleSubClassLint implements PatternBasedLint<OWLClass> {
 		return this.instance.getPatterns();
 	}
 
-	public LintReport<OWLClass> detected(
-			Collection<? extends OWLOntology> targets) throws LintException {
+	public LintReport<OWLClass> detected(Collection<? extends OWLOntology> targets)
+			throws LintException {
 		LintReport<OWLClass> instanceReport = this.instance.detected(targets);
 		instanceReport.setLint(this);
 		return instanceReport;
@@ -70,6 +71,10 @@ public final class SingleSubClassLint implements PatternBasedLint<OWLClass> {
 
 	public String getName() {
 		return this.instance.getName();
+	}
+
+	public LintConfiguration getLintConfiguration() {
+		return NonConfigurableLintConfiguration.getInstance();
 	}
 
 	public void accept(LintVisitor visitor) {

@@ -16,7 +16,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import org.coode.lint.protege.ProtegeLintManager;
+import org.coode.lint.protege.ProtegeLintManager.LintLoadListener;
 import org.protege.editor.core.ui.util.ComponentFactory;
+import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owl.lint.Lint;
 
 /**
@@ -28,12 +31,28 @@ public abstract class LintSelectionPanel extends JPanel {
 	 * 
 	 */
 	private static final long serialVersionUID = 2302989184108579631L;
-	private final Set<Lint<?>> availableLints = new HashSet<Lint<?>>();
 	private final JPanel mainPanel = new JPanel(new BorderLayout());
 	private final Set<JCheckBox> checkboxes = new HashSet<JCheckBox>();
+	private final Set<Lint<?>> availableLints = new HashSet<Lint<?>>();
+	private final OWLEditorKit owlEditorKit;
+	private final LintLoadListener lintLoadListener = new LintLoadListener() {
+		public void loadChanged() {
+			LintSelectionPanel.this.availableLints.clear();
+			LintSelectionPanel.this.availableLints.addAll(ProtegeLintManager.getInstance(
+					LintSelectionPanel.this.getOWLEditorKit()).getLoadedLints());
+			LintSelectionPanel.this.resetGUI();
+		}
+	};
 
-	public LintSelectionPanel(Collection<? extends Lint<?>> availableLints) {
-		this.availableLints.addAll(availableLints);
+	public LintSelectionPanel(OWLEditorKit owlEditorKit) {
+		if (owlEditorKit == null) {
+			throw new NullPointerException("The OWL editor Kit cannot be null");
+		}
+		this.owlEditorKit = owlEditorKit;
+		Set<Lint<?>> loadedLints = ProtegeLintManager.getInstance(this.getOWLEditorKit()).getLoadedLints();
+		this.availableLints.addAll(loadedLints);
+		ProtegeLintManager.getInstance(this.getOWLEditorKit()).addLintLoadListener(
+				this.lintLoadListener);
 		this.initGUI();
 	}
 
@@ -92,4 +111,11 @@ public abstract class LintSelectionPanel extends JPanel {
 	protected abstract void lintSelected(Lint<?> lint);
 
 	protected abstract void lintDeSelected(Lint<?> lint);
+
+	/**
+	 * @return the owlEditorKit
+	 */
+	public OWLEditorKit getOWLEditorKit() {
+		return this.owlEditorKit;
+	}
 }

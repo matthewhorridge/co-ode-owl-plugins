@@ -3,10 +3,13 @@
  */
 package org.coode.lint.protege.loader;
 
+import java.util.EnumSet;
+
 import org.coode.lint.protege.LintProtegePluginInstance;
 import org.protege.editor.core.plugin.AbstractPluginLoader;
 import org.protege.editor.core.plugin.ProtegePlugin;
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.event.EventType;
 
 /**
  * @author Luigi Iannone
@@ -32,4 +35,12 @@ public abstract class AbstractLintPluginLoader<O extends ProtegePlugin<? extends
 	public OWLEditorKit getOWLEditorKit() {
 		return this.owlEditorKit;
 	}
+
+	/**
+	 * Returns the event types that are relevant for this AbstractPluginLoader.
+	 * When one of them is raised the ProtegeLintManager try and reload it.
+	 * 
+	 * @return an EnumSet<EventType>
+	 */
+	public abstract EnumSet<EventType> getRelevantEventTypes();
 }

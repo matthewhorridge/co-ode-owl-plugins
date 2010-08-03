@@ -24,6 +24,7 @@ package org.semanticweb.owl.lint;
 
 import java.util.Collection;
 
+import org.semanticweb.owl.lint.configuration.LintConfiguration;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
@@ -56,4 +57,11 @@ public interface Lint<O extends OWLObject> {
 	public void accept(LintVisitor visitor);
 
 	public <P> P accept(LintVisitorEx<P> visitor);
+
+	/**
+	 * Retrieves the configuration strategy for this Lint.
+	 * 
+	 * @return a LintConfiguration
+	 */
+	LintConfiguration getLintConfiguration();
 }
