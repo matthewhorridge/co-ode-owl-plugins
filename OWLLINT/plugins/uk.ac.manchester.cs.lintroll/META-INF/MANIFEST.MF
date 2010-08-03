@@ -36,7 +36,7 @@ Import-Package: org.osgi.framework,
  org.xml.sax.helpers,
  javax.xml.parsers
 Bundle-Version: 1.1.0
-Export-Package: org.semanticweb.owl.lint, uk.ac.manchester.cs.owl.lint.commons, uk.ac.manchester.cs.owl.lint, org.coode.lint.protege, org.coode.lint.protege.loader, org.coode.lint.protege.loader.extensions
+Export-Package: org.semanticweb.owl.lint, org.semanticweb.owl.lint.configuration, uk.ac.manchester.cs.owl.lint.commons, uk.ac.manchester.cs.owl.lint, org.coode.lint.protege, org.coode.lint.protege.loader, org.coode.lint.protege.loader.extensions
 Bundle-Activator: org.protege.editor.core.plugin.DefaultPluginActivator 
 Require-Bundle: org.eclipse.equinox.registry,
  org.eclipse.equinox.common,
