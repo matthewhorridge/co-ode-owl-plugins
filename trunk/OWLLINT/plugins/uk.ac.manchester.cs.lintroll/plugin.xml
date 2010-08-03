@@ -15,7 +15,7 @@
         <category value="@org.protege.ontologycategory"/>
   	</extension>
  	<!-- Example Lints -->
- 	<extension id="SingleSubClassLint" point="uk.ac.manchester.cs.lintroll.lint">
+ <!-- 	<extension id="SingleSubClassLint" point="uk.ac.manchester.cs.lintroll.lint">
  		<label value="Single sub-class"/>
  		<class value="uk.ac.manchester.cs.owl.lint.examples.SingleSubClassLint"/> 		
  	</extension>
@@ -30,5 +30,5 @@
  	<extension id="TransitiveObjectPropertyHierarchy" point="uk.ac.manchester.cs.lintroll.lint">
  		<label value="Transitive Object Property Hierarchy"/>
  		<class value=" 	uk.ac.manchester.cs.owl.lint.examples.TransitiveObjectPropertyLint"/> 		
- 	</extension>	  
+ 	</extension>	-->  
   </plugin>

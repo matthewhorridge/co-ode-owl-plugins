@@ -1,18 +1,21 @@
 package org.coode.lint.protege;
 
+import java.util.EnumSet;
+
+import org.coode.lint.protege.loader.AbstractLintPluginLoader;
 import org.eclipse.core.runtime.IExtension;
-import org.protege.editor.core.plugin.AbstractPluginLoader;
 import org.protege.editor.core.plugin.PluginExtensionMatcher;
+import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.event.EventType;
 import org.semanticweb.owl.lint.Lint;
 
 /**
  * Loader for Generic {@link Lint} specified as extension whose point is
  * uk.ac.manchester.cs.lintroll.lint
  */
-public final class ProtegeLintPluginLoader extends
-		AbstractPluginLoader<LintPlugin> {
-	public ProtegeLintPluginLoader() {
-		super("uk.ac.manchester.cs.lintroll", LintPlugin.LINT_PLUGIN_TYPE_ID);
+public final class ProtegeLintPluginLoader extends AbstractLintPluginLoader<LintPlugin> {
+	public ProtegeLintPluginLoader(OWLEditorKit owlEditorKit) {
+		super("uk.ac.manchester.cs.lintroll", LintPlugin.LINT_PLUGIN_TYPE_ID, owlEditorKit);
 	}
 
 	/**
@@ -52,5 +55,10 @@ public final class ProtegeLintPluginLoader extends
 				return true;
 			}
 		};
+	}
+
+	@Override
+	public EnumSet<EventType> getRelevantEventTypes() {
+		return EnumSet.noneOf(EventType.class);
 	}
 }

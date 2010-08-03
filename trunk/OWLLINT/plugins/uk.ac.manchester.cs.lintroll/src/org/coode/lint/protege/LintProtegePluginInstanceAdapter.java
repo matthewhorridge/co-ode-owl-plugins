@@ -9,6 +9,7 @@ import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.lint.LintVisitor;
 import org.semanticweb.owl.lint.LintVisitorEx;
+import org.semanticweb.owl.lint.configuration.LintConfiguration;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
@@ -95,6 +96,10 @@ public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
 	 */
 	public Lint<O> getDelegate() {
 		return this.delegate;
+	}
+
+	public LintConfiguration getLintConfiguration() {
+		return this.getDelegate().getLintConfiguration();
 	}
 
 	/**

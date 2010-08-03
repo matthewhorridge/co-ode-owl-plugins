@@ -12,9 +12,11 @@ import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.lint.LintVisitor;
 import org.semanticweb.owl.lint.LintVisitorEx;
+import org.semanticweb.owl.lint.configuration.LintConfiguration;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
+import uk.ac.manchester.cs.owl.lint.commons.NonConfigurableLintConfiguration;
 import uk.ac.manchester.cs.owl.lint.commons.SimpleMatchBasedLintReport;
 
 /**
@@ -25,16 +27,14 @@ public final class WaitFor20secondsLint implements Lint<OWLObject> {
 	/**
 	 * @see org.semanticweb.owl.lint.Lint#detected(java.util.Collection)
 	 */
-	public LintReport<OWLObject> detected(
-			Collection<? extends OWLOntology> targets) throws LintException {
-		LintReport<OWLObject> empty = new SimpleMatchBasedLintReport<OWLObject>(
-				this);
+	public LintReport<OWLObject> detected(Collection<? extends OWLOntology> targets)
+			throws LintException {
+		LintReport<OWLObject> empty = new SimpleMatchBasedLintReport<OWLObject>(this);
 		try {
 			Thread.sleep(20000);
 			return empty;
 		} catch (InterruptedException e) {
-			Logger.getLogger(this.getClass().getName()).log(Level.SEVERE,
-					"Could not wait anymore");
+			Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Could not wait anymore");
 			return empty;
 		}
 	}
@@ -59,5 +59,9 @@ public final class WaitFor20secondsLint implements Lint<OWLObject> {
 
 	public <P> P accept(LintVisitorEx<P> visitor) {
 		return visitor.visitGenericLint(this);
+	}
+
+	public LintConfiguration getLintConfiguration() {
+		return NonConfigurableLintConfiguration.getInstance();
 	}
 }
