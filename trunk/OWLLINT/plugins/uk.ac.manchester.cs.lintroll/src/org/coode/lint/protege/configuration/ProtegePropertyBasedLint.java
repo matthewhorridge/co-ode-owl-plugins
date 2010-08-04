@@ -6,6 +6,7 @@ package org.coode.lint.protege.configuration;
 import java.util.Collection;
 
 import org.coode.lint.protege.LintProtegePluginInstance;
+import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.lint.LintVisitor;
@@ -81,7 +82,8 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 	 * @see org.semanticweb.owl.lint.Lint#getLintConfiguration()
 	 */
 	public LintConfiguration getLintConfiguration() {
-		return new ProtegeAbstractPropertiesBasedLintConfiguration(this.delegate);
+		return new ProtegeAbstractPropertiesBasedLintConfiguration(
+				this.delegate.getOriginatingLint());
 	}
 
 	/**
@@ -111,5 +113,14 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 	public static <P extends OWLObject> ProtegePropertyBasedLint<P> buildProtegePropertyBasedLint(
 			LintProtegePluginInstance<P> lint) {
 		return new ProtegePropertyBasedLint<P>(lint);
+	}
+
+	@Override
+	public String toString() {
+		return this.delegate.toString();
+	}
+
+	public Lint<?> getOriginatingLint() {
+		return this.delegate;
 	}
 }
