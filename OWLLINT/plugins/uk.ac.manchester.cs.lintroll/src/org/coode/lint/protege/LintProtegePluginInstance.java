@@ -13,4 +13,5 @@ import org.semanticweb.owl.model.OWLObject;
  */
 public interface LintProtegePluginInstance<O extends OWLObject> extends ProtegePluginInstance,
 		Lint<O> {
+	Lint<?> getOriginatingLint();
 }

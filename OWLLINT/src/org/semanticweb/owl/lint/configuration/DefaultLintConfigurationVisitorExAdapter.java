@@ -12,7 +12,7 @@ public abstract class DefaultLintConfigurationVisitorExAdapter<O> implements
 		return this.doDefault(nonConfigurableLintConfiguration);
 	}
 
-	public O visitAbstractPropertiesBasedLintConfiguration(
+	public O visitPropertiesBasedLintConfiguration(
 			AbstractPropertiesBasedLintConfiguration abstractPropertiesBasedLintConfiguration) {
 		return this.doDefault(abstractPropertiesBasedLintConfiguration);
 	}

@@ -14,6 +14,11 @@
 		<headerColor value="@org.protege.ontologycolor"/>
         <category value="@org.protege.ontologycategory"/>
   	</extension>
+  	<extension id="ConfigurableLintPreferences" 
+  	point="org.protege.editor.core.application.preferencespanel">
+  		<label value="Configurable Lint Checks"/>
+  		<class value="org.coode.lint.protege.configuration.ui.LintConfigurationPanel"/>
+  	</extension>
  	<!-- Example Lints -->
  <!-- 	<extension id="SingleSubClassLint" point="uk.ac.manchester.cs.lintroll.lint">
  		<label value="Single sub-class"/>

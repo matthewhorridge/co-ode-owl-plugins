@@ -16,6 +16,6 @@ public interface LintConfigurationVisitorEx<O> {
 	O visitNonConfigurableLintConfiguration(
 			NonConfigurableLintConfiguration nonConfigurableLintConfiguration);
 
-	O visitAbstractPropertiesBasedLintConfiguration(
+	O visitPropertiesBasedLintConfiguration(
 			AbstractPropertiesBasedLintConfiguration abstractPropertiesBasedLintConfiguration);
 }

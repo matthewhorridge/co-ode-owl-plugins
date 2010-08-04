@@ -149,7 +149,7 @@ public final class ProtegeLintManager implements Disposable {
 							}
 
 							@Override
-							public LintProtegePluginInstance<?> visitAbstractPropertiesBasedLintConfiguration(
+							public LintProtegePluginInstance<?> visitPropertiesBasedLintConfiguration(
 									AbstractPropertiesBasedLintConfiguration abstractPropertiesBasedLintConfiguration) {
 								return ProtegePropertyBasedLint.buildProtegePropertyBasedLint(newInstance);
 							}

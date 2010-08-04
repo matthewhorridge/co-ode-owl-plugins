@@ -59,6 +59,11 @@ public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
 				this.delegate.getName());
 	}
 
+	@Override
+	public String toString() {
+		return this.getName();
+	}
+
 	/**
 	 * @return
 	 * @see org.semanticweb.owl.lint.Lint#getDescription()
@@ -107,5 +112,9 @@ public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
 	 */
 	public IExtension getExtension() {
 		return this.extension;
+	}
+
+	public Lint<?> getOriginatingLint() {
+		return this.getDelegate();
 	}
 }
