@@ -22,6 +22,7 @@ import org.semanticweb.owl.model.OWLOntology;
 public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 		LintProtegePluginInstance<O> {
 	private final LintProtegePluginInstance<O> delegate;
+	private final LintConfiguration lintConfiguration;
 
 	/**
 	 * @param delegate
@@ -31,6 +32,9 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 			throw new NullPointerException("The delegate cannot be null");
 		}
 		this.delegate = delegate;
+		this.lintConfiguration = new ProtegeStoredLintConfiguration(this.getClass(),
+				delegate.getLintConfiguration());
+		this.getLintConfigurationInitializer().initialise(this.lintConfiguration);
 	}
 
 	/**
@@ -82,8 +86,7 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 	 * @see org.semanticweb.owl.lint.Lint#getLintConfiguration()
 	 */
 	public LintConfiguration getLintConfiguration() {
-		return new ProtegeAbstractPropertiesBasedLintConfiguration(
-				this.delegate.getOriginatingLint());
+		return this.lintConfiguration;
 	}
 
 	/**
@@ -122,5 +125,9 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 
 	public Lint<?> getOriginatingLint() {
 		return this.delegate;
+	}
+
+	public LintConfigurationInitializer getLintConfigurationInitializer() {
+		return this.delegate.getLintConfigurationInitializer();
 	}
 }

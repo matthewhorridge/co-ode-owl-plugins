@@ -12,6 +12,6 @@ import org.protege.editor.owl.OWLEditorKit;
  * @author Luigi Iannone
  * 
  */
-public interface LoaderFactory<O extends ProtegePlugin<? extends LintProtegePluginInstance<?>>> {
-	AbstractLintPluginLoader<O> createLintPluginLoader(OWLEditorKit owlEditorKit);
+public interface LoaderFactory<O extends ProtegePlugin<E>, E extends LintProtegePluginInstance<?>> {
+	AbstractLintPluginLoader<O, E> createLintPluginLoader(OWLEditorKit owlEditorKit);
 }

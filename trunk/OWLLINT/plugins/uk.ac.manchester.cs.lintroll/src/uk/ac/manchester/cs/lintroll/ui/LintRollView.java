@@ -62,6 +62,8 @@ import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintActionException;
 import org.semanticweb.owl.lint.LintManager;
 import org.semanticweb.owl.lint.LintReport;
+import org.semanticweb.owl.lint.configuration.LintConfigurationChangeEvent;
+import org.semanticweb.owl.lint.configuration.LintConfigurationChangeListener;
 import org.semanticweb.owl.model.OWLException;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
@@ -84,7 +86,8 @@ import uk.ac.manchester.cs.owl.lint.commons.LintVisitorAdapter;
  */
 public class LintRollView extends AbstractOWLViewComponent implements TreeSelectionListener,
 		HierarchyListener {
-	private static final DefaultMutableTreeNode LINT_ROLL_READY_DEFAULT_MUTABLE_TREE_NODE = new DefaultMutableTreeNode("Press the button above for detecting lint");
+	private static final DefaultMutableTreeNode LINT_ROLL_READY_DEFAULT_MUTABLE_TREE_NODE = new DefaultMutableTreeNode(
+			"Press the button above for detecting lint");
 
 	/**
 	 * @author Luigi Iannone
@@ -162,6 +165,12 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 	private static final DefaultMutableTreeNode NO_LINT_DETECTED_DEFAULT_MUTABLE_TREE_NODE = new DefaultMutableTreeNode(
 			"No Lint detected");
 	private JButton fixButton = new JButton("Fix");
+	private LintConfigurationChangeListener lodedLintConfigurationChangeListener = new LintConfigurationChangeListener() {
+		public void configurationChanged(LintConfigurationChangeEvent event) {
+			LintRollView.this.isDirty = true;
+			LintRollView.this.enableDetectLints();
+		}
+	};
 	private static final long serialVersionUID = 2527582629024593024L;
 	private OWLLinkedObjectTree lintReportTree = null;
 	private JTextArea lintDescriptionTextArea = new JTextArea();
@@ -335,16 +344,28 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 	 * 
 	 */
 	private void enableDetectLints() {
-		if (ProtegeLintManager.getInstance(LintRollView.this.getOWLEditorKit()).getSelectedLints().isEmpty()) {
+		Set<Lint<?>> selectedLints = ProtegeLintManager.getInstance(
+				LintRollView.this.getOWLEditorKit()).getSelectedLints();
+		if (selectedLints.isEmpty()) {
 			LintRollView.this.lintReportTreeModel = new DefaultTreeModel(
 					NO_LINT_SELECTED_DEFAULT_MUTABLE_TREE_NODE);
 		} else {
 			LintRollView.this.lintReportTreeModel = new DefaultTreeModel(
 					LintRollView.LINT_ROLL_READY_DEFAULT_MUTABLE_TREE_NODE);
 		}
+		this.setupListeners();
 		LintRollView.this.lintReportTree.setModel(LintRollView.this.lintReportTreeModel);
 		this.detectLintAction.setEnabled(!ProtegeLintManager.getInstance(this.getOWLEditorKit()).getSelectedLints().isEmpty()
 				&& this.isDirty);
+	}
+
+	private void setupListeners() {
+		Set<Lint<?>> selectedLints = ProtegeLintManager.getInstance(
+				LintRollView.this.getOWLEditorKit()).getSelectedLints();
+		for (Lint<?> lint : selectedLints) {
+			lint.getLintConfiguration().addLintConfigurationChangeListener(
+					this.lodedLintConfigurationChangeListener);
+		}
 	}
 
 	public void valueChanged(TreeSelectionEvent e) {

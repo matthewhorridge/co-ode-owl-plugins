@@ -14,15 +14,16 @@ import org.protege.editor.owl.OWLEditorKit;
  * @author Luigi Iannone
  * 
  */
-public final class LoaderFactoryProtegePluginInstanceAdapter<O extends ProtegePlugin<? extends LintProtegePluginInstance<?>>>
-		implements ProtegePluginInstance, LoaderFactory<O> {
-	private final LoaderFactory<O> delegate;
+public final class LoaderFactoryProtegePluginInstanceAdapter<O extends ProtegePlugin<E>, E extends LintProtegePluginInstance<?>>
+		implements ProtegePluginInstance, LoaderFactory<O, E> {
+	private final LoaderFactory<O, E> delegate;
 
 	/**
 	 * @param extension
 	 * @param delegate
 	 */
-	public LoaderFactoryProtegePluginInstanceAdapter(IExtension extension, LoaderFactory<O> delegate) {
+	public LoaderFactoryProtegePluginInstanceAdapter(IExtension extension,
+			LoaderFactory<O, E> delegate) {
 		if (delegate == null) {
 			throw new NullPointerException("The loader factory cannot be null");
 		}
@@ -53,12 +54,12 @@ public final class LoaderFactoryProtegePluginInstanceAdapter<O extends ProtegePl
 	 * @return
 	 * @see org.coode.lint.protege.loader.extensions.LoaderFactory#createLintPluginLoader(org.protege.editor.owl.OWLEditorKit)
 	 */
-	public AbstractLintPluginLoader<O> createLintPluginLoader(OWLEditorKit owlEditorKit) {
+	public AbstractLintPluginLoader<O, E> createLintPluginLoader(OWLEditorKit owlEditorKit) {
 		return this.delegate.createLintPluginLoader(owlEditorKit);
 	}
 
-	public static <P extends ProtegePlugin<? extends LintProtegePluginInstance<?>>> LoaderFactoryProtegePluginInstanceAdapter<P> buildLoaderFactoryProtegePluginInstanceAdapter(
-			LoaderFactory<P> delegate, IExtension extension) {
-		return new LoaderFactoryProtegePluginInstanceAdapter<P>(extension, delegate);
+	public static <P extends ProtegePlugin<Q>, Q extends LintProtegePluginInstance<?>> LoaderFactoryProtegePluginInstanceAdapter<P, Q> buildLoaderFactoryProtegePluginInstanceAdapter(
+			LoaderFactory<P, Q> delegate, IExtension extension) {
+		return new LoaderFactoryProtegePluginInstanceAdapter<P, Q>(extension, delegate);
 	}
 }
