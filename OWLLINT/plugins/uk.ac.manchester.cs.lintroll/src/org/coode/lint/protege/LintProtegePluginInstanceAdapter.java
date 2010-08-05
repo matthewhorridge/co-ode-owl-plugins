@@ -2,6 +2,8 @@ package org.coode.lint.protege;
 
 import java.util.Collection;
 
+import org.coode.lint.protege.configuration.LintClassBasedLintConfigurationInitializer;
+import org.coode.lint.protege.configuration.LintConfigurationInitializer;
 import org.eclipse.core.runtime.IExtension;
 import org.protege.editor.core.plugin.PluginProperties;
 import org.semanticweb.owl.lint.Lint;
@@ -116,5 +118,9 @@ public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
 
 	public Lint<?> getOriginatingLint() {
 		return this.getDelegate();
+	}
+
+	public LintConfigurationInitializer getLintConfigurationInitializer() {
+		return new LintClassBasedLintConfigurationInitializer(this.delegate);
 	}
 }

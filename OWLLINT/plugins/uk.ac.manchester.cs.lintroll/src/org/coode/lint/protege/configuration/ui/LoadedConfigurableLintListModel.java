@@ -19,8 +19,7 @@ import org.protege.editor.owl.OWLEditorKit;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.configuration.LintConfiguration;
 import org.semanticweb.owl.lint.configuration.LintConfigurationVisitorAdapter;
-
-import uk.ac.manchester.cs.owl.lint.commons.AbstractPropertiesBasedLintConfiguration;
+import org.semanticweb.owl.lint.configuration.PropertyBasedLintConfiguration;
 
 /**
  * @author Luigi Iannone
@@ -57,7 +56,7 @@ public final class LoadedConfigurableLintListModel implements ListModel, Disposa
 			lintConfiguration.accept(new LintConfigurationVisitorAdapter() {
 				@Override
 				public void visitPropertiesBasedLintConfiguration(
-						AbstractPropertiesBasedLintConfiguration propertiesBasedLintConfiguration) {
+						PropertyBasedLintConfiguration propertiesBasedLintConfiguration) {
 					LoadedConfigurableLintListModel.this.configurableLints.add(lint);
 				}
 			});

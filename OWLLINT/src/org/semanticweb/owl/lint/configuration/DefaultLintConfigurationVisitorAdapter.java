@@ -3,7 +3,6 @@
  */
 package org.semanticweb.owl.lint.configuration;
 
-import uk.ac.manchester.cs.owl.lint.commons.AbstractPropertiesBasedLintConfiguration;
 import uk.ac.manchester.cs.owl.lint.commons.NonConfigurableLintConfiguration;
 
 /**
@@ -19,7 +18,7 @@ public abstract class DefaultLintConfigurationVisitorAdapter implements LintConf
 	}
 
 	public void visitPropertiesBasedLintConfiguration(
-			AbstractPropertiesBasedLintConfiguration propertiesBasedLintConfiguration) {
+			PropertyBasedLintConfiguration propertiesBasedLintConfiguration) {
 		this.doDefault(propertiesBasedLintConfiguration);
 	}
 }

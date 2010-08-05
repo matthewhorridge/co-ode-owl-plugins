@@ -24,8 +24,7 @@ import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.configuration.LintConfigurationVisitorAdapter;
-
-import uk.ac.manchester.cs.owl.lint.commons.AbstractPropertiesBasedLintConfiguration;
+import org.semanticweb.owl.lint.configuration.PropertyBasedLintConfiguration;
 
 /**
  * @author Luigi Iannone
@@ -99,7 +98,7 @@ public class LintConfigurationPanel extends OWLPreferencesPanel {
 			lint.getLintConfiguration().accept(new LintConfigurationVisitorAdapter() {
 				@Override
 				public void visitPropertiesBasedLintConfiguration(
-						AbstractPropertiesBasedLintConfiguration propertiesBasedLintConfiguration) {
+						PropertyBasedLintConfiguration propertiesBasedLintConfiguration) {
 					try {
 						propertiesBasedLintConfiguration.store();
 					} catch (IOException e) {

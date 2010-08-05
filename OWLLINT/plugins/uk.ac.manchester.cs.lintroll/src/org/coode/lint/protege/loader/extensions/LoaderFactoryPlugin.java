@@ -6,7 +6,7 @@ import org.protege.editor.core.plugin.JPFUtil;
 import org.protege.editor.core.plugin.ProtegePlugin;
 
 public final class LoaderFactoryPlugin implements
-		ProtegePlugin<LoaderFactoryProtegePluginInstanceAdapter<?>> {
+		ProtegePlugin<LoaderFactoryProtegePluginInstanceAdapter<?, ?>> {
 	private final IExtension extension;
 	public static final String LOADER_FACTORY_PLUGIN_TYPE_ID = "loaderfactory";
 
@@ -34,14 +34,13 @@ public final class LoaderFactoryPlugin implements
 		return JPFUtil.getDocumentation(this.extension);
 	}
 
-	public LoaderFactoryProtegePluginInstanceAdapter<?> newInstance()
-			throws ClassNotFoundException, IllegalAccessException,
-			InstantiationException {
-		ExtensionInstantiator<LoaderFactoryProtegePluginInstanceAdapter<?>> instantiator = new ExtensionInstantiator<LoaderFactoryProtegePluginInstanceAdapter<?>>(
+	public LoaderFactoryProtegePluginInstanceAdapter<?, ?> newInstance()
+			throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+		ExtensionInstantiator<LoaderFactoryProtegePluginInstanceAdapter<?, ?>> instantiator = new ExtensionInstantiator<LoaderFactoryProtegePluginInstanceAdapter<?, ?>>(
 				this.extension);
-		LoaderFactoryProtegePluginInstanceAdapter<?> loaderFactory = LoaderFactoryProtegePluginInstanceAdapter
-				.buildLoaderFactoryProtegePluginInstanceAdapter(instantiator
-						.instantiate(), this.extension);
+		LoaderFactoryProtegePluginInstanceAdapter<?, ?> loaderFactory = LoaderFactoryProtegePluginInstanceAdapter.buildLoaderFactoryProtegePluginInstanceAdapter(
+				instantiator.instantiate(),
+				this.extension);
 		return loaderFactory;
 	}
 

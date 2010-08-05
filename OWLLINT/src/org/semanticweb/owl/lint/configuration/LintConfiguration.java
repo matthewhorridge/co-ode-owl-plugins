@@ -56,4 +56,30 @@ public interface LintConfiguration {
 	 *             if the input key is {@code null}.
 	 */
 	public String getPropertyValue(String key);
+
+	/**
+	 * Adds a listener to those that should be notified when this
+	 * LintConfiguration changes
+	 * 
+	 * @param l
+	 *            The LintConfigurationChangeListener to add. Cannot be
+	 *            {@code null}.
+	 * @throws NullPointerException
+	 *             if the input is {@code null}.
+	 */
+	public void addLintConfigurationChangeListener(LintConfigurationChangeListener l);
+
+	/**
+	 * Adds a listener from those that should be notified when this
+	 * LintConfiguration changes
+	 * 
+	 * @param l
+	 *            The LintConfigurationChangeListener to remove.
+	 */
+	public void removeLintConfigurationChangeListener(LintConfigurationChangeListener l);
+
+	/**
+	 * Removes all the instances listening to change to this LintConfiguration.
+	 */
+	public void removeAllListeners();
 }

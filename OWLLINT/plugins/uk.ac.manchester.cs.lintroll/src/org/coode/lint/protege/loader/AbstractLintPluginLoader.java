@@ -6,16 +6,18 @@ package org.coode.lint.protege.loader;
 import java.util.EnumSet;
 
 import org.coode.lint.protege.LintProtegePluginInstance;
+import org.coode.lint.protege.configuration.ProtegePropertyBasedLint;
 import org.protege.editor.core.plugin.AbstractPluginLoader;
 import org.protege.editor.core.plugin.ProtegePlugin;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.event.EventType;
+import org.semanticweb.owl.model.OWLObject;
 
 /**
  * @author Luigi Iannone
  * 
  */
-public abstract class AbstractLintPluginLoader<O extends ProtegePlugin<? extends LintProtegePluginInstance<?>>>
+public abstract class AbstractLintPluginLoader<O extends ProtegePlugin<E>, E extends LintProtegePluginInstance<?>>
 		extends AbstractPluginLoader<O> {
 	private final OWLEditorKit owlEditorKit;
 
@@ -43,4 +45,9 @@ public abstract class AbstractLintPluginLoader<O extends ProtegePlugin<? extends
 	 * @return an EnumSet<EventType>
 	 */
 	public abstract EnumSet<EventType> getRelevantEventTypes();
+
+	public <P extends OWLObject> ProtegePropertyBasedLint<P> buildPropertyBasedLint(
+			LintProtegePluginInstance<P> lint) {
+		return ProtegePropertyBasedLint.buildProtegePropertyBasedLint(lint);
+	}
 }

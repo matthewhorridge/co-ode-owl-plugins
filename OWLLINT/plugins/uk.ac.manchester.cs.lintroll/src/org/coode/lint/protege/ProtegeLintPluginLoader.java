@@ -13,7 +13,8 @@ import org.semanticweb.owl.lint.Lint;
  * Loader for Generic {@link Lint} specified as extension whose point is
  * uk.ac.manchester.cs.lintroll.lint
  */
-public final class ProtegeLintPluginLoader extends AbstractLintPluginLoader<LintPlugin> {
+public final class ProtegeLintPluginLoader extends
+		AbstractLintPluginLoader<LintPlugin, LintProtegePluginInstanceAdapter<?>> {
 	public ProtegeLintPluginLoader(OWLEditorKit owlEditorKit) {
 		super("uk.ac.manchester.cs.lintroll", LintPlugin.LINT_PLUGIN_TYPE_ID, owlEditorKit);
 	}

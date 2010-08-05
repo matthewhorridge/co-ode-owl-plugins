@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.semanticweb.owl.lint.configuration.LintConfiguration;
+import org.semanticweb.owl.lint.configuration.LintConfigurationChangeListener;
 import org.semanticweb.owl.lint.configuration.LintConfigurationVisitor;
 import org.semanticweb.owl.lint.configuration.LintConfigurationVisitorEx;
 
@@ -60,5 +61,20 @@ public class NonConfigurableLintConfiguration implements LintConfiguration {
 		if (key == null) {
 			throw new NullPointerException("The key cannot be null");
 		}
+	}
+
+	public void addLintConfigurationChangeListener(LintConfigurationChangeListener l) {
+		// Do Nothing as it cannot change hence no need to keep track of
+		// listeners.
+	}
+
+	public void removeLintConfigurationChangeListener(LintConfigurationChangeListener l) {
+		// Do Nothing as it cannot change hence no need to keep track of
+		// listeners.
+	}
+
+	public void removeAllListeners() {
+		// Do Nothing as it cannot change hence no need to keep track of
+		// listeners.
 	}
 }

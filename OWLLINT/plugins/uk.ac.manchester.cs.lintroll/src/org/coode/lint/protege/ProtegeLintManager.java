@@ -10,7 +10,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.coode.lint.protege.configuration.ProtegePropertyBasedLint;
 import org.coode.lint.protege.loader.AbstractLintPluginLoader;
 import org.coode.lint.protege.loader.extensions.LoaderFactoryPlugin;
 import org.coode.lint.protege.loader.extensions.LoaderFactoryPluginLoader;
@@ -25,9 +24,9 @@ import org.protege.editor.owl.model.event.OWLModelManagerListener;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.configuration.DefaultLintConfigurationVisitorExAdapter;
 import org.semanticweb.owl.lint.configuration.LintConfiguration;
+import org.semanticweb.owl.lint.configuration.PropertyBasedLintConfiguration;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
-import uk.ac.manchester.cs.owl.lint.commons.AbstractPropertiesBasedLintConfiguration;
 
 /**
  * @author Luigi Iannone
@@ -48,18 +47,23 @@ public final class ProtegeLintManager implements Disposable {
 	private final OWLEditorKit owlEditorKit;
 	private final Set<LintSelectionListener> selectionListeners = new HashSet<ProtegeLintManager.LintSelectionListener>();
 	private final Set<LintLoadListener> loadListeners = new HashSet<ProtegeLintManager.LintLoadListener>();
-	private final Set<AbstractLintPluginLoader<?>> loaders = new HashSet<AbstractLintPluginLoader<?>>();
-	private final Map<AbstractLintPluginLoader<?>, Set<LintProtegePluginInstance<?>>> lintLoaderMap = new HashMap<AbstractLintPluginLoader<?>, Set<LintProtegePluginInstance<?>>>();
+	private final Set<AbstractLintPluginLoader<?, ?>> loaders = new HashSet<AbstractLintPluginLoader<?, ?>>();
+	private final Map<AbstractLintPluginLoader<?, ?>, Set<LintProtegePluginInstance<?>>> lintLoaderMap = new HashMap<AbstractLintPluginLoader<?, ?>, Set<LintProtegePluginInstance<?>>>();
 	private final OWLModelManagerListener modelManagerListener = new OWLModelManagerListener() {
 		public void handleChange(OWLModelManagerChangeEvent event) {
 			ProtegeLintManager.this.resetLintManager();
-			for (AbstractLintPluginLoader<?> loader : ProtegeLintManager.this.loaders) {
+			for (AbstractLintPluginLoader<?, ?> loader : ProtegeLintManager.this.loaders) {
 				EnumSet<EventType> relevantEventTypes = loader.getRelevantEventTypes();
 				if (relevantEventTypes.contains(event.getType())) {
 					Set<LintProtegePluginInstance<?>> relevantLoadedLints = ProtegeLintManager.this.lintLoaderMap.get(loader);
 					if (relevantLoadedLints != null) {
 						ProtegeLintManager.this.loadedLints.removeAll(relevantLoadedLints);
 						ProtegeLintManager.this.selectedLints.removeAll(relevantLoadedLints);
+						// Need to detach the listeners form the removed lints'
+						// configurations.
+						for (LintProtegePluginInstance<?> lint : relevantLoadedLints) {
+							lint.getLintConfiguration().removeAllListeners();
+						}
 						ProtegeLintManager.this.loadedLints.remove(loader);
 					}
 					ProtegeLintManager.this.installLintChecks(loader);
@@ -103,9 +107,9 @@ public final class ProtegeLintManager implements Disposable {
 		Set<LoaderFactoryPlugin> plugins = loaderFactoryPluginLoader.getPlugins();
 		for (LoaderFactoryPlugin loaderFactoryPlugin : plugins) {
 			try {
-				LoaderFactoryProtegePluginInstanceAdapter<?> factory = loaderFactoryPlugin.newInstance();
+				LoaderFactoryProtegePluginInstanceAdapter<?, ?> factory = loaderFactoryPlugin.newInstance();
 				if (factory != null) {
-					AbstractLintPluginLoader<?> pluginLoader = factory.createLintPluginLoader(this.owlEditorKit);
+					AbstractLintPluginLoader<?, ?> pluginLoader = factory.createLintPluginLoader(this.owlEditorKit);
 					if (pluginLoader != null) {
 						this.loaders.add(pluginLoader);
 					}
@@ -125,7 +129,7 @@ public final class ProtegeLintManager implements Disposable {
 	private void installFactories() {
 		this.loadedLints.clear();
 		this.lintLoaderMap.clear();
-		for (AbstractLintPluginLoader<?> loader : this.loaders) {
+		for (AbstractLintPluginLoader<?, ?> loader : this.loaders) {
 			this.installLintChecks(loader);
 		}
 		this.notifyLoadChanged();
@@ -134,7 +138,7 @@ public final class ProtegeLintManager implements Disposable {
 	/**
 	 * @param loader
 	 */
-	private boolean installLintChecks(AbstractLintPluginLoader<?> loader) {
+	private boolean installLintChecks(final AbstractLintPluginLoader<?, ?> loader) {
 		boolean changed = false;
 		for (ProtegePlugin<? extends LintProtegePluginInstance<?>> protegePlugin : loader.getPlugins()) {
 			LintProtegePluginInstance<?> lint;
@@ -150,8 +154,8 @@ public final class ProtegeLintManager implements Disposable {
 
 							@Override
 							public LintProtegePluginInstance<?> visitPropertiesBasedLintConfiguration(
-									AbstractPropertiesBasedLintConfiguration abstractPropertiesBasedLintConfiguration) {
-								return ProtegePropertyBasedLint.buildProtegePropertyBasedLint(newInstance);
+									PropertyBasedLintConfiguration abstractPropertiesBasedLintConfiguration) {
+								return loader.buildPropertyBasedLint(newInstance);
 							}
 						});
 				if (lint != null) {
