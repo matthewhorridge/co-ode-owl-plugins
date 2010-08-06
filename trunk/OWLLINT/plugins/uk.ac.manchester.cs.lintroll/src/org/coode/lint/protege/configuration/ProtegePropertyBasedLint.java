@@ -6,7 +6,6 @@ package org.coode.lint.protege.configuration;
 import java.util.Collection;
 
 import org.coode.lint.protege.LintProtegePluginInstance;
-import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.lint.LintVisitor;
@@ -32,9 +31,8 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 			throw new NullPointerException("The delegate cannot be null");
 		}
 		this.delegate = delegate;
-		this.lintConfiguration = new ProtegeStoredLintConfiguration(this.getClass(),
-				delegate.getLintConfiguration());
-		this.getLintConfigurationInitializer().initialise(this.lintConfiguration);
+		this.lintConfiguration = new ProtegePreferenceLintConfiguration(this
+				.getId(), delegate.getLintConfiguration());
 	}
 
 	/**
@@ -43,7 +41,8 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 	 * @throws LintException
 	 * @see org.semanticweb.owl.lint.Lint#detected(java.util.Collection)
 	 */
-	public LintReport<O> detected(Collection<? extends OWLOntology> targets) throws LintException {
+	public LintReport<O> detected(Collection<? extends OWLOntology> targets)
+			throws LintException {
 		return this.delegate.detected(targets);
 	}
 
@@ -123,11 +122,7 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 		return this.delegate.toString();
 	}
 
-	public Lint<?> getOriginatingLint() {
-		return this.delegate;
-	}
-
-	public LintConfigurationInitializer getLintConfigurationInitializer() {
-		return this.delegate.getLintConfigurationInitializer();
+	public String getId() {
+		return this.delegate.getId();
 	}
 }
