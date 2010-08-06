@@ -4,8 +4,12 @@
 package org.coode.lint.protege.configuration.ui;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -21,14 +25,15 @@ import uk.ac.manchester.cs.owl.lint.commons.NonConfigurableLintConfiguration;
  * @author Luigi Iannone
  * 
  */
-public class LintConfigurationTableModel implements TableModel {
+public final class LintConfigurationTableModel implements TableModel {
 	private LintConfiguration configuration;
+	private final Map<LintConfiguration, Properties> changes = new HashMap<LintConfiguration, Properties>();
 
 	/**
 	 * @param configuration
 	 */
 	public LintConfigurationTableModel() {
-		this.configuration = NonConfigurableLintConfiguration.getInstance();
+		this.setConfiguration(NonConfigurableLintConfiguration.getInstance());
 	}
 
 	private final Set<TableModelListener> tableModelListeners = new HashSet<TableModelListener>();
@@ -81,7 +86,7 @@ public class LintConfigurationTableModel implements TableModel {
 	 * @see javax.swing.table.TableModel#getRowCount()
 	 */
 	public int getRowCount() {
-		return this.configuration.getPropertyKeys().size();
+		return this.getKeys().size();
 	}
 
 	/**
@@ -89,13 +94,25 @@ public class LintConfigurationTableModel implements TableModel {
 	 */
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		String toReturn = "";
-		if (rowIndex >= 0 && rowIndex <= this.getRowCount() - 1 && columnIndex >= 0
-				&& columnIndex <= 1) {
-			List<String> keys = new ArrayList<String>(new TreeSet<String>(
-					this.configuration.getPropertyKeys()));
+		if (rowIndex >= 0 && rowIndex <= this.getRowCount() - 1
+				&& columnIndex >= 0 && columnIndex <= 1) {
+			List<String> keys = new ArrayList<String>(this.getKeys());
 			String key = keys.get(rowIndex);
-			String value = this.configuration.getPropertyValue(key);
+			String value = this.changes.get(this.configuration)
+					.getProperty(key);
 			toReturn = columnIndex == 0 ? key : value == null ? "" : value;
+		}
+		return toReturn;
+	}
+
+	/**
+	 * @return
+	 */
+	private Set<String> getKeys() {
+		TreeSet<String> toReturn = new TreeSet<String>();
+		Set<Object> keySet = this.changes.get(this.configuration).keySet();
+		for (Object object : keySet) {
+			toReturn.add(object.toString());
 		}
 		return toReturn;
 	}
@@ -121,16 +138,31 @@ public class LintConfigurationTableModel implements TableModel {
 	public void setValueAt(Object value, int rowIndex, int columnIndex) {
 		if (columnIndex == 1) {
 			String key = this.getValueAt(rowIndex, 0).toString();
-			this.configuration.setProperty(key, value.toString());
-			this.notifyListeners();
+			this.setPropertyValue(key, value);
 		}
 	}
 
-	/**
-	 * @return the configuration
-	 */
-	public LintConfiguration getConfiguration() {
-		return this.configuration;
+	void setPropertyValue(String key, Object value) {
+		Properties properties = this.changes.get(this.configuration);
+		if (properties == null) {
+			properties = new Properties();
+			this.changes.put(this.configuration, properties);
+		}
+		properties.setProperty(key, value.toString());
+		this.notifyListeners();
+	}
+
+	public void applyChanges() {
+		Set<LintConfiguration> configurations = this.changes.keySet();
+		for (LintConfiguration lintConfiguration : configurations) {
+			Properties properties = this.changes.get(lintConfiguration);
+			Enumeration<?> propertyNames = properties.propertyNames();
+			while (propertyNames.hasMoreElements()) {
+				String string = propertyNames.nextElement().toString();
+				lintConfiguration.setProperty(string, properties
+						.getProperty(string));
+			}
+		}
 	}
 
 	/**
@@ -142,6 +174,16 @@ public class LintConfigurationTableModel implements TableModel {
 			throw new NullPointerException("The configuration cannnot be null");
 		}
 		this.configuration = configuration;
+		Properties properties = this.changes.get(configuration);
+		if (properties == null) {
+			Properties initialProperties = new Properties();
+			Set<String> propertyKeys = configuration.getPropertyKeys();
+			for (String string : propertyKeys) {
+				initialProperties.setProperty(string, configuration
+						.getPropertyValue(string));
+			}
+			this.changes.put(configuration, initialProperties);
+		}
 		this.notifyListeners();
 	}
 }
