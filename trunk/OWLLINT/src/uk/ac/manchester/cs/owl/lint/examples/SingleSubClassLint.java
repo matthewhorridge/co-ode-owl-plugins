@@ -38,6 +38,7 @@ import org.semanticweb.owl.model.OWLOntology;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 import uk.ac.manchester.cs.owl.lint.commons.NonConfigurableLintConfiguration;
+import uk.ac.manchester.cs.owl.lint.commons.SimpleMatchBasedLintReport;
 
 /**
  * @author Luigi Iannone
@@ -50,8 +51,9 @@ public final class SingleSubClassLint implements PatternBasedLint<OWLClass> {
 	private PatternBasedLint<OWLClass> instance;
 
 	public SingleSubClassLint() {
-		this.instance = LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
-				Collections.singleton(new SingleSubClassLintPattern()));
+		this.instance = LintManagerFactory.getInstance().getLintManager()
+				.getLintFactory().createLint(
+						Collections.singleton(new SingleSubClassLintPattern()));
 	}
 
 	public String getDescription() {
@@ -62,11 +64,12 @@ public final class SingleSubClassLint implements PatternBasedLint<OWLClass> {
 		return this.instance.getPatterns();
 	}
 
-	public LintReport<OWLClass> detected(Collection<? extends OWLOntology> targets)
-			throws LintException {
-		LintReport<OWLClass> instanceReport = this.instance.detected(targets);
-		instanceReport.setLint(this);
-		return instanceReport;
+	public LintReport<OWLClass> detected(
+			Collection<? extends OWLOntology> targets) throws LintException {
+		LintReport<OWLClass> detected = this.instance.detected(targets);
+		SimpleMatchBasedLintReport<OWLClass> toReturn = new SimpleMatchBasedLintReport<OWLClass>(
+				this, detected);
+		return toReturn;
 	}
 
 	public String getName() {

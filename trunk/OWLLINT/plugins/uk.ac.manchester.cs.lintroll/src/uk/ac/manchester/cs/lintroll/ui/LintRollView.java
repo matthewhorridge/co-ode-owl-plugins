@@ -84,8 +84,8 @@ import uk.ac.manchester.cs.owl.lint.commons.LintVisitorAdapter;
  *         February 11, 2008
  * 
  */
-public class LintRollView extends AbstractOWLViewComponent implements TreeSelectionListener,
-		HierarchyListener {
+public class LintRollView extends AbstractOWLViewComponent implements
+		TreeSelectionListener, HierarchyListener {
 	private static final DefaultMutableTreeNode LINT_ROLL_READY_DEFAULT_MUTABLE_TREE_NODE = new DefaultMutableTreeNode(
 			"Press the button above for detecting lint");
 
@@ -95,8 +95,8 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 	 */
 	public class DetectLintAction extends AbstractAction {
 		public DetectLintAction() {
-			super("Detect Lint", new ImageIcon(DetectLintAction.class.getClassLoader().getResource(
-					"lintroll.jpg")));
+			super("Detect Lint", new ImageIcon(DetectLintAction.class
+					.getClassLoader().getResource("lintroll.jpg")));
 		}
 
 		/**
@@ -111,7 +111,8 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 			LintRollView.this.lintSelectionPanel.setEnabled(false);
 			LintRollView.this.lintReportTreeModel = new DefaultTreeModel(
 					LintRollView.EXECUTING_LINT_CHECKS_PLEASE_WAIT_DEFAULT_MUTABLE_TREE_NODE);
-			LintRollView.this.lintReportTree.setModel(LintRollView.this.lintReportTreeModel);
+			LintRollView.this.lintReportTree
+					.setModel(LintRollView.this.lintReportTreeModel);
 			SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					SwingWorker<Set<LintReport<?>>, Collection<? extends Lint<?>>> lintDetectionSwingWorker = new LintDetectionSwingWorker();
@@ -127,8 +128,10 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 		@Override
 		protected Set<LintReport<?>> doInBackground() throws Exception {
 			Set<LintReport<?>> toReturn = LintRollView.this.lintManager.run(
-					ProtegeLintManager.getInstance(LintRollView.this.getOWLEditorKit()).getSelectedLints(),
-					LintRollView.this.getOWLModelManager().getOntologies());
+					ProtegeLintManager.getInstance(
+							LintRollView.this.getOWLEditorKit())
+							.getSelectedLints(), LintRollView.this
+							.getOWLModelManager().getOntologies());
 			LintRollView.this.isDirty = false;
 			return toReturn;
 		}
@@ -143,14 +146,17 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 								"Error in computing lint reports execution interrupted "
 										+ e.getMessage()));
 				ProtegeApplication.getErrorLog().logError(e);
-				LintRollView.this.lintReportTree.setModel(LintRollView.this.lintReportTreeModel);
+				LintRollView.this.lintReportTree
+						.setModel(LintRollView.this.lintReportTreeModel);
 			} catch (ExecutionException e) {
 				LintRollView.this.lintReportTreeModel = new DefaultTreeModel(
 						new DefaultMutableTreeNode(
 								"Error in computing lint reports exception occurred "
 										+ e.getMessage()));
-				LintRollView.this.lintReportTree.setModel(LintRollView.this.lintReportTreeModel);
-				LintRollView.this.lintReportTree.setModel(LintRollView.this.lintReportTreeModel);
+				LintRollView.this.lintReportTree
+						.setModel(LintRollView.this.lintReportTreeModel);
+				LintRollView.this.lintReportTree
+						.setModel(LintRollView.this.lintReportTreeModel);
 			} finally {
 				LintRollView.this.lintSelectionPanel.setEnabled(true);
 				LintRollView.this.detectLintAction.setEnabled(false);
@@ -211,32 +217,38 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 	protected void initialiseOWLView() throws Exception {
 		this.getOWLEditorKit().getOWLModelManager().addOntologyChangeListener(
 				this.ontologyChangeListener);
-		this.getOWLEditorKit().getOWLModelManager().addListener(this.modelManagerListener);
+		this.getOWLEditorKit().getOWLModelManager().addListener(
+				this.modelManagerListener);
 		this.lintManager = LintManagerFactory.getInstance().getLintManager();
 		this.setLayout(new BorderLayout());
 		this.lintReportTree = new OWLLinkedObjectTree(this.getOWLEditorKit());
 		this.lintReportTree.setModel(this.lintReportTreeModel);
-		this.lintReportTree.setCellRenderer(new LintRenderer(this.getOWLEditorKit()));
+		this.lintReportTree.setCellRenderer(new LintRenderer(this
+				.getOWLEditorKit()));
 		this.lintReportTree.addTreeSelectionListener(this);
 		this.lintSelectionPanel = new LintSelectionPanel(this.getOWLEditorKit()) {
 			private static final long serialVersionUID = -944782945498849392L;
 
 			@Override
 			protected void lintSelected(Lint<?> lint) {
-				ProtegeLintManager.getInstance(LintRollView.this.getOWLEditorKit()).addSelectedLint(
+				ProtegeLintManager.getInstance(
+						LintRollView.this.getOWLEditorKit()).addSelectedLint(
 						lint);
 			}
 
 			@Override
 			protected void lintDeSelected(Lint<?> lint) {
-				ProtegeLintManager.getInstance(LintRollView.this.getOWLEditorKit()).removeSelectedLint(
-						lint);
+				ProtegeLintManager.getInstance(
+						LintRollView.this.getOWLEditorKit())
+						.removeSelectedLint(lint);
 			}
 		};
 		JToolBar runToolBar = ComponentFactory.createViewToolBar();
 		runToolBar.add(this.detectLintAction);
+		this.detectLintAction.setEnabled(false);
 		JPanel leftPanel = new JPanel(new BorderLayout());
-		JScrollPane treePane = ComponentFactory.createScrollPane(this.lintReportTree);
+		JScrollPane treePane = ComponentFactory
+				.createScrollPane(this.lintReportTree);
 		leftPanel.add(runToolBar, BorderLayout.NORTH);
 		leftPanel.add(treePane);
 		JPanel reportPanel = new JPanel(new BorderLayout());
@@ -250,15 +262,19 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 		this.fixButton.setEnabled(false);
 		this.fixButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				DefaultMutableTreeNode selected = (DefaultMutableTreeNode) LintRollView.this.lintReportTree.getLastSelectedPathComponent();
+				DefaultMutableTreeNode selected = (DefaultMutableTreeNode) LintRollView.this.lintReportTree
+						.getLastSelectedPathComponent();
 				Object userObject = selected.getUserObject();
-				if (selected != null && LintReport.class.isAssignableFrom(userObject.getClass())) {
+				if (selected != null
+						&& LintReport.class.isAssignableFrom(userObject
+								.getClass())) {
 					final LintReport<?> lintReport = (LintReport<?>) userObject;
 					lintReport.getLint().accept(new LintVisitorAdapter() {
 						@Override
 						public void visitActingLint(ActingLint<?> actingLint) {
 							try {
-								actingLint.executeActions(lintReport.getAffectedOntologies());
+								actingLint.executeActions(lintReport
+										.getAffectedOntologies());
 							} catch (LintActionException e) {
 								ProtegeApplication.getErrorLog().logError(e);
 								JOptionPane.showMessageDialog(
@@ -270,32 +286,37 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 				}
 			}
 		});
-		reportPanel.setBorder(ComponentFactory.createTitledBorder("Lint Report"));
+		reportPanel.setBorder(ComponentFactory
+				.createTitledBorder("Lint Report"));
 		JSplitPane mainSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 		mainSplitPane.setTopComponent(reportPanel);
-		JScrollPane lintDescriptionPane = new JScrollPane(this.lintDescriptionTextArea);
+		JScrollPane lintDescriptionPane = new JScrollPane(
+				this.lintDescriptionTextArea);
 		JScrollPane explanationPane = new JScrollPane(this.explanationTextArea);
 		JPanel explanationPanel = new JPanel(new BorderLayout());
 		explanationPanel.add(explanationPane);
-		explanationPanel.setBorder(ComponentFactory.createTitledBorder("Explanation"));
+		explanationPanel.setBorder(ComponentFactory
+				.createTitledBorder("Explanation"));
 		this.explanationTextArea.setEditable(false);
 		this.explanationTextArea.setColumns(40);
 		this.explanationTextArea.setRows(3);
 		JPanel lintDescriptionPanel = new JPanel(new BorderLayout());
 		lintDescriptionPanel.add(lintDescriptionPane);
-		lintDescriptionPanel.setBorder(ComponentFactory.createTitledBorder("Lint Description "));
+		lintDescriptionPanel.setBorder(ComponentFactory
+				.createTitledBorder("Lint Description "));
 		this.lintDescriptionTextArea.setEditable(false);
 		this.lintDescriptionTextArea.setColumns(40);
 		this.lintDescriptionTextArea.setRows(3);
 		this.lintDescriptionTextArea.setWrapStyleWord(true);
-		JSplitPane bottomSplitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+		JSplitPane bottomSplitPanel = new JSplitPane(
+				JSplitPane.HORIZONTAL_SPLIT);
 		bottomSplitPanel.setLeftComponent(lintDescriptionPanel);
 		bottomSplitPanel.setRightComponent(explanationPanel);
 		mainSplitPane.setBottomComponent(bottomSplitPanel);
 		this.add(mainSplitPane, BorderLayout.CENTER);
 		this.addHierarchyListener(this);
-		ProtegeLintManager.getInstance(this.getOWLEditorKit()).addLintSelectionListener(
-				this.lintSelectionListener);
+		ProtegeLintManager.getInstance(this.getOWLEditorKit())
+				.addLintSelectionListener(this.lintSelectionListener);
 	}
 
 	/**
@@ -309,14 +330,20 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 		this.lintReportTree.clearSelection();
 		this.lintDescriptionTextArea.setText("");
 		for (LintReport<?> lintReport : lintReports) {
-			DefaultMutableTreeNode lintNode = new DefaultMutableTreeNode(lintReport);
+			DefaultMutableTreeNode lintNode = new DefaultMutableTreeNode(
+					lintReport);
 			for (OWLOntology ontology : lintReport.getAffectedOntologies()) {
-				DefaultMutableTreeNode ontologyNode = new DefaultMutableTreeNode(ontology);
-				for (OWLObject owlObject : lintReport.getAffectedOWLObjects(ontology)) {
-					DefaultMutableTreeNode owlObjectNode = new DefaultMutableTreeNode(owlObject);
-					this.lintReportTreeModel.insertNodeInto(owlObjectNode, ontologyNode, 0);
+				DefaultMutableTreeNode ontologyNode = new DefaultMutableTreeNode(
+						ontology);
+				for (OWLObject owlObject : lintReport
+						.getAffectedOWLObjects(ontology)) {
+					DefaultMutableTreeNode owlObjectNode = new DefaultMutableTreeNode(
+							owlObject);
+					this.lintReportTreeModel.insertNodeInto(owlObjectNode,
+							ontologyNode, 0);
 				}
-				this.lintReportTreeModel.insertNodeInto(ontologyNode, lintNode, 0);
+				this.lintReportTreeModel.insertNodeInto(ontologyNode, lintNode,
+						0);
 			}
 			this.lintReportTreeModel.insertNodeInto(lintNode, root, 0);
 		}
@@ -330,9 +357,10 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 	protected void disposeOWLView() {
 		this.getOWLEditorKit().getModelManager().removeOntologyChangeListener(
 				this.ontologyChangeListener);
-		this.getOWLEditorKit().getModelManager().removeListener(this.modelManagerListener);
-		ProtegeLintManager.getInstance(this.getOWLEditorKit()).removeLintSelectionListener(
-				this.lintSelectionListener);
+		this.getOWLEditorKit().getModelManager().removeListener(
+				this.modelManagerListener);
+		ProtegeLintManager.getInstance(this.getOWLEditorKit())
+				.removeLintSelectionListener(this.lintSelectionListener);
 		try {
 			ProtegeLintManager.getInstance(this.getOWLEditorKit()).dispose();
 		} catch (Exception e) {
@@ -354,8 +382,10 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 					LintRollView.LINT_ROLL_READY_DEFAULT_MUTABLE_TREE_NODE);
 		}
 		this.setupListeners();
-		LintRollView.this.lintReportTree.setModel(LintRollView.this.lintReportTreeModel);
-		this.detectLintAction.setEnabled(!ProtegeLintManager.getInstance(this.getOWLEditorKit()).getSelectedLints().isEmpty()
+		LintRollView.this.lintReportTree
+				.setModel(LintRollView.this.lintReportTreeModel);
+		this.detectLintAction.setEnabled(!ProtegeLintManager.getInstance(
+				this.getOWLEditorKit()).getSelectedLints().isEmpty()
 				&& this.isDirty);
 	}
 
@@ -369,11 +399,14 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 	}
 
 	public void valueChanged(TreeSelectionEvent e) {
-		DefaultMutableTreeNode selected = (DefaultMutableTreeNode) LintRollView.this.lintReportTree.getLastSelectedPathComponent();
+		DefaultMutableTreeNode selected = (DefaultMutableTreeNode) LintRollView.this.lintReportTree
+				.getLastSelectedPathComponent();
 		if (selected != null) {
 			if (selected.getUserObject() instanceof LintReport<?>) {
-				LintReport<?> lintReport = (LintReport<?>) selected.getUserObject();
-				this.lintDescriptionTextArea.setText(lintReport.getLint().getDescription());
+				LintReport<?> lintReport = (LintReport<?>) selected
+						.getUserObject();
+				this.lintDescriptionTextArea.setText(lintReport.getLint()
+						.getDescription());
 				this.explanationTextArea.setText("");
 				Lint<?> aLint = lintReport.getLint();
 				aLint.accept(new DefaultLintVisitorAdapter() {
@@ -387,13 +420,17 @@ public class LintRollView extends AbstractOWLViewComponent implements TreeSelect
 						LintRollView.this.fixButton.setEnabled(true);
 					}
 				});
-			} else if (selected.getUserObject() instanceof OWLObject && selected.isLeaf()) {
+			} else if (selected.getUserObject() instanceof OWLObject
+					&& selected.isLeaf()) {
 				this.fixButton.setEnabled(false);
 				OWLObject object = (OWLObject) selected.getUserObject();
-				DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selected.getParent();
+				DefaultMutableTreeNode parent = (DefaultMutableTreeNode) selected
+						.getParent();
 				OWLOntology ontology = (OWLOntology) parent.getUserObject();
-				DefaultMutableTreeNode reportNode = (DefaultMutableTreeNode) parent.getParent();
-				LintReport<?> report = (LintReport<?>) reportNode.getUserObject();
+				DefaultMutableTreeNode reportNode = (DefaultMutableTreeNode) parent
+						.getParent();
+				LintReport<?> report = (LintReport<?>) reportNode
+						.getUserObject();
 				String explanation = report.getExplanation(object, ontology);
 				if (explanation != null) {
 					this.explanationTextArea.setText(explanation);

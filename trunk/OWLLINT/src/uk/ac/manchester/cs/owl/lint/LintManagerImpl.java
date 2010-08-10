@@ -50,15 +50,16 @@ public final class LintManagerImpl implements LintManager {
 	 * @param ontologyManager
 	 * @param reasoner
 	 */
-	public LintManagerImpl(OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
+	public LintManagerImpl(OWLOntologyManager ontologyManager,
+			OWLReasoner reasoner) {
 		assert ontologyManager != null;
 		this.ontologyManager = ontologyManager;
 		this.reasoner = reasoner;
 	}
 
 	/**
-	 * @see org.semanticweb.owl.lint.LintManager#run(java.util.Set,
-	 *      java.util.Set)
+	 * @see org.semanticweb.owl.lint.LintManager#run(java.util.Collection,
+	 *      java.util.Collection)
 	 */
 	public Set<LintReport<?>> run(Collection<? extends Lint<?>> lints,
 			Collection<? extends OWLOntology> targets) throws LintException {

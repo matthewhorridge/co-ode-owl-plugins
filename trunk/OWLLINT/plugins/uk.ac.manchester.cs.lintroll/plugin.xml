@@ -19,8 +19,8 @@
   		<label value="Configurable Lint Checks"/>
   		<class value="org.coode.lint.protege.configuration.ui.LintConfigurationPanel"/>
   	</extension>
- 	<!-- Example Lints -->
- <!-- 	<extension id="SingleSubClassLint" point="uk.ac.manchester.cs.lintroll.lint">
+ 	<!-- Example Lints 
+ 	<extension id="SingleSubClassLint" point="uk.ac.manchester.cs.lintroll.lint">
  		<label value="Single sub-class"/>
  		<class value="uk.ac.manchester.cs.owl.lint.examples.SingleSubClassLint"/> 		
  	</extension>
@@ -28,12 +28,8 @@
  		<label value="Non leaf classes with no additional information"/>
  		<class value="uk.ac.manchester.cs.owl.lint.examples.NonLeafNoInfoLint"/> 		
  	</extension>
- 	<extension id="Wait20sec" point="uk.ac.manchester.cs.lintroll.lint">
- 		<label value="Wait for 20 seconds"/>
- 		<class value="uk.ac.manchester.cs.owl.lint.examples.WaitFor20secondsLint"/> 		
- 	</extension>
  	<extension id="TransitiveObjectPropertyHierarchy" point="uk.ac.manchester.cs.lintroll.lint">
  		<label value="Transitive Object Property Hierarchy"/>
  		<class value=" 	uk.ac.manchester.cs.owl.lint.examples.TransitiveObjectPropertyLint"/> 		
- 	</extension>	-->  
+ 	</extension>   -->
   </plugin>

@@ -49,11 +49,13 @@ import uk.ac.manchester.cs.owl.lint.commons.SimpleMatchBasedLintReport;
  *         Bio-Health Informatics Group<br>
  *         Feb 12, 2008
  */
-public class PatternBasedLintImpl<O extends OWLObject> implements PatternBasedLint<O> {
+public class PatternBasedLintImpl<O extends OWLObject> implements
+		PatternBasedLint<O> {
 	private final Set<LintPattern<O>> patterns = new HashSet<LintPattern<O>>();
 	private final String name = null;
 
-	protected PatternBasedLintImpl(Collection<? extends LintPattern<O>> lintPatterns) {
+	protected PatternBasedLintImpl(
+			Collection<? extends LintPattern<O>> lintPatterns) {
 		for (LintPattern<O> lintPattern : lintPatterns) {
 			this.patterns.add(lintPattern);
 		}
@@ -74,9 +76,10 @@ public class PatternBasedLintImpl<O extends OWLObject> implements PatternBasedLi
 	 * @return the {@link LintReport} after the execution of this {@link Lint}
 	 *         on the input Set of OWLOntology
 	 * @throws LintException
-	 * @see org.semanticweb.owl.lint.Lint#detected(java.util.Set)
+	 * @see org.semanticweb.owl.lint.Lint#detected(Collection)
 	 */
-	public LintReport<O> detected(Collection<? extends OWLOntology> targets) throws LintException {
+	public LintReport<O> detected(Collection<? extends OWLOntology> targets)
+			throws LintException {
 		Iterator<LintPattern<O>> it = this.patterns.iterator();
 		LintPattern<O> lintPattern;
 		boolean unsatisfiablePatternConjunction = false;
@@ -90,8 +93,8 @@ public class PatternBasedLintImpl<O extends OWLObject> implements PatternBasedLi
 			}
 			unsatisfiablePatternConjunction = patternMatches.isEmpty();
 		}
-		SimpleMatchBasedLintReport<O> lintReport = new SimpleMatchBasedLintReport<O>(this,
-				patternMatches);
+		SimpleMatchBasedLintReport<O> lintReport = new SimpleMatchBasedLintReport<O>(
+				this, patternMatches);
 		return lintReport;
 	}
 
