@@ -17,4 +17,6 @@ public interface LintConfigurationVisitor {
 
 	void visitPropertiesBasedLintConfiguration(
 			PropertyBasedLintConfiguration propertiesBasedLintConfiguration);
+
+	void visitGenericLintConfiguration(LintConfiguration lintConfiguration);
 }

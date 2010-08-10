@@ -16,4 +16,7 @@ public abstract class LintConfigurationVisitorAdapter implements LintConfigurati
 	public void visitPropertiesBasedLintConfiguration(
 			PropertyBasedLintConfiguration propertiesBasedLintConfiguration) {
 	}
+
+	public void visitGenericLintConfiguration(LintConfiguration lintConfiguration) {
+	}
 }
