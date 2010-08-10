@@ -32,7 +32,6 @@ import org.semanticweb.owl.lint.PatternReport;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
-
 /**
  * @author Luigi Iannone
  * 
@@ -45,7 +44,7 @@ public abstract class OntologyWiseLintPattern<O extends OWLObject> implements
 	/**
 	 * Executes the match one OWLOntology at time
 	 * 
-	 * @see org.semanticweb.owl.lint.LintPattern#matches(java.util.Set)
+	 * @see org.semanticweb.owl.lint.LintPattern#matches(Collection)
 	 */
 	public PatternReport<O> matches(Collection<? extends OWLOntology> targets)
 			throws LintException {

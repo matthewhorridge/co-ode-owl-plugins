@@ -78,8 +78,15 @@ public class LintManagerFactory {
 	}
 
 	/**
-	 * @param instance
-	 *            the instance to set
+	 * Default factory method
+	 * 
+	 * @param ontologyManager
+	 *            The OWLOntologyManager. Cannot be {@code null}.
+	 * @param reasoner
+	 *            The reasoner
+	 * @return the default LintManagerFactory
+	 * @throws NullPointerException
+	 *             if the input OWLOntologyManager is {@code null}.
 	 */
 	public static LintManagerFactory getInstance(
 			OWLOntologyManager ontologyManager, OWLReasoner reasoner) {

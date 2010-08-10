@@ -61,13 +61,6 @@ public interface LintReport<O extends OWLObject> {
 	Lint<O> getLint();
 
 	/**
-	 * Sets the Lint originating this report
-	 * 
-	 * @param lint
-	 */
-	void setLint(Lint<O> lint);
-
-	/**
 	 * Adds the input OWLObject to the this LintReport for the input ontology
 	 * 
 	 * @param object

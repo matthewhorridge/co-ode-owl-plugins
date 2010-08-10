@@ -14,6 +14,8 @@ import org.semanticweb.owl.lint.configuration.LintConfiguration;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
+import uk.ac.manchester.cs.owl.lint.commons.SimpleMatchBasedLintReport;
+
 public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
 		LintProtegePluginInstance<O> {
 	private static final String NAME_PARAM = "label";
@@ -48,7 +50,10 @@ public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
 	 */
 	public LintReport<O> detected(Collection<? extends OWLOntology> targets)
 			throws LintException {
-		return this.getDelegate().detected(targets);
+		LintReport<O> detected = this.getDelegate().detected(targets);
+		SimpleMatchBasedLintReport<O> toReturn = new SimpleMatchBasedLintReport<O>(
+				this, detected);
+		return toReturn;
 	}
 
 	/**

@@ -30,8 +30,7 @@ public abstract class DefaultLintVisitorEx<O> implements LintVisitorEx<O> {
 	}
 
 	/**
-	 * @see org.semanticweb.owl.lint.LintVisitorEx#visitGenericLint(org.semanticweb
-	 *      .owl.lint.Lint)
+	 * @see org.semanticweb.owl.lint.LintVisitorEx#visitGenericLint(org.semanticweb.owl.lint.Lint)
 	 */
 	public O visitGenericLint(Lint<?> lint) {
 		return this.doDefault(lint);

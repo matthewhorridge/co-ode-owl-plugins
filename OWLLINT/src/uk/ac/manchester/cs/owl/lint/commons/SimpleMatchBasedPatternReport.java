@@ -101,8 +101,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @param o
-	 * @return
+	 * 
 	 * @see java.util.Map#equals(java.lang.Object)
 	 */
 	@Override
@@ -111,8 +110,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @param e
-	 * @return
+	 * 
 	 * @see java.util.Set#add(java.lang.Object)
 	 */
 	public boolean add(Match<O> e) {
@@ -120,8 +118,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @param c
-	 * @return
+	 * 
 	 * @see java.util.Set#addAll(java.util.Collection)
 	 */
 	public boolean addAll(Collection<? extends Match<O>> c) {
@@ -137,8 +134,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @param o
-	 * @return
+	 * 
 	 * @see java.util.Set#contains(java.lang.Object)
 	 */
 	public boolean contains(Object o) {
@@ -146,8 +142,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @param c
-	 * @return
+	 * 
 	 * @see java.util.Set#containsAll(java.util.Collection)
 	 */
 	public boolean containsAll(Collection<?> c) {
@@ -155,7 +150,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @return
+	 * 
 	 * @see java.util.Set#hashCode()
 	 */
 	@Override
@@ -164,7 +159,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @return
+	 * 
 	 * @see java.util.Set#isEmpty()
 	 */
 	public boolean isEmpty() {
@@ -172,7 +167,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @return
+	 * 
 	 * @see java.util.Set#iterator()
 	 */
 	public Iterator<Match<O>> iterator() {
@@ -180,8 +175,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @param o
-	 * @return
+	 * 
 	 * @see java.util.Set#remove(java.lang.Object)
 	 */
 	public boolean remove(Object o) {
@@ -189,8 +183,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @param c
-	 * @return
+	 * 
 	 * @see java.util.Set#removeAll(java.util.Collection)
 	 */
 	public boolean removeAll(Collection<?> c) {
@@ -198,8 +191,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @param c
-	 * @return
+	 * 
 	 * @see java.util.Set#retainAll(java.util.Collection)
 	 */
 	public boolean retainAll(Collection<?> c) {
@@ -207,7 +199,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @return
+	 * 
 	 * @see java.util.Set#size()
 	 */
 	public int size() {
@@ -215,7 +207,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @return
+	 * 
 	 * @see java.util.Set#toArray()
 	 */
 	public Object[] toArray() {
@@ -223,10 +215,8 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @param <T>
-	 * @param a
-	 * @return
-	 * @see java.util.Set#toArray(T[])
+	 * 
+	 * @see java.util.Set#toArray(Object[])
 	 */
 	public <T> T[] toArray(T[] a) {
 		return this.delegate.toArray(a);

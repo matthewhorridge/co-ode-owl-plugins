@@ -43,7 +43,37 @@ import org.semanticweb.owl.model.OWLOntology;
 public final class SimpleMatchBasedLintReport<O extends OWLObject> implements
 		LintReport<O> {
 	private Set<Match<O>> matches = new HashSet<Match<O>>();
-	protected Lint<O> lint;
+	private final Lint<O> lint;
+
+	/**
+	 * Creates a new SimpleMatchBasedLintReport based on the result contained in
+	 * another LintReport. This report will have as its Lint the one specified
+	 * in the first input parameter. The one in the input LintReport will be
+	 * ignored.
+	 * 
+	 * @param lint
+	 *            The Lint of this SimpleMatchBasedLintReport. Cannot be {@code
+	 *            null}.
+	 * @param report
+	 *            The LintReport from which the results will copied. Cannot be
+	 *            {@code null}.
+	 * @throws NullPointerException
+	 *             when either input is {@code null}.
+	 */
+	public SimpleMatchBasedLintReport(Lint<O> lint, LintReport<O> report) {
+		this(lint);
+		if (report == null) {
+			throw new NullPointerException("The report to copy cannot be null");
+		}
+		for (OWLOntology owlOntology : report.getAffectedOntologies()) {
+			Set<O> affectedOWLObjects = report
+					.getAffectedOWLObjects(owlOntology);
+			for (O owlClass : affectedOWLObjects) {
+				this.add(owlClass, owlOntology, report.getExplanation(owlClass,
+						owlOntology));
+			}
+		}
+	}
 
 	public SimpleMatchBasedLintReport(Lint<O> lint) {
 		this(lint, Collections.<Match<O>> emptySet());
@@ -124,10 +154,6 @@ public final class SimpleMatchBasedLintReport<O extends OWLObject> implements
 	 */
 	public Lint<O> getLint() {
 		return this.lint;
-	}
-
-	public void setLint(Lint<O> lint) {
-		this.lint = lint;
 	}
 
 	public void add(O object, OWLOntology affectedOntology) {

@@ -7,6 +7,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.net.URL;
+import java.util.Formatter;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
@@ -28,6 +29,9 @@ import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintPattern;
 import org.semanticweb.owl.lint.LintReport;
 import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owl.model.OWLOntology;
+
+import uk.ac.manchester.cs.owl.lint.commons.LintVisitorAdapter;
 
 /**
  * @author Luigi Iannone
@@ -54,7 +58,7 @@ public class LintRenderer extends OWLCellRenderer implements TreeCellRenderer,
 	public Component getTreeCellRendererComponent(JTree tree, Object value,
 			boolean selected, boolean expanded, boolean leaf, int row,
 			boolean hasFocus) {
-		Component toReturn;
+		final Component toReturn;
 		DefaultMutableTreeNode valueNode = (DefaultMutableTreeNode) value;
 		if (valueNode.isRoot()) {
 			URL url = this.getClass().getClassLoader().getResource(
@@ -94,15 +98,26 @@ public class LintRenderer extends OWLCellRenderer implements TreeCellRenderer,
 				((JPanel) toReturn).add(textPane, BorderLayout.CENTER);
 				LintReport<?> report = (LintReport<?>) nodeUserObject;
 				Lint<?> lint = report.getLint();
-				if (lint instanceof ActingLint<?>) {
-					URL url = this.getClass().getClassLoader().getResource(
-							"hammer.jpg");
-					ImageIcon icon = new ImageIcon(url);
-					((JPanel) toReturn)
-							.add(new JLabel(icon), BorderLayout.EAST);
+				lint.accept(new LintVisitorAdapter() {
+					@Override
+					public void visitActingLint(ActingLint<?> actingLint) {
+						URL url = this.getClass().getClassLoader().getResource(
+								"hammer.jpg");
+						ImageIcon icon = new ImageIcon(url);
+						((JPanel) toReturn).add(new JLabel(icon),
+								BorderLayout.EAST);
+					}
+				});
+				int objectCount = 0;
+				for (OWLOntology ontology : report.getAffectedOntologies()) {
+					objectCount += report.getAffectedOWLObjects(ontology)
+							.size();
 				}
-				textPane.setText(lint.getName() + "{"
-						+ report.getAffectedOntologies().size() + "}");
+				Formatter formatter = new Formatter();
+				formatter.format("%s {Ontologies: %d, OWL Objects: %d}", lint
+						.getName(), report.getAffectedOntologies().size(),
+						objectCount);
+				textPane.setText(formatter.toString());
 				this.render(tree, toReturn, selected);
 			} else {
 				toReturn = this.defaultTreeCellRenderer
