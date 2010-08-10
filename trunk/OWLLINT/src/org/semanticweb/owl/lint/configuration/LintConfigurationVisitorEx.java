@@ -17,4 +17,6 @@ public interface LintConfigurationVisitorEx<O> {
 
 	O visitPropertiesBasedLintConfiguration(
 			PropertyBasedLintConfiguration propertiesBasedLintConfiguration);
+
+	O visitGenericLintConfiguration(LintConfiguration lintConfiguration);
 }

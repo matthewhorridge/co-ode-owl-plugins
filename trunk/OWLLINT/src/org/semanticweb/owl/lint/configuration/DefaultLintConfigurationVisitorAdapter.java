@@ -21,4 +21,8 @@ public abstract class DefaultLintConfigurationVisitorAdapter implements LintConf
 			PropertyBasedLintConfiguration propertiesBasedLintConfiguration) {
 		this.doDefault(propertiesBasedLintConfiguration);
 	}
+
+	public void visitGenericLintConfiguration(LintConfiguration lintConfiguration) {
+		this.doDefault(lintConfiguration);
+	}
 }
