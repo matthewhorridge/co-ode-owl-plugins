@@ -1,0 +1,1 @@
+Transitive property lint; ?x:OBJECTPROPERTY, ?y:OBJECTPROPERTY SELECT ?y subPropertyOf ?x, Transitive: ?y, Transitive: ?x  WHERE ?x!= ?y BEGIN REMOVE Transitive: ?y END; RETURN ?y; Lint that corrects the undesirable situation in which a transitive object property is sub-property of another transitive object property  
