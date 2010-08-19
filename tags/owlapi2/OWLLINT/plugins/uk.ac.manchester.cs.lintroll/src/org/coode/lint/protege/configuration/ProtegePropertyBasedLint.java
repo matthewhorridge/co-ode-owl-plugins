@@ -31,8 +31,8 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 			throw new NullPointerException("The delegate cannot be null");
 		}
 		this.delegate = delegate;
-		this.lintConfiguration = new ProtegePreferenceLintConfiguration(this
-				.getId(), delegate.getLintConfiguration());
+		this.lintConfiguration = new ProtegePreferenceLintConfiguration(this.getId(),
+				delegate.getLintConfiguration());
 	}
 
 	/**
@@ -41,8 +41,7 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 	 * @throws LintException
 	 * @see org.semanticweb.owl.lint.Lint#detected(java.util.Collection)
 	 */
-	public LintReport<O> detected(Collection<? extends OWLOntology> targets)
-			throws LintException {
+	public LintReport<O> detected(Collection<? extends OWLOntology> targets) throws LintException {
 		return this.delegate.detected(targets);
 	}
 
@@ -60,6 +59,10 @@ public final class ProtegePropertyBasedLint<O extends OWLObject> implements
 	 */
 	public String getDescription() {
 		return this.delegate.getDescription();
+	}
+
+	public boolean isInferenceRequired() {
+		return this.delegate.isInferenceRequired();
 	}
 
 	/**

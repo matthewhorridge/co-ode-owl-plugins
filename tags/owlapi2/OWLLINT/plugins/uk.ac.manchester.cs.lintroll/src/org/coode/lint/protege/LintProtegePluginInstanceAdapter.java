@@ -25,8 +25,7 @@ public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
 	/**
 	 * @param delegate
 	 */
-	private LintProtegePluginInstanceAdapter(Lint<O> delegate,
-			IExtension extension) {
+	private LintProtegePluginInstanceAdapter(Lint<O> delegate, IExtension extension) {
 		if (delegate == null) {
 			throw new NullPointerException("The lint cannot be null");
 		}
@@ -48,11 +47,9 @@ public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
 	 * @throws LintException
 	 * @see org.semanticweb.owl.lint.Lint#detected(java.util.Collection)
 	 */
-	public LintReport<O> detected(Collection<? extends OWLOntology> targets)
-			throws LintException {
+	public LintReport<O> detected(Collection<? extends OWLOntology> targets) throws LintException {
 		LintReport<O> detected = this.getDelegate().detected(targets);
-		SimpleMatchBasedLintReport<O> toReturn = new SimpleMatchBasedLintReport<O>(
-				this, detected);
+		SimpleMatchBasedLintReport<O> toReturn = new SimpleMatchBasedLintReport<O>(this, detected);
 		return toReturn;
 	}
 
@@ -61,8 +58,10 @@ public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
 	 * @see org.semanticweb.owl.lint.Lint#getName()
 	 */
 	public String getName() {
-		return PluginProperties.getParameterValue(this.getExtension(),
-				NAME_PARAM, this.delegate.getName());
+		return PluginProperties.getParameterValue(
+				this.getExtension(),
+				NAME_PARAM,
+				this.delegate.getName());
 	}
 
 	@Override
@@ -89,6 +88,10 @@ public class LintProtegePluginInstanceAdapter<O extends OWLObject> implements
 
 	public <P> P accept(LintVisitorEx<P> visitor) {
 		return this.getDelegate().accept(visitor);
+	}
+
+	public boolean isInferenceRequired() {
+		return this.delegate.isInferenceRequired();
 	}
 
 	@Override

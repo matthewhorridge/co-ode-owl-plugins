@@ -69,4 +69,8 @@ public final class NonLeafNoInfoLint implements Lint<OWLClass> {
 	public LintConfiguration getLintConfiguration() {
 		return NonConfigurableLintConfiguration.getInstance();
 	}
+
+	public boolean isInferenceRequired() {
+		return this.delegate.isInferenceRequired();
+	}
 }

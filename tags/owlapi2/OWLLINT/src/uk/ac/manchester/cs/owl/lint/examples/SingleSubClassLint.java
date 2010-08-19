@@ -51,9 +51,8 @@ public final class SingleSubClassLint implements PatternBasedLint<OWLClass> {
 	private PatternBasedLint<OWLClass> instance;
 
 	public SingleSubClassLint() {
-		this.instance = LintManagerFactory.getInstance().getLintManager()
-				.getLintFactory().createLint(
-						Collections.singleton(new SingleSubClassLintPattern()));
+		this.instance = LintManagerFactory.getInstance().getLintManager().getLintFactory().createLint(
+				Collections.singleton(new SingleSubClassLintPattern()));
 	}
 
 	public String getDescription() {
@@ -64,8 +63,8 @@ public final class SingleSubClassLint implements PatternBasedLint<OWLClass> {
 		return this.instance.getPatterns();
 	}
 
-	public LintReport<OWLClass> detected(
-			Collection<? extends OWLOntology> targets) throws LintException {
+	public LintReport<OWLClass> detected(Collection<? extends OWLOntology> targets)
+			throws LintException {
 		LintReport<OWLClass> detected = this.instance.detected(targets);
 		SimpleMatchBasedLintReport<OWLClass> toReturn = new SimpleMatchBasedLintReport<OWLClass>(
 				this, detected);
@@ -86,5 +85,9 @@ public final class SingleSubClassLint implements PatternBasedLint<OWLClass> {
 
 	public <P> P accept(LintVisitorEx<P> visitor) {
 		return this.instance.accept(visitor);
+	}
+
+	public boolean isInferenceRequired() {
+		return this.instance.isInferenceRequired();
 	}
 }

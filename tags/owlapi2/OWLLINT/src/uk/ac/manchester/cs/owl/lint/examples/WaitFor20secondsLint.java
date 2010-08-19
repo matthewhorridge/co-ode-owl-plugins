@@ -64,4 +64,8 @@ public final class WaitFor20secondsLint implements Lint<OWLObject> {
 	public LintConfiguration getLintConfiguration() {
 		return NonConfigurableLintConfiguration.getInstance();
 	}
+
+	public boolean isInferenceRequired() {
+		return false;
+	}
 }

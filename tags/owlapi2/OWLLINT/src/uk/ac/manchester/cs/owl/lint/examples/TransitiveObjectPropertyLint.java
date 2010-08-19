@@ -97,4 +97,8 @@ public final class TransitiveObjectPropertyLint implements ActingLint<OWLObjectP
 	public LintConfiguration getLintConfiguration() {
 		return NonConfigurableLintConfiguration.getInstance();
 	}
+
+	public boolean isInferenceRequired() {
+		return false;
+	}
 }

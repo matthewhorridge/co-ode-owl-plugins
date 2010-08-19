@@ -43,4 +43,12 @@ public interface LintPattern<O extends OWLObject> {
 	 * @throws LintException
 	 */
 	PatternReport<O> matches(Collection<? extends OWLOntology> targets) throws LintException;
+
+	/**
+	 * Determines weather this LintPattern requires inference.
+	 * 
+	 * @return {@code true} if a reasoner is required for this Lint to work
+	 *         properly <code>false</code> otherwise.
+	 */
+	public boolean isInferenceRequired();
 }
