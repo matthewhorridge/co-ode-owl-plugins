@@ -64,4 +64,12 @@ public interface Lint<O extends OWLObject> {
 	 * @return a LintConfiguration
 	 */
 	LintConfiguration getLintConfiguration();
+
+	/**
+	 * Determines weather this Lint requires inference.
+	 * 
+	 * @return {@code true} if a reasoner is required for this Lint to work
+	 *         properly <code>false</code> otherwise.
+	 */
+	public boolean isInferenceRequired();
 }

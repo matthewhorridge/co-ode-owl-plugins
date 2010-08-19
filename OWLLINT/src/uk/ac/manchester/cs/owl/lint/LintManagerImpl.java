@@ -23,15 +23,19 @@
 package uk.ac.manchester.cs.owl.lint;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.semanticweb.owl.inference.OWLReasoner;
+import org.semanticweb.owl.lint.DefaultLintReportVisitorAdapter;
+import org.semanticweb.owl.lint.ErrorLintReport;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintException;
 import org.semanticweb.owl.lint.LintFactory;
 import org.semanticweb.owl.lint.LintManager;
 import org.semanticweb.owl.lint.LintReport;
+import org.semanticweb.owl.lint.WarningLintReport;
 import org.semanticweb.owl.model.OWLOntology;
 import org.semanticweb.owl.model.OWLOntologyManager;
 
@@ -50,8 +54,7 @@ public final class LintManagerImpl implements LintManager {
 	 * @param ontologyManager
 	 * @param reasoner
 	 */
-	public LintManagerImpl(OWLOntologyManager ontologyManager,
-			OWLReasoner reasoner) {
+	public LintManagerImpl(OWLOntologyManager ontologyManager, OWLReasoner reasoner) {
 		assert ontologyManager != null;
 		this.ontologyManager = ontologyManager;
 		this.reasoner = reasoner;
@@ -63,11 +66,32 @@ public final class LintManagerImpl implements LintManager {
 	 */
 	public Set<LintReport<?>> run(Collection<? extends Lint<?>> lints,
 			Collection<? extends OWLOntology> targets) throws LintException {
-		Set<LintReport<?>> toReturn = new HashSet<LintReport<?>>();
+		final Set<LintReport<?>> toReturn = new HashSet<LintReport<?>>();
 		for (Lint<?> lint : lints) {
-			LintReport<?> lintReport = lint.detected(targets);
-			if (!lintReport.getAffectedOntologies().isEmpty()) {
-				toReturn.add(lintReport);
+			try {
+				LintReport<?> lintReport = lint.detected(targets);
+				if (lint.isInferenceRequired() && this.reasoner == null) {
+					lintReport = WarningLintReport.buildWarningReport(
+							lintReport,
+							Collections.singleton("The results may not be accurate as the reasoner should have been turned on"));
+				}
+				lintReport.accept(new DefaultLintReportVisitorAdapter() {
+					@Override
+					protected void doDefault(LintReport<?> lintReport) {
+						if (!lintReport.getAffectedOntologies().isEmpty()) {
+							toReturn.add(lintReport);
+						}
+					}
+
+					@Override
+					public void visitWarningLintReport(WarningLintReport<?> warningLintReport) {
+						toReturn.add(warningLintReport);
+					}
+				});
+			} catch (Throwable t) {
+				// Cannot interrupt the run of the detection of lint just
+				// because one throws an Error/Exception
+				toReturn.add(ErrorLintReport.buildErrorReport(lint, t));
 			}
 		}
 		return toReturn;

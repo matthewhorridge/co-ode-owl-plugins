@@ -88,4 +88,21 @@ public interface LintReport<O extends OWLObject> {
 	 *         input ontology, it can be null
 	 */
 	String getExplanation(OWLObject object, OWLOntology affectedOntology);
+
+	/**
+	 * Visitor pattern for LintReport
+	 * 
+	 * @param lintReportVisitor
+	 */
+	public void accept(LintReportVisitor lintReportVisitor);
+
+	/**
+	 * Visitor pattern with return value for LintReport
+	 * 
+	 * @param <P>
+	 *            the type of the return value
+	 * @param lintReportVisitor
+	 * @return
+	 */
+	public <P> P accept(LintReportVisitorEx<P> lintReportVisitor);
 }

@@ -29,6 +29,8 @@ import java.util.Set;
 
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintReport;
+import org.semanticweb.owl.lint.LintReportVisitor;
+import org.semanticweb.owl.lint.LintReportVisitorEx;
 import org.semanticweb.owl.lint.PatternReport;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
@@ -40,8 +42,7 @@ import org.semanticweb.owl.model.OWLOntology;
  *         Bio-Health Informatics Group<br>
  *         Feb 18, 2008
  */
-public final class SimpleMatchBasedLintReport<O extends OWLObject> implements
-		LintReport<O> {
+public final class SimpleMatchBasedLintReport<O extends OWLObject> implements LintReport<O> {
 	private Set<Match<O>> matches = new HashSet<Match<O>>();
 	private final Lint<O> lint;
 
@@ -52,8 +53,8 @@ public final class SimpleMatchBasedLintReport<O extends OWLObject> implements
 	 * ignored.
 	 * 
 	 * @param lint
-	 *            The Lint of this SimpleMatchBasedLintReport. Cannot be {@code
-	 *            null}.
+	 *            The Lint of this SimpleMatchBasedLintReport. Cannot be
+	 *            {@code null}.
 	 * @param report
 	 *            The LintReport from which the results will copied. Cannot be
 	 *            {@code null}.
@@ -66,11 +67,9 @@ public final class SimpleMatchBasedLintReport<O extends OWLObject> implements
 			throw new NullPointerException("The report to copy cannot be null");
 		}
 		for (OWLOntology owlOntology : report.getAffectedOntologies()) {
-			Set<O> affectedOWLObjects = report
-					.getAffectedOWLObjects(owlOntology);
+			Set<O> affectedOWLObjects = report.getAffectedOWLObjects(owlOntology);
 			for (O owlClass : affectedOWLObjects) {
-				this.add(owlClass, owlOntology, report.getExplanation(owlClass,
-						owlOntology));
+				this.add(owlClass, owlOntology, report.getExplanation(owlClass, owlOntology));
 			}
 		}
 	}
@@ -136,8 +135,7 @@ public final class SimpleMatchBasedLintReport<O extends OWLObject> implements
 	public void addPatternReport(PatternReport<O> patternReport) {
 		Set<OWLOntology> ontologies = patternReport.getAffectedOntologies();
 		for (OWLOntology ontology : ontologies) {
-			Set<O> affectedOWLObjects = patternReport
-					.getAffectedOWLObjects(ontology);
+			Set<O> affectedOWLObjects = patternReport.getAffectedOWLObjects(ontology);
 			for (O object : affectedOWLObjects) {
 				this.matches.add(new Match<O>(object, ontology));
 			}
@@ -158,6 +156,14 @@ public final class SimpleMatchBasedLintReport<O extends OWLObject> implements
 
 	public void add(O object, OWLOntology affectedOntology) {
 		this.matches.add(new Match<O>(object, affectedOntology));
+	}
+
+	public void accept(LintReportVisitor lintReportVisitor) {
+		lintReportVisitor.visitGenericLintReport(this);
+	}
+
+	public <P> P accept(LintReportVisitorEx<P> lintReportVisitor) {
+		return lintReportVisitor.visitGenericLintReport(this);
 	}
 
 	public void add(O object, OWLOntology affectedOntology, String explanation) {

@@ -45,8 +45,7 @@ import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
  *         Bio-Health Informatics Group<br>
  *         Feb 13, 2008
  */
-public final class SingleSubClassLintPattern extends
-		OntologyWiseLintPattern<OWLClass> {
+public final class SingleSubClassLintPattern extends OntologyWiseLintPattern<OWLClass> {
 	/**
 	 * @return the set of {@link OWLClass} that have just one <b>asserted</b>
 	 *         subclass in the input {@link OWLOntology}
@@ -54,17 +53,14 @@ public final class SingleSubClassLintPattern extends
 	 * @see org.semanticweb.owl.lint.LintPattern#matches(org.semanticweb.owl.model.OWLOntology)
 	 */
 	@Override
-	public Set<Match<OWLClass>> matches(OWLOntology ontology)
-			throws LintException {
+	public Set<Match<OWLClass>> matches(OWLOntology ontology) throws LintException {
 		Set<Match<OWLClass>> toReturn = new HashSet<Match<OWLClass>>();
 		Set<OWLClass> nothing = new HashSet<OWLClass>();
 		try {
-			OWLReasoner reasoner = LintManagerFactory.getInstance()
-					.getReasoner();
+			OWLReasoner reasoner = LintManagerFactory.getInstance().getReasoner();
 			if (reasoner instanceof NoOpReasoner || reasoner == null) {
 				for (OWLClass cls : ontology.getReferencedClasses()) {
-					Set<OWLDescription> subClasses = cls
-							.getSubClasses(ontology);
+					Set<OWLDescription> subClasses = cls.getSubClasses(ontology);
 					int count = 0;
 					Iterator<OWLDescription> it = subClasses.iterator();
 					while (count <= 1 && it.hasNext()) {
@@ -89,8 +85,7 @@ public final class SingleSubClassLintPattern extends
 					Set<Set<OWLClass>> subClasses = reasoner.getSubClasses(cls);
 					subClasses.remove(nothing);
 					if (subClasses.size() == 1) {
-						Set<OWLClass> subclassEquivalenceClass = subClasses
-								.iterator().next();
+						Set<OWLClass> subclassEquivalenceClass = subClasses.iterator().next();
 						if (subclassEquivalenceClass.size() == 1) {
 							toReturn.add(new Match<OWLClass>(cls, ontology,
 									"The class has only got one sub-class"));
@@ -102,5 +97,9 @@ public final class SingleSubClassLintPattern extends
 			throw new LintException(e);
 		}
 		return toReturn;
+	}
+
+	public boolean isInferenceRequired() {
+		return true;
 	}
 }

@@ -25,9 +25,12 @@ import javax.swing.tree.TreeCellRenderer;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owl.lint.ActingLint;
+import org.semanticweb.owl.lint.ErrorLintReport;
 import org.semanticweb.owl.lint.Lint;
 import org.semanticweb.owl.lint.LintPattern;
 import org.semanticweb.owl.lint.LintReport;
+import org.semanticweb.owl.lint.LintReportVisitor;
+import org.semanticweb.owl.lint.WarningLintReport;
 import org.semanticweb.owl.model.OWLObject;
 import org.semanticweb.owl.model.OWLOntology;
 
@@ -37,15 +40,14 @@ import uk.ac.manchester.cs.owl.lint.commons.LintVisitorAdapter;
  * @author Luigi Iannone
  * 
  */
-public class LintRenderer extends OWLCellRenderer implements TreeCellRenderer,
-		ListCellRenderer {
+public class LintRenderer extends OWLCellRenderer implements TreeCellRenderer, ListCellRenderer {
 	private OWLCellRenderer owlCellRenderer;
 	private DefaultTreeCellRenderer defaultTreeCellRenderer = new DefaultTreeCellRenderer();
 	private DefaultListCellRenderer defaultListCellRenderer = new DefaultListCellRenderer();
-	public static final Color SELECTION_BACKGROUND = UIManager.getDefaults()
-			.getColor("List.selectionBackground");
-	public static final Color SELECTION_FOREGROUND = UIManager.getDefaults()
-			.getColor("List.selectionForeground");
+	public static final Color SELECTION_BACKGROUND = UIManager.getDefaults().getColor(
+			"List.selectionBackground");
+	public static final Color SELECTION_FOREGROUND = UIManager.getDefaults().getColor(
+			"List.selectionForeground");
 
 	public LintRenderer(OWLEditorKit owlEditorKit) {
 		super(owlEditorKit);
@@ -55,81 +57,125 @@ public class LintRenderer extends OWLCellRenderer implements TreeCellRenderer,
 	}
 
 	@Override
-	public Component getTreeCellRendererComponent(JTree tree, Object value,
-			boolean selected, boolean expanded, boolean leaf, int row,
-			boolean hasFocus) {
+	public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
+			boolean expanded, boolean leaf, int row, boolean hasFocus) {
 		final Component toReturn;
 		DefaultMutableTreeNode valueNode = (DefaultMutableTreeNode) value;
 		if (valueNode.isRoot()) {
-			URL url = this.getClass().getClassLoader().getResource(
-					"lintroll.jpg");
+			URL url = this.getClass().getClassLoader().getResource("lintroll.jpg");
 			ImageIcon newIcon = new ImageIcon(url);
 			if (valueNode.isLeaf()) {
 				this.defaultTreeCellRenderer.setLeafIcon(newIcon);
-				toReturn = this.defaultTreeCellRenderer
-						.getTreeCellRendererComponent(tree, value, selected,
-								expanded, leaf, row, hasFocus);
-				this.defaultTreeCellRenderer
-						.setLeafIcon(this.defaultTreeCellRenderer
-								.getDefaultLeafIcon());
+				toReturn = this.defaultTreeCellRenderer.getTreeCellRendererComponent(
+						tree,
+						value,
+						selected,
+						expanded,
+						leaf,
+						row,
+						hasFocus);
+				this.defaultTreeCellRenderer.setLeafIcon(this.defaultTreeCellRenderer.getDefaultLeafIcon());
 			} else {
 				this.defaultTreeCellRenderer.setOpenIcon(newIcon);
 				this.defaultTreeCellRenderer.setClosedIcon(newIcon);
-				toReturn = this.defaultTreeCellRenderer
-						.getTreeCellRendererComponent(tree, "", selected,
-								expanded, leaf, row, hasFocus);
-				this.defaultTreeCellRenderer
-						.setOpenIcon(this.defaultTreeCellRenderer
-								.getDefaultOpenIcon());
-				this.defaultTreeCellRenderer
-						.setClosedIcon(this.defaultTreeCellRenderer
-								.getDefaultClosedIcon());
+				toReturn = this.defaultTreeCellRenderer.getTreeCellRendererComponent(
+						tree,
+						"",
+						selected,
+						expanded,
+						leaf,
+						row,
+						hasFocus);
+				this.defaultTreeCellRenderer.setOpenIcon(this.defaultTreeCellRenderer.getDefaultOpenIcon());
+				this.defaultTreeCellRenderer.setClosedIcon(this.defaultTreeCellRenderer.getDefaultClosedIcon());
 			}
 		} else {
 			Object nodeUserObject = valueNode.getUserObject();
 			if (nodeUserObject instanceof OWLObject) {
 				toReturn = this.owlCellRenderer.getTreeCellRendererComponent(
-						tree, nodeUserObject, selected, expanded, leaf, row,
+						tree,
+						nodeUserObject,
+						selected,
+						expanded,
+						leaf,
+						row,
 						hasFocus);
 			} else if (nodeUserObject instanceof LintReport<?>) {
 				toReturn = new JPanel(new BorderLayout());
-				JTextPane textPane = new JTextPane();
-				textPane.setOpaque(false);
-				((JPanel) toReturn).add(textPane, BorderLayout.CENTER);
 				LintReport<?> report = (LintReport<?>) nodeUserObject;
-				Lint<?> lint = report.getLint();
-				lint.accept(new LintVisitorAdapter() {
-					@Override
-					public void visitActingLint(ActingLint<?> actingLint) {
-						URL url = this.getClass().getClassLoader().getResource(
-								"hammer.jpg");
+				final JTextPane textPane = new JTextPane();
+				((JPanel) toReturn).add(textPane, BorderLayout.CENTER);
+				report.accept(new LintReportVisitor() {
+					public void visitGenericLintReport(LintReport<?> genericLintReport) {
+						Lint<?> lint = genericLintReport.getLint();
+						lint.accept(new LintVisitorAdapter() {
+							@Override
+							public void visitActingLint(ActingLint<?> actingLint) {
+								URL url = this.getClass().getClassLoader().getResource("hammer.jpg");
+								ImageIcon icon = new ImageIcon(url);
+								((JPanel) toReturn).add(new JLabel(icon), BorderLayout.EAST);
+							}
+						});
+						int objectCount = 0;
+						for (OWLOntology ontology : genericLintReport.getAffectedOntologies()) {
+							objectCount += genericLintReport.getAffectedOWLObjects(ontology).size();
+						}
+						Formatter formatter = new Formatter();
+						formatter.format(
+								"%s {Ontologies: %d, OWL Objects: %d}",
+								lint.getName(),
+								genericLintReport.getAffectedOntologies().size(),
+								objectCount);
+						textPane.setText(formatter.toString());
+					}
+
+					public void visitErrorLintReport(ErrorLintReport<?> errorLintReport) {
+						URL url = this.getClass().getClassLoader().getResource("error.png");
 						ImageIcon icon = new ImageIcon(url);
-						((JPanel) toReturn).add(new JLabel(icon),
-								BorderLayout.EAST);
+						((JPanel) toReturn).add(new JLabel(icon), BorderLayout.WEST);
+						Formatter formatter = new Formatter();
+						formatter.format(
+								"%s Encountered an error: %s",
+								errorLintReport.getLint().getName(),
+								errorLintReport.getThrowable().getMessage());
+						textPane.setText(formatter.toString());
+					}
+
+					public void visitWarningLintReport(WarningLintReport<?> warningLintReport) {
+						URL url = this.getClass().getClassLoader().getResource("warning.png");
+						ImageIcon icon = new ImageIcon(url);
+						((JPanel) toReturn).add(new JLabel(icon), BorderLayout.WEST);
+						int objectCount = 0;
+						for (OWLOntology ontology : warningLintReport.getAffectedOntologies()) {
+							objectCount += warningLintReport.getAffectedOWLObjects(ontology).size();
+						}
+						Formatter formatter = new Formatter();
+						formatter.format(
+								"%s {Ontologies: %d, OWL Objects: %d} warnings: %s",
+								warningLintReport.getLint().getName(),
+								warningLintReport.getAffectedOntologies().size(),
+								objectCount,
+								warningLintReport.getWarnings());
+						textPane.setText(formatter.toString());
 					}
 				});
-				int objectCount = 0;
-				for (OWLOntology ontology : report.getAffectedOntologies()) {
-					objectCount += report.getAffectedOWLObjects(ontology)
-							.size();
-				}
-				Formatter formatter = new Formatter();
-				formatter.format("%s {Ontologies: %d, OWL Objects: %d}", lint
-						.getName(), report.getAffectedOntologies().size(),
-						objectCount);
-				textPane.setText(formatter.toString());
+				textPane.setOpaque(false);
 				this.render(tree, toReturn, selected);
 			} else {
-				toReturn = this.defaultTreeCellRenderer
-						.getTreeCellRendererComponent(tree, value, selected,
-								expanded, leaf, row, hasFocus);
+				toReturn = this.defaultTreeCellRenderer.getTreeCellRendererComponent(
+						tree,
+						value,
+						selected,
+						expanded,
+						leaf,
+						row,
+						hasFocus);
 			}
 		}
 		return toReturn;
 	}
 
-	private void render(Component renderingComponent, Component toReturn,
-			boolean selected) {
+	private void render(Component renderingComponent, Component toReturn, boolean selected) {
 		if (selected) {
 			toReturn.setBackground(SELECTION_BACKGROUND);
 			toReturn.setForeground(SELECTION_FOREGROUND);
@@ -141,20 +187,22 @@ public class LintRenderer extends OWLCellRenderer implements TreeCellRenderer,
 	}
 
 	@Override
-	public Component getListCellRendererComponent(JList list, Object value,
-			int index, boolean isSelected, boolean cellHasFocus) {
+	public Component getListCellRendererComponent(JList list, Object value, int index,
+			boolean isSelected, boolean cellHasFocus) {
 		Component toReturn;
 		if (value instanceof Lint<?>) {
 			toReturn = new JTextPane();
 			((JTextPane) toReturn).setText(((Lint<?>) value).getName());
 		} else if (value instanceof LintPattern<?>) {
 			toReturn = new JTextPane();
-			((JTextPane) toReturn).setText(((LintPattern<?>) value).getClass()
-					.getSimpleName());
+			((JTextPane) toReturn).setText(((LintPattern<?>) value).getClass().getSimpleName());
 		} else {
-			toReturn = this.defaultListCellRenderer
-					.getListCellRendererComponent(list, value, index,
-							isSelected, cellHasFocus);
+			toReturn = this.defaultListCellRenderer.getListCellRendererComponent(
+					list,
+					value,
+					index,
+					isSelected,
+					cellHasFocus);
 		}
 		this.render(list, toReturn, isSelected);
 		return toReturn;

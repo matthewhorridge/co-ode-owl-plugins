@@ -40,8 +40,7 @@ import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
  *         Bio-Health Informatics Group<br>
  *         Feb 13, 2008
  */
-public class RedundantInfoInSubClassesLintPattern extends
-		OntologyWiseLintPattern<OWLClass> {
+public class RedundantInfoInSubClassesLintPattern extends OntologyWiseLintPattern<OWLClass> {
 	/**
 	 * @return the Set of OWLObject that have redundant information in their
 	 *         subclasses
@@ -51,12 +50,10 @@ public class RedundantInfoInSubClassesLintPattern extends
 	public Set<Match<OWLClass>> matches(OWLOntology target) {
 		Set<Match<OWLClass>> toReturn = new HashSet<Match<OWLClass>>();
 		for (OWLClass owlClass : target.getReferencedClasses()) {
-			boolean hasRedundancy = this.hasRedundantInfoInSubclasses(owlClass,
-					target);
+			boolean hasRedundancy = this.hasRedundantInfoInSubclasses(owlClass, target);
 			if (hasRedundancy) {
-				toReturn
-						.add(new Match<OWLClass>(owlClass, target,
-								"It contains redundant information about its superclasses"));
+				toReturn.add(new Match<OWLClass>(owlClass, target,
+						"It contains redundant information about its superclasses"));
 			}
 		}
 		return toReturn;
@@ -73,8 +70,7 @@ public class RedundantInfoInSubClassesLintPattern extends
 			firstsuperS.remove(c);
 			while (csubSIT.hasNext()) {
 				OWLClass csubC = csubSIT.next().asOWLClass();
-				Set<OWLDescription> nextsuperS = csubC.asOWLClass()
-						.getSuperClasses(ont);
+				Set<OWLDescription> nextsuperS = csubC.asOWLClass().getSuperClasses(ont);
 				Iterator<OWLDescription> firstsuperSIT = firstsuperS.iterator();
 				while (firstsuperSIT.hasNext() && !firstsuperS.isEmpty()) {
 					OWLDescription firstsuperC = firstsuperSIT.next();
@@ -86,5 +82,9 @@ public class RedundantInfoInSubClassesLintPattern extends
 			toReturn = !firstsuperS.isEmpty();
 		}
 		return toReturn;
+	}
+
+	public boolean isInferenceRequired() {
+		return false;
 	}
 }
