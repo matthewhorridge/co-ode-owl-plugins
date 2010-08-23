@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="uk.ac.manchester.cs.lintroll" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="uk.ac.manchester.cs.lintroll" id="LoaderFactory" name="LoaderFactory"/>
+      </appinfo>
+      <documentation>
+         LoaderFactory provides a way for defining new Lint Plug-ins
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="label"/>
+            <element ref="class"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="label">
+      <annotation>
+         <documentation>
+            The label that will appear in the view menu etc.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="class">
+      <annotation>
+         <documentation>
+            The class that should be instantiated to create the LoaderFactory.
+        This must implement the org.coode.lint.protege.loader.extensions.LoaderFactory<O> interface
+        where O extends 
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=" org.coode.lint.protege.loader.extensions.LoaderFactory<O>:"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+
+
+
+
+
+</schema>
