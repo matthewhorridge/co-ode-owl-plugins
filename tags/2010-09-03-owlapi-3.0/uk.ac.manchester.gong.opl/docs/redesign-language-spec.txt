@@ -1,0 +1,55 @@
+// If we were to make this a much more powerful language what features would be required?
+// Nick Drummond 30/11/2007
+
+Require more conditions.
+This begins to sound like the LHS of a SWRL rule
+
+existing: annotation, descendantOf, equivalentTo, subClassOf, subPropertyOf
+
+require:
+    identity
+        isClass(x)
+        isIndividual(x)
+        isObjectProperty(x)
+        isDataProperty(x)
+        isDataRange(x)
+    
+    all reasoner queries
+        r.isSatisfiable(OWLClass c)
+
+        r.isSubClassOf(OWLClass, OWLDescription)
+        r.isEquivalentClass(OWLClass, OWLDescription)
+
+        r.hasType(owlIndividual, OWLDescription)
+        r.hasObjectPropertyRelationship(owlIndividual, OWLObjectPropertyExpression, OWLIndividual)
+        r.hasDataPropertyRelationship(OWLIndividual, OWLDataPropertyExpression OWLConstant owlConstant)
+
+        r.isFunctional(OWLObjectProperty)
+        r.isInverseFunctional(OWLObjectProperty)
+        r.isSymmetric(OWLObjectProperty)
+        r.isTransitive(OWLObjectProperty)
+        r.isReflexive(OWLObjectProperty)
+        r.isIrreflexive(OWLObjectProperty)
+        r.isAntiSymmetric(OWLObjectProperty)
+
+    annotations
+        hasAnnotation(?x, Annotation, regexp)
+
+    structural queries (about the asserted axioms)
+
+
+    boolean combinations of conditions
+        negation of conditions
+        composition of conditions
+            intersection
+            union
+
+    multiple variables
+
+examples
+
+    // get subclasses of all classes with a label ending with "Cheese"
+    SELECT ?x, ?y WHERE hasAnnotation(?y, label, ".*Cheese"), r.isSubClassOf(?x, ?y);
+
+- how do we know in which order to evaluate the sequence of conditions?
+    - 

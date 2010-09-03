@@ -1,0 +1,13 @@
+This is a list of the tasks which still need to be completed in order to get the FEDERATION plug-in to work:
+
+ - Refactor the ChangeCapsule out of the server package into an independent module
+ - Decouple the OWL-API from the HTTP servlet server
+ - Create a way for a new "baseline" to be created on the server for a new ontology
+ - Debug the Protege plug-in GUI to make it work nicely
+ (- Create a locking version management strategy where the locks ensure referential integrity is preserved, so check-ins and check-outs can be interleaved)
+
+ If there are any question, please contact:
+
+ Julian Seidenberg
+ j@deltaflow.com
+ http://www.deltaflow.com
