@@ -16,8 +16,8 @@ http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.cloud.p
 // Outline View
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.existentialtree.properties
 
-// Matrix Views
-http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.matrix.properties
+// Matrix Views - not working yet
+// http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.matrix.properties
 
 // OBO tools
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.obotools.properties
