@@ -5,7 +5,7 @@ http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.annotat
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.bookmark.properties
 
 // Cardinality View
-http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.cardinality.properties
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.cardinality-owlapi-3.1.properties
 
 // Change View
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.change.properties
