@@ -1,0 +1,40 @@
+// Annotate View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.annotate.properties
+
+// Bookmark View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.bookmark.properties
+
+// Cardinality View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.cardinality.properties
+
+// Change View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.change.properties
+
+// Cloud Views
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.cloud.properties
+
+// Outline View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.existentialtree.properties
+
+// Matrix Views
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.matrix.properties
+
+// OBO tools
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.obotools.properties
+
+// OWLDoc
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.owldoc.properties
+
+// Pun tools
+//http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.puntools.properties
+
+// Search
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.search.properties
+
+// Beanshell
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.shell.properties
+
+// Example Tabbed Subclasses
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.taxonomy.properties
+
+// TODO calculations etc

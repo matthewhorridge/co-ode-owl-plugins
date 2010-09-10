@@ -70,12 +70,14 @@
             <property name="classes" location="${build}/classes.existentialtree"/>
         </ant>
 
-        <echo message = "Building Matrix plugin"/>
+        <echo message = "Warning - Matrix plugin not ready"/>
+        <!-- 
         <ant antfile="./build.xml"
              dir="./matrix"
              target="${sub.target}">
             <property name="classes" location="${build}/classes.matrix"/>
         </ant>
+        -->
 
 
         <echo message = "Building Nerd plugin"/>
