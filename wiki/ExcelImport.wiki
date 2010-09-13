@@ -2,6 +2,11 @@
 
 = Excel Import =
 
+
+*The excel import plugin is no longer supported and may not work on recent versions of Protege*
+
+
+
 == Description ==
 Load excel or CSV files and generate classes from the content. Provide rules to create restrictions between columns.
 
