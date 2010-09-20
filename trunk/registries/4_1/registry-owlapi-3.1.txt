@@ -2,7 +2,7 @@
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.annotate.properties
 
 // Bookmark View
-http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.bookmark.properties
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.bookmark-owlapi-3.1.properties
 
 // Cardinality View
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.cardinality-owlapi-3.1.properties
