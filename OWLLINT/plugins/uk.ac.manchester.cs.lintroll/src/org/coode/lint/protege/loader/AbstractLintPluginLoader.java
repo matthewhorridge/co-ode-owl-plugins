@@ -50,4 +50,7 @@ public abstract class AbstractLintPluginLoader<O extends ProtegePlugin<E>, E ext
 			LintProtegePluginInstance<P> lint) {
 		return ProtegePropertyBasedLint.buildProtegePropertyBasedLint(lint);
 	}
+
+	public void dispose() {
+	}
 }
