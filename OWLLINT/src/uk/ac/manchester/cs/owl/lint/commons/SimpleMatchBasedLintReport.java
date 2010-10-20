@@ -104,8 +104,7 @@ public final class SimpleMatchBasedLintReport<O extends OWLObject> implements Li
 	}
 
 	/**
-	 * 
-	 * @see org.semanticweb.owlapi.lint.LintReport#getAffectedOWLObjects(org.semanticweb.owl.model.OWLOntology)
+	 * @see org.semanticweb.owlapi.lint.LintReport#getAffectedOWLObjects(org.semanticweb.owlapi.model.OWLOntology)
 	 */
 	public Set<O> getAffectedOWLObjects(OWLOntology ontology) {
 		Set<O> toReturn = new HashSet<O>();
@@ -118,7 +117,7 @@ public final class SimpleMatchBasedLintReport<O extends OWLObject> implements Li
 	}
 
 	/**
-	 * @see org.semanticweb.owlapi.lint.LintReport#isAffected(org.semanticweb.owl.model.OWLOntology)
+	 * @see org.semanticweb.owlapi.lint.LintReport#isAffected(org.semanticweb.owlapi.model.OWLOntology)
 	 */
 	public boolean isAffected(OWLOntology ontology) {
 		return this.getAffectedOntologies().contains(ontology);

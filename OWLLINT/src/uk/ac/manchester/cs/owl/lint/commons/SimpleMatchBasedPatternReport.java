@@ -40,8 +40,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
  *         Bio-Health Informatics Group<br>
  *         Feb 18, 2008
  */
-public final class SimpleMatchBasedPatternReport<O extends OWLObject>
-		implements PatternReport<O> {
+public final class SimpleMatchBasedPatternReport<O extends OWLObject> implements PatternReport<O> {
 	private final Set<Match<O>> delegate = new HashSet<Match<O>>();
 	private final LintPattern<O> lintPattern;
 
@@ -55,15 +54,14 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 			throw new NullPointerException("The pattern cannot be null");
 		}
 		if (matches == null) {
-			throw new NullPointerException(
-					"The matches collection cannot be null");
+			throw new NullPointerException("The matches collection cannot be null");
 		}
 		this.lintPattern = pattern;
 		this.delegate.addAll(matches);
 	}
 
 	/**
-	 * @see org.semanticweb.owlapi.lint.PatternReport#getAffectedOWLObjects(org.semanticweb.owl.model.OWLOntology)
+	 * @see org.semanticweb.owlapi.lint.PatternReport#getAffectedOWLObjects(org.semanticweb.owlapi.model.OWLOntology)
 	 */
 	public Set<O> getAffectedOWLObjects(OWLOntology ontology) {
 		Set<O> toReturn = new HashSet<O>();
@@ -87,7 +85,7 @@ public final class SimpleMatchBasedPatternReport<O extends OWLObject>
 	}
 
 	/**
-	 * @see org.semanticweb.owlapi.lint.PatternReport#isAffected(org.semanticweb.owl.model.OWLOntology)
+	 * @see org.semanticweb.owlapi.lint.PatternReport#isAffected(org.semanticweb.owlapi.model.OWLOntology)
 	 */
 	public boolean isAffected(OWLOntology ontology) {
 		return this.getAffectedOntologies().contains(ontology);
