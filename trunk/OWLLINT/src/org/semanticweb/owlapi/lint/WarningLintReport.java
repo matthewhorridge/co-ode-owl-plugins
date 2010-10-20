@@ -69,16 +69,13 @@ public final class WarningLintReport<O extends OWLObject> implements LintReport<
 	}
 
 	/**
-	 * @param ontology
-	 * @return
-	 * @see org.semanticweb.owlapi.lint.LintReport#getAffectedOWLObjects(org.semanticweb.owl.model.OWLOntology)
+	 * @see org.semanticweb.owlapi.lint.LintReport#getAffectedOWLObjects(org.semanticweb.owlapi.model.OWLOntology)
 	 */
 	public Set<O> getAffectedOWLObjects(OWLOntology ontology) {
 		return this.delegate.getAffectedOWLObjects(ontology);
 	}
 
 	/**
-	 * @return
 	 * @see org.semanticweb.owlapi.lint.LintReport#getAffectedOntologies()
 	 */
 	public Set<OWLOntology> getAffectedOntologies() {
@@ -86,16 +83,13 @@ public final class WarningLintReport<O extends OWLObject> implements LintReport<
 	}
 
 	/**
-	 * @param ontology
-	 * @return
-	 * @see org.semanticweb.owlapi.lint.LintReport#isAffected(org.semanticweb.owl.model.OWLOntology)
+	 * @see org.semanticweb.owlapi.lint.LintReport#isAffected(org.semanticweb.owlapi.model.OWLOntology)
 	 */
 	public boolean isAffected(OWLOntology ontology) {
 		return this.delegate.isAffected(ontology);
 	}
 
 	/**
-	 * @return
 	 * @see org.semanticweb.owlapi.lint.LintReport#getLint()
 	 */
 	public Lint<O> getLint() {
@@ -103,32 +97,24 @@ public final class WarningLintReport<O extends OWLObject> implements LintReport<
 	}
 
 	/**
-	 * @param object
-	 * @param affectedOntology
-	 * @see org.semanticweb.owlapi.lint.LintReport#add(org.semanticweb.owl.model.OWLObject,
-	 *      org.semanticweb.owl.model.OWLOntology)
+	 * @see org.semanticweb.owlapi.lint.LintReport#add(org.semanticweb.owlapi.model.OWLObject,
+	 *      org.semanticweb.owlapi.model.OWLOntology)
 	 */
 	public void add(O object, OWLOntology affectedOntology) {
 		this.delegate.add(object, affectedOntology);
 	}
 
 	/**
-	 * @param object
-	 * @param affectedOntology
-	 * @param explanation
-	 * @see org.semanticweb.owlapi.lint.LintReport#add(org.semanticweb.owl.model.OWLObject,
-	 *      org.semanticweb.owl.model.OWLOntology, java.lang.String)
+	 * @see org.semanticweb.owlapi.lint.LintReport#add(org.semanticweb.owlapi.model.OWLObject,
+	 *      org.semanticweb.owlapi.model.OWLOntology, java.lang.String)
 	 */
 	public void add(O object, OWLOntology affectedOntology, String explanation) {
 		this.delegate.add(object, affectedOntology, explanation);
 	}
 
 	/**
-	 * @param object
-	 * @param affectedOntology
-	 * @return
-	 * @see org.semanticweb.owlapi.lint.LintReport#getExplanation(org.semanticweb.owl.model.OWLObject,
-	 *      org.semanticweb.owl.model.OWLOntology)
+	 * @see org.semanticweb.owlapi.lint.LintReport#getExplanation(org.semanticweb.owlapi.model.OWLObject,
+	 *      org.semanticweb.owlapi.model.OWLOntology)
 	 */
 	public String getExplanation(OWLObject object, OWLOntology affectedOntology) {
 		return this.delegate.getExplanation(object, affectedOntology);

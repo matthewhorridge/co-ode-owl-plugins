@@ -102,7 +102,7 @@ public interface LintReport<O extends OWLObject> {
 	 * @param <P>
 	 *            the type of the return value
 	 * @param lintReportVisitor
-	 * @return
+	 * @return depends on the implementation
 	 */
 	public <P> P accept(LintReportVisitorEx<P> lintReportVisitor);
 }
