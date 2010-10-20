@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.protege.editor.owl.model.inference.NoOpReasoner;
 import org.semanticweb.owlapi.lint.LintException;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
@@ -46,8 +45,7 @@ import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
  *         Bio-Health Informatics Group<br>
  *         Feb 13, 2008
  */
-public final class SingleSubClassLintPattern extends
-		OntologyWiseLintPattern<OWLClass> {
+public final class SingleSubClassLintPattern extends OntologyWiseLintPattern<OWLClass> {
 	/**
 	 * @return the set of {@link OWLClass} that have just one <b>asserted</b>
 	 *         subclass in the input {@link OWLOntology}
@@ -55,16 +53,13 @@ public final class SingleSubClassLintPattern extends
 	 * @see org.semanticweb.owlapi.lint.LintPattern#matches(org.semanticweb.owl.model.OWLOntology)
 	 */
 	@Override
-	public Set<Match<OWLClass>> matches(OWLOntology ontology)
-			throws LintException {
+	public Set<Match<OWLClass>> matches(OWLOntology ontology) throws LintException {
 		Set<Match<OWLClass>> toReturn = new HashSet<Match<OWLClass>>();
 		try {
-			OWLReasoner reasoner = LintManagerFactory.getInstance()
-					.getReasoner();
-			if (reasoner instanceof NoOpReasoner || reasoner == null) {
+			OWLReasoner reasoner = LintManagerFactory.getInstance().getReasoner();
+			if (reasoner == null) {
 				for (OWLClass cls : ontology.getClassesInSignature()) {
-					Set<OWLClassExpression> subClasses = cls
-							.getSubClasses(ontology);
+					Set<OWLClassExpression> subClasses = cls.getSubClasses(ontology);
 					int count = 0;
 					Iterator<OWLClassExpression> it = subClasses.iterator();
 					while (count <= 1 && it.hasNext()) {
@@ -83,11 +78,9 @@ public final class SingleSubClassLintPattern extends
 				// therefore
 				// they are presented in sets
 				for (OWLClass cls : ontology.getClassesInSignature()) {
-					NodeSet<OWLClass> subClasses = reasoner.getSubClasses(cls,
-							true);
+					NodeSet<OWLClass> subClasses = reasoner.getSubClasses(cls, true);
 					Set<OWLClass> flattened = subClasses.getFlattened();
-					flattened.remove(ontology.getOWLOntologyManager()
-							.getOWLDataFactory().getOWLNothing());
+					flattened.remove(ontology.getOWLOntologyManager().getOWLDataFactory().getOWLNothing());
 					if (flattened.size() == 1) {
 						toReturn.add(new Match<OWLClass>(cls, ontology,
 								"The class has only got one sub-class"));
