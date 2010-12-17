@@ -18,6 +18,7 @@ http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.existen
 
 // Matrix Views - not working yet
 // http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.matrix.properties
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/matrix/etc/update.matrix.properties
 
 // OBO tools
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.obotools.properties
