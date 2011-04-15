@@ -23,9 +23,6 @@ http://co-ode-owl-plugins.googlecode.com/svn/trunk/matrix/etc/update.matrix.prop
 // OBO tools
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.obotools.properties
 
-// OWLDoc
-http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.owldoc-owlapi-3.1.properties
-
 // Pun tools
 //http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.puntools.properties
 
