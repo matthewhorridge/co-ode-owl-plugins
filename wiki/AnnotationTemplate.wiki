@@ -7,7 +7,6 @@ A view that can be configured to show a set of standard annotation fields for ev
 
 Useful when developing in a consortium and some standard metadata set should always be entered.
 
-
 == Features ==
   * Concise viewing/editing of annotations of interest
   * Quick move between fields with (Ctrl-Tab/Shift-Ctrl-Tab)
@@ -19,10 +18,8 @@ Useful when developing in a consortium and some standard metadata set should alw
 <a href="http://protegewiki.stanford.edu/images/4/4d/Annotate.png">
 <img src="http://protegewiki.stanford.edu/images/4/4d/Annotate.png" width = "500"/></a>
 
-
-== Find the plugin ==
-
-Find the view under the *Window | Views | Misc views | Annotation template* menu
+== Find the view ==
+Enable the view by selecting *Window | Views | Misc views | Annotation template* from the menu
 
 == Download ==
 
