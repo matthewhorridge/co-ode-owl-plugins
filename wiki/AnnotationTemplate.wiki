@@ -17,7 +17,7 @@ Useful when developing in a consortium and some standard metadata set should alw
 == Screenshots ==
 
 <a href="http://protegewiki.stanford.edu/images/4/4d/Annotate.png">
-<img src="http://protegewiki.stanford.edu/images/4/4d/Annotate.png"/></a>
+<img src="http://protegewiki.stanford.edu/images/4/4d/Annotate.png" width = "500"/></a>
 
 
 == Find the plugin ==
