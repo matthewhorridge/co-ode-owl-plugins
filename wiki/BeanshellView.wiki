@@ -90,7 +90,7 @@ The beanshell is a view plugin. Find it under the *View | Misc views | Bean Shel
 
 == Download ==
 
-[http://code.google.com/p/co-ode-owl-plugins/downloads/list?q=shell download]
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=beanshell download]
 
 == Author ==
 
