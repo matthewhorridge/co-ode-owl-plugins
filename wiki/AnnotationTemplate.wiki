@@ -23,7 +23,7 @@ Enable the view by selecting *Window | Views | Misc views | Annotation template*
 
 == Download ==
 
-[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=annotate download]
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=annotation+template+view download]
 
 == Author ==
 
