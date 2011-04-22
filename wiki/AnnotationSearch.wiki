@@ -17,7 +17,7 @@ A view for searching entity annotations for a string or regular expression match
 
 == Find the plugin ==
 
-Find the view under the *View | Misc views | Search Annotations* menu
+Find the view under the *Window | Views | Misc views | Search Annotations* menu
 
 == Download ==
 
