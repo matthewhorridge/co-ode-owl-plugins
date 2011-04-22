@@ -21,7 +21,7 @@ Find the view under the *Window | Views | Misc views | Search Annotations* menu
 
 == Download ==
 
-[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=search download]
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=annotation+search+view download]
 
 == Author ==
 
