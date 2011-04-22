@@ -21,7 +21,7 @@ Press *Command-B* or find it under the *Tools* menu
 
 == Download ==
 
-[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=bookmark download]
+[http://code.google.com/p/co-ode-owl-plugins/downloads/list?can=2&q=bookmarks download]
 
 == Author ==
 
