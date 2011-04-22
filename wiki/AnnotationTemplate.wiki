@@ -11,17 +11,18 @@ Useful when developing in a consortium and some standard metadata set should alw
 == Features ==
   * Concise viewing/editing of annotations of interest
   * Quick move between fields with (Ctrl-Tab/Shift-Ctrl-Tab)
-  * Configure the view *File | Preferences | Annotate Preferences*
+  * Configure the view *File | Preferences | Annotation template*
   * Share configurations through import/export
 
 == Screenshots ==
 
-<a href="http://www.co-ode.org/downloads/protege-x/plugins/images/annotate.png"><img src="http://www.co-ode.org/downloads/protege-x/plugins/images/annotate.png" width="400" /></a>
+<a href="http://protegewiki.stanford.edu/images/4/4d/Annotate.png">
+<img src="http://protegewiki.stanford.edu/images/4/4d/Annotate.png"/></a>
 
 
 == Find the plugin ==
 
-Find the view under the *View | Misc views | Annotate View* menu
+Find the view under the *Window | Views | Misc views | Annotation template* menu
 
 == Download ==
 
