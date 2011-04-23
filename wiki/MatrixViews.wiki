@@ -26,14 +26,14 @@ Several spreadsheet-style views of an ontology, including existential fillers, i
 
 == The plugins ==
 
-=== Tabs menu ===
+=== Window | Tabs menu ===
 
 Two default tab layouts are provided:
 
   * Matrix
   * Property Matrix
 
-=== Views menu ===
+=== Window | Views menu ===
 
 All of the matrices are implemented as views so you can add them into your own custom tabs:
 
