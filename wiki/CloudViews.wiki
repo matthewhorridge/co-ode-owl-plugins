@@ -27,7 +27,7 @@ The bigger the name, the higher the rating. Sort alphabetically or by rating, an
 
 == Find the plugin ==
 
-Find them under the *View | Cloud views* menu
+Find them under the *Window | Views | Cloud views* menu
 
 == Download ==
 
