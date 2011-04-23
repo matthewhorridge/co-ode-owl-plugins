@@ -32,7 +32,7 @@ A straightforward view that allows two loaded ontologies to be selected for side
 
 == Find the plugins ==
 
-Find the Changes and Diff Vies under the *View | Misc views* menu
+Find the Changes and Diff Vies under the *Window | Views | Misc views* menu
 
 == Download ==
 
