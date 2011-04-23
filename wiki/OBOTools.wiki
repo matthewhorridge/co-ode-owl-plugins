@@ -26,7 +26,7 @@ A view for listing the obsolete terms separately from the rest of the hierarchy.
 
 == Find the plugin ==
 
-Find them under the *View | Class views* menu
+Find them under the *Window | Views | Class views* menu
 
 == Download ==
 
