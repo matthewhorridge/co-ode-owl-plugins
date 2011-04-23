@@ -16,7 +16,7 @@ If several different restrictions are along the same property with the same fill
 
 == Find the plugin ==
 
-Find it under the *View | Class views* menu
+Find it under the *Window | Views | Class views* menu
 
 == Download ==
 
