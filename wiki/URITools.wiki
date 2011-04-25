@@ -12,7 +12,7 @@ Entity URI just shows the URI of the last selected entity
 
 == Find the plugin ==
 
-Entity URI is a view plugin. Find it under the *View | Misc views | Entity URI* menu
+Entity URI is a view plugin. Find it under the *Window | Views | Misc views | Entity URI* menu
 
 == Download ==
 
