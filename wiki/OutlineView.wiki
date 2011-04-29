@@ -36,7 +36,7 @@ To enable this view select the single property you wish to follow by using the a
 
 == Find the plugin ==
 
-Find them under the *View | Class views* menu
+Find them under the *Window | Views | Class views* menu
 
 == Download ==
 
