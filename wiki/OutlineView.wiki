@@ -1,6 +1,6 @@
 #summary Navigate your ontology structure using various properties
 
-= Outline/Existential View =
+= Outline/Existential Tree Views =
 
 == Description ==
 The subsumption hierarchy is not the only "axis" on which an ontology relies. Many other axis (such as partOf) can be useful for navigation.
