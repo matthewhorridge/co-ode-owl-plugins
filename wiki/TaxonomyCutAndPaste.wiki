@@ -1,6 +1,6 @@
 #summary Show the class hierarchy in plain text
 
-= Outline/Existential View =
+= Taxonomy Cut+Paste =
 
 == Description ==
 Sometimes, all you need is a quick extract of a part of your hierarchy for a paper or presentation.
@@ -20,7 +20,7 @@ Does the same without indentation. Just cut and paste into your favourite applic
 
 == Find the plugin ==
 
-Find them under the *View | Class views* menu
+Find them under the *Window | Views | Class views* menu
 
 == Download ==
 
