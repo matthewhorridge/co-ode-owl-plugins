@@ -6,7 +6,7 @@
    <property file="version.properties"/>
    <property name="major.version" value="1"/>
    <property name="minor.version" value="1"/>
-   <property name="micro.version" value="1"/>
+   <property name="micro.version" value="2"/>
 
    <!--
         To run this build file set the environment variable
@@ -213,16 +213,55 @@
            overwrite = "true"/>
    </target>
 
-   <target name = "dist" depends="jar">
-       <zip destfile="${build}/${plugin}_${major.version}_${minor.version}_${micro.version}.zip">
+   <target name = "clean">
+     <delete dir = "${build}"/>
+   </target>
+
+   <!-- ===================================================================  -->
+   <!-- Distribution Support - Optional                                      -->
+   <!-- ===================================================================  -->
+
+   <property name="svn.root" value="https://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.uri"/>
+
+   <property name="update.properties.file" value="${svn.root}/etc/update.properties"/>
+   <property name="readme.file"            value="${svn.root}/etc/version-readme.html"/>
+   <property name="versioned.zip"          value="${plugin}_${major.version}_${minor.version}_${micro.version}.zip"/>
+
+   <property name="download"               value="http://co-ode-owl-plugins.googlecode.com/files/${versioned.zip}"/>
+
+
+   <target name = "make.versioned" depends="jar">
+       <zip destfile="${build}/${versioned.zip}">
            <fileset dir="${build}">
                <filename name="${plugin}.jar"/>
            </fileset>
        </zip>
    </target>
 
-   <target name = "clean">
-     <delete dir = "${build}"/>
+   <target name = "dist" depends="make.versioned">
+       <echo file="./etc/update.properties" append="false">
+id=${plugin}
+version=${bundle.version}
+download=${download}
+name=URI Utilities
+readme=${readme.file}
+license=http://www.gnu.org/licenses/lgpl.html
+author=CO-ODE, The University of Manchester
+       </echo>
+       <echo message="The build file should ensure that"/>
+       <echo message="1. The bundle version and id is correct."/>
+       <echo message="Check the following things"/>
+       <echo message="1. The main repository uses "/>
+       <echo message="      ${update.properties.file}"/>
+       <echo message="   to find this update"/>
+       <echo message="2. The update.properties can be found at "/>
+       <echo message="      ${update.properties.file}"/>
+       <echo message="   Usually this is ensured by committing your changed files."/>
+       <echo message="3. The readme file for this update can be found at"/>
+       <echo message="      ${readme.file}"/>
+       <echo message="   Usually this is ensured by committing your changed files."/>
+       <echo message="4. The download for this update can be found at"/>
+       <echo message="      ${download}"/>
    </target>
 
 </project>
