@@ -6,7 +6,7 @@
    <property file="version.properties"/>
    <property name="major.version" value="1"/>
    <property name="minor.version" value="1"/>
-   <property name="micro.version" value="2"/>
+   <property name="micro.version" value="1"/>
 
    <!--
         To run this build file set the environment variable
@@ -82,7 +82,10 @@
         libraries that have been uncovered in buildlibs.
      -->
    <target name = "checkProtegeLibs">
-     <echo message="Using Protege Home = ${protege.home} to find protege jars"/>
+     <echo message="**********************************************************"/>
+     <echo message="Using Protege Home = ${protege.home}"/>
+     <echo message="Using Java Version = ${ant.java.version}" />
+     <echo message="**********************************************************"/>
      <condition property="libs.found">
        <and>
 	 <available file="${equinox.common}" type = "file"/>
