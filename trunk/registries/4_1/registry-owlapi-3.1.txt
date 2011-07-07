@@ -1,6 +1,9 @@
 // Annotate View
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.annotate.properties
 
+// Beanshell
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.shell.properties
+
 // Bookmark View
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.bookmark-owlapi-3.1.properties
 
@@ -12,6 +15,9 @@ http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.change.
 
 // Cloud Views
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.cloud.properties
+
+// Example Tabbed Subclasses
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.taxonomy.properties
 
 // Outline View
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.existentialtree.properties
@@ -29,10 +35,8 @@ http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.obotool
 // Search
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.search.properties
 
-// Beanshell
-http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.shell.properties
-
-// Example Tabbed Subclasses
-http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.taxonomy.properties
+// URI Utilities
+https://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.uri/etc/update.properties
 
 // TODO calculations etc
+
