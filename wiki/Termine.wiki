@@ -1,6 +1,6 @@
 #summary Populate your ontology using text extraction
 
-= TerMine =
+= !TerMine =
 
 == Description ==
 The !TerMine plug-in uses text mining tools to extract candidate terms from a corpus of text and provides an interface for rapidly bringing these terms into an OWL ontology.  It currently uses the [http://www.nactem.ac.uk/software/termine/ TerMine] term extraction tool provided by The National Centre for Text Mining (NaCTeM) to extract concepts from text. The plug-in accesses !TerMine via web services.
