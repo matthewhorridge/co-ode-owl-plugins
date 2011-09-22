@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pluginUpdateInfo version="1.1.1" id="org.coode.search" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://protege.googlecode.com/svn/trunk/autoupdate/4_1/PluginUpdateInfo.xsd">
 
-	<name>Annotation Search Views</name>
+	<name>Annotation Search View</name>
 
 	<author>CO-ODE, The University of Manchester</author>
 
