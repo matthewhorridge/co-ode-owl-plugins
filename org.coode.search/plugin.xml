@@ -4,7 +4,7 @@
 
     <extension id="SearchAnnotationsView"
                point="org.protege.editor.core.application.ViewComponent">
-        <label value="Search Annotations"/>
+        <label value="Search annotations"/>
         <class value="org.coode.search.view.SearchAnnotationsView"/>
     </extension>
 
