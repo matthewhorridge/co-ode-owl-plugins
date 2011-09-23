@@ -1,6 +1,6 @@
 #summary Several simple views for tracking ontology changes
 
-= Change/Diff View =
+= Changes/Diff Views =
 
 == Description ==
 
@@ -32,7 +32,7 @@ A straightforward view that allows two loaded ontologies to be selected for side
 
 == Find the plugins ==
 
-Find the Changes and Diff Vies under the *Window | Views | Misc views* menu
+Find the Changes and Diff Views under the *Window | Views | Misc views* menu
 
 == Download ==
 
