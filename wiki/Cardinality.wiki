@@ -1,6 +1,6 @@
 #summary An alternative to the Class Description View
 
-= Outline/Existential View =
+= Cardinality View =
 
 == Description ==
 An experimental alternative to the class description view that shows restrictions in relation to their cardinality.
