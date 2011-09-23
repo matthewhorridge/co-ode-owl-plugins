@@ -86,7 +86,7 @@ First make sure a reasoner has been selected and the ontology is classified.
 
 == Find the plugin ==
 
-The beanshell is a view plugin. Find it under the *View | Misc views | Bean Shell* menu
+The beanshell is a view plugin. Find it under the *Window | Views | Misc views | Beanshell* menu
 
 == Download ==
 
