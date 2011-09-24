@@ -1,0 +1,32 @@
+// Annotation Search View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.search/etc/update.search.xml
+
+// Annotation Template View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.annotate/etc/update.annotate.xml
+
+// Beanshell
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.shell/etc/update.shell.xml
+
+// Bookmark View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/bookmark/etc/update.bookmark.xml
+
+// Cardinality View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/cardinality/etc/update.cardinality.xml
+
+// Change View
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.change/etc/update.change.xml
+
+// Cloud Views
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/cloud/etc/update.cloud.xml
+
+// Matrix Views
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/matrix/etc/update.matrix.xml
+
+// OBO Tools
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/obotools/etc/update.obotools.xml
+
+// Outline/Existential Tree Views
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/existentialtree/etc/update.existentialtree.xml
+
+// Taxonomy Cut+Paste
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/taxonomy/etc/update.taxonomy.xml
