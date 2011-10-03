@@ -16,7 +16,7 @@ Find DL Query under the *Tabs* menu.
 
 == Download ==
 
-DL Query is part of the standard Protégé 4.0 distribution
+DL Query is part of the standard Protege 4.0, 4.1, and 4.2 distributions.
 
 == Author ==
 
