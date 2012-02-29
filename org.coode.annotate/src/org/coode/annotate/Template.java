@@ -1,6 +1,7 @@
 package org.coode.annotate;
 
 import org.protege.editor.core.ui.util.Icons;
+import org.protege.editor.owl.ui.renderer.OWLAnnotationCellRenderer2;
 import org.semanticweb.owlapi.model.OWLAnnotationSubject;
 import org.semanticweb.owlapi.model.OWLOntology;
 
@@ -41,7 +42,7 @@ import java.awt.event.MouseEvent;
  */
 public class Template extends JComponent implements Scrollable {
 
-    private static final Color LABEL_COLOUR = new Color(0, 0, 180);
+    private static final Color LABEL_COLOUR = OWLAnnotationCellRenderer2.ANNOTATION_PROPERTY_FOREGROUND;
 
     private TemplateModel model;
 
