@@ -1,5 +1,5 @@
 // Annotate View
-http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.annotate.properties
+http://co-ode-owl-plugins.googlecode.com/svn/trunk/org.coode.annotate/etc/update.annotate.properties
 
 // Beanshell
 http://co-ode-owl-plugins.googlecode.com/svn/trunk/registries/4_1/update.shell.properties
