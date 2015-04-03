@@ -1,6 +1,10 @@
 package test;
 
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.AddImport;
+import org.semanticweb.owlapi.model.AddOntologyAnnotation;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeVisitor;
 /*
  * Copyright (C) 2007, University of Manchester
  *
@@ -23,6 +27,10 @@ import org.semanticweb.owl.model.*;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+import org.semanticweb.owlapi.model.RemoveAxiom;
+import org.semanticweb.owlapi.model.RemoveImport;
+import org.semanticweb.owlapi.model.RemoveOntologyAnnotation;
+import org.semanticweb.owlapi.model.SetOntologyID;
 
 
 /**
@@ -41,17 +49,45 @@ public class ReverseChangeGenerator implements OWLOntologyChangeVisitor {
     }
 
 
+    @Override
     public void visit(AddAxiom change) {
         reverseChange = new RemoveAxiom(change.getOntology(), change.getAxiom());
     }
 
 
+    @Override
     public void visit(RemoveAxiom change) {
         reverseChange = new AddAxiom(change.getOntology(), change.getAxiom());
     }
 
 
-    public void visit(SetOntologyURI change) {
-        reverseChange = new SetOntologyURI(change.getOntology(), change.getOriginalURI());
+    @Override
+    public void visit(SetOntologyID change) {
+        reverseChange = new SetOntologyID(change.getOntology(),
+                change.getOriginalOntologyID());
+    }
+
+    @Override
+    public void visit(AddImport change) {
+        reverseChange = new RemoveImport(change.getOntology(),
+                change.getImportDeclaration());
+    }
+
+    @Override
+    public void visit(RemoveImport change) {
+        reverseChange = new AddImport(change.getOntology(),
+                change.getImportDeclaration());
+    }
+
+    @Override
+    public void visit(AddOntologyAnnotation change) {
+        reverseChange = new RemoveOntologyAnnotation(change.getOntology(),
+                change.getAnnotation());
+    }
+
+    @Override
+    public void visit(RemoveOntologyAnnotation change) {
+        reverseChange = new AddOntologyAnnotation(change.getOntology(),
+                change.getAnnotation());
     }
 }

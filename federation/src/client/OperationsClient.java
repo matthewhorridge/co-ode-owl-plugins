@@ -1,19 +1,26 @@
 package client;
 
-import changeServerPackage.ApplyChangesServlet;
-import changeServerPackage.ChangeCapsule;
-
-import java.net.*;
-import java.io.*;
-import java.util.ArrayList;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyChange;
-import fileManagerPackage.TagReader;
-import fileManagerPackage.TagWriter;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+
+import changeServerPackage.ApplyChangesServlet;
+import changeServerPackage.ChangeCapsule;
 import fileManagerPackage.OntologyFileManager;
+import fileManagerPackage.TagWriter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -51,7 +58,7 @@ public class OperationsClient {
     /** queries the server for the latest change sequence number for this given ontology */
     public Long getLatestVersionNumber(OWLOntology ontology) throws IOException {
         ChangeCapsule commandCapsule = new ChangeCapsule();
-        commandCapsule.setOntologyURI(ontology.getURI().toString());
+        commandCapsule.setOntologyURI(ontology.getOntologyID());
 
         String response = server.issueCommandToServer(ApplyChangesServlet.QUERY, commandCapsule);
 
@@ -73,7 +80,7 @@ public class OperationsClient {
     /** fetches on specific changeCapsule object from the server based upon its sequence number (sequence numbers start from one, not zero)*/
     public ChangeCapsule getSpecificChange(OWLOntology ontology, Long sequenceNumber) throws IOException {
         ChangeCapsule commandCapsule = new ChangeCapsule();
-        commandCapsule.setOntologyURI(ontology.getURI().toString());
+        commandCapsule.setOntologyURI(ontology.getOntologyID());
         commandCapsule.setSequence(sequenceNumber);
 
         String jsonResponse = server.issueCommandToServer(ApplyChangesServlet.UPDATE, commandCapsule);
@@ -105,7 +112,7 @@ public class OperationsClient {
     public String commitChangestoServer(OWLOntology ontology, Long localSequenceNumber, String summary, List<OWLOntologyChange> changes) throws IOException {
         ChangeCapsule changeCapsule = new ChangeCapsule(changes);
         changeCapsule.setUsername(username);
-        changeCapsule.setOntologyURI(ontology.getURI().toString());
+        changeCapsule.setOntologyURI(ontology.getOntologyID());
         changeCapsule.setSequence(localSequenceNumber);
         changeCapsule.setSummary(summary);
 
@@ -130,14 +137,25 @@ public class OperationsClient {
      * the ontology is stored in as a tempoary file (deleted when the virtual machine shuts down) */
     public File downloadSpecificTag(OWLOntology ontology, Long versionNumber) throws IOException {
         //File localFile = File.createTempFile(TEMPDIR+ OntologyFileManager.shortenURI(ontology.getURI().toASCIIString()), TagWriter.TAGPREFIX+latestVersion);
-        File localFile = File.createTempFile(TagWriter.TAGPREFIX+versionNumber, TagWriter.TAGEXTENSION, new File(TEMPDIR+ OntologyFileManager.shortenURI(ontology.getURI().toASCIIString())));
+        File localFile = File.createTempFile(
+                TagWriter.TAGPREFIX + versionNumber,
+                TagWriter.TAGEXTENSION,
+                new File(TEMPDIR
+                        + OntologyFileManager.shortenURI(ontology
+.getOntologyID())));
         OutputStream out = null;
         URLConnection conn;
         //InputStream  in = null;
         GZIPInputStream zipin = null;
         try {
             //url for the latest tag of the current ontology (gzipped)
-            URL url = new URL(server.getServerBase()+"/"+ OntologyFileManager.shortenURI(ontology.getURI().toASCIIString()) + "/"+OntologyFileManager.TAGSFOLDER + "/" + TagWriter.TAGPREFIX+ versionNumber + TagWriter.TAGEXTENSION);
+            URL url = new URL(server.getServerBase()
+                    + "/"
+                    + OntologyFileManager.shortenURI(ontology.getOntologyID())
+                    + "/"
+                    + OntologyFileManager.TAGSFOLDER + "/"
+                    + TagWriter.TAGPREFIX + versionNumber
+                    + TagWriter.TAGEXTENSION);
             out = new BufferedOutputStream(
                 new FileOutputStream(localFile));
             conn = url.openConnection();

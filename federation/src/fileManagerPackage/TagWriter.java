@@ -1,19 +1,28 @@
 package fileManagerPackage;
 
-import changeServerPackage.ChangeCapsule;
-
+import java.io.File;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.io.File;
-import java.io.IOException;
 
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.io.OWLXMLOntologyFormat;
-import org.semanticweb.owl.vocab.OWLRDFVocabulary;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.io.OWLXMLOntologyFormat;
+import org.semanticweb.owlapi.model.AddOntologyAnnotation;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.model.RemoveOntologyAnnotation;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
+
+import changeServerPackage.ChangeCapsule;
 
 /**
  * Created by IntelliJ IDEA.
@@ -31,9 +40,9 @@ public class TagWriter {
 
     public TagWriter(File ontologyFile) throws OWLOntologyCreationException {
         latestOntologyFile = ontologyFile;
-        URI physicalURI = ontologyFile.toURI();
+
         manager = OWLManager.createOWLOntologyManager();
-        latestOntology = manager.loadOntologyFromPhysicalURI(physicalURI);
+        latestOntology = manager.loadOntologyFromOntologyDocument(ontologyFile);
     }
 
 
@@ -67,14 +76,17 @@ public class TagWriter {
         String newFileName = TAGPREFIX + sequenceString + TAGEXTENSION;
 
         //remove existing change version annotation
-        Set<OWLOntologyAnnotationAxiom> allAnnotations = latestOntology.getOntologyAnnotationAxioms();
-        for(OWLOntologyAnnotationAxiom annotation: allAnnotations) {
-            if (annotation.getAnnotation().getAnnotationURI().compareTo(OWLRDFVocabulary.OWL_VERSION_INFO.getURI()) == 0) {
-                if (annotation.getAnnotation().getAnnotationValue() instanceof OWLConstant) {
-                    String literal = ((OWLConstant)annotation.getAnnotation().getAnnotationValue()).getLiteral();
+        Set<OWLAnnotation> allAnnotations = latestOntology.getAnnotations();
+        for (OWLAnnotation annotation : allAnnotations) {
+            if (annotation.getProperty().getIRI()
+                    .compareTo(OWLRDFVocabulary.OWL_VERSION_INFO.getIRI()) == 0) {
+                if (annotation.getValue() instanceof OWLLiteral) {
+                    String literal = ((OWLLiteral) annotation.getValue())
+                            .getLiteral();
                     if (literal.startsWith(TagReader.CHANGEAXIOMPREFIX)) {
                         try {
-                            manager.applyChange(new RemoveAxiom(latestOntology, annotation));
+                            manager.applyChange(new RemoveOntologyAnnotation(
+                                    latestOntology, annotation));
                         } catch (OWLOntologyChangeException e) {
                             e.printStackTrace();
                         }
@@ -84,21 +96,23 @@ public class TagWriter {
         }
 
         //add an annotation to indicate the version of this tag
-        OWLConstant cons = df.getOWLUntypedConstant(TagReader.CHANGEAXIOMPREFIX+sequenceNumber);
-        OWLAnnotation anno = df.getOWLConstantAnnotation(OWLRDFVocabulary.OWL_VERSION_INFO.getURI(), cons);
-        OWLOntologyAnnotationAxiom annoax = df.getOWLOntologyAnnotationAxiom(latestOntology, anno);
+        OWLLiteral cons = df.getOWLLiteral(TagReader.CHANGEAXIOMPREFIX
+                + sequenceNumber);
+        OWLAnnotation anno = df.getOWLAnnotation(df
+                .getOWLAnnotationProperty(OWLRDFVocabulary.OWL_VERSION_INFO
+                        .getIRI()), cons);
 
         try {
-            manager.applyChange(new AddAxiom(latestOntology, annoax));
+            manager.applyChange(new AddOntologyAnnotation(latestOntology, anno));
         } catch (OWLOntologyChangeException e) {
             e.printStackTrace();
         }
 
         //save the tag to disk
         File newFile = new File(latestOntologyFile.getParentFile().getAbsoluteFile().getPath(), newFileName);
-        URI physicalURI2 = newFile.toURI();  //folder and new filename
-        manager.saveOntology(latestOntology, new OWLXMLOntologyFormat(), physicalURI2);
-        manager.removeOntology(latestOntology.getURI());
+        manager.saveOntology(latestOntology, new OWLXMLOntologyFormat(),
+                IRI.create(newFile));
+        manager.removeOntology(latestOntology.getOntologyID());
 
         return newFile;
     }

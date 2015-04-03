@@ -1,16 +1,15 @@
 package client;
 
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLOntologyCreationException;
-import org.semanticweb.owl.apibinding.OWLManager;
-
-import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.zip.GZIPInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.Set;
+
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -73,14 +72,18 @@ public class ConflictManagerClient {
     /** Load an ontology from a file, or return an already loaded file (only keeps one ontology in memory at a time) */
     private OWLOntology loadOntologyFromTag(File tagFile) throws OWLOntologyCreationException {
         if (cachedTag == null) {
-            cachedTag = manager.loadOntologyFromPhysicalURI(tagFile.toURI());   //save a cached copy of the ontology
+            cachedTag = manager.loadOntologyFromOntologyDocument(IRI
+                    .create(tagFile));   // save a cached copy of the ontology
             cachedFile = tagFile;
         } else {
-            if (cachedFile.toURI().toString().compareToIgnoreCase(tagFile.toURI().toString()) == 0) {
+            if (cachedFile.toURI().equals(tagFile.toURI())) {
                 //trying to load the cached ontlogy again, so just return the cached version
             } else {
-                manager.removeOntology(cachedTag.getURI()); //unload the existing cached ontology to free up memory
-                cachedTag = manager.loadOntologyFromPhysicalURI(tagFile.toURI());   //save a cached copy of the new ontology
+                manager.removeOntology(cachedTag); // unload the existing cached
+                                                   // ontology to free up memory
+                cachedTag = manager.loadOntologyFromOntologyDocument(IRI
+                        .create(tagFile));   // save a cached copy of the new
+                                           // ontology
                 cachedFile = tagFile;   //update the cached filename
             }
         }

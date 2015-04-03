@@ -2,9 +2,9 @@ package org.protege.federation;
 
 import client.ChangeMonitor;
 import client.OperationsClient;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyCreationException;
-import org.semanticweb.owl.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

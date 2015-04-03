@@ -1,14 +1,21 @@
 package client;
 
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.vocab.OWLRDFVocabulary;
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
-import fileManagerPackage.TagReader;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
+
 import test.ReverseChangeGenerator;
+import fileManagerPackage.TagReader;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,7 +35,9 @@ public class ChangeMonitor implements OWLOntologyChangeListener {
     public ChangeMonitor(OWLOntology ontology, List<OWLOntologyChange> initialChanges) {
         this.ontology = ontology;
 
-        if (ontology != null && initialChanges != null) recordedChanges.addAll(initialChanges);
+        if (ontology != null && initialChanges != null) {
+            recordedChanges.addAll(initialChanges);
+        }
     }
 
     /** creates an empty change monitor object */
@@ -51,11 +60,13 @@ public class ChangeMonitor implements OWLOntologyChangeListener {
     /** read the change sequence number of an ontology */
     protected Long getOntologySequenceNumber(OWLOntology ontology) {
         Long number = null;
-        Set<OWLOntologyAnnotationAxiom> allAnnotations = ontology.getOntologyAnnotationAxioms();
-        for(OWLOntologyAnnotationAxiom annotation: allAnnotations) {
-            if (annotation.getAnnotation().getAnnotationURI().compareTo(OWLRDFVocabulary.OWL_VERSION_INFO.getURI()) == 0) {
-                if (annotation.getAnnotation().getAnnotationValue() instanceof OWLConstant) {
-                    String literal = ((OWLConstant)annotation.getAnnotation().getAnnotationValue()).getLiteral();
+        Set<OWLAnnotation> allAnnotations = ontology.getAnnotations();
+        for (OWLAnnotation annotation : allAnnotations) {
+            if (annotation.getProperty().getIRI()
+                    .compareTo(OWLRDFVocabulary.OWL_VERSION_INFO.getIRI()) == 0) {
+                if (annotation.getValue() instanceof OWLLiteral) {
+                    String literal = ((OWLLiteral) annotation.getValue())
+                            .getLiteral();
                     if (literal.startsWith(TagReader.CHANGEAXIOMPREFIX)) {
                         number = new Long(literal.substring(TagReader.CHANGEAXIOMPREFIX.length()));
                     }
@@ -66,6 +77,7 @@ public class ChangeMonitor implements OWLOntologyChangeListener {
     }
 
     /** listener method that records changes as they are made */
+    @Override
     public void ontologiesChanged(List<? extends OWLOntologyChange> changes) throws OWLException {
         if (active) {
             for(OWLOntologyChange change : changes) {

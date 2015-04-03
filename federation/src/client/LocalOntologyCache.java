@@ -1,6 +1,6 @@
 package client;
 
-import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 /**
  * Created by IntelliJ IDEA.

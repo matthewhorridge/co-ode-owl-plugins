@@ -1,20 +1,22 @@
 package client;
 
-import changeServerPackage.ChangeCapsule;
-import changeServerPackage.ApplyChangesServlet;
-
-import java.net.*;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.Set;
 
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyAnnotationAxiom;
-import org.semanticweb.owl.model.OWLConstant;
-import org.semanticweb.owl.vocab.OWLRDFVocabulary;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
+
+import changeServerPackage.ApplyChangesServlet;
+import changeServerPackage.ChangeCapsule;
 import fileManagerPackage.TagReader;
 
 /**
@@ -74,7 +76,7 @@ public class ConnectorClient {
         BufferedReader input = new BufferedReader (new InputStreamReader (urlConn.getInputStream()));
         StringBuffer response = new StringBuffer();
         String str;
-        while (null != ((str = input.readLine()))) {
+        while (null != (str = input.readLine())) {
             response.append(str);
         }
 
@@ -129,11 +131,13 @@ public class ConnectorClient {
      /** read the change sequence number of an ontology */
      protected Long getOntologySequenceNumber(OWLOntology ontology) {
          Long number = null;
-         Set<OWLOntologyAnnotationAxiom> allAnnotations = ontology.getOntologyAnnotationAxioms();
-         for(OWLOntologyAnnotationAxiom annotation: allAnnotations) {
-             if (annotation.getAnnotation().getAnnotationURI().compareTo(OWLRDFVocabulary.OWL_VERSION_INFO.getURI()) == 0) {
-                 if (annotation.getAnnotation().getAnnotationValue() instanceof OWLConstant) {
-                     String literal = ((OWLConstant)annotation.getAnnotation().getAnnotationValue()).getLiteral();
+        Set<OWLAnnotation> allAnnotations = ontology.getAnnotations();
+        for (OWLAnnotation annotation : allAnnotations) {
+            if (annotation.getProperty().getIRI()
+                    .equals(OWLRDFVocabulary.OWL_VERSION_INFO.getIRI())) {
+                if (annotation.getValue() instanceof OWLLiteral) {
+                    String literal = ((OWLLiteral) annotation.getValue())
+                            .getLiteral();
                      if (literal.startsWith(TagReader.CHANGEAXIOMPREFIX)) {
                          number = new Long(literal.substring(TagReader.CHANGEAXIOMPREFIX.length()));
                      }

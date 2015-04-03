@@ -1,10 +1,12 @@
 package changeServerPackage;
 
-import fileManagerPackage.OntologyFileManager;
-
 import java.io.IOException;
-import java.util.Date;
 import java.text.DateFormat;
+import java.util.Date;
+
+import org.semanticweb.owlapi.model.OWLOntologyID;
+
+import fileManagerPackage.OntologyFileManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +26,8 @@ public class ChangeServerImpl implements ChangeServer {
     }
 
     /** returns the latest change number for the given ontology URI */
-    public String getLatestChangeNumber(String ontologyURI) {
+    @Override
+    public String getLatestChangeNumber(OWLOntologyID ontologyURI) {
         String changeNumber;
         OntologyFileManager fm;
         try {
@@ -38,7 +41,9 @@ public class ChangeServerImpl implements ChangeServer {
     }
 
     /** returns a serialized verion of the change capsule requested for transfer to requesting client */
-    public String getSpecificChange(String ontologyURI, Long sequenceNumber) {
+    @Override
+    public String getSpecificChange(OWLOntologyID ontologyURI,
+            Long sequenceNumber) {
         String cpString = null;
         try {
             OntologyFileManager fm = OntologyFileManager.getInstance(ontologyURI);
@@ -56,16 +61,20 @@ public class ChangeServerImpl implements ChangeServer {
      * stores the change in the list of changes for that "OntologyFileManager".<br><br>
      * Slight hack: take only the first change in the list of changes to be applied at once for
      * deciding which ontology to send this change to on the server) */
+    @Override
     public String recordChange(ChangeCapsule changeCapsule) {
         String errorReturn = "success";
 
         //get first change's URI
-        String firstOntologyURI = changeCapsule.getOntologyURI();
+        OWLOntologyID firstOntologyURI = changeCapsule.getOntologyURI();
 
         //removed temporary hack to create ontology folder
         boolean created = createNewOntologyBaseline(firstOntologyURI);
-        if (created) System.err.println("created new ontology folder");
-        //else System.err.println("did not created folder (already exists?)");
+        if (created)
+         {
+            System.err.println("created new ontology folder");
+            //else System.err.println("did not created folder (already exists?)");
+        }
 
         //store changeCapsule away onto the filesystem
         try {
@@ -99,7 +108,8 @@ public class ChangeServerImpl implements ChangeServer {
         return df.format(date);
     }
 
-    public boolean createNewOntologyBaseline(String uri) {
+    @Override
+    public boolean createNewOntologyBaseline(OWLOntologyID uri) {
         try {
             return OntologyFileManager.createBaseline(uri);
         } catch (IOException e) {

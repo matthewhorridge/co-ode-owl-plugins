@@ -1,18 +1,34 @@
 package test;
 
-import java.net.*;
-import java.io.*;
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
-import org.semanticweb.owl.util.SimpleURIMapper;
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.apibinding.OWLManager;
-import changeServerPackage.ChangeCapsule;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.util.SimpleIRIMapper;
+
 import changeServerPackage.ApplyChangesServlet;
+import changeServerPackage.ChangeCapsule;
 
 /**
  * Created by IntelliJ IDEA.
@@ -24,7 +40,7 @@ import changeServerPackage.ApplyChangesServlet;
 public class TestClient {
 
     OWLOntologyManager manager = null;
-    URI ontologyURI = null;
+    IRI ontologyURI = null;
     OWLOntology ontology = null;
     OWLDataFactory factory = null;
     ArrayList<OWLOntologyChange> currentChanges = null;
@@ -57,7 +73,7 @@ public class TestClient {
             // Get response data.
             BufferedReader input = new BufferedReader (new InputStreamReader (urlConn.getInputStream()));
             String str;
-            while (null != ((str = input.readLine()))) {
+            while (null != (str = input.readLine())) {
                 System.out.println(str);
             }
 
@@ -92,16 +108,18 @@ public class TestClient {
     public void createNewTestOntology() throws OWLOntologyChangeException, OWLOntologyCreationException {
         manager = OWLManager.createOWLOntologyManager();
 
-        ontologyURI = URI.create("http://www.co-ode.org/ontologies/plugin/protege/federation/test/testont.owl");
+        ontologyURI = IRI
+                .create("http://www.co-ode.org/ontologies/plugin/protege/federation/test/testont.owl");
 
-        URI physicalURI = new File("tempOnto.owl").toURI();
-        SimpleURIMapper mapper = new SimpleURIMapper(ontologyURI, physicalURI);
-        manager.addURIMapper(mapper);
+        IRI physicalURI = IRI.create(new File("tempOnto.owl"));
+        SimpleIRIMapper mapper = new SimpleIRIMapper(ontologyURI, physicalURI);
+        manager.addIRIMapper(mapper);
 
         ontology = manager.createOntology(ontologyURI);
         factory = manager.getOWLDataFactory();
 
         manager.addOntologyChangeListener(new OWLOntologyChangeListener() {
+            @Override
             public void ontologiesChanged(List<? extends OWLOntologyChange> changes) throws OWLException {
                 currentChanges = new ArrayList<OWLOntologyChange>(changes.size());  //convert all changes to XML
                 for(OWLOntologyChange c: changes) {
@@ -112,32 +130,32 @@ public class TestClient {
     }
 
     public ArrayList<OWLOntologyChange> applyNewChange() throws OWLOntologyChangeException {
-        OWLClass clsA = factory.getOWLClass(URI.create(ontologyURI + "#A"));
-        OWLClass clsB = factory.getOWLClass(URI.create(ontologyURI + "#B"));
-        OWLClass clsC = factory.getOWLClass(URI.create(ontologyURI + "#C"));
-        OWLClass clsD = factory.getOWLClass(URI.create(ontologyURI + "#D"));
-        OWLClass clsE = factory.getOWLClass(URI.create(ontologyURI + "#E"));
-        OWLClass clsF = factory.getOWLClass(URI.create(ontologyURI + "#F"));
-        OWLClass clsG = factory.getOWLClass(URI.create(ontologyURI + "#G"));
-        OWLClass clsH = factory.getOWLClass(URI.create(ontologyURI + "#H"));
-        OWLClass clsI = factory.getOWLClass(URI.create(ontologyURI + "#I"));
-        OWLClass clsJ = factory.getOWLClass(URI.create(ontologyURI + "#J"));
-        OWLClass clsK = factory.getOWLClass(URI.create(ontologyURI + "#K"));
-        OWLClass clsL = factory.getOWLClass(URI.create(ontologyURI + "#L"));
-        OWLClass clsM = factory.getOWLClass(URI.create(ontologyURI + "#M"));
+        OWLClass clsA = factory.getOWLClass(IRI.create(ontologyURI + "#A"));
+        OWLClass clsB = factory.getOWLClass(IRI.create(ontologyURI + "#B"));
+        OWLClass clsC = factory.getOWLClass(IRI.create(ontologyURI + "#C"));
+        OWLClass clsD = factory.getOWLClass(IRI.create(ontologyURI + "#D"));
+        OWLClass clsE = factory.getOWLClass(IRI.create(ontologyURI + "#E"));
+        OWLClass clsF = factory.getOWLClass(IRI.create(ontologyURI + "#F"));
+        OWLClass clsG = factory.getOWLClass(IRI.create(ontologyURI + "#G"));
+        OWLClass clsH = factory.getOWLClass(IRI.create(ontologyURI + "#H"));
+        OWLClass clsI = factory.getOWLClass(IRI.create(ontologyURI + "#I"));
+        OWLClass clsJ = factory.getOWLClass(IRI.create(ontologyURI + "#J"));
+        OWLClass clsK = factory.getOWLClass(IRI.create(ontologyURI + "#K"));
+        OWLClass clsL = factory.getOWLClass(IRI.create(ontologyURI + "#L"));
+        OWLClass clsM = factory.getOWLClass(IRI.create(ontologyURI + "#M"));
 
-        OWLAxiom axiom = factory.getOWLSubClassAxiom(clsA, clsB);
-        OWLAxiom axiom2 = factory.getOWLSubClassAxiom(clsA, clsC);
-        OWLAxiom axiom3 = factory.getOWLSubClassAxiom(clsA, clsD);
-        OWLAxiom axiom4 = factory.getOWLSubClassAxiom(clsA, clsE);
-        OWLAxiom axiom5 = factory.getOWLSubClassAxiom(clsA, clsF);
-        OWLAxiom axiom6 = factory.getOWLSubClassAxiom(clsA, clsG);
-        OWLAxiom axiom7 = factory.getOWLSubClassAxiom(clsA, clsH);
-        OWLAxiom axiom8 = factory.getOWLSubClassAxiom(clsA, clsI);
-        OWLAxiom axiom9 = factory.getOWLSubClassAxiom(clsA, clsJ);
-        OWLAxiom axiom10 = factory.getOWLSubClassAxiom(clsA, clsK);
-        OWLAxiom axiom11 = factory.getOWLSubClassAxiom(clsA, clsL);
-        OWLAxiom axiom12  = factory.getOWLSubClassAxiom(clsA, clsM);
+        OWLAxiom axiom = factory.getOWLSubClassOfAxiom(clsA, clsB);
+        OWLAxiom axiom2 = factory.getOWLSubClassOfAxiom(clsA, clsC);
+        OWLAxiom axiom3 = factory.getOWLSubClassOfAxiom(clsA, clsD);
+        OWLAxiom axiom4 = factory.getOWLSubClassOfAxiom(clsA, clsE);
+        OWLAxiom axiom5 = factory.getOWLSubClassOfAxiom(clsA, clsF);
+        OWLAxiom axiom6 = factory.getOWLSubClassOfAxiom(clsA, clsG);
+        OWLAxiom axiom7 = factory.getOWLSubClassOfAxiom(clsA, clsH);
+        OWLAxiom axiom8 = factory.getOWLSubClassOfAxiom(clsA, clsI);
+        OWLAxiom axiom9 = factory.getOWLSubClassOfAxiom(clsA, clsJ);
+        OWLAxiom axiom10 = factory.getOWLSubClassOfAxiom(clsA, clsK);
+        OWLAxiom axiom11 = factory.getOWLSubClassOfAxiom(clsA, clsL);
+        OWLAxiom axiom12 = factory.getOWLSubClassOfAxiom(clsA, clsM);
 
         ArrayList<AddAxiom> changes = new ArrayList<AddAxiom>();
         changes.add(new AddAxiom(ontology, axiom));

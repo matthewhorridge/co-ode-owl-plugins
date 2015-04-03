@@ -1,5 +1,7 @@
 package changeServerPackage;
 
+import org.semanticweb.owlapi.model.OWLOntologyID;
+
 /**
  * Created by IntelliJ IDEA.
  * User: candidasa
@@ -17,10 +19,10 @@ public interface ChangeServer {
     public static final String ontology ="ontology";
 
     /** returns the latest change number for the given ontology URI */
-    public String getLatestChangeNumber(String ontologyURI);
+    public String getLatestChangeNumber(OWLOntologyID ontologyURI);
 
     /** returns a serialized verion of the change capsule requested for transfer to requesting client */
-    public String getSpecificChange(String ontologyURI, Long sequenceNumber);
+    public String getSpecificChange(OWLOntologyID ontologyURI, Long sequenceNumber);
 
     /** Sets a changes timestamp and sequence number,
      * extracts the target ontology from a change object, and
@@ -30,6 +32,6 @@ public interface ChangeServer {
     public String recordChange(ChangeCapsule changeCapsule);
 
     /** creates a new baseline ontology file+folder on the server */
-    public boolean createNewOntologyBaseline(String uri);
+    public boolean createNewOntologyBaseline(OWLOntologyID uri);
     
 }

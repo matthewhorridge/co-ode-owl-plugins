@@ -5,10 +5,10 @@ import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.history.HistoryManagerImpl;
 import org.protege.editor.core.prefs.PreferencesManager;
 import org.protege.editor.core.prefs.Preferences;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyChangeException;
-import org.semanticweb.owl.model.OWLOntologyCreationException;
-import org.semanticweb.owl.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owl.util.SimpleURIShortFormProvider;
 
 import javax.swing.*;

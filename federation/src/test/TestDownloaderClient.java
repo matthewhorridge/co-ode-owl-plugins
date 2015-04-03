@@ -1,17 +1,28 @@
 package test;
 
-import fileManagerPackage.ChangeReader;
-import fileManagerPackage.TagWriter;
-import fileManagerPackage.TagReader;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Set;
-import java.net.*;
+
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 import changeServerPackage.ChangeCapsule;
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.vocab.OWLRDFVocabulary;
+import fileManagerPackage.ChangeReader;
+import fileManagerPackage.TagReader;
+import fileManagerPackage.TagWriter;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,7 +59,13 @@ public class TestDownloaderClient {
     /** queries the server for the latest change sequence number for this given ontology */
     private Long queryServer(OWLOntology ontologyURI) throws IOException {
         String requestString = "http://"+ InetAddress.getLocalHost().getHostName()+":8080/ChangeServer";
-        requestString += "?query="+URLEncoder.encode(ontologyURI.getURI().toString(), "UTF-8"); //append uri to the query parameter
+        requestString += "?query="
+                + URLEncoder.encode(ontologyURI.getOntologyID()
+                        .getOntologyIRI().get().toString(), "UTF-8"); // append
+                                                                      // uri to
+                                                                      // the
+                                                                      // query
+                                                                      // parameter
         URL url = new URL(requestString);// URL of the server
         //URLConnection urlConn = url.openConnection(); // URL connection channel.
         //urlConn.setDoInput(true);  // Let the run-time system (RTS) know that we want input.
@@ -63,7 +80,7 @@ public class TestDownloaderClient {
         BufferedReader input = new BufferedReader (new InputStreamReader (url.openStream()));
         StringBuffer returned = new StringBuffer();
         String str;
-        while (null != ((str = input.readLine()))) {
+        while (null != (str = input.readLine())) {
             returned.append(str);
         }
 
@@ -74,11 +91,13 @@ public class TestDownloaderClient {
     /** read the change sequence number of an ontology */
     protected Long getOntologySequenceNumber(OWLOntology ontology) {
         Long number = null;
-        Set<OWLOntologyAnnotationAxiom> allAnnotations = ontology.getOntologyAnnotationAxioms();
-        for(OWLOntologyAnnotationAxiom annotation: allAnnotations) {
-            if (annotation.getAnnotation().getAnnotationURI().compareTo(OWLRDFVocabulary.OWL_VERSION_INFO.getURI()) == 0) {
-                if (annotation.getAnnotation().getAnnotationValue() instanceof OWLConstant) {
-                    String literal = ((OWLConstant)annotation.getAnnotation().getAnnotationValue()).getLiteral();
+        Set<OWLAnnotation> allAnnotations = ontology.getAnnotations();
+        for (OWLAnnotation annotation : allAnnotations) {
+            if (annotation.getProperty().getIRI()
+                    .equals(OWLRDFVocabulary.OWL_VERSION_INFO.getIRI())) {
+                if (annotation.getValue() instanceof OWLLiteral) {
+                    String literal = ((OWLLiteral) annotation.getValue())
+                            .getLiteral();
                     if (literal.startsWith(TagReader.CHANGEAXIOMPREFIX)) {
                         number = new Long(literal.substring(TagReader.CHANGEAXIOMPREFIX.length()));
                     }
@@ -91,7 +110,14 @@ public class TestDownloaderClient {
     /** fetches on specific changeCapsule object from the server */
     private ChangeCapsule fetchServer(OWLOntology ontologyURI, Long sequenceNumber) throws IOException {
         String requestString = "http://"+ InetAddress.getLocalHost().getHostName()+":8080/ChangeServer";
-        requestString += "?fetch="+URLEncoder.encode(ontologyURI.getURI().toString(), "UTF-8"); //append uri to the query parameter
+        requestString += "?fetch="
+                + URLEncoder.encode(ontologyURI.getOntologyID()
+                        .getOntologyIRI().get().toString(), "UTF-8");
+        // append
+                                                                      // uri to
+                                                                      // the
+                                                                      // query
+                                                                      // parameter
         requestString += "&number"+sequenceNumber;
         URL url = new URL(requestString);// URL of the server
 
@@ -99,7 +125,7 @@ public class TestDownloaderClient {
         BufferedReader input = new BufferedReader (new InputStreamReader (url.openStream()));
         StringBuffer returned = new StringBuffer();
         String str;
-        while (null != ((str = input.readLine()))) {
+        while (null != (str = input.readLine())) {
             returned.append(str);
         }
 

@@ -1,20 +1,21 @@
 package fileManagerPackage;
 
-import changeServerPackage.ChangeCapsule;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
 
-import org.semanticweb.owl.model.OWLOntologyCreationException;
-import org.semanticweb.owl.model.OWLOntologyStorageException;
-import org.semanticweb.owl.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+
+import changeServerPackage.ChangeCapsule;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,8 +28,8 @@ public class OntologyFileManager {
     public static final String CHANGESFOLDER = "changes";
     public static final String TAGSFOLDER = "tags";
     public static final String ONTOLOGYFILEEXTENSION = ".owl";
-
-    private static HashMap<String, OntologyFileManager> fileManagerListSingleton = new HashMap<String, OntologyFileManager>();  //this object is created when this class is first referenced
+    //this object is created when this class is first referenced
+    private static HashMap<OWLOntologyID, OntologyFileManager> fileManagerListSingleton = new HashMap<OWLOntologyID, OntologyFileManager>();
 
     ArrayList<File> changes = new ArrayList<File>();
     ArrayList<File> tags = new ArrayList<File>();
@@ -42,7 +43,8 @@ public class OntologyFileManager {
     /** Singleton access to a file manager object for each possible ontologyURI (hashtable mapped).
      * This is used to ensure that the same object is used in all access to the storage system. If
      * the same object is used synchronized methods can be used to reliably implement transaction-based access */
-    public static OntologyFileManager getInstance(String uri) throws IOException {
+    public static OntologyFileManager getInstance(OWLOntologyID uri)
+            throws IOException {
         if (!fileManagerListSingleton.containsKey(uri)) {   //populate the hashmap, if it doesn't already contain instances
             fileManagerListSingleton.put(uri, new OntologyFileManager(shortenURI(uri)));
         }
@@ -51,8 +53,9 @@ public class OntologyFileManager {
     }
 
     /** transforms a URI into something that can be used for a folder name */
-    public static String shortenURI(String uri) {
-        String shortenedName = uri.replaceFirst("http://","");   //cut out the http prefix
+    public static String shortenURI(OWLOntologyID uri) {
+        String shortenedName = uri.getOntologyIRI().get().toString()
+                .replaceFirst("http://", "");   // cut out the http prefix
         //shortenedName.replace('/','_');
         try {
             shortenedName = URLEncoder.encode(shortenedName, "US-ASCII");
@@ -217,7 +220,7 @@ public class OntologyFileManager {
     }
 
     /** create a new folder for a new ontology from a URI (does nothing, if the folder already exists) */
-    public static boolean createBaseline(String uri) throws IOException {
+    public static boolean createBaseline(OWLOntologyID uri) throws IOException {
         File baselineFile = new File(shortenURI(uri));
         boolean created = baselineFile.mkdirs();    //create the directory, if not already existing
         getInstance(uri).baseline = baselineFile;   //set the appropriate object's baseline file, creating the object, if necessary

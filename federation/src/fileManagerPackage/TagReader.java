@@ -1,14 +1,14 @@
 package fileManagerPackage;
 
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyAnnotationAxiom;
-import org.semanticweb.owl.model.OWLOntologyCreationException;
-
 import java.io.File;
-import java.net.URI;
 import java.util.Set;
+
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,19 +23,19 @@ public class TagReader {
     OWLOntology ontology;
 
     public TagReader(File ontologyFile) throws OWLOntologyCreationException {
-        URI physicalURI = ontologyFile.toURI();
+        IRI physicalURI = IRI.create(ontologyFile.toURI());
         manager = OWLManager.createOWLOntologyManager();
 
         //ask the manager to load the ontology
-        ontology = manager.loadOntologyFromPhysicalURI(physicalURI);
+        ontology = manager.loadOntologyFromOntologyDocument(physicalURI);
     }
 
     public long getLatestChangeInTag() {
         long latestChange = -1;
         //find the relevant annotaiton axiom that records sequence numbers of changes
-        Set<OWLOntologyAnnotationAxiom> annotations = ontology.getOntologyAnnotationAxioms();
-        for(OWLOntologyAnnotationAxiom annotation: annotations) {
-            String text = annotation.getAnnotation().getAnnotationValueAsConstant().getLiteral();
+        Set<OWLAnnotation> annotations = ontology.getAnnotations();
+        for (OWLAnnotation annotation : annotations) {
+            String text = annotation.getValue().toString();
             if (text.startsWith(CHANGEAXIOMPREFIX)) {
                 text = text.substring(CHANGEAXIOMPREFIX.length());
                 latestChange = new Long(text);

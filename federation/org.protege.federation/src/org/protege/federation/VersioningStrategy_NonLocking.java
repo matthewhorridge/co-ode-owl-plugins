@@ -1,6 +1,6 @@
 package org.protege.federation;
 
-import org.semanticweb.owl.model.*;
+import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owl.apibinding.OWLManager;
 import org.semanticweb.owl.vocab.OWLRDFVocabulary;
 import client.ChangeMonitor;
