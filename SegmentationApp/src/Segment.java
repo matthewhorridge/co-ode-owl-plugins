@@ -1,10 +1,44 @@
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-import java.io.*;
-import java.net.URI;
-import java.util.*;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLClassAxiom;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLIndividualAxiom;
+import org.semanticweb.owlapi.model.OWLObjectPropertyAxiom;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntologyStorageException;
+import org.semanticweb.owlapi.model.parameters.Imports;
+import org.semanticweb.owlapi.search.EntitySearcher;
+import org.semanticweb.owlapi.util.BidirectionalShortFormProviderAdapter;
+import org.semanticweb.owlapi.util.DeprecatedOWLEntityCollector;
+import org.semanticweb.owlapi.util.SimpleIRIMapper;
+import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,7 +55,8 @@ public class Segment {
     OWLOntologyManager newManager;
 
     Set<OWLClass> markedClasses = new HashSet<OWLClass>(); //list of classes marked for inclusion in the extract
-    Set<OWLProperty> markedProperties = new HashSet<OWLProperty>(); //list of classes marked for inclusion in the extract
+    Set<OWLObjectPropertyExpression> markedObjectProperties = new HashSet<OWLObjectPropertyExpression>(); //list of classes marked for inclusion in the extract
+    Set<OWLObjectPropertyExpression> markedDataProperties = new HashSet<OWLObjectPropertyExpression>(); //list of classes marked for inclusion in the extract
     Set<OWLIndividual> markedIndividuals = new HashSet<OWLIndividual>(); //list of individuals marked for inclusion in the extract
 
     PropertyAxiomCollectionVisitor propertyVisitor;
@@ -35,20 +70,23 @@ public class Segment {
 
         //load old ontology
         oldManager = OWLManager.createOWLOntologyManager();
-        URI physicalURI = new File(filename).toURI();
-        oldOntology = oldManager.loadOntologyFromPhysicalURI(physicalURI);
+        oldOntology = oldManager.loadOntologyFromOntologyDocument(new File(
+                filename));
 
         //create new empty ontology
         newManager = OWLManager.createOWLOntologyManager();
-        SimpleURIMapper mapper = new SimpleURIMapper(oldOntology.getURI(), getNewFilenameURI(physicalURI));
-        newManager.addURIMapper(mapper);
-        newOntology = newManager.createOntology(oldOntology.getURI());
+        SimpleIRIMapper mapper = new SimpleIRIMapper(oldOntology
+                .getOntologyID().getOntologyIRI().get(),
+                getNewFilenameURI(new File(filename)));
+        newManager.addIRIMapper(mapper);
+        newOntology = newManager.createOntology(oldOntology.getOntologyID()
+                .getOntologyIRI().get());
     }
 
     /** creates a new name for the new ontology */
-    protected URI getNewFilenameURI(URI oldURI) {
+    protected IRI getNewFilenameURI(File oldURI) {
         //oldFilename = new File(oldFilename).getAbsolutePath();
-        String oldFilename = oldURI.toString();
+        String oldFilename = oldURI.toURI().toString();
         int lastDot = oldFilename.lastIndexOf(".");
         String left = oldFilename.substring(0, lastDot);
         String right = oldFilename.substring(lastDot, oldFilename.length());
@@ -65,7 +103,7 @@ public class Segment {
             targetString2 = left+"-segment";
         }
 
-        URI saveURI = URI.create(targetString2 + right);
+        IRI saveURI = IRI.create(targetString2 + right);
         return saveURI;
     }
 
@@ -86,10 +124,14 @@ public class Segment {
             BidirectionalShortFormProviderAdapter bi = new BidirectionalShortFormProviderAdapter(oldManager, oldManager.getOntologies(), new SimpleShortFormProvider());
             for (OWLEntity ent : bi.getEntities(target)) {
 
-                if (!oldOntology.containsClassReference(ent.asOWLClass().getURI())) {
+                if (!oldOntology.containsClassInSignature(ent.asOWLClass()
+                        .getIRI(), Imports.EXCLUDED)) {
                     System.err.println("Error: target class "+target+" not found in ontology.");
                 } else {    //given class exists, so collect it in a new array
-                    targetClasses[i] = factory.getOWLClass(URI.create(oldOntology.getURI().toString()+"#"+target));
+                    targetClasses[i] = factory.getOWLClass(IRI
+                            .create(oldOntology.getOntologyID()
+                                    .getOntologyIRI().get().toString()
+                                    + "#" + target));
                     i++;
                 }
             }
@@ -97,7 +139,8 @@ public class Segment {
 
         //collect all the classes that need to be included in the segment
         markedClasses.clear();
-        markedProperties.clear();
+        markedObjectProperties.clear();
+        markedDataProperties.clear();
         markedIndividuals.clear();
 
         for(OWLClass target : targetClasses) {
@@ -136,7 +179,8 @@ public class Segment {
     /** get all named classes that the given class references" */
     private ArrayList<OWLClass> getReferrals(OWLClass cls) {//throws OWLException {
         ArrayList<OWLClass> referentClasses = new ArrayList<OWLClass>();
-        ArrayList<OWLProperty> referentProperties = new ArrayList<OWLProperty>();
+        ArrayList<OWLObjectPropertyExpression> referentObjectProperties = new ArrayList<>();
+        ArrayList<OWLDataPropertyExpression> referentDataProperties = new ArrayList<>();
         ArrayList<OWLIndividual> referentindividuals = new ArrayList<OWLIndividual>();
 
         if (cls != null) {
@@ -147,21 +191,22 @@ public class Segment {
             }
 
 
-            OWLEntityCollector collector = new OWLEntityCollector();
+            DeprecatedOWLEntityCollector collector = new DeprecatedOWLEntityCollector();
 
             cls.accept(collector);          //collect all the references this class has to other classes
 
             //collect from all superclasses as well
-            Set<OWLDescription> superSet = cls.getSuperClasses(oldOntology);
-            for (Iterator<OWLDescription> iterator = superSet.iterator(); iterator.hasNext();) {
-                OWLDescription owlDescription = iterator.next();
+            for (OWLClassExpression owlDescription : EntitySearcher
+                    .getSuperClasses(cls, oldOntology)) {
                 owlDescription.accept(collector);
             }
 
             //also collect from all equivalent classes
-            Set<OWLDescription> equivSet = cls.getEquivalentClasses(oldOntology);
-            for (Iterator<OWLDescription> iterator = equivSet.iterator(); iterator.hasNext();) {
-                OWLDescription owlDescription = iterator.next();
+            Collection<OWLClassExpression> equivSet = EntitySearcher
+                    .getEquivalentClasses(cls, oldOntology);
+            for (Iterator<OWLClassExpression> iterator = equivSet.iterator(); iterator
+                    .hasNext();) {
+                OWLClassExpression owlDescription = iterator.next();
                 owlDescription.accept(collector);
             }
 
@@ -170,15 +215,16 @@ public class Segment {
                 OWLEntity owlEntity = iterator.next();
 
                 if (owlEntity instanceof OWLClass) {
-                    if (owlEntity.getURI() != null && !referentClasses.contains((OWLClass)owlEntity)) {
                         referentClasses.add((OWLClass)owlEntity);
                     }
-                }
 
-                if (owlEntity instanceof OWLProperty) {
-                    if (owlEntity.getURI() != null && !referentProperties.contains((OWLProperty)owlEntity)) {
-                        referentProperties.add((OWLProperty)owlEntity);
+                if (owlEntity instanceof OWLObjectPropertyExpression) {
+                    referentObjectProperties
+                            .add((OWLObjectPropertyExpression) owlEntity);
                     }
+                if (owlEntity instanceof OWLDataPropertyExpression) {
+                    referentDataProperties
+                            .add((OWLDataPropertyExpression) owlEntity);
                 }
 
                /* if (owlEntity instanceof OWLIndividual) { //doesn't work for some reason, replaced with "getClassAssertionAxioms" call
@@ -190,18 +236,33 @@ public class Segment {
         }
 
         //add all used properties to global list
-        for(OWLProperty newProperty : referentProperties) {
-            if (!markedProperties.contains(newProperty)) {
-                markedProperties.add(newProperty);
+        for (OWLObjectPropertyExpression newProperty : referentObjectProperties) {
+            if (!markedObjectProperties.contains(newProperty)) {
+                markedObjectProperties.add(newProperty);
+                HashSet<OWLObjectPropertyExpression> superProperties = new HashSet<>();
+                 //fill the set
+                getSuperproperties(superProperties, newProperty);  
 
-                HashSet<OWLProperty> superProperties = new HashSet<OWLProperty>();
-                getSuperproperties(superProperties, newProperty);   //fill the set
-
-                for(OWLProperty property : superProperties) {   //add all the supers from the set to the main list
-                    if (!markedProperties.contains(property)) {
-                        markedProperties.add(property);
+                for(OWLObjectPropertyExpression property : superProperties) {   //add all the supers from the set to the main list
+                    if (!markedObjectProperties.contains(property)) {
+                        markedObjectProperties.add(property);
                     }
                 }
+            }
+        }
+        for (OWLDataPropertyExpression newProperty : referentDataProperties) {
+            if (!markedDataProperties.contains(newProperty)) {
+                markedDataProperties.add(newProperty);
+                //fill the set
+                HashSet<OWLDataPropertyExpression> superProperties = new HashSet<>();
+                getSuperproperties(superProperties, newProperty);
+
+                for(OWLDataPropertyExpression property : superProperties) {   //add all the supers from the set to the main list
+                    if (!markedDataProperties.contains(property)) {
+                        markedDataProperties.add(property);
+                    }
+                }
+
             }
         }
 
@@ -214,14 +275,30 @@ public class Segment {
     }
 
     /** recursively get all super-properties of a given property */
-    private void getSuperproperties(HashSet<OWLProperty> set, OWLProperty property) {
-        if (!set.contains(property)) {  //only get the supers if we haven't already do so (to avoid infinite loop in cyclic ontology)
-            Set superProperites = property.getSuperProperties(oldOntology);
-            for(Object superProperty : superProperites) {
-                if (superProperty instanceof OWLProperty) {
-                    set.add((OWLProperty)superProperty);
-                    getSuperproperties(set, (OWLProperty)superProperty);
+    private void getSuperproperties(Set<OWLObjectPropertyExpression> set,
+            OWLObjectPropertyExpression property) {
+         //only get the supers if we haven't already do so (to avoid infinite loop in cyclic ontology)
+        if (!set.contains(property)) {
+            set.add(property);
+            Collection<OWLObjectPropertyExpression> superProperites = EntitySearcher
+                    .getSuperProperties(property, oldOntology);
+            for (OWLObjectPropertyExpression superProperty : superProperites) {
+                getSuperproperties(set, superProperty);
                 }
+            }
+        }
+    /** recursively get all super-properties of a given property */
+    private void getSuperproperties(Set<OWLDataPropertyExpression> set,
+            OWLDataPropertyExpression property) {
+        if (!set.contains(property)) {
+            // only get the supers if we haven't
+            // already do so (to avoid infinite loop
+            // in cyclic ontology)
+            set.add(property);
+            Collection<OWLDataPropertyExpression> superProperites = EntitySearcher
+                    .getSuperProperties(property, oldOntology);
+            for (OWLDataPropertyExpression superProperty : superProperites) {
+                getSuperproperties(set, superProperty);
             }
         }
     }
@@ -232,23 +309,19 @@ public class Segment {
     /** collect all axioms that are relevant for the new model */
     protected void segment() {
         //data structure to collect and store all releveant axioms
-        propertyVisitor = new PropertyAxiomCollectionVisitor(markedProperties, oldManager.getOWLDataFactory());
+        propertyVisitor = new PropertyAxiomCollectionVisitor(markedObjectProperties,markedDataProperties, oldManager.getOWLDataFactory());
 
-        for(OWLProperty property : markedProperties) {
-            if (property.isOWLDataProperty()) { //visit all data properites that were collected in phase 1
-                Set<OWLDataPropertyAxiom> pAxioms = oldOntology.getAxioms(property.asOWLDataProperty());
-                for(OWLDataPropertyAxiom axiom : pAxioms) {
+        for(OWLObjectPropertyExpression property : markedObjectProperties) {
+            for (OWLObjectPropertyAxiom axiom : oldOntology.getAxioms(property)) {
+                axiom.accept(propertyVisitor);  //collect all axioms from the marked properties that make sense to add to the new model
+            }}
+        for(OWLDataPropertyExpression property:markedDataProperties) {
+            for (OWLDataPropertyAxiom axiom : oldOntology.getAxioms(property
+                    .asOWLDataProperty())) {
                     axiom.accept(propertyVisitor);  //collect all axioms from the marked properties that make sense to add to the new model
                 }
             }
 
-            if (property.isOWLObjectProperty()) { //visit all object properties
-                Set<OWLObjectPropertyAxiom> pAxioms = oldOntology.getAxioms(property.asOWLObjectProperty());
-                for(OWLObjectPropertyAxiom axiom : pAxioms) {
-                    axiom.accept(propertyVisitor);  //collect all axioms from the marked properties that make sense to add to the new model
-                }
-            }
-        }
 
         classVisitor = new ClassAxiomCollectionVisitor(markedClasses, oldManager.getOWLDataFactory());
 
@@ -259,7 +332,9 @@ public class Segment {
             }
         }
 
-        individualVisitor = new IndividualAxiomCollectionVisitor(markedIndividuals, markedProperties, markedClasses, oldManager.getOWLDataFactory());
+        individualVisitor = new IndividualAxiomCollectionVisitor(
+                markedIndividuals, markedClasses,
+                oldManager.getOWLDataFactory());
 
         for(OWLIndividual ind : markedIndividuals) {
             Set<OWLIndividualAxiom> iAxiom = oldOntology.getAxioms(ind);
@@ -300,13 +375,13 @@ public class Segment {
 
     /** count the number of classes in the new ontology */
     public int getNewModelClassNumber() {
-        Set<OWLClass> allClasses = newOntology.getReferencedClasses();
+        Set<OWLClass> allClasses = newOntology.getClassesInSignature();
         return allClasses.size();
     }
 
     /** count the number of classes in the old ontology */
     public int getOldModelClassNumber() {
-        Set<OWLClass> allClasses = oldOntology.getReferencedClasses();
+        Set<OWLClass> allClasses = oldOntology.getClassesInSignature();
         return allClasses.size();
     }
 
