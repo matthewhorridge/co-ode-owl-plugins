@@ -22,7 +22,7 @@
  */
 package uk.ac.manchester.mae.evaluation;
 
-import org.semanticweb.owl.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLIndividual;
 
 /**
  * @author Luigi Iannone

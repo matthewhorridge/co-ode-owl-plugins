@@ -22,134 +22,101 @@
  */
 package uk.ac.manchester.mae;
 
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.coode.oae.utils.ParserFactory;
-import org.semanticweb.owl.model.OWLAnnotation;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLObjectPropertyInverse;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLPropertyExpressionVisitor;
-import org.semanticweb.owl.util.NamespaceUtil;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLObjectInverseOf;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitor;
+import org.semanticweb.owlapi.search.EntitySearcher;
+import org.semanticweb.owlapi.util.NamespaceUtil;
 
 import uk.ac.manchester.mae.parser.ArithmeticsParser;
 import uk.ac.manchester.mae.parser.MAEStart;
 import uk.ac.manchester.mae.parser.ParseException;
 
 /**
- * @author Luigi Iannone
- * 
- *         The University Of Manchester<br>
+ * @author Luigi Iannone The University Of Manchester<br>
  *         Bio-Health Informatics Group<br>
  *         Mar 12, 2008
  */
 public class PropertyVisitor implements OWLPropertyExpressionVisitor {
-	protected Set<String> extractedFormulaStrings = new HashSet<String>();
-	private Set<OWLOntology> ontologies;
 
-	// private OWLModelManager manager;
-	public PropertyVisitor(Set<OWLOntology> ontologies) {
-		this.ontologies = ontologies;
-		// this.manager = m;
-	}
+    protected Set<String> extractedFormulaStrings = new HashSet<String>();
+    private Set<OWLOntology> ontologies;
 
-	/**
-	 * No formula can be attached to an OWLObjectProperty. This visitor will not
-	 * act on it
-	 * 
-	 * @see org.semanticweb.owl.model.OWLPropertyExpressionVisitor#visit(org.semanticweb.owl.model.OWLObjectProperty)
-	 */
-	public void visit(OWLObjectProperty property) {
-	}
+    public PropertyVisitor(Set<OWLOntology> ontologies) {
+        this.ontologies = ontologies;
+    }
 
-	/**
-	 * No formula can be attached to an OWLObjectPropertyInverse. This visitor
-	 * will not act on it
-	 * 
-	 * @see org.semanticweb.owl.model.OWLPropertyExpressionVisitor#visit(org.semanticweb.owl.model.OWLObjectProperty)
-	 */
-	public void visit(OWLObjectPropertyInverse property) {
-	}
+    /**
+     * No formula can be attached to an OWLObjectProperty. This visitor will not
+     * act on it
+     */
+    @Override
+    public void visit(OWLObjectProperty property) {}
 
-	/**
-	 * Will extract the annotations containing the formulas
-	 * 
-	 * @see org.semanticweb.owl.model.OWLPropertyExpressionVisitor#visit(org.semanticweb.owl.model.OWLDataProperty)
-	 */
-	@SuppressWarnings("unchecked")
-	public void visit(OWLDataProperty property) {
-		Set<OWLAnnotation> annotations = new HashSet<OWLAnnotation>();
-		for (OWLOntology ontology : this.ontologies) {
-			annotations.addAll(property.getAnnotations(ontology));
-		}
-		for (OWLAnnotation annotation : annotations) {
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			URI annotationURI = annotation.getAnnotationURI();
-			if (annotationURI != null) {
-				String annotationNameSpace = nsUtil.split(annotationURI
-						.toString(), new String[2])[0];
-				if (annotationNameSpace
-						.compareTo(Constants.FORMULA_NAMESPACE_URI_STRING) == 0) {
-					String annotationBody = annotation
-							.getAnnotationValueAsConstant().getLiteral();
-					this.extractedFormulaStrings.add(annotationBody);
-				}
-			}
-		}
-	}
+    @Override
+    public void visit(OWLObjectInverseOf property) {}
 
-	@Deprecated
-	/**
-	 * @return the extractedFormulas
-	 */
-	public Set<String> getExtractedFormulaStrings() {
-		return this.extractedFormulaStrings;
-	}
+    /**
+     * Will extract the annotations containing the formulas
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public void visit(OWLDataProperty property) {
+        Set<OWLAnnotation> annotations = new HashSet<OWLAnnotation>();
+        for (OWLOntology ontology : ontologies) {
+            annotations.addAll(EntitySearcher.getAnnotations(property.getIRI(),
+                    ontology));
+        }
+        for (OWLAnnotation annotation : annotations) {
+            NamespaceUtil nsUtil = new NamespaceUtil();
+            IRI annotationURI = annotation.getProperty().getIRI();
+            String annotationNameSpace = annotationURI.getNamespace();
+            if (Constants.FORMULA_NAMESPACE_URI_STRING
+                    .equals(annotationNameSpace)) {
+                String annotationBody = ((OWLLiteral) annotation.getValue())
+                        .getLiteral();
+                extractedFormulaStrings.add(annotationBody);
+            }
+        }
+    }
 
-	public Set<MAEStart> getExtractedFormulas() {
-		Set<MAEStart> toReturn = new HashSet<MAEStart>(
-				this.extractedFormulaStrings.size());
-		for (String formulaBody : this.extractedFormulaStrings) {
-			ParserFactory.initParser(formulaBody, this.ontologies);
-			try {
-				toReturn.add((MAEStart) ArithmeticsParser.Start());
-			} catch (ParseException e) {
-				Logger
-						.getLogger(this.getClass().toString())
-						.warn(
-								"The formula body "
-										+ formulaBody
-										+ " could not be correctly parsed it will be skipped\n"
-										+ e.getMessage(), e);
-			}
-		}
-		return toReturn;
-	}
-	// private Set<OWLObjectProperty> getObjectProperties() {
-	// Set<OWLObjectProperty> toReturn = new HashSet<OWLObjectProperty>();
-	// OWLObjectPropertyHierarchyProvider p = new
-	// OWLObjectPropertyHierarchyProvider(
-	// this.manager);
-	// for (OWLObjectProperty op : p.getRoots()) {
-	// toReturn.add(op);
-	// toReturn.addAll(p.getDescendants(op));
-	// }
-	// return toReturn;
-	// }
-	//
-	// private Set<OWLDataProperty> getDataProperties() {
-	// Set<OWLDataProperty> toReturn = new HashSet<OWLDataProperty>();
-	// OWLDataPropertyHierarchyProvider p = new
-	// OWLDataPropertyHierarchyProvider(
-	// this.manager);
-	// for (OWLDataProperty op : p.getRoots()) {
-	// toReturn.add(op);
-	// toReturn.addAll(p.getDescendants(op));
-	// }
-	// return toReturn;
-	// }
+    @Deprecated
+    /**
+     * @return the extractedFormulas
+     */
+    public Set<String> getExtractedFormulaStrings() {
+        return extractedFormulaStrings;
+    }
+
+    public Set<MAEStart> getExtractedFormulas() {
+        Set<MAEStart> toReturn = new HashSet<MAEStart>(
+                extractedFormulaStrings.size());
+        for (String formulaBody : extractedFormulaStrings) {
+            ParserFactory.initParser(formulaBody, ontologies);
+            try {
+                toReturn.add((MAEStart) ArithmeticsParser.Start());
+            } catch (ParseException e) {
+                Logger.getLogger(this.getClass().toString())
+                        .warn("The formula body "
+                                + formulaBody
+                                + " could not be correctly parsed it will be skipped\n"
+                                + e.getMessage(), e);
+            }
+        }
+        return toReturn;
+    }
+
+    @Override
+    public void visit(OWLAnnotationProperty property) {}
 }

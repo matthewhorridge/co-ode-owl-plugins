@@ -25,12 +25,12 @@ package uk.ac.manchester.mae;
 import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLConstant;
-import org.semanticweb.owl.model.OWLDataPropertyAssertionAxiom;
-import org.semanticweb.owl.model.OWLIndividual;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyChangeException;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -40,13 +40,14 @@ import org.semanticweb.owl.model.OWLOntologyManager;
  *         Mar 13, 2008
  */
 public interface ConflictStrategy {
-	void solve(OWLIndividual individual,
-			OWLDataPropertyAssertionAxiom oldAssertion, OWLConstant newValue,
+
+    void solve(OWLNamedIndividual individual,
+            OWLDataPropertyAssertionAxiom oldAssertion, OWLLiteral newValue,
 			Set<OWLOntology> ontologies, OWLOntologyManager ontologyManager)
 			throws OWLOntologyChangeException, ValueAlreadySetException;
 
-	void solve(OWLIndividual individual,
-			OWLDataPropertyAssertionAxiom oldAssertion, OWLConstant newValue,
+    void solve(OWLNamedIndividual individual,
+            OWLDataPropertyAssertionAxiom oldAssertion, OWLLiteral newValue,
 			OWLModelManager modelManager) throws OWLOntologyChangeException,
 			ValueAlreadySetException;
 }

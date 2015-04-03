@@ -39,10 +39,9 @@ import org.coode.oae.utils.ParserFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.OWLIcons;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRow;
-import org.semanticweb.owl.model.OWLAnnotation;
-import org.semanticweb.owl.model.OWLAnnotationAxiom;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.util.NamespaceUtil;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLLiteral;
 
 import uk.ac.manchester.mae.parser.ArithmeticsParser;
 import uk.ac.manchester.mae.parser.ArithmeticsParserVisitor;
@@ -88,69 +87,68 @@ public class ViewFormulaCellRederer extends JPanel implements ListCellRenderer,
 		this.isClassView = isClassView;
 		setLayout(new BorderLayout());
 		setBorder(BorderFactory.createEmptyBorder(1, 2, 1, 2));
-		this.formulaURILabel = new JLabel();
-		this.formulaURILabel.setForeground(LABEL_COLOR);
-		this.formulaContentArea = new JTextArea();
-		this.formulaContentArea.setFont(new Font("lucida grande", Font.PLAIN,
+		formulaURILabel = new JLabel();
+		formulaURILabel.setForeground(LABEL_COLOR);
+		formulaContentArea = new JTextArea();
+		formulaContentArea.setFont(new Font("lucida grande", Font.PLAIN,
 				12));
-		this.formulaContentArea.setLineWrap(true);
-		this.formulaContentArea.setWrapStyleWord(true);
-		this.add(this.formulaURILabel, BorderLayout.NORTH);
+		formulaContentArea.setLineWrap(true);
+		formulaContentArea.setWrapStyleWord(true);
+		this.add(formulaURILabel, BorderLayout.NORTH);
 		JPanel contentPanel = new JPanel(new BorderLayout(3, 3));
-		contentPanel.add(this.formulaContentArea, BorderLayout.CENTER);
+		contentPanel.add(formulaContentArea, BorderLayout.CENTER);
 		this.add(contentPanel, BorderLayout.SOUTH);
-		this.formulaContentArea.setOpaque(false);
+		formulaContentArea.setOpaque(false);
 		contentPanel.setBorder(BorderFactory.createEmptyBorder(2, 20, 2, 2));
 		contentPanel.setOpaque(false);
-		this.iconLabel = new JLabel();
-		contentPanel.add(this.iconLabel, BorderLayout.WEST);
-		this.iconLabel.setIcon(OWLIcons.getIcon("property.data.png"));
+		iconLabel = new JLabel();
+		contentPanel.add(iconLabel, BorderLayout.WEST);
+		iconLabel.setIcon(OWLIcons.getIcon("property.data.png"));
 	}
 
 	/**
 	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList,
 	 *      java.lang.Object, int, boolean, boolean)
 	 */
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
 	public Component getListCellRendererComponent(JList list, Object value,
 			int index, boolean isSelected, boolean cellHasFocus) {
-		Component toReturn = this.defaultListCellRenderer
+		Component toReturn = defaultListCellRenderer
 				.getListCellRendererComponent(list, value, index, isSelected,
 						cellHasFocus);
 		if (value instanceof AbstractOWLFrameSectionRow) {
-			AbstractOWLFrameSectionRow<Object, OWLAnnotationAxiom<OWLDataProperty>, ? extends Object> row = (AbstractOWLFrameSectionRow) value;
-			OWLAnnotationAxiom axiom = row.getAxiom();
+            AbstractOWLFrameSectionRow<Object, OWLAnnotationAssertionAxiom, ? extends Object> row = (AbstractOWLFrameSectionRow) value;
+            OWLAnnotationAssertionAxiom axiom = row.getAxiom();
 			OWLAnnotation annotation = axiom.getAnnotation();
-			String uriString = annotation.getAnnotationURI().toString();
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			String localName = nsUtil.split(uriString, null)[1];
-			String annotationValue = annotation.getAnnotationValueAsConstant()
+            String localName = annotation.getProperty().getIRI().getFragment();
+            String annotationValue = ((OWLLiteral) annotation.getValue())
 					.getLiteral();
-			ParserFactory.initParser(annotationValue, this.owlEditorKit
+			ParserFactory.initParser(annotationValue, owlEditorKit
 					.getModelManager());
 			try {
 				SimpleNode formula = ArithmeticsParser.Start();
 				formula.jjtAccept(this, null);
-				String rendering = this.formulaString;
-				String propertyName = this.owlEditorKit.getModelManager()
+				String rendering = formulaString;
+				String propertyName = owlEditorKit.getModelManager()
 						.getRendering(axiom.getSubject());
-				if (this.isClassView) {
-					this.formulaURILabel
+				if (isClassView) {
+					formulaURILabel
 							.setText(propertyName + " " + localName);
 				} else {
-					this.formulaURILabel.setText(localName);
+					formulaURILabel.setText(localName);
 				}
-				this.formulaContentArea.setText(rendering);
+				formulaContentArea.setText(rendering);
 				if (isSelected) {
-					this.formulaContentArea.setForeground(list
+					formulaContentArea.setForeground(list
 							.getSelectionForeground());
-					this.formulaURILabel.setForeground(list
+					formulaURILabel.setForeground(list
 							.getSelectionForeground());
 				} else {
-					this.formulaContentArea.setForeground(list.getForeground());
-					this.formulaURILabel.setForeground(LABEL_COLOR);
+					formulaContentArea.setForeground(list.getForeground());
+					formulaURILabel.setForeground(LABEL_COLOR);
 				}
-				this.iconLabel.setVisible(this.isClassView);
+				iconLabel.setVisible(isClassView);
 				toReturn = this;
 			} catch (ParseException e) {
 				e.printStackTrace();
@@ -159,9 +157,10 @@ public class ViewFormulaCellRederer extends JPanel implements ListCellRenderer,
 		return toReturn;
 	}
 
-	public Object visit(MAEStart node, Object data) {
-		this.formulaString = node.toString();
-		return this.formulaString;
+	@Override
+    public Object visit(MAEStart node, Object data) {
+		formulaString = node.toString();
+		return formulaString;
 		// String toReturn = "";
 		// Node child, previousChild = null;
 		// for (int i = 0; i < node.jjtGetNumChildren(); i++) {
@@ -186,69 +185,80 @@ public class ViewFormulaCellRederer extends JPanel implements ListCellRenderer,
 		// return toReturn;
 	}
 
-	public Object visit(MAEConflictStrategy node, Object data) {
-		this.formulaString += node.toString();
+	@Override
+    public Object visit(MAEConflictStrategy node, Object data) {
+		formulaString += node.toString();
 		return node.toString();
 	}
 
-	public Object visit(MAEStoreTo node, Object data) {
+	@Override
+    public Object visit(MAEStoreTo node, Object data) {
 		String toReturn = " STORETO <";
-		this.formulaString += toReturn;
+		formulaString += toReturn;
 		toReturn += node.childrenAccept(this, data);
-		this.formulaString += ">";
+		formulaString += ">";
 		return toReturn + ">";
 	}
 
-	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
+	@Override
+    public Object visit(MAEmanSyntaxClassExpression node, Object data) {
 		// XXX
 		String toReturn = " APPLESTO <" + node.getContent() + ">";
-		this.formulaString += toReturn;
+		formulaString += toReturn;
 		return toReturn;
 	}
 
-	public Object visit(MAEBinding node, Object data) {
+	@Override
+    public Object visit(MAEBinding node, Object data) {
 		String toReturn = node.getIdentifier() + "=";
-		this.formulaString += node.getIdentifier() + "=";
+		formulaString += node.getIdentifier() + "=";
 		toReturn += node.childrenAccept(this, data);
 		return toReturn;
 	}
 
-	public Object visit(MAEAdd node, Object data) {
-		this.formulaString += node.toString();
+	@Override
+    public Object visit(MAEAdd node, Object data) {
+		formulaString += node.toString();
 		return node.toString();
 	}
 
-	public Object visit(MAEMult node, Object data) {
-		this.formulaString += node.toString();
+	@Override
+    public Object visit(MAEMult node, Object data) {
+		formulaString += node.toString();
 		return node.toString();
 	}
 
-	public Object visit(MAEPower node, Object data) {
-		this.formulaString += node.toString();
+	@Override
+    public Object visit(MAEPower node, Object data) {
+		formulaString += node.toString();
 		return node.toString();
 	}
 
-	public Object visit(MAEIntNode node, Object data) {
-		this.formulaString += node.toString();
+	@Override
+    public Object visit(MAEIntNode node, Object data) {
+		formulaString += node.toString();
 		return node.toString();
 	}
 
-	public Object visit(MAEIdentifier node, Object data) {
-		this.formulaString += node.toString();
+	@Override
+    public Object visit(MAEIdentifier node, Object data) {
+		formulaString += node.toString();
 		return node.toString();
 	}
 
-	public Object visit(MAEBigSum node, Object data) {
-		this.formulaString += node.toString();
+	@Override
+    public Object visit(MAEBigSum node, Object data) {
+		formulaString += node.toString();
 		return node.toString();
 	}
 
 	public String getFormulaString() {
-		return this.formulaString;
+		return formulaString;
 	}
 
-	public Object visit(MAEpropertyChainExpression node, Object data) {
-		this.formulaString += node.toString();
+	@Override
+    public Object visit(MAEpropertyChainExpression node, Object data) {
+		formulaString += node.toString();
 		return node.toString();
 	}
 }

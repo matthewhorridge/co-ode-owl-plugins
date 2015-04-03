@@ -28,9 +28,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import org.protege.editor.core.ui.util.ComponentFactory;
-import org.protege.editor.owl.ui.framelist.OWLFrameList2;
-import org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent;
-import org.semanticweb.owl.model.OWLClass;
+import org.protege.editor.owl.ui.framelist.OWLFrameList;
+import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
+import org.semanticweb.owlapi.model.OWLClass;
 
 /**
  * This view displays the formulas related to the selected class
@@ -47,20 +47,20 @@ public class OWLArithmeticsFormulaClassView extends
 	 * 
 	 */
 	private static final long serialVersionUID = -823271855893012472L;
-	private OWLFrameList2<OWLClass> list;
+    private OWLFrameList<OWLClass> list;
 
 	/**
 	 * @see org.protege.editor.owl.ui.view.AbstractOWLClassViewComponent#initialiseClassView()
 	 */
 	@Override
 	public void initialiseClassView() throws Exception {
-		this.list = new OWLFrameList2<OWLClass>(getOWLEditorKit(),
+        list = new OWLFrameList<OWLClass>(getOWLEditorKit(),
 				new OWLCalculationsFormulaClassFrame(getOWLEditorKit()));
 		setLayout(new BorderLayout());
-		JScrollPane sp = ComponentFactory.createScrollPane(this.list);
+		JScrollPane sp = ComponentFactory.createScrollPane(list);
 		sp
 				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		this.list.setCellRenderer(new ViewFormulaCellRederer(true,
+		list.setCellRenderer(new ViewFormulaCellRederer(true,
 				getOWLEditorKit()));
 		this.add(sp);
 	}
@@ -78,7 +78,7 @@ public class OWLArithmeticsFormulaClassView extends
 	 */
 	@Override
 	protected OWLClass updateView(OWLClass selectedClass) {
-		this.list.setRootObject(selectedClass);
+		list.setRootObject(selectedClass);
 		return selectedClass;
 	}
 
@@ -87,6 +87,6 @@ public class OWLArithmeticsFormulaClassView extends
 	 */
 	@Override
 	public void disposeView() {
-		this.list.dispose();
+		list.dispose();
 	}
 }

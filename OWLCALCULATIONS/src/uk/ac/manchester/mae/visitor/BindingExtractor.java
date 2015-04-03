@@ -25,8 +25,8 @@ package uk.ac.manchester.mae.visitor;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.manchester.mae.evaluation.BindingModel;
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;

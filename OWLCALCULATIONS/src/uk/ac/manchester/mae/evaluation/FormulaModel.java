@@ -22,14 +22,14 @@
  */
 package uk.ac.manchester.mae.evaluation;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 
 import uk.ac.manchester.mae.ConflictStrategy;
 
@@ -41,9 +41,10 @@ import uk.ac.manchester.mae.ConflictStrategy;
  *         Apr 10, 2008
  */
 public class FormulaModel {
-	protected URI formulaURI;
+
+    protected IRI formulaURI;
 	protected ConflictStrategy conflictStrategy = null;
-	protected OWLDescription appliesTo = null;
+    protected OWLClassExpression appliesTo = null;
 	protected Set<BindingModel> bindings = new HashSet<BindingModel>();
 	protected String formulaBody = null;
 	protected StorageModel storageModel = null;
@@ -52,7 +53,7 @@ public class FormulaModel {
 	 * @return the conflictStrategy
 	 */
 	public ConflictStrategy getConflictStrategy() {
-		return this.conflictStrategy;
+		return conflictStrategy;
 	}
 
 	/**
@@ -67,7 +68,7 @@ public class FormulaModel {
 	 * @return the formulaBody
 	 */
 	public String getFormulaBody() {
-		return this.formulaBody;
+		return formulaBody;
 	}
 
 	/**
@@ -82,7 +83,7 @@ public class FormulaModel {
 	 * @return the bindings
 	 */
 	public Set<BindingModel> getBindings() {
-		return this.bindings;
+		return bindings;
 	}
 
 	/**
@@ -93,11 +94,11 @@ public class FormulaModel {
 		this.bindings = bindings;
 	}
 
-	public OWLDescription getAppliesTo() {
-		return this.appliesTo;
+    public OWLClassExpression getAppliesTo() {
+		return appliesTo;
 	}
 
-	public void setAppliesTo(OWLDescription appliesTo) {
+    public void setAppliesTo(OWLClassExpression appliesTo) {
 		this.appliesTo = appliesTo;
 	}
 
@@ -112,38 +113,37 @@ public class FormulaModel {
 	 * @return the storageModel
 	 */
 	public StorageModel getStorageModel() {
-		return this.storageModel;
+		return storageModel;
 	}
 
-	public URI getFormulaURI() {
-		return this.formulaURI;
+    public IRI getFormulaURI() {
+		return formulaURI;
 	}
 
-	public void setFormulaURI(URI formulaURI) {
+    public void setFormulaURI(IRI formulaURI) {
 		this.formulaURI = formulaURI;
 	}
 
 	public String render(OWLModelManager manager) {
 		StringBuilder toReturn = new StringBuilder();
-		if (this.conflictStrategy != null) {
+		if (conflictStrategy != null) {
 			toReturn.append("$");
-			toReturn.append(this.conflictStrategy.toString());
+			toReturn.append(conflictStrategy.toString());
 			toReturn.append("$ ");
 		}
-		if (this.appliesTo != null) {
-			String rendering = manager.getOWLObjectRenderer().render(
-					this.appliesTo, manager.getOWLEntityRenderer());
+		if (appliesTo != null) {
+            String rendering = manager.getOWLObjectRenderer().render(appliesTo);
 			toReturn.append("APPLIESTO <");
 			toReturn.append(rendering);
 			toReturn.append("> ");
 		}
-		if (this.storageModel != null) {
+		if (storageModel != null) {
 			toReturn.append("STORETO <");
-			toReturn.append(this.storageModel.getPropertyChainModel().render(
+			toReturn.append(storageModel.getPropertyChainModel().render(
 					manager));
 			toReturn.append(">");
 		}
-		if (!this.bindings.isEmpty()) {
+		if (!bindings.isEmpty()) {
 			toReturn.append("{");
 			List<BindingModel> listedBindings = new ArrayList<BindingModel>(
 					getBindings());

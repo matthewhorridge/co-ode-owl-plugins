@@ -5,15 +5,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxDescriptionParser;
 import org.coode.oae.utils.RenderingOWLEntityChecker;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.model.description.OWLExpressionParserException;
+import org.protege.editor.owl.model.classexpression.OWLExpressionParserException;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
-import org.semanticweb.owl.expression.ParserException;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObjectProperty;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
+import org.semanticweb.owlapi.util.mansyntax.ManchesterOWLSyntaxParser;
 
 import uk.ac.manchester.mae.evaluation.PropertyChainCell;
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;
@@ -27,7 +28,7 @@ public class PropertyChainExpressionChecker implements
 	// final OWLExpressionChecker<List<OWLObjectPropertyExpression>>
 	// objectPortionChecker;
 	final RenderingOWLEntityChecker r;
-	final ManchesterOWLSyntaxDescriptionParser parser;
+    final ManchesterOWLSyntaxParser parser;
 	final List<PropertyChainCell> cells = new ArrayList<PropertyChainCell>();
 	final Set<String> emptySet = Collections.emptySet();
 	final boolean objectPropertiesOnly;
@@ -36,41 +37,42 @@ public class PropertyChainExpressionChecker implements
 
 	public PropertyChainExpressionChecker(OWLEditorKit kit,
 			boolean isObjectPropertiesOnly, boolean canBeEmpty) {
-		this.r = new RenderingOWLEntityChecker(kit.getModelManager());
-		this.parser = new ManchesterOWLSyntaxDescriptionParser(kit
-				.getModelManager().getOWLDataFactory(), this.r);
-		this.objectPropertiesOnly = isObjectPropertiesOnly;
-		this.datatypesAllowed = !this.objectPropertiesOnly;
+		r = new RenderingOWLEntityChecker(kit.getModelManager());
+        parser = OWLManager.createManchesterParser();
+        parser.setOWLEntityChecker(r);
+		objectPropertiesOnly = isObjectPropertiesOnly;
+		datatypesAllowed = !objectPropertiesOnly;
 		this.canBeEmpty = canBeEmpty;
 	}
 
-	public void check(String _text) throws OWLExpressionParserException {
-		this.cells.clear();
+	@Override
+    public void check(String _text) throws OWLExpressionParserException {
+		cells.clear();
 		String text = _text.trim();
 		// catches the bogus fake expression used by autocompleter
-		if ((text.length() == 0 || text.equals("**")) && !this.canBeEmpty) {
+		if ((text.length() == 0 || text.equals("**")) && !canBeEmpty) {
 			throw new OWLExpressionParserException("The chain cannot be empty",
-					0, 0, false, true, true && this.datatypesAllowed, false,
-					false, this.emptySet);
+					0, 0, false, true, true && datatypesAllowed, false,
+ false,
+                    false, emptySet);
 		}
-		List<MAEpropertyChainCell> list = this.checkBasicPropertyChain(_text);
+		List<MAEpropertyChainCell> list = checkBasicPropertyChain(_text);
 		for (int i = 0; i < list.size() - 1; i++) {
 			MAEpropertyChainCell c = list.get(i);
-			OWLObjectProperty op = this.checkObjectProperty(_text, c);
-			OWLDescription odfacet = this.checkFacet(_text, c, c.getFacet());
-			this.cells.add(new PropertyChainCell(op, odfacet));
+			OWLObjectProperty op = checkObjectProperty(_text, c);
+            OWLClassExpression odfacet = checkFacet(_text, c, c.getFacet());
+			cells.add(new PropertyChainCell(op, odfacet));
 		}
 		// now check that the last one is a datatype property
 		if (list.size() > 0) {
 			MAEpropertyChainCell c = list.get(list.size() - 1);
-			if (this.objectPropertiesOnly) {
-				OWLObjectProperty op = this.checkObjectProperty(_text, c);
-				OWLDescription odfacet = this
-						.checkFacet(_text, c, c.getFacet());
-				this.cells.add(new PropertyChainCell(op, odfacet));
+			if (objectPropertiesOnly) {
+				OWLObjectProperty op = checkObjectProperty(_text, c);
+                OWLClassExpression odfacet = checkFacet(_text, c, c.getFacet());
+				cells.add(new PropertyChainCell(op, odfacet));
 			} else {
-				OWLDataProperty dp = this.checkDataProperty(_text, c);
-				this.cells.add(new PropertyChainCell(dp, null));
+				OWLDataProperty dp = checkDataProperty(_text, c);
+				cells.add(new PropertyChainCell(dp, null));
 			}
 		}
 	}
@@ -83,21 +85,24 @@ public class PropertyChainExpressionChecker implements
 		} catch (TokenMgrError e) {
 			if (e.getMessage().contains("Encountered: \"[\"")) {
 				throw new OWLExpressionParserException(e.getMessage(), 0, _text
-						.length(), true, false, false, false, false,
-						this.emptySet);
+.length(), true, false, false, false, false,
+                        false,
+						emptySet);
 			}
 			throw new OWLExpressionParserException(e.getMessage(), 0, _text
-					.length(), true, true, true && this.datatypesAllowed,
-					false, false, this.emptySet);
+					.length(), true, true, true && datatypesAllowed,
+                    false, false, false, emptySet);
 		} catch (ParseException e1) {
 			if (e1.getMessage().startsWith("Unbalanced brackets")) {
 				throw new OWLExpressionParserException(e1.getMessage(), 0,
-						_text.length(), true, false, false, false, false,
-						this.emptySet);
+                        _text.length(), true, false, false, false, false,
+                        false,
+						emptySet);
 			}
 			throw new OWLExpressionParserException(e1.getMessage(), 0, _text
-					.length(), false, true, true && this.datatypesAllowed,
-					false, false, this.emptySet);
+.length(), false, true, true && datatypesAllowed,
+                    false,
+					false, false, emptySet);
 		}
 		return list;
 	}
@@ -107,10 +112,10 @@ public class PropertyChainExpressionChecker implements
 		if (c.getPropertyName().length() == 0) {
 			throw new OWLExpressionParserException(
 					"The chain is not complete: missing objectproperty", _text
-							.length(), _text.length(), false, true, false,
-					false, false, this.emptySet);
+.length(), _text.length(), false, true, false, false,
+					false, false, emptySet);
 		} else {
-			OWLObjectProperty op = this.r.getOWLObjectProperty(c
+			OWLObjectProperty op = r.getOWLObjectProperty(c
 					.getPropertyName());
 			if (op == null) {
 				String s = c.getPropertyName();
@@ -118,27 +123,30 @@ public class PropertyChainExpressionChecker implements
 				int i2 = _text.indexOf(s) + s.length();
 				throw new OWLExpressionParserException(
 						"The current property is not an OWLObjectProperty: "
-								+ s, i1, i2, false, true, false, false, false,
-						this.emptySet);
+                                + s, i1, i2, false, true, false, false, false,
+                        false,
+						emptySet);
 			}
 			return op;
 		}
 	}
 
-	private OWLDescription checkFacet(String _text, MAEpropertyChainCell c,
+    private OWLClassExpression checkFacet(String _text, MAEpropertyChainCell c,
 			String facet) throws OWLExpressionParserException {
-		OWLDescription odfacet = null;
+        OWLClassExpression odfacet = null;
 		if (facet != null) {
+            parser.setStringToParse(facet);
 			try {
-				odfacet = this.parser.parse(facet);
-			} catch (ParserException e) {
+                odfacet = parser.parseClassExpression();
+            } catch (OWLRuntimeException e) {
 				String s = c.getContent();
 				int i1 = _text.indexOf(s);
 				int i2 = _text.indexOf(s) + s.length();
 				throw new OWLExpressionParserException(
 						"The current facet is not a valid Manchester syntax class expression: "
-								+ s, i1, i2, true, false, false, false, false,
-						this.emptySet);
+                                + s, i1, i2, true, false, false, false, false,
+                        false,
+						emptySet);
 			}
 		}
 		return odfacet;
@@ -149,25 +157,27 @@ public class PropertyChainExpressionChecker implements
 		if (c.getPropertyName().length() == 0) {
 			throw new OWLExpressionParserException(
 					"The chain is not complete: missing dataproperty", _text
-							.length(), _text.length(), false, true, true,
-					false, false, this.emptySet);
+.length(), _text.length(), false, true, true, false,
+					false, false, emptySet);
 		} else {
-			OWLDataProperty dp = this.r.getOWLDataProperty(c.getPropertyName());
+			OWLDataProperty dp = r.getOWLDataProperty(c.getPropertyName());
 			if (dp == null) {
 				String s = c.getContent();
 				int i1 = _text.indexOf(s);
 				int i2 = _text.indexOf(s) + s.length();
 				throw new OWLExpressionParserException(
 						"The current property is not an OWLDataProperty: " + s,
-						i1, i2, false, false, true, false, false, this.emptySet);
+                        i1, i2, false, false, true, false, false, false,
+                        emptySet);
 			}
 			return dp;
 		}
 	}
 
-	public PropertyChainModel createObject(String text)
+	@Override
+    public PropertyChainModel createObject(String text)
 			throws OWLExpressionParserException {
-		this.check(text);
-		return new PropertyChainModel(this.cells);
+		check(text);
+		return new PropertyChainModel(cells);
 	}
 }

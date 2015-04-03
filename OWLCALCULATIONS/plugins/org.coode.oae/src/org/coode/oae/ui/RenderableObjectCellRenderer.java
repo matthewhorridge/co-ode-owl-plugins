@@ -6,7 +6,7 @@ import org.coode.oae.ui.StaticListModel.StaticListItem;
 import org.coode.oae.ui.VariableListModel.VariableListItem;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import uk.ac.manchester.mae.evaluation.BindingModel;
 import uk.ac.manchester.mae.evaluation.PropertyChainCell;

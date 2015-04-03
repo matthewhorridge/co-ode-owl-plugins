@@ -24,7 +24,7 @@ package uk.ac.manchester.mae.report;
 
 import java.util.Set;
 
-import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataProperty;
 
 import uk.ac.manchester.mae.parser.MAEStart;
 

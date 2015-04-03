@@ -27,8 +27,8 @@ import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcherImpl;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.manchester.mae.parser.ArithmeticsParser;
 

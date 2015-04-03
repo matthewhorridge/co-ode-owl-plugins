@@ -18,10 +18,11 @@ import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import uk.ac.manchester.mae.evaluation.PropertyChainCell;
 
@@ -29,42 +30,45 @@ public class DataPropertySelector extends JPanel implements VerifiedInputEditor 
 	private static final long serialVersionUID = 4118824886564461973L;
 	protected List<OWLDataProperty> dataProperties = new ArrayList<OWLDataProperty>();
 	protected StaticListModel<OWLDataProperty> dataPropertiesModel = new StaticListModel<OWLDataProperty>(
-			this.dataProperties, null);
+			dataProperties, null);
 	protected MList dataPropertiesView = new MList();
 	protected Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private OWLEditorKit kit;
 
-	public void addStatusChangedListener(
+	@Override
+    public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		this.listeners.add(listener);
+		listeners.add(listener);
 	}
 
-	public void removeStatusChangedListener(
+	@Override
+    public void removeStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		this.listeners.remove(listener);
+		listeners.remove(listener);
 	}
 
 	public DataPropertySelector(OWLEditorKit k) {
 		super(new BorderLayout());
-		this.kit = k;
-		this.dataPropertiesView
-				.setCellRenderer(new RenderableObjectCellRenderer(this.kit));
-		this.dataPropertiesView.setModel(this.dataPropertiesModel);
-		OWLObjectHierarchyProvider<OWLDataProperty> dpp = this.kit
+		kit = k;
+		dataPropertiesView
+				.setCellRenderer(new RenderableObjectCellRenderer(kit));
+		dataPropertiesView.setModel(dataPropertiesModel);
+		OWLObjectHierarchyProvider<OWLDataProperty> dpp = kit
 				.getOWLModelManager().getOWLHierarchyManager()
 				.getOWLDataPropertyHierarchyProvider();
 		for (OWLDataProperty dp : dpp.getRoots()) {
-			this.dataProperties.add(dp);
+			dataProperties.add(dp);
 			for (OWLDataProperty dpd : dpp.getDescendants(dp)) {
-				this.dataProperties.add(dpd);
+				dataProperties.add(dpd);
 			}
 		}
-		this.dataPropertiesModel.init();
-		this.dataPropertiesView
+		dataPropertiesModel.init();
+		dataPropertiesView
 				.addListSelectionListener(new ListSelectionListener() {
-					public void valueChanged(ListSelectionEvent e) {
+					@Override
+                    public void valueChanged(ListSelectionEvent e) {
 						if (!e.getValueIsAdjusting()) {
-							if (DataPropertySelector.this.dataPropertiesView
+							if (dataPropertiesView
 									.getSelectedIndex() > -1) {
 								// then status is OK
 								notifyVerified();
@@ -73,7 +77,7 @@ public class DataPropertySelector extends JPanel implements VerifiedInputEditor 
 					}
 				});
 		JScrollPane spd = ComponentFactory
-				.createScrollPane(this.dataPropertiesView);
+				.createScrollPane(dataPropertiesView);
 		spd.setBorder(ComponentFactory
 				.createTitledBorder("Data property selection"));
 		this.add(spd, BorderLayout.CENTER);
@@ -81,8 +85,8 @@ public class DataPropertySelector extends JPanel implements VerifiedInputEditor 
 
 	protected Set<OWLClass> getOWLClasses(OWLObjectProperty op) {
 		Set<OWLClass> ranges = new HashSet<OWLClass>();
-		for (OWLDescription d : op.getRanges(this.kit.getOWLModelManager()
-				.getActiveOntology())) {
+        for (OWLClassExpression d : EntitySearcher.getRanges(op, kit
+                .getOWLModelManager().getActiveOntology())) {
 			if (d instanceof OWLClass) {
 				ranges.add((OWLClass) d);
 			}
@@ -91,13 +95,13 @@ public class DataPropertySelector extends JPanel implements VerifiedInputEditor 
 	}
 
 	public void clear() {
-		this.dataPropertiesView.getSelectionModel().clearSelection();
+		dataPropertiesView.getSelectionModel().clearSelection();
 	}
 
 	@SuppressWarnings("unchecked")
 	public PropertyChainCell getCell() {
-		if (this.dataPropertiesView.getSelectedIndex() > -1) {
-			OWLDataProperty prop = ((StaticListItem<OWLDataProperty>) this.dataPropertiesView
+		if (dataPropertiesView.getSelectedIndex() > -1) {
+			OWLDataProperty prop = ((StaticListItem<OWLDataProperty>) dataPropertiesView
 					.getSelectedValue()).getItem();
 			return new PropertyChainCell(prop, null);
 		}
@@ -105,7 +109,7 @@ public class DataPropertySelector extends JPanel implements VerifiedInputEditor 
 	}
 
 	protected void notifyVerified() {
-		for (InputVerificationStatusChangedListener i : this.listeners) {
+		for (InputVerificationStatusChangedListener i : listeners) {
 			i.verifiedStatusChanged(true);
 		}
 	}

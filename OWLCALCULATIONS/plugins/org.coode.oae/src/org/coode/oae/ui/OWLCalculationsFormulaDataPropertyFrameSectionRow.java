@@ -22,19 +22,20 @@
  */
 package org.coode.oae.ui;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.editor.OWLObjectEditor;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRow;
 import org.protege.editor.owl.ui.frame.OWLFrameSection;
-import org.protege.editor.owl.ui.frame.OWLFrameSectionRowObjectEditor;
-import org.semanticweb.owl.model.OWLAnnotationAxiom;
-import org.semanticweb.owl.model.OWLDataFactory;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationAxiom;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 import uk.ac.manchester.mae.evaluation.FormulaModel;
 import uk.ac.manchester.mae.parser.MAEStart;
@@ -49,33 +50,36 @@ import uk.ac.manchester.mae.parser.ParseException;
  */
 public class OWLCalculationsFormulaDataPropertyFrameSectionRow
 		extends
-		AbstractOWLFrameSectionRow<OWLDataProperty, OWLAnnotationAxiom<OWLDataProperty>, FormulaModel> {
-	protected OWLAnnotationAxiom<OWLDataProperty> axiom;
+        AbstractOWLFrameSectionRow<OWLDataProperty, OWLAnnotationAssertionAxiom, FormulaModel> {
+
+    protected OWLAnnotationAssertionAxiom axiom;
 
 	protected OWLCalculationsFormulaDataPropertyFrameSectionRow(
 			OWLEditorKit owlEditorKit,
-			OWLFrameSection<OWLDataProperty, OWLAnnotationAxiom<OWLDataProperty>, FormulaModel> section,
-			OWLOntology ontology, OWLDataProperty rootObject,
-			OWLAnnotationAxiom<OWLDataProperty> axiom) {
+            OWLFrameSection<OWLDataProperty, OWLAnnotationAssertionAxiom, FormulaModel> section,
+            OWLOntology ontology, OWLDataProperty rootObject,
+            OWLAnnotationAssertionAxiom axiom) {
 		super(owlEditorKit, section, ontology, rootObject, axiom);
 		this.axiom = axiom;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	protected OWLAnnotationAxiom<OWLDataProperty> createAxiom(
+    protected OWLAnnotationAssertionAxiom
+            createAxiom(
 			FormulaModel editedObject) {
-		OWLAnnotationAxiom toReturn = null;
-		OWLDataProperty dataProperty = getRootObject();
+        OWLAnnotationAssertionAxiom toReturn = null;
+        OWLDataProperty dataProperty = getRootObject();
 		OWLDataFactory odf = getOWLDataFactory();
 		if (dataProperty != null) {
-			URI uri = editedObject.getFormulaURI();
+            IRI uri = editedObject.getFormulaURI();
 			if (uri != null) {
 				try {
-					toReturn = odf.getOWLEntityAnnotationAxiom(dataProperty,
-							uri, odf.getOWLTypedConstant(MAENodeAdapter
-									.toFormula(editedObject,
-											getOWLModelManager()).toString()));
+                    toReturn = odf.getOWLAnnotationAssertionAxiom(odf
+                            .getOWLAnnotationProperty(uri), dataProperty
+                            .getIRI(), odf.getOWLLiteral(MAENodeAdapter
+                            .toFormula(editedObject, getOWLModelManager())
+                                    .toString()));
 				} catch (ParseException e) {
 					// Impossible
 					e.printStackTrace();
@@ -84,26 +88,24 @@ public class OWLCalculationsFormulaDataPropertyFrameSectionRow
 		}
 		return toReturn;
 	}
-
 	@Override
-	protected OWLFrameSectionRowObjectEditor<FormulaModel> getObjectEditor() {
-		OWLCalculationsFormulaEditor toReturn = new OWLCalculationsFormulaEditor(
+    protected OWLObjectEditor<FormulaModel> getObjectEditor() {
+        OWLCalculationsFormulaEditor toReturn = new OWLCalculationsFormulaEditor(
 				getOWLEditorKit());
 		AnnotationFormulaExtractor extractor = new AnnotationFormulaExtractor(
 				null, getOWLModelManager());
-		this.axiom.getAnnotation().accept(extractor);
-		MAEStart formula = extractor.getExtractedFormula();
+        MAEStart formula = extractor.visit(axiom.getAnnotation());
 		if (formula != null) {
-			toReturn.setFormula(MAENodeAdapter.toFormulaModel(formula,
-					this.axiom.getAnnotation().getAnnotationURI(),
-					getOWLEditorKit()));
+            toReturn.setFormula(MAENodeAdapter.toFormulaModel(formula, axiom
+                    .getAnnotation().getProperty().getIRI(), getOWLEditorKit()));
 		}
 		return toReturn;
 	}
 
-	public List<? extends OWLObject> getManipulatableObjects() {
-		List<OWLAnnotationAxiom<OWLDataProperty>> toReturn = new ArrayList<OWLAnnotationAxiom<OWLDataProperty>>();
-		toReturn.add(this.axiom);
+	@Override
+    public List<? extends OWLObject> getManipulatableObjects() {
+        List<OWLAnnotationAxiom> toReturn = new ArrayList<OWLAnnotationAxiom>();
+		toReturn.add(axiom);
 		return toReturn;
 	}
 }

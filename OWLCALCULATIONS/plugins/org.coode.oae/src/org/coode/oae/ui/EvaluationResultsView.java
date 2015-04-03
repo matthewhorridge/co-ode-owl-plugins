@@ -35,7 +35,7 @@ import javax.swing.tree.MutableTreeNode;
 
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-import org.semanticweb.owl.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLIndividual;
 
 import uk.ac.manchester.mae.report.EvaluationReport;
 import uk.ac.manchester.mae.report.FormulaEvaluationReport;

@@ -24,11 +24,10 @@ package org.coode.oae.ui;
 
 import org.coode.oae.utils.ParserFactory;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLAnnotationVisitor;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLConstantAnnotation;
-import org.semanticweb.owl.model.OWLObjectAnnotation;
-import org.semanticweb.owl.util.NamespaceUtil;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLLiteral;
 
 import uk.ac.manchester.mae.Constants;
 import uk.ac.manchester.mae.parser.ArithmeticsParser;
@@ -42,10 +41,10 @@ import uk.ac.manchester.mae.visitor.protege.ProtegeClassExtractor;
  *         Bio-Health Informatics Group<br>
  *         Apr 4, 2008
  */
-public class AnnotationFormulaExtractor implements OWLAnnotationVisitor {
+public class AnnotationFormulaExtractor {
+
 	protected OWLClass owlClass = null;
 	private OWLModelManager modelManager;
-	private MAEStart extractedFormula;
 
 	/**
 	 * @param owlClass
@@ -57,54 +56,31 @@ public class AnnotationFormulaExtractor implements OWLAnnotationVisitor {
 		this.modelManager = modelManager;
 	}
 
-	public AnnotationFormulaExtractor() {
-	}
+    public AnnotationFormulaExtractor() {}
 
-	/**
-	 * @see org.semanticweb.owl.model.OWLAnnotationVisitor#visit(org.semanticweb.owl.model.OWLObjectAnnotation)
-	 */
-	public void visit(OWLObjectAnnotation annotation) {
-	}
-
-	/**
-	 * @see org.semanticweb.owl.model.OWLAnnotationVisitor#visit(org.semanticweb.owl.model.OWLConstantAnnotation)
-	 */
-	public void visit(OWLConstantAnnotation annotation) {
-		NamespaceUtil namespaceUtil = new NamespaceUtil();
-		String[] namespaceSplitURString = new String[2];
-		String uriString = annotation.getAnnotationURI().toString();
-		if (uriString != null) {
-			namespaceUtil.split(uriString, namespaceSplitURString);
-			String namespace = namespaceSplitURString[0];
-			if (namespace != null
-					&& namespace
-							.compareTo(Constants.FORMULA_NAMESPACE_URI_STRING) == 0) {
-				String formulaString = annotation.getAnnotationValue()
-						.getLiteral().toString();
-				ParserFactory.initParser(formulaString, this.modelManager);
+    public MAEStart visit(OWLAnnotation annotation) {
+        MAEStart extractedFormula = null;
+        IRI uriString = annotation.getProperty().getIRI();
+        String namespace = uriString.getNamespace();
+        if (Constants.FORMULA_NAMESPACE_URI_STRING.equals(namespace)) {
+            String formulaString = ((OWLLiteral) annotation.getValue())
+                    .getLiteral();
+            ParserFactory.initParser(formulaString, modelManager);
 				try {
 					MAEStart extractedF = (MAEStart) ArithmeticsParser.Start();
 					ProtegeClassExtractor classExtractor = new ProtegeClassExtractor(
-							this.modelManager);
+                        modelManager);
 					extractedF.jjtAccept(classExtractor, null);
-					Object extractedClass = classExtractor
-							.getClassDescription();
-					this.extractedFormula = this.owlClass == null
-							|| this.owlClass.equals(extractedClass) ? extractedF
-							: null;
+                Object extractedClass = classExtractor.getClassDescription();
+                extractedFormula = owlClass == null
+                        || owlClass.equals(extractedClass) ? extractedF : null;
 				} catch (Throwable e) {
 					System.out.println(formulaString);
 					System.out.println("Caught at:");
 					e.printStackTrace(System.out);
 				}
 			}
+        return extractedFormula;
 		}
 	}
 
-	/**
-	 * @return the extractedFormula
-	 */
-	public MAEStart getExtractedFormula() {
-		return this.extractedFormula;
-	}
-}

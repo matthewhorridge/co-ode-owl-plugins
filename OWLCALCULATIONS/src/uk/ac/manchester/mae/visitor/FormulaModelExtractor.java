@@ -24,17 +24,14 @@ package uk.ac.manchester.mae.visitor;
 
 import java.util.Set;
 
-import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxDescriptionParser;
-import org.semanticweb.owl.expression.ParserException;
-import org.semanticweb.owl.expression.ShortFormEntityChecker;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
-import org.semanticweb.owl.util.OWLEntitySetProvider;
-import org.semanticweb.owl.util.ReferencedEntitySetProvider;
-import org.semanticweb.owl.util.SimpleShortFormProvider;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.expression.ShortFormEntityChecker;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.util.BidirectionalShortFormProviderAdapter;
+import org.semanticweb.owlapi.util.SimpleShortFormProvider;
+import org.semanticweb.owlapi.util.mansyntax.ManchesterOWLSyntaxParser;
 
 import uk.ac.manchester.mae.ConflictStrategyFactory;
 import uk.ac.manchester.mae.evaluation.BindingModel;
@@ -73,7 +70,7 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 			Set<OWLOntology> ontologies) {
 		this.manager = manager;
 		this.ontologies = ontologies;
-		this.formulaModel = new FormulaModel();
+		formulaModel = new FormulaModel();
 	}
 
 	/**
@@ -88,7 +85,8 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStart,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEStart node, Object data) {
+	@Override
+    public Object visit(MAEStart node, Object data) {
 		int childCount = node.jjtGetNumChildren();
 		for (int i = 0; i < childCount; i++) {
 			Node child = node.jjtGetChild(i);
@@ -101,8 +99,9 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEConflictStrategy,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEConflictStrategy node, Object data) {
-		this.formulaModel.setConflictStrategy(ConflictStrategyFactory
+	@Override
+    public Object visit(MAEConflictStrategy node, Object data) {
+		formulaModel.setConflictStrategy(ConflictStrategyFactory
 				.getStrategy(node.getStrategyName()));
 		return null;
 	}
@@ -111,22 +110,16 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
-		BidirectionalShortFormProviderAdapter adapter = new BidirectionalShortFormProviderAdapter(
+	@Override
+    public Object visit(MAEmanSyntaxClassExpression node, Object data) {
+        BidirectionalShortFormProviderAdapter adapter = new BidirectionalShortFormProviderAdapter(
+                ontologies,
 				new SimpleShortFormProvider());
-		OWLEntitySetProvider<OWLEntity> owlEntitySetProvider = new ReferencedEntitySetProvider(
-				this.ontologies);
-		adapter.rebuild(owlEntitySetProvider);
-		ManchesterOWLSyntaxDescriptionParser parser = new ManchesterOWLSyntaxDescriptionParser(
-				this.manager.getOWLDataFactory(), new ShortFormEntityChecker(
-						adapter));
-		OWLDescription owlExpresion = null;
-		try {
-			owlExpresion = parser.parse(node.getContent());
-		} catch (ParserException e) {
-			e.printStackTrace();
-		}
-		this.formulaModel.setAppliesTo(owlExpresion);
+        ManchesterOWLSyntaxParser parser = OWLManager.createManchesterParser();
+        parser.setOWLEntityChecker(new ShortFormEntityChecker(adapter));
+        parser.setStringToParse(node.getContent());
+        OWLClassExpression owlExpresion = parser.parseClassExpression();
+		formulaModel.setAppliesTo(owlExpresion);
 		return owlExpresion;
 	}
 
@@ -137,10 +130,11 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * uk.ac.manchester.mae.ArithmeticsParserVisitor#visit(uk.ac.manchester.
 	 * mae.MAEBinding, java.lang.Object)
 	 */
-	public Object visit(MAEBinding node, Object data) {
+	@Override
+    public Object visit(MAEBinding node, Object data) {
 		BindingModel bindingModel = new BindingModel(node.getIdentifier(),
 				(PropertyChainModel) node.jjtGetChild(0).jjtAccept(this, data));
-		this.formulaModel.getBindings().add(bindingModel);
+		formulaModel.getBindings().add(bindingModel);
 		return null;
 	}
 
@@ -148,17 +142,19 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPropertyChain,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEpropertyChainExpression node, Object data) {
-		return MAEAdapter.toPropertyChainModel(node, this.ontologies,
-				this.manager);
+	@Override
+    public Object visit(MAEpropertyChainExpression node, Object data) {
+		return MAEAdapter.toPropertyChainModel(node, ontologies,
+				manager);
 	}
 
 	/**
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEAdd,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEAdd node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
+	@Override
+    public Object visit(MAEAdd node, Object data) {
+		formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
@@ -166,8 +162,9 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEMult,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEMult node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
+	@Override
+    public Object visit(MAEMult node, Object data) {
+		formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
@@ -175,8 +172,9 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPower,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEPower node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
+	@Override
+    public Object visit(MAEPower node, Object data) {
+		formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
@@ -184,8 +182,9 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEIntNode,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEIntNode node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
+	@Override
+    public Object visit(MAEIntNode node, Object data) {
+		formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
@@ -193,8 +192,9 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEIdentifier,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEIdentifier node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
+	@Override
+    public Object visit(MAEIdentifier node, Object data) {
+		formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
@@ -202,30 +202,32 @@ public class FormulaModelExtractor implements ArithmeticsParserVisitor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEBigSum,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEBigSum node, Object data) {
-		this.formulaModel.setFormulaBody(node.toString() + ";");
+	@Override
+    public Object visit(MAEBigSum node, Object data) {
+		formulaModel.setFormulaBody(node.toString() + ";");
 		return null;
 	}
 
 	public FormulaModel getExtractedFormulaModel() {
-		return this.formulaModel;
+		return formulaModel;
 	}
 
 	/**
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStoreTo,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEStoreTo node, Object data) {
+	@Override
+    public Object visit(MAEStoreTo node, Object data) {
 		// PropertyChainModel propertyChainModel = (PropertyChainModel) node
 		// .jjtGetChild(0).jjtAccept(this, data);
 		MAEpropertyChainExpression propertyChain = (MAEpropertyChainExpression) node
 				.jjtGetChild(0);
 		if (propertyChain != null) {
 			PropertyChainModel propertyChainModel = MAEAdapter
-					.toPropertyChainModel(propertyChain, this.ontologies,
-							this.manager);
+					.toPropertyChainModel(propertyChain, ontologies,
+							manager);
 			StorageModel storageModel = new StorageModel(propertyChainModel);
-			this.formulaModel.setStorageModel(storageModel);
+			formulaModel.setStorageModel(storageModel);
 		}
 		return null;
 	}

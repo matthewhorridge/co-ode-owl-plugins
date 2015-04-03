@@ -18,9 +18,10 @@ import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import uk.ac.manchester.mae.evaluation.PropertyChainCell;
 
@@ -32,72 +33,75 @@ public class ObjectPropertySelector extends JPanel implements
 	protected List<OWLObjectProperty> objectProperties = new ArrayList<OWLObjectProperty>();
 	protected List<OWLClass> facetClasses = new ArrayList<OWLClass>();
 	protected StaticListModel<OWLObjectProperty> objectPropertiesModel = new StaticListModel<OWLObjectProperty>(
-			this.objectProperties, null);
+			objectProperties, null);
 	protected StaticListModel<OWLClass> facetClassesModel = new StaticListModel<OWLClass>(
-			this.facetClasses, null);
+			facetClasses, null);
 	private Set<InputVerificationStatusChangedListener> listeners = new HashSet<InputVerificationStatusChangedListener>();
 	private OWLEditorKit kit;
 
-	public void addStatusChangedListener(
+	@Override
+    public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		this.listeners.add(listener);
+		listeners.add(listener);
 	}
 
-	public void removeStatusChangedListener(
+	@Override
+    public void removeStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		this.listeners.remove(listener);
+		listeners.remove(listener);
 	}
 
 	public ObjectPropertySelector(OWLEditorKit k) {
 		super(new BorderLayout());
-		this.kit = k;
-		this.objectPropertiesView
+		kit = k;
+		objectPropertiesView
 				.setPreferredSize(GraphicalEditorConstants.LIST_PREFERRED_SIZE);
-		this.facetClassView
+		facetClassView
 				.setPreferredSize(GraphicalEditorConstants.LIST_PREFERRED_SIZE);
-		this.objectPropertiesView
-				.setCellRenderer(new RenderableObjectCellRenderer(this.kit));
-		this.facetClassView.setCellRenderer(new RenderableObjectCellRenderer(
-				this.kit));
-		this.objectPropertiesView.setModel(this.objectPropertiesModel);
-		this.facetClassView.setModel(this.facetClassesModel);
-		OWLObjectHierarchyProvider<OWLObjectProperty> opp = this.kit
+		objectPropertiesView
+				.setCellRenderer(new RenderableObjectCellRenderer(kit));
+		facetClassView.setCellRenderer(new RenderableObjectCellRenderer(
+				kit));
+		objectPropertiesView.setModel(objectPropertiesModel);
+		facetClassView.setModel(facetClassesModel);
+		OWLObjectHierarchyProvider<OWLObjectProperty> opp = kit
 				.getOWLModelManager().getOWLHierarchyManager()
 				.getOWLObjectPropertyHierarchyProvider();
 		for (OWLObjectProperty op : opp.getRoots()) {
-			this.objectProperties.add(op);
+			objectProperties.add(op);
 			for (OWLObjectProperty opd : opp.getDescendants(op)) {
-				this.objectProperties.add(opd);
+				objectProperties.add(opd);
 			}
 		}
-		this.objectPropertiesModel.init();
-		this.facetClassesModel.init();
+		objectPropertiesModel.init();
+		facetClassesModel.init();
 		JScrollPane spobj = ComponentFactory
-				.createScrollPane(this.objectPropertiesView);
+				.createScrollPane(objectPropertiesView);
 		spobj.setBorder(ComponentFactory
 				.createTitledBorder("Object property selection"));
 		JScrollPane spobjf = ComponentFactory
-				.createScrollPane(this.facetClassView);
+				.createScrollPane(facetClassView);
 		spobjf
 				.setBorder(ComponentFactory
 						.createTitledBorder("Facet selection"));
 		this.add(spobj, BorderLayout.WEST);
 		this.add(spobjf, BorderLayout.EAST);
-		this.objectPropertiesView
+		objectPropertiesView
 				.addListSelectionListener(new ListSelectionListener() {
-					@SuppressWarnings("unchecked")
+					@Override
+                    @SuppressWarnings("unchecked")
 					public void valueChanged(ListSelectionEvent e) {
 						if (!e.getValueIsAdjusting()) {
-							if (ObjectPropertySelector.this.objectPropertiesView
+							if (objectPropertiesView
 									.getSelectedIndex() > -1) {
 								// then facets get loaded and status is OK
-								OWLObjectProperty p = ((StaticListItem<OWLObjectProperty>) ObjectPropertySelector.this.objectPropertiesView
+								OWLObjectProperty p = ((StaticListItem<OWLObjectProperty>) objectPropertiesView
 										.getSelectedValue()).getItem();
-								ObjectPropertySelector.this.facetClasses
+								facetClasses
 										.clear();
-								ObjectPropertySelector.this.facetClasses
+								facetClasses
 										.addAll(getOWLClasses(p));
-								ObjectPropertySelector.this.facetClassesModel
+								facetClassesModel
 										.init();
 								notifyVerified();
 							}
@@ -108,8 +112,8 @@ public class ObjectPropertySelector extends JPanel implements
 
 	protected Set<OWLClass> getOWLClasses(OWLObjectProperty op) {
 		Set<OWLClass> ranges = new HashSet<OWLClass>();
-		for (OWLDescription d : op.getRanges(this.kit.getOWLModelManager()
-				.getActiveOntology())) {
+        for (OWLClassExpression d : EntitySearcher.getRanges(op, kit
+                .getOWLModelManager().getActiveOntology())) {
 			if (d instanceof OWLClass) {
 				ranges.add((OWLClass) d);
 			}
@@ -118,20 +122,20 @@ public class ObjectPropertySelector extends JPanel implements
 	}
 
 	public void clear() {
-		this.objectPropertiesView.getSelectionModel().clearSelection();
-		this.facetClassView.getSelectionModel().clearSelection();
-		this.facetClasses.clear();
-		this.facetClassesModel.init();
+		objectPropertiesView.getSelectionModel().clearSelection();
+		facetClassView.getSelectionModel().clearSelection();
+		facetClasses.clear();
+		facetClassesModel.init();
 	}
 
 	@SuppressWarnings("unchecked")
 	public PropertyChainCell getCell() {
-		if (this.objectPropertiesView.getSelectedIndex() > -1) {
-			OWLObjectProperty p = ((StaticListItem<OWLObjectProperty>) this.objectPropertiesView
+		if (objectPropertiesView.getSelectedIndex() > -1) {
+			OWLObjectProperty p = ((StaticListItem<OWLObjectProperty>) objectPropertiesView
 					.getSelectedValue()).getItem();
 			OWLClass facet = null;
-			if (this.facetClassView.getSelectedIndex() > -1) {
-				facet = ((StaticListItem<OWLClass>) this.facetClassView
+			if (facetClassView.getSelectedIndex() > -1) {
+				facet = ((StaticListItem<OWLClass>) facetClassView
 						.getSelectedValue()).getItem();
 			}
 			return new PropertyChainCell(p, facet);
@@ -140,7 +144,7 @@ public class ObjectPropertySelector extends JPanel implements
 	}
 
 	protected void notifyVerified() {
-		for (InputVerificationStatusChangedListener i : this.listeners) {
+		for (InputVerificationStatusChangedListener i : listeners) {
 			i.verifiedStatusChanged(true);
 		}
 	}

@@ -2,7 +2,7 @@ package org.coode.oae.ui;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.clsdescriptioneditor.ExpressionEditor;
-import org.semanticweb.owl.model.OWLException;
+import org.semanticweb.owlapi.model.OWLException;
 
 import uk.ac.manchester.mae.evaluation.BindingModel;
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;

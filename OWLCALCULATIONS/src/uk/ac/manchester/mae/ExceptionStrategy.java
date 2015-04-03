@@ -25,12 +25,12 @@ package uk.ac.manchester.mae;
 import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLConstant;
-import org.semanticweb.owl.model.OWLDataPropertyAssertionAxiom;
-import org.semanticweb.owl.model.OWLIndividual;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyChangeException;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLDataPropertyAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 /**
  * @author Luigi Iannone
@@ -45,16 +45,17 @@ public class ExceptionStrategy extends BuiltInConflictStrategy {
 	ExceptionStrategy() {
 	}
 
-	/**
-	 * Raises an Exception
-	 * 
-	 * @see uk.ac.manchester.mae.ConflictStrategy#solve(org.semanticweb.owl.model.OWLIndividual,
-	 *      org.semanticweb.owl.model.OWLDataPropertyAssertionAxiom,
-	 *      org.semanticweb.owl.model.OWLConstant, java.util.Set,
-	 *      org.semanticweb.owl.model.OWLOntologyManager)
-	 */
-	public void solve(OWLIndividual individual,
-			OWLDataPropertyAssertionAxiom oldAssertion, OWLConstant newValue,
+	    /**
+     * Raises an Exception
+     * 
+     * @see uk.ac.manchester.mae.ConflictStrategy#solve(org.semanticweb.owl.model.OWLIndividual,
+     *      org.semanticweb.owl.model.OWLDataPropertyAssertionAxiom,
+     *      org.semanticweb.owl.model.OWLLiteral, java.util.Set,
+     *      org.semanticweb.owl.model.OWLOntologyManager)
+     */
+	@Override
+    public void solve(OWLNamedIndividual individual,
+            OWLDataPropertyAssertionAxiom oldAssertion, OWLLiteral newValue,
 			Set<OWLOntology> ontologies, OWLOntologyManager ontologyManager)
 			throws OWLOntologyChangeException, ValueAlreadySetException {
 		this.solve(individual, oldAssertion, newValue);
@@ -66,13 +67,13 @@ public class ExceptionStrategy extends BuiltInConflictStrategy {
 	 * @param newValue
 	 * @throws ValueAlreadySetException
 	 */
-	private void solve(OWLIndividual individual,
-			OWLDataPropertyAssertionAxiom oldAssertion, OWLConstant newValue)
+    private void solve(OWLNamedIndividual individual,
+            OWLDataPropertyAssertionAxiom oldAssertion, OWLLiteral newValue)
 			throws ValueAlreadySetException {
 		throw new ValueAlreadySetException("The value for the property "
 				+ oldAssertion.getProperty().toString()
 				+ " was already set for individual "
-				+ individual.getURI().toString()
+                + individual.getIRI().toString()
 				+ " and there is a formula that computed a new value ("
 				+ newValue.getLiteral() + ")");
 	}
@@ -83,8 +84,9 @@ public class ExceptionStrategy extends BuiltInConflictStrategy {
 		return theInstance;
 	}
 
-	public void solve(OWLIndividual individual,
-			OWLDataPropertyAssertionAxiom oldAssertion, OWLConstant newValue,
+	@Override
+    public void solve(OWLNamedIndividual individual,
+            OWLDataPropertyAssertionAxiom oldAssertion, OWLLiteral newValue,
 			OWLModelManager modelManager) throws OWLOntologyChangeException,
 			ValueAlreadySetException {
 		this.solve(individual, oldAssertion, newValue);

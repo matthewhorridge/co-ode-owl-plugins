@@ -23,7 +23,6 @@
 package uk.ac.manchester.mae;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.inference.OWLReasonerException;
 
 import uk.ac.manchester.mae.evaluation.Evaluator;
 
@@ -36,7 +35,7 @@ import uk.ac.manchester.mae.evaluation.Evaluator;
  */
 public class ProtegeEvaluator extends Evaluator {
 	public ProtegeEvaluator(OWLModelManager owlModeManager)
-			throws OWLReasonerException {
+ {
 		super(owlModeManager.getActiveOntology(), owlModeManager
 				.getOWLOntologyManager(), owlModeManager.getReasoner());
 	}

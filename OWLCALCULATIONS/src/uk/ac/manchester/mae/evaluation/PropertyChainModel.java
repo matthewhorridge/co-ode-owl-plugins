@@ -25,8 +25,8 @@ package uk.ac.manchester.mae.evaluation;
 import java.util.List;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLProperty;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLProperty;
 
 /**
  * @author Luigi Iannone
@@ -44,14 +44,14 @@ public class PropertyChainModel {
 	 * @param property
 	 * @param index
 	 */
-	public PropertyChainModel(OWLProperty property, OWLDescription facet) {
-		this.cell = new PropertyChainCell(property, facet);
+    public PropertyChainModel(OWLProperty property, OWLClassExpression facet) {
+		cell = new PropertyChainCell(property, facet);
 	}
 
 	protected PropertyChainModel(List<PropertyChainCell> cells, int i) {
-		this.cell = cells.get(i);
+		cell = cells.get(i);
 		if (i < cells.size() - 1) {
-			this.child = new PropertyChainModel(cells, i + 1);
+			child = new PropertyChainModel(cells, i + 1);
 		}
 	}
 
@@ -63,45 +63,45 @@ public class PropertyChainModel {
 	 * @return the property
 	 */
 	public OWLProperty getProperty() {
-		return this.cell.getProperty();
+		return cell.getProperty();
 	}
 
-	public OWLDescription getFacet() {
-		return this.cell.getFacet();
+    public OWLClassExpression getFacet() {
+		return cell.getFacet();
 	}
 
 	/**
 	 * @param descriptionFacet
 	 */
-	public void setFacet(OWLDescription descriptionFacet) {
-		this.cell.setFacet(descriptionFacet);
+    public void setFacet(OWLClassExpression descriptionFacet) {
+		cell.setFacet(descriptionFacet);
 	}
 
 	public PropertyChainModel getChild() {
-		return this.child;
+		return child;
 	}
 
 	public void setChild(PropertyChainModel childPropertyChainModel) {
-		this.child = childPropertyChainModel;
+		child = childPropertyChainModel;
 	}
 
 	@Override
 	public String toString() {
-		String toReturn = this.cell.toString();
-		if (this.child != null) {
-			toReturn += " o " + this.child.toString();
+		String toReturn = cell.toString();
+		if (child != null) {
+			toReturn += " o " + child.toString();
 		}
 		return toReturn;
 	}
 
 	public PropertyChainCell getCell() {
-		return this.cell;
+		return cell;
 	}
 
 	public String render(OWLModelManager manager) {
-		String toReturn = this.cell.render(manager);
-		if (this.child != null) {
-			toReturn += " o " + this.child.render(manager);
+		String toReturn = cell.render(manager);
+		if (child != null) {
+			toReturn += " o " + child.render(manager);
 		}
 		return toReturn;
 	}

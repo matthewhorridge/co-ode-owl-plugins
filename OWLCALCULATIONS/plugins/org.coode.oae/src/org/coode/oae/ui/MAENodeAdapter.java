@@ -22,7 +22,6 @@
  */
 package org.coode.oae.ui;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +31,7 @@ import javax.swing.tree.MutableTreeNode;
 import org.coode.oae.utils.ParserFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.IRI;
 
 import uk.ac.manchester.mae.evaluation.BindingModel;
 import uk.ac.manchester.mae.evaluation.FormulaModel;
@@ -117,14 +117,14 @@ public class MAENodeAdapter {
 		return (MAEStart) ArithmeticsParser.Start();
 	}
 
-	public static FormulaModel toFormulaModel(MAEStart formula, URI formulaURI,
+    public static FormulaModel toFormulaModel(MAEStart formula, IRI formulaURI,
 			OWLEditorKit owlEditorKit) {
 		ProtegeFormulaModelExtractor fme = new ProtegeFormulaModelExtractor(
 				owlEditorKit.getModelManager());
 		formula.jjtAccept(fme, null);
 		FormulaModel extractedFormulaModel = fme.getExtractedFormulaModel();
 		if (extractedFormulaModel != null) {
-			extractedFormulaModel.setFormulaURI(formulaURI);
+            extractedFormulaModel.setFormulaURI(formulaURI);
 		}
 		return extractedFormulaModel;
 	}

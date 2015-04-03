@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +26,8 @@ import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
 import org.protege.editor.owl.ui.renderer.OWLRendererPreferences;
-import org.semanticweb.owl.model.OWLException;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLException;
 
 import uk.ac.manchester.mae.ConflictStrategy;
 import uk.ac.manchester.mae.Constants;
@@ -60,117 +59,122 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 
 	public GraphicalEditor(OWLEditorKit kit) {
 		super(new BorderLayout());
-		this.edKit = kit;
-		this.nameTextField.getDocument().addDocumentListener(this);
-		this.checker = new OWLCalculationsExpressionChecker(this.edKit);
-		this.storeToEditor = new StoreToEditor(this.edKit);
-		this.storeToEditor.addStatusChangedListener(this);
-		this.appliesToEditor = new AppliesToEditor_ExpressionEditor(this.edKit);
-		this.storeToEditor.addStatusChangedListener(this);
-		this.appliesToEditor.addStatusChangedListener(this);
-		this.bindingviewer = new BindingViewer(this.edKit);
-		this.bindingviewer.addStatusChangedListener(this);
-		this.expression.setWrapStyleWord(true);
-		this.expression.setLineWrap(true);
-		this.expression.getDocument().addDocumentListener(this);
-		this.conflictStrategyEditor.addStatusChangedListener(this);
+		edKit = kit;
+		nameTextField.getDocument().addDocumentListener(this);
+		checker = new OWLCalculationsExpressionChecker(edKit);
+		storeToEditor = new StoreToEditor(edKit);
+		storeToEditor.addStatusChangedListener(this);
+		appliesToEditor = new AppliesToEditor_ExpressionEditor(edKit);
+		storeToEditor.addStatusChangedListener(this);
+		appliesToEditor.addStatusChangedListener(this);
+		bindingviewer = new BindingViewer(edKit);
+		bindingviewer.addStatusChangedListener(this);
+		expression.setWrapStyleWord(true);
+		expression.setLineWrap(true);
+		expression.getDocument().addDocumentListener(this);
+		conflictStrategyEditor.addStatusChangedListener(this);
 		JPanel namePanel = new JPanel(new BorderLayout(0, 0));
 		namePanel.setBorder(ComponentFactory.createTitledBorder("Name"));
-		namePanel.add(this.nameTextField, BorderLayout.NORTH);
+		namePanel.add(nameTextField, BorderLayout.NORTH);
 		this.add(namePanel, BorderLayout.NORTH);
 		// expression
-		this.mainPanel.add(StretchingPanelsFactory.getStretchyPanelWithBorder(
-				this.expression, "Expression"), BorderLayout.NORTH);
+		mainPanel.add(StretchingPanelsFactory.getStretchyPanelWithBorder(
+				expression, "Expression"), BorderLayout.NORTH);
 		// bindings
-		this.mainPanel.add(this.bindingviewer, BorderLayout.CENTER);
-		this.more.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		mainPanel.add(bindingviewer, BorderLayout.CENTER);
+		more.addActionListener(new ActionListener() {
+			@Override
+            public void actionPerformed(ActionEvent e) {
 				GraphicalEditor.this.showExtendedView();
 			}
 		});
-		this.less.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		less.addActionListener(new ActionListener() {
+			@Override
+            public void actionPerformed(ActionEvent e) {
 				GraphicalEditor.this.hideExtendedView();
 			}
 		});
-		this.lowerPanel.add(this.more, BorderLayout.NORTH);
-		this.extendedArea.add(StretchingPanelsFactory
-				.getStretchyPanelWithBorder(this.conflictStrategyEditor,
+		lowerPanel.add(more, BorderLayout.NORTH);
+		extendedArea.add(StretchingPanelsFactory
+				.getStretchyPanelWithBorder(conflictStrategyEditor,
 						"Conflict Strategy"));
-		this.extendedArea
+		extendedArea
 				.add(StretchingPanelsFactory.getStretchyPanelWithBorder(
-						this.appliesToEditor, "Applies to"));
-		this.extendedArea.add(StretchingPanelsFactory
-				.getStretchyPanelWithBorder(this.storeToEditor, "Copy to"));
-		this.mainPanel.add(this.lowerPanel, BorderLayout.SOUTH);
+						appliesToEditor, "Applies to"));
+		extendedArea.add(StretchingPanelsFactory
+				.getStretchyPanelWithBorder(storeToEditor, "Copy to"));
+		mainPanel.add(lowerPanel, BorderLayout.SOUTH);
 		// optional bits
-		this.add(this.mainPanel, BorderLayout.CENTER);
+		this.add(mainPanel, BorderLayout.CENTER);
 		this.add(StretchingPanelsFactory.getStretchyPanelWithBorder(
-				this.report, "Error report"), BorderLayout.SOUTH);
+				report, "Error report"), BorderLayout.SOUTH);
 		// handleVerification();
 	}
 
 	protected void showExtendedView() {
-		this.lowerPanel.remove(this.more);
-		this.lowerPanel.add(this.less, BorderLayout.NORTH);
-		this.lowerPanel.add(this.extendedArea, BorderLayout.CENTER);
-		this.validate();
+		lowerPanel.remove(more);
+		lowerPanel.add(less, BorderLayout.NORTH);
+		lowerPanel.add(extendedArea, BorderLayout.CENTER);
+		validate();
 	}
 
 	protected void hideExtendedView() {
-		this.lowerPanel.remove(this.less);
-		this.lowerPanel.remove(this.extendedArea);
-		this.lowerPanel.add(this.more, BorderLayout.NORTH);
-		this.validate();
+		lowerPanel.remove(less);
+		lowerPanel.remove(extendedArea);
+		lowerPanel.add(more, BorderLayout.NORTH);
+		validate();
 	}
 
-	public void refreshComponent() {
+	@Override
+    public void refreshComponent() {
 		// copied from ExpressionEditor
-		this.setFont(OWLRendererPreferences.getInstance().getFont());
+		setFont(OWLRendererPreferences.getInstance().getFont());
 	}
 
-	public void addStatusChangedListener(
+	@Override
+    public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		this.listeners.add(listener);
+		listeners.add(listener);
 	}
 
-	public void removeStatusChangedListener(
+	@Override
+    public void removeStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		this.listeners.remove(listener);
+		listeners.remove(listener);
 	}
 
 	public FormulaModel createObject() throws OWLException {
-		return this.checker.createObject(this.getText());
+		return checker.createObject(getText());
 	}
 
 	public void clear() {
-		this.nameTextField.setText("");
-		this.conflictStrategyEditor.setConflictStrategy(null);
-		this.appliesToEditor.clear();
-		this.storeToEditor.clear();
-		this.bindingviewer.clear();
-		this.expression.setText("");
-		this.report.clearReport();
+		nameTextField.setText("");
+		conflictStrategyEditor.setConflictStrategy(null);
+		appliesToEditor.clear();
+		storeToEditor.clear();
+		bindingviewer.clear();
+		expression.setText("");
+		report.clearReport();
 		// handleVerification();
 	}
 
 	public FormulaModel getFormulaModel() {
 		FormulaModel fm = new FormulaModel();
-		fm.setFormulaURI(this.getURI());
-		ConflictStrategy selectedConflictStrategy = this.conflictStrategyEditor
+		fm.setFormulaURI(getURI());
+		ConflictStrategy selectedConflictStrategy = conflictStrategyEditor
 				.getSelectedConflictStrategy();
 		fm.setConflictStrategy(selectedConflictStrategy);
-		fm.setAppliesTo(this.appliesToEditor.getAppliesTo());
-		PropertyChainModel pcm = this.storeToEditor.getPropertyChainModel();
+		fm.setAppliesTo(appliesToEditor.getAppliesTo());
+		PropertyChainModel pcm = storeToEditor.getPropertyChainModel();
 		if (pcm != null) {
 			fm.setStorageModel(new StorageModel(pcm));
 		} else {
 			fm.setStorageModel(null);
 		}
-		if (this.bindingviewer.getBindingModels().size() > 0) {
-			fm.setBindings(this.bindingviewer.getBindingModels());
+		if (bindingviewer.getBindingModels().size() > 0) {
+			fm.setBindings(bindingviewer.getBindingModels());
 		}
-		String b = this.expression.getText();
+		String b = expression.getText();
 		if (!b.endsWith(";")) {
 			b += ";";
 		}
@@ -178,68 +182,62 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		return fm;
 	}
 
-	private URI getURI() {
-		URI anURI = null;
-		if (this.nameTextField.getText().length() > 0) {
-			try {
-				anURI = new URI(Constants.FORMULA_NAMESPACE_URI_STRING
-						+ this.nameTextField.getText());
-			} catch (URISyntaxException e) {
-				this.report
-						.addReport("A valid name must be specified: current name causes URISyntaxException: "
-								+ e.getMessage());
-			}
+    private IRI getURI() {
+        IRI anURI = null;
+		if (nameTextField.getText().length() > 0) {
+            anURI = IRI.create(Constants.FORMULA_NAMESPACE_URI_STRING
+						+ nameTextField.getText());
 		} else {
-			this.report.addReport("A name must be specified");
+			report.addReport("A name must be specified");
 		}
 		return anURI;
 	}
 
 	public String getText() {
-		return this.getFormulaModel().render(this.edKit.getOWLModelManager());
+		return getFormulaModel().render(edKit.getOWLModelManager());
 	}
 
 	public void initFormula(FormulaModel fm) {
-		this.initializing = true;
+		initializing = true;
 		String localName = fm.getFormulaURI().getFragment();
 		if (localName == null) {
 			localName = "";
 		}
-		this.nameTextField.setText(localName);
-		this.conflictStrategyEditor.setConflictStrategy(fm
+		nameTextField.setText(localName);
+		conflictStrategyEditor.setConflictStrategy(fm
 				.getConflictStrategy());
-		this.appliesToEditor.setAppliesTo(fm.getAppliesTo());
+		appliesToEditor.setAppliesTo(fm.getAppliesTo());
 		StorageModel storageModel = fm.getStorageModel();
 		if (storageModel != null) {
-			this.storeToEditor.setStoreTo(storageModel.getPropertyChainModel());
+			storeToEditor.setStoreTo(storageModel.getPropertyChainModel());
 		} else {
-			this.storeToEditor.setStoreTo(null);
+			storeToEditor.setStoreTo(null);
 		}
 		String formula = fm.getFormulaBody().trim();
 		if (formula.endsWith(";")) {
 			formula = formula.substring(0, formula.length() - 1);
 		}
-		this.expression.setText(formula);
-		this.bindingviewer.addBindingModels(fm.getBindings());
-		this.initializing = false;
-		this.handleVerification();
+		expression.setText(formula);
+		bindingviewer.addBindingModels(fm.getBindings());
+		initializing = false;
+		handleVerification();
 	}
 
 	protected void handleVerification() {
-		if (!this.initializing) {
-			this.report.clearReport();
+		if (!initializing) {
+			report.clearReport();
 			// if the uri is not assigned, it will be false
-			boolean status = this.getURI() != null;
-			String currentFormula = this.getText();
-			this.updateIdentifiers();
+			boolean status = getURI() != null;
+			String currentFormula = getText();
+			updateIdentifiers();
 			try {
-				this.checker.check(currentFormula);
+				checker.check(currentFormula);
 			} catch (Throwable e) {
-				this.report.addReport(e.getMessage().replace(
+				report.addReport(e.getMessage().replace(
 						"uk.ac.manchester.mae.parser.ParseException: ", ""));
 				status = false;
 			}
-			for (InputVerificationStatusChangedListener v : this.listeners) {
+			for (InputVerificationStatusChangedListener v : listeners) {
 				v.verifiedStatusChanged(status);
 			}
 		}
@@ -250,9 +248,9 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		 * then there is one or more unbound symbols: take the expression, pull
 		 * out the symbols, add a binding for each one
 		 */
-		List<String> identifiers = this.getIdentifiers(this.expression
+		List<String> identifiers = getIdentifiers(expression
 				.getText());
-		List<String> currentIdentifiers = this.bindingviewer.getBindingNames();
+		List<String> currentIdentifiers = bindingviewer.getBindingNames();
 		// any identifier in the viewer and not in the expression
 		// should be removed; this ought to take into account typing
 		// errors, so it will only remove bindings whose chain is
@@ -260,11 +258,11 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		// call for attention, but not deleted
 		for (String id : currentIdentifiers) {
 			if (!identifiers.contains(id)) {
-				this.bindingviewer.removeBinding(id);
+				bindingviewer.removeBinding(id);
 			}
 		}
 		for (String id : identifiers) {
-			this.bindingviewer.addBinding(id);
+			bindingviewer.addBinding(id);
 		}
 	}
 
@@ -299,23 +297,28 @@ public class GraphicalEditor extends JPanel implements RefreshableComponent,
 		return toReturn;
 	}
 
-	public void changedUpdate(DocumentEvent e) {
-		this.handleVerification();
+	@Override
+    public void changedUpdate(DocumentEvent e) {
+		handleVerification();
 	}
 
-	public void insertUpdate(DocumentEvent e) {
-		this.handleVerification();
+	@Override
+    public void insertUpdate(DocumentEvent e) {
+		handleVerification();
 	}
 
-	public void removeUpdate(DocumentEvent e) {
-		this.handleVerification();
+	@Override
+    public void removeUpdate(DocumentEvent e) {
+		handleVerification();
 	}
 
-	public void verifiedStatusChanged(boolean newState) {
-		this.handleVerification();
+	@Override
+    public void verifiedStatusChanged(boolean newState) {
+		handleVerification();
 	}
 
-	public void actionPerformed(ActionEvent e) {
-		this.handleVerification();
+	@Override
+    public void actionPerformed(ActionEvent e) {
+		handleVerification();
 	}
 }

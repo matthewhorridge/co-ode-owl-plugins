@@ -4,16 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxDescriptionParser;
 import org.coode.oae.utils.RenderingOWLEntityCheckerNoModelManager;
-import org.semanticweb.owl.expression.OWLEntityChecker;
-import org.semanticweb.owl.expression.ParserException;
-import org.semanticweb.owl.model.OWLDataFactory;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.expression.OWLEntityChecker;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
+import org.semanticweb.owlapi.util.mansyntax.ManchesterOWLSyntaxParser;
 
 import uk.ac.manchester.mae.evaluation.PropertyChainCell;
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;
@@ -21,10 +22,13 @@ import uk.ac.manchester.mae.parser.MAEpropertyChainCell;
 import uk.ac.manchester.mae.parser.MAEpropertyChainExpression;
 
 public class MAEAdapter {
-	public static ManchesterOWLSyntaxDescriptionParser getParser(
+
+    public static ManchesterOWLSyntaxParser getParser(
 			Set<OWLOntology> ontologies, OWLDataFactory factory) {
-		return new ManchesterOWLSyntaxDescriptionParser(factory,
+        ManchesterOWLSyntaxParser p = OWLManager.createManchesterParser();
+        p.setOWLEntityChecker(
 				new RenderingOWLEntityCheckerNoModelManager(ontologies));
+        return p;
 	}
 
 	public static OWLEntityChecker getChecker(Set<OWLOntology> ontologies) {
@@ -35,27 +39,28 @@ public class MAEAdapter {
 			MAEpropertyChainExpression node, Set<OWLOntology> ontologies,
 			OWLOntologyManager manager) {
 		List<PropertyChainCell> list = new ArrayList<PropertyChainCell>();
-		RenderingOWLEntityCheckerNoModelManager r = new RenderingOWLEntityCheckerNoModelManager(
-				ontologies);
-		ManchesterOWLSyntaxDescriptionParser parser = new ManchesterOWLSyntaxDescriptionParser(
-				manager.getOWLDataFactory(), r);
+        ManchesterOWLSyntaxParser parser = getParser(ontologies,
+                manager.getOWLDataFactory());
 		for (int i = 0; i < node.getCells().size(); i++) {
 			MAEpropertyChainCell cell = node.getCells().get(i);
-			OWLDescription facet = null;
+            OWLClassExpression facet = null;
 			if (cell.getFacet() != null) {
 				try {
-					facet = parser.parse(cell.getFacet());
-				} catch (ParserException e) {
+                    parser.setStringToParse(cell.getFacet());
+                    facet = parser.parseClassExpression();
+                } catch (OWLRuntimeException e) {
 					throw new RuntimeException("Invalid facet: "
 							+ cell.getFacet(), e);
 				}
 			}
-			OWLObjectProperty op = r.getOWLObjectProperty(cell
+            OWLObjectProperty op = getChecker(ontologies).getOWLObjectProperty(
+                    cell
 					.getPropertyName());
 			if (op != null) {
 				list.add(new PropertyChainCell(op, facet));
 			} else {
-				OWLDataProperty dp = r.getOWLDataProperty(cell
+                OWLDataProperty dp = getChecker(ontologies).getOWLDataProperty(
+                        cell
 						.getPropertyName());
 				if (dp == null) {
 					throw new RuntimeException(

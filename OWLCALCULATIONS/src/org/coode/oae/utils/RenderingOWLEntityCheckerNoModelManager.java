@@ -24,17 +24,18 @@ package org.coode.oae.utils;
 
 import java.util.Set;
 
-import org.semanticweb.owl.expression.OWLEntityChecker;
-import org.semanticweb.owl.expression.ShortFormEntityChecker;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLDataType;
-import org.semanticweb.owl.model.OWLIndividual;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
-import org.semanticweb.owl.util.NamespaceUtil;
-import org.semanticweb.owl.util.SimpleShortFormProvider;
+import org.semanticweb.owlapi.expression.OWLEntityChecker;
+import org.semanticweb.owlapi.expression.ShortFormEntityChecker;
+import org.semanticweb.owlapi.io.XMLUtils;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDatatype;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.util.BidirectionalShortFormProviderAdapter;
+import org.semanticweb.owlapi.util.SimpleShortFormProvider;
 
 /**
  * @author Luigi Iannone
@@ -53,16 +54,16 @@ public class RenderingOWLEntityCheckerNoModelManager implements
 	 */
 	public RenderingOWLEntityCheckerNoModelManager(Set<OWLOntology> ontologies) {
 		this.ontologies = ontologies;
-		this.shortFormEntityChecker = new ShortFormEntityChecker(
+		shortFormEntityChecker = new ShortFormEntityChecker(
 				new BidirectionalShortFormProviderAdapter(ontologies,
 						new SimpleShortFormProvider()));
 	}
 
 	private OWLClass getOWLClassByFullURI(String uri) {
-		for (OWLOntology o : this.ontologies) {
-			Set<OWLClass> classes = o.getReferencedClasses();
+		for (OWLOntology o : ontologies) {
+            Set<OWLClass> classes = o.getClassesInSignature();
 			for (OWLClass c : classes) {
-				if (c.getURI().toString().equals(uri)) {
+                if (c.getIRI().toString().equals(uri)) {
 					return c;
 				}
 			}
@@ -71,10 +72,10 @@ public class RenderingOWLEntityCheckerNoModelManager implements
 	}
 
 	private OWLDataProperty getOWLDataPropertyByFullURI(String uri) {
-		for (OWLOntology o : this.ontologies) {
-			Set<OWLDataProperty> props = o.getReferencedDataProperties();
+		for (OWLOntology o : ontologies) {
+            Set<OWLDataProperty> props = o.getDataPropertiesInSignature();
 			for (OWLDataProperty c : props) {
-				if (c.getURI().toString().equals(uri)) {
+                if (c.getIRI().toString().equals(uri)) {
 					return c;
 				}
 			}
@@ -82,23 +83,36 @@ public class RenderingOWLEntityCheckerNoModelManager implements
 		return null;
 	}
 
-	private OWLObjectProperty getOWLObjectPropertyByFullURI(String uri) {
-		for (OWLOntology o : this.ontologies) {
-			Set<OWLObjectProperty> props = o.getReferencedObjectProperties();
-			for (OWLObjectProperty c : props) {
-				if (c.getURI().toString().equals(uri)) {
-					return c;
-				}
-			}
-		}
-		return null;
-	}
+    private OWLObjectProperty getOWLObjectPropertyByFullURI(String uri) {
+        for (OWLOntology o : ontologies) {
+            Set<OWLObjectProperty> props = o.getObjectPropertiesInSignature();
+            for (OWLObjectProperty c : props) {
+                if (c.getIRI().toString().equals(uri)) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
 
-	private OWLIndividual getOWLIndividualByFullURI(String uri) {
-		for (OWLOntology o : this.ontologies) {
-			Set<OWLIndividual> props = o.getReferencedIndividuals();
-			for (OWLIndividual c : props) {
-				if (c.getURI().toString().equals(uri)) {
+    private OWLAnnotationProperty getOWLAnnotationPropertyByFullURI(String uri) {
+        for (OWLOntology o : ontologies) {
+            Set<OWLAnnotationProperty> props = o
+                    .getAnnotationPropertiesInSignature();
+            for (OWLAnnotationProperty c : props) {
+                if (c.getIRI().toString().equals(uri)) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+
+    private OWLNamedIndividual getOWLIndividualByFullURI(String uri) {
+		for (OWLOntology o : ontologies) {
+            Set<OWLNamedIndividual> props = o.getIndividualsInSignature();
+            for (OWLNamedIndividual c : props) {
+                if (c.getIRI().toString().equals(uri)) {
 					return c;
 				}
 			}
@@ -109,82 +123,78 @@ public class RenderingOWLEntityCheckerNoModelManager implements
 	/**
 	 * @see org.semanticweb.owl.expression.OWLEntityChecker#getOWLClass(java.lang.String)
 	 */
-	public OWLClass getOWLClass(String name) {
+	@Override
+    public OWLClass getOWLClass(String name) {
 		OWLClass toReturn = getOWLClassByFullURI(name);
 		if (toReturn == null) {
-			toReturn = this.shortFormEntityChecker.getOWLClass(name);
+			toReturn = shortFormEntityChecker.getOWLClass(name);
 		}
 		if (name.length() > 0 && toReturn == null) {
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			String[] split = nsUtil.split(name, null);
-			if (split.length == 2) {
-				toReturn = this.shortFormEntityChecker.getOWLClass(split[1]);
-			}
-		}
+            toReturn = shortFormEntityChecker.getOWLClass(XMLUtils
+                    .getNCNameSuffix(name));
+        }
 		return toReturn;
 	}
 
 	/**
 	 * @see org.semanticweb.owl.expression.OWLEntityChecker#getOWLDataProperty(java.lang.String)
 	 */
-	public OWLDataProperty getOWLDataProperty(String name) {
+	@Override
+    public OWLDataProperty getOWLDataProperty(String name) {
 		OWLDataProperty toReturn = getOWLDataPropertyByFullURI(name);
 		if (toReturn == null) {
-			toReturn = this.shortFormEntityChecker.getOWLDataProperty(name);
+			toReturn = shortFormEntityChecker.getOWLDataProperty(name);
 		}
 		if (name.length() > 0 && toReturn == null) {
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			String[] split = nsUtil.split(name, null);
-			if (split.length == 2) {
-				toReturn = this.shortFormEntityChecker
-						.getOWLDataProperty(split[1]);
-			}
+
+				toReturn = shortFormEntityChecker
+.getOWLDataProperty(XMLUtils
+                    .getNCNameSuffix(name));
 		}
 		return toReturn;
 	}
 
-	/**
-	 * @see org.semanticweb.owl.expression.OWLEntityChecker#getOWLDataType(java.lang.String)
-	 */
-	public OWLDataType getOWLDataType(String name) {
-		return this.shortFormEntityChecker.getOWLDataType(name);
+    @Override
+    public OWLDatatype getOWLDatatype(String name) {
+        return shortFormEntityChecker.getOWLDatatype(name);
 	}
 
-	/**
-	 * @see org.semanticweb.owl.expression.OWLEntityChecker#getOWLIndividual(java.lang.String)
-	 */
-	public OWLIndividual getOWLIndividual(String name) {
-		OWLIndividual toReturn = getOWLIndividualByFullURI(name);
+	@Override
+    public OWLNamedIndividual getOWLIndividual(String name) {
+        OWLNamedIndividual toReturn = getOWLIndividualByFullURI(name);
 		if (toReturn == null) {
-			toReturn = this.shortFormEntityChecker.getOWLIndividual(name);
+			toReturn = shortFormEntityChecker.getOWLIndividual(name);
 		}
 		if (name.length() > 0 && toReturn == null) {
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			String[] split = nsUtil.split(name, null);
-			if (split.length == 2) {
-				toReturn = this.shortFormEntityChecker
-						.getOWLIndividual(split[1]);
-			}
+            toReturn = shortFormEntityChecker.getOWLIndividual(XMLUtils
+                    .getNCNameSuffix(name));
 		}
 		return toReturn;
 	}
 
-	/**
-	 * @see org.semanticweb.owl.expression.OWLEntityChecker#getOWLObjectProperty(java.lang.String)
-	 */
-	public OWLObjectProperty getOWLObjectProperty(String name) {
+	@Override
+    public OWLObjectProperty getOWLObjectProperty(String name) {
 		OWLObjectProperty toReturn = getOWLObjectPropertyByFullURI(name);
 		if (toReturn == null) {
-			toReturn = this.shortFormEntityChecker.getOWLObjectProperty(name);
+			toReturn = shortFormEntityChecker.getOWLObjectProperty(name);
 		}
 		if (name.length() > 0 && toReturn == null) {
-			NamespaceUtil nsUtil = new NamespaceUtil();
-			String[] split = nsUtil.split(name, null);
-			if (split.length == 2) {
-				toReturn = this.shortFormEntityChecker
-						.getOWLObjectProperty(split[1]);
-			}
+            toReturn = shortFormEntityChecker.getOWLObjectProperty(XMLUtils
+                    .getNCNameSuffix(name));
 		}
 		return toReturn;
 	}
+
+    @Override
+    public OWLAnnotationProperty getOWLAnnotationProperty(String name) {
+        OWLAnnotationProperty toReturn = getOWLAnnotationPropertyByFullURI(name);
+        if (toReturn == null) {
+            toReturn = shortFormEntityChecker.getOWLAnnotationProperty(name);
+        }
+        if (name.length() > 0 && toReturn == null) {
+            toReturn = shortFormEntityChecker.getOWLAnnotationProperty(XMLUtils
+                    .getNCNameSuffix(name));
+        }
+        return toReturn;
+    }
 }

@@ -28,9 +28,9 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import org.protege.editor.core.ui.util.ComponentFactory;
-import org.protege.editor.owl.ui.framelist.OWLFrameList2;
-import org.protege.editor.owl.ui.view.AbstractOWLDataPropertyViewComponent;
-import org.semanticweb.owl.model.OWLDataProperty;
+import org.protege.editor.owl.ui.framelist.OWLFrameList;
+import org.protege.editor.owl.ui.view.dataproperty.AbstractOWLDataPropertyViewComponent;
+import org.semanticweb.owlapi.model.OWLDataProperty;
 
 /**
  * This view displays the formulas related to the selected class
@@ -44,32 +44,32 @@ import org.semanticweb.owl.model.OWLDataProperty;
 public class OWLArithmeticsFormulaDataPropertyView extends
 		AbstractOWLDataPropertyViewComponent {
 	private static final long serialVersionUID = -2353902183664081082L;
-	private OWLFrameList2<OWLDataProperty> list;
+    private OWLFrameList<OWLDataProperty> list;
 
 	/**
 	 * @see org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent#disposeView()
 	 */
 	@Override
 	public void disposeView() {
-		this.list.dispose();
+		list.dispose();
 	}
 
 	@Override
 	protected OWLDataProperty updateView(OWLDataProperty property) {
-		this.list.setRootObject(property);
+		list.setRootObject(property);
 		return property;
 	}
 
 	@Override
 	public void initialiseView() throws Exception {
-		this.list = new OWLFrameList2<OWLDataProperty>(getOWLEditorKit(),
+        list = new OWLFrameList<OWLDataProperty>(getOWLEditorKit(),
 				new OWLCalculationsFormulaDataPropertyFrame(getOWLEditorKit()));
 		setLayout(new BorderLayout());
-		JScrollPane sp = ComponentFactory.createScrollPane(this.list);
+		JScrollPane sp = ComponentFactory.createScrollPane(list);
 		sp
 				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		this.add(sp);
-		this.list.setCellRenderer(new ViewFormulaCellRederer(false,
+		list.setCellRenderer(new ViewFormulaCellRederer(false,
 				getOWLEditorKit()));
 	}
 }

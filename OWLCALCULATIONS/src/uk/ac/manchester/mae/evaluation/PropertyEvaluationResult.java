@@ -2,7 +2,7 @@ package uk.ac.manchester.mae.evaluation;
 
 import java.util.Set;
 
-import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataProperty;
 
 public class PropertyEvaluationResult {
 	OWLDataProperty dataProperty;

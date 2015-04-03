@@ -12,7 +12,7 @@ import javax.swing.tree.TreeCellRenderer;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import uk.ac.manchester.mae.parser.MAEStart;
 

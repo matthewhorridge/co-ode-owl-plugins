@@ -23,14 +23,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owl.expression.OWLEntityChecker;
-import org.semanticweb.owl.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
-import org.semanticweb.owl.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 import org.semanticweb.owl.expression.ParserException;
 import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObject;
 import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcher;
 
 public class ArithmeticsParser/*@bgen(jjtree)*/implements ArithmeticsParserTreeConstants/*@egen*/ {/*@bgen(jjtree)*/

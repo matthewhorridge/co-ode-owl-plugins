@@ -22,7 +22,7 @@
  */
 package uk.ac.manchester.mae.visitor;
 
-import org.semanticweb.owl.model.OWLDescription;
+import org.semanticweb.owlapi.model.OWLClassExpression;
 
 import uk.ac.manchester.mae.parser.ArithmeticsParserVisitor;
 
@@ -34,5 +34,6 @@ import uk.ac.manchester.mae.parser.ArithmeticsParserVisitor;
  * Apr 25, 2008
  */
 public abstract class FacetExtractor implements ArithmeticsParserVisitor {
-	public abstract OWLDescription getExtractedDescription();
+
+    public abstract OWLClassExpression getExtractedDescription();
 }

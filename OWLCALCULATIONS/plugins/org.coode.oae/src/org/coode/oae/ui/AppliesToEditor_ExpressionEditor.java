@@ -2,14 +2,14 @@ package org.coode.oae.ui;
 
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.clsdescriptioneditor.ExpressionEditor;
-import org.protege.editor.owl.ui.clsdescriptioneditor.OWLDescriptionChecker;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLException;
+import org.protege.editor.owl.ui.clsdescriptioneditor.ManchesterOWLExpressionCheckerFactory;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLException;
 
 import uk.ac.manchester.mae.evaluation.BindingModel;
 
 public class AppliesToEditor_ExpressionEditor extends
-		ExpressionEditor<OWLDescription> {
+        ExpressionEditor<OWLClassExpression> {
 	private static final long serialVersionUID = -339908555692710213L;
 
 	/**
@@ -20,25 +20,26 @@ public class AppliesToEditor_ExpressionEditor extends
 	 *            empty
 	 */
 	public AppliesToEditor_ExpressionEditor(OWLEditorKit k) {
-		super(k, new OWLDescriptionChecker(k.getOWLModelManager()));
+        super(k, new ManchesterOWLExpressionCheckerFactory(
+                k.getOWLModelManager()).getOWLClassExpressionChecker());
 	}
 
-	public void setAppliesTo(OWLDescription f) {
-		this.setExpressionObject(f);
+    public void setAppliesTo(OWLClassExpression f) {
+		setExpressionObject(f);
 	}
 
-	public OWLDescription getAppliesTo() {
+    public OWLClassExpression getAppliesTo() {
 		if (this.getText().trim().length() == 0) {
 			return null;
 		}
 		try {
-			return this.createObject();
+			return createObject();
 		} catch (OWLException e) {
 			return null;
 		}
 	}
 
 	public void clear() {
-		this.setExpressionObject(null);
+		setExpressionObject(null);
 	}
 }

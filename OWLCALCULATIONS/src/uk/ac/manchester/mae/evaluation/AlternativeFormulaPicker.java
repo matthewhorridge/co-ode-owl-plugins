@@ -25,16 +25,18 @@ package uk.ac.manchester.mae.evaluation;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLIndividual;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLObjectPropertyInverse;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.model.OWLPropertyExpressionVisitor;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLObjectInverseOf;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLPropertyExpressionVisitor;
+import org.semanticweb.owlapi.reasoner.InferenceType;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 import uk.ac.manchester.mae.MoreThanOneFormulaPerIndividualException;
 import uk.ac.manchester.mae.PropertyVisitor;
@@ -58,7 +60,7 @@ public class AlternativeFormulaPicker implements OWLPropertyExpressionVisitor {
 	private Set<MAEStart> formulas = null;
 	private OWLReasoner reasoner;
 	private OWLOntologyManager ontologyManager;
-
+    private OWLDataFactory df;
 	/**
 	 * @param ontologies
 	 * @param individual
@@ -73,19 +75,23 @@ public class AlternativeFormulaPicker implements OWLPropertyExpressionVisitor {
 		this.formula = formula;
 		this.reasoner = reasoner;
 		this.ontologyManager = ontologyManager;
+        df = ontologyManager.getOWLDataFactory();
 	}
 
-	public void visit(OWLObjectProperty property) {
+	@Override
+    public void visit(OWLObjectProperty property) {
 	}
 
-	public void visit(OWLObjectPropertyInverse property) {
+    @Override
+    public void visit(OWLObjectInverseOf property) {
 	}
 
-	public void visit(OWLDataProperty property) {
-		PropertyVisitor propertyVisitor = new PropertyVisitor(this.ontologies);
+	@Override
+    public void visit(OWLDataProperty property) {
+		PropertyVisitor propertyVisitor = new PropertyVisitor(ontologies);
 		property.accept(propertyVisitor);
-		this.formulas = propertyVisitor.getExtractedFormulas();
-		this.formulas.remove(this.formula);
+		formulas = propertyVisitor.getExtractedFormulas();
+		formulas.remove(formula);
 	}
 
 	/**
@@ -95,42 +101,45 @@ public class AlternativeFormulaPicker implements OWLPropertyExpressionVisitor {
 	 * @throws MoreThanOneFormulaPerIndividualException
 	 *             if there is more than one alternative
 	 */
-	public MAEStart pickFormula() throws OWLReasonerException,
+    public MAEStart pickFormula()
+            throws
 			MoreThanOneFormulaPerIndividualException {
-		ClassExtractor classExtractor = new ClassExtractor(this.ontologies,
-				this.ontologyManager);
-		this.formula.jjtAccept(classExtractor, null);
-		OWLDescription classDescription = classExtractor.getClassDescription() == null ? this.ontologyManager
+		ClassExtractor classExtractor = new ClassExtractor(ontologies,
+				ontologyManager);
+		formula.jjtAccept(classExtractor, null);
+        OWLClassExpression classDescription = classExtractor
+                .getClassDescription() == null ? ontologyManager
 				.getOWLDataFactory().getOWLThing()
 				: classExtractor.getClassDescription();
 		MAEStart toReturn = null;
-		if (!this.reasoner.isClassified()) {
-			this.reasoner.classify();
-		}
-		for (MAEStart anotherFormula : new HashSet<MAEStart>(this.formulas)) {
+        reasoner.precomputeInferences(InferenceType.CLASS_ASSERTIONS);
+		for (MAEStart anotherFormula : new HashSet<MAEStart>(formulas)) {
 			anotherFormula.jjtAccept(classExtractor, null);
-			OWLDescription anotherFormulaClassDescription = classExtractor
-					.getClassDescription() == null ? this.ontologyManager
+            OWLClassExpression anotherFormulaClassDescription = classExtractor
+					.getClassDescription() == null ? ontologyManager
 					.getOWLDataFactory().getOWLThing() : classExtractor
 					.getClassDescription();
-			if (!this.reasoner.hasType(this.individual,
-					anotherFormulaClassDescription, false)
-					|| this.reasoner.isSubClassOf(classDescription,
-							anotherFormulaClassDescription)
-					&& !this.reasoner.isSubClassOf(
-							anotherFormulaClassDescription, classDescription)) {
-				this.formulas.remove(anotherFormula);
+            if (!reasoner.isEntailed(df.getOWLClassAssertionAxiom(
+                    anotherFormulaClassDescription, individual))
+                    || reasoner.isEntailed(df.getOWLSubClassOfAxiom(
+                            classDescription, anotherFormulaClassDescription))
+                    && !reasoner.isEntailed(df.getOWLSubClassOfAxiom(
+                            anotherFormulaClassDescription, classDescription))) {
+				formulas.remove(anotherFormula);
 			}
 		}
 		// There must be at most one applicable formula per individual
-		if (this.formulas.size() > 1) {
+		if (formulas.size() > 1) {
 			throw new MoreThanOneFormulaPerIndividualException(
 					"There is more than one formula for individual "
-							+ this.individual);
+							+ individual);
 		} else {
-			toReturn = this.formulas.size() > 0 ? this.formulas.iterator()
+			toReturn = formulas.size() > 0 ? formulas.iterator()
 					.next() : null;
 		}
 		return toReturn;
 	}
+
+    @Override
+    public void visit(OWLAnnotationProperty property) {}
 }

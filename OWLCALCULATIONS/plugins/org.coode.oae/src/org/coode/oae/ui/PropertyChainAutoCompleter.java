@@ -34,11 +34,11 @@ import org.apache.log4j.Logger;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.description.OWLExpressionParserException;
+import org.protege.editor.owl.model.classexpression.OWLExpressionParserException;
 import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcher;
 import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcherImpl;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import uk.ac.manchester.mae.evaluation.PropertyChainModel;
 
@@ -78,11 +78,11 @@ public class PropertyChainAutoCompleter {
 		public void keyReleased(KeyEvent e) {
 			if (e.getKeyCode() != KeyEvent.VK_UP
 					&& e.getKeyCode() != KeyEvent.VK_DOWN) {
-				if (PropertyChainAutoCompleter.this.popupWindow.isVisible()
-						&& !PropertyChainAutoCompleter.this.lastTextUpdate
-								.equals(PropertyChainAutoCompleter.this.textComponent
+				if (popupWindow.isVisible()
+						&& !lastTextUpdate
+								.equals(textComponent
 										.getText())) {
-					PropertyChainAutoCompleter.this.lastTextUpdate = PropertyChainAutoCompleter.this.textComponent
+					lastTextUpdate = textComponent
 							.getText();
 					updatePopup(getMatches());
 				}
@@ -112,14 +112,15 @@ public class PropertyChainAutoCompleter {
 		 * 
 		 * @see java.awt.event.HierarchyEvent#getChangeFlags()
 		 */
-		public void hierarchyChanged(HierarchyEvent e) {
+		@Override
+        public void hierarchyChanged(HierarchyEvent e) {
 			if ((e.getChangeFlags() & HierarchyEvent.PARENT_CHANGED) != 0) {
 				createPopupWindow();
-				Container frame = PropertyChainAutoCompleter.this.textComponent
+				Container frame = textComponent
 						.getTopLevelAncestor();
 				if (frame != null) {
 					frame
-							.addComponentListener(PropertyChainAutoCompleter.this.componentListener);
+							.addComponentListener(componentListener);
 				}
 			}
 		}
@@ -143,32 +144,32 @@ public class PropertyChainAutoCompleter {
 			JTextComponent tc, OWLExpressionChecker<PropertyChainModel> checker) {
 		this.owlEditorKit = owlEditorKit;
 		this.checker = checker;
-		this.textComponent = tc;
-		this.wordDelimeters = new HashSet<String>();
-		this.wordDelimeters.add(" ");
-		this.wordDelimeters.add("\n");
-		this.wordDelimeters.add("[");
-		this.wordDelimeters.add("]");
-		this.wordDelimeters.add("{");
-		this.wordDelimeters.add("}");
-		this.wordDelimeters.add("(");
-		this.wordDelimeters.add(")");
-		this.wordDelimeters.add(",");
-		this.wordDelimeters.add("^");
-		this.matcher = new AutoCompleterMatcherImpl(owlEditorKit
+		textComponent = tc;
+		wordDelimeters = new HashSet<String>();
+		wordDelimeters.add(" ");
+		wordDelimeters.add("\n");
+		wordDelimeters.add("[");
+		wordDelimeters.add("]");
+		wordDelimeters.add("{");
+		wordDelimeters.add("}");
+		wordDelimeters.add("(");
+		wordDelimeters.add(")");
+		wordDelimeters.add(",");
+		wordDelimeters.add("^");
+		matcher = new AutoCompleterMatcherImpl(owlEditorKit
 				.getModelManager());
-		this.popupList = new JList();
-		this.popupList.setAutoscrolls(true);
-		this.popupList.setCellRenderer(owlEditorKit.getWorkspace()
+		popupList = new JList();
+		popupList.setAutoscrolls(true);
+		popupList.setCellRenderer(owlEditorKit.getWorkspace()
 				.createOWLCellRenderer());
-		this.popupList.addMouseListener(this.mouseListener);
-		this.popupList.setRequestFocusEnabled(false);
-		this.textComponent.addKeyListener(this.keyListener);
-		this.textComponent.addHierarchyListener(this.hierarchyListener);
+		popupList.addMouseListener(mouseListener);
+		popupList.setRequestFocusEnabled(false);
+		textComponent.addKeyListener(keyListener);
+		textComponent.addHierarchyListener(hierarchyListener);
 		// moving or resizing the text component or dialog closes the popup
-		this.textComponent.addComponentListener(this.componentListener);
+		textComponent.addComponentListener(componentListener);
 		// switching focus to another component closes the popup
-		this.textComponent.addFocusListener(this.focusListener);
+		textComponent.addFocusListener(focusListener);
 		createPopupWindow();
 	}
 
@@ -184,24 +185,24 @@ public class PropertyChainAutoCompleter {
 			e.consume();
 			performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-			if (this.popupWindow.isVisible()) {
+			if (popupWindow.isVisible()) {
 				// Hide popup
 				e.consume();
 				hidePopup();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if (this.popupWindow.isVisible()) {
+			if (popupWindow.isVisible()) {
 				// Complete
 				e.consume();
 				completeWithPopupSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-			if (this.popupWindow.isVisible()) {
+			if (popupWindow.isVisible()) {
 				e.consume();
 				incrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
-			if (this.popupWindow.isVisible()) {
+			if (popupWindow.isVisible()) {
 				e.consume();
 				decrementSelection();
 			}
@@ -213,8 +214,8 @@ public class PropertyChainAutoCompleter {
 	}
 
 	protected void completeWithPopupSelection() {
-		if (this.popupWindow.isVisible()) {
-			Object selObject = this.popupList.getSelectedValue();
+		if (popupWindow.isVisible()) {
+			Object selObject = popupList.getSelectedValue();
 			if (selObject != null) {
 				insertWord(getInsertText(selObject));
 				hidePopup();
@@ -228,12 +229,12 @@ public class PropertyChainAutoCompleter {
 		// etc.
 		try {
 			int wordIndex = getWordIndex();
-			String expression = this.textComponent.getDocument().getText(0,
+			String expression = textComponent.getDocument().getText(0,
 					wordIndex);
 			try {
-				this.checker.check(expression);
+				checker.check(expression);
 			} catch (OWLExpressionParserException e) {
-				Set<OWLObject> matches = this.matcher.getMatches("", e
+				Set<OWLObject> matches = matcher.getMatches("", e
 						.isOWLClassExpected(), e.isOWLObjectPropertyExpected(),
 						e.isOWLDataPropertyExpected(), false, false);
 				List kwMatches = new ArrayList(matches.size() + 10);
@@ -250,14 +251,14 @@ public class PropertyChainAutoCompleter {
 	}
 
 	protected void createPopupWindow() {
-		JScrollPane sp = ComponentFactory.createScrollPane(this.popupList);
-		this.popupWindow = new JWindow((Window) SwingUtilities
-				.getAncestorOfClass(Window.class, this.textComponent));
+		JScrollPane sp = ComponentFactory.createScrollPane(popupList);
+		popupWindow = new JWindow((Window) SwingUtilities
+				.getAncestorOfClass(Window.class, textComponent));
 		// popupWindow.setAlwaysOnTop(true); // this doesn't appear to work with
 		// certain Windows/java combinations
-		this.popupWindow.getContentPane().setLayout(new BorderLayout());
-		this.popupWindow.getContentPane().add(sp, BorderLayout.CENTER);
-		this.popupWindow.setFocusableWindowState(false);
+		popupWindow.getContentPane().setLayout(new BorderLayout());
+		popupWindow.getContentPane().add(sp, BorderLayout.CENTER);
+		popupWindow.setFocusableWindowState(false);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -268,7 +269,7 @@ public class PropertyChainAutoCompleter {
 			insertWord(getInsertText(matches.iterator().next()));
 		} else if (matches.size() > 1) {
 			// Show popup
-			this.lastTextUpdate = this.textComponent.getText();
+			lastTextUpdate = textComponent.getText();
 			showPopup();
 			updatePopup(matches);
 		}
@@ -279,90 +280,90 @@ public class PropertyChainAutoCompleter {
 			// remove any currently selected text - this is the default
 			// behaviour
 			// of the editor when typing manually
-			int selStart = this.textComponent.getSelectionStart();
-			int selEnd = this.textComponent.getSelectionEnd();
+			int selStart = textComponent.getSelectionStart();
+			int selEnd = textComponent.getSelectionEnd();
 			int selLen = selEnd - selStart;
 			if (selLen > 0) {
-				this.textComponent.getDocument().remove(selStart, selLen);
+				textComponent.getDocument().remove(selStart, selLen);
 			}
 			int index = getWordIndex();
-			int caretIndex = this.textComponent.getCaretPosition();
+			int caretIndex = textComponent.getCaretPosition();
 			if (caretIndex > 0 && caretIndex > index) {
-				this.textComponent.getDocument().remove(index,
+				textComponent.getDocument().remove(index,
 						caretIndex - index);
 			}
-			this.textComponent.getDocument().insertString(index, word, null);
+			textComponent.getDocument().insertString(index, word, null);
 		} catch (BadLocationException e) {
 			logger.error(e);
 		}
 	}
 
 	private void showPopup() {
-		if (this.popupWindow == null) {
+		if (popupWindow == null) {
 			createPopupWindow();
 		}
-		if (!this.popupWindow.isVisible()) {
-			this.popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
+		if (!popupWindow.isVisible()) {
+			popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
 			try {
 				int wordIndex = getWordIndex();
 				Point p = new Point(0, 0); // default for when the doc is empty
 				if (wordIndex > 0) {
-					p = this.textComponent.modelToView(wordIndex).getLocation();
+					p = textComponent.modelToView(wordIndex).getLocation();
 				}
-				SwingUtilities.convertPointToScreen(p, this.textComponent);
+				SwingUtilities.convertPointToScreen(p, textComponent);
 				p.y = p.y
-						+ this.textComponent.getFontMetrics(
-								this.textComponent.getFont()).getHeight();
-				this.popupWindow.setLocation(p);
+						+ textComponent.getFontMetrics(
+								textComponent.getFont()).getHeight();
+				popupWindow.setLocation(p);
 			} catch (BadLocationException e) {
 				e.printStackTrace();
 			}
-			this.popupWindow.setVisible(true);
+			popupWindow.setVisible(true);
 		}
 	}
 
 	protected void hidePopup() {
-		this.popupWindow.setVisible(false);
-		this.popupList.setListData(new Object[0]);
+		popupWindow.setVisible(false);
+		popupList.setListData(new Object[0]);
 	}
 
 	@SuppressWarnings("unchecked")
 	protected void updatePopup(List matches) {
 		int count = matches.size();
-		if (count > this.maxEntries) {
-			count = this.maxEntries;
+		if (count > maxEntries) {
+			count = maxEntries;
 		}
 		if (!matches.isEmpty()) {
-			this.popupList.setListData(matches.subList(0, count).toArray());
+			popupList.setListData(matches.subList(0, count).toArray());
 		} else {
-			this.popupList.setListData(matches.toArray());
+			popupList.setListData(matches.toArray());
 		}
-		this.popupList.setSelectedIndex(0);
-		this.popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
+		popupList.setSelectedIndex(0);
+		popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
 	}
 
 	private void incrementSelection() {
-		if (this.popupList.getModel().getSize() > 0) {
-			int selIndex = this.popupList.getSelectedIndex();
+		if (popupList.getModel().getSize() > 0) {
+			int selIndex = popupList.getSelectedIndex();
 			selIndex++;
-			if (selIndex > this.popupList.getModel().getSize() - 1) {
+			if (selIndex > popupList.getModel().getSize() - 1) {
 				selIndex = 0;
 			}
-			this.popupList.setSelectedIndex(selIndex);
-			this.popupList.scrollRectToVisible(this.popupList.getCellBounds(
+			popupList.setSelectedIndex(selIndex);
+			popupList.scrollRectToVisible(popupList.getCellBounds(
 					selIndex, selIndex));
 		}
 	}
 
 	private void decrementSelection() {
-		if (this.popupList.getModel().getSize() > 0) {
-			int selIndex = this.popupList.getSelectedIndex();
+		if (popupList.getModel().getSize() > 0) {
+			int selIndex = popupList.getSelectedIndex();
 			selIndex--;
 			if (selIndex < 0) {
-				selIndex = this.popupList.getModel().getSize() - 1;
+				selIndex = popupList.getModel().getSize() - 1;
 			}
-			this.popupList.setSelectedIndex(selIndex);
-			this.popupList.scrollRectToVisible(this.popupList.getCellBounds(
+			popupList.setSelectedIndex(selIndex);
+			popupList.scrollRectToVisible(popupList.getCellBounds(
 					selIndex, selIndex));
 		}
 	}
@@ -380,7 +381,7 @@ public class PropertyChainAutoCompleter {
 	private int getEscapedWordIndex() {
 		try {
 			int caretPos = Math.max(0, getEffectiveCaretPosition() - 1);
-			String expression = this.textComponent.getDocument().getText(0,
+			String expression = textComponent.getDocument().getText(0,
 					caretPos);
 			int escapeEnd = -1;
 			do {
@@ -405,7 +406,7 @@ public class PropertyChainAutoCompleter {
 			int caretPos = Math.max(0, getEffectiveCaretPosition() - 1);
 			if (caretPos > 0) {
 				for (int index = caretPos; index > -1; index--) {
-					if (this.wordDelimeters.contains(this.textComponent
+					if (wordDelimeters.contains(textComponent
 							.getDocument().getText(index, 1))) {
 						return index + 1;
 					}
@@ -422,7 +423,7 @@ public class PropertyChainAutoCompleter {
 
 	private String getInsertText(Object o) {
 		if (o instanceof OWLObject) {
-			OWLModelManager mngr = this.owlEditorKit.getModelManager();
+			OWLModelManager mngr = owlEditorKit.getModelManager();
 			return mngr.getRendering((OWLObject) o);
 		} else {
 			return o.toString();
@@ -442,18 +443,18 @@ public class PropertyChainAutoCompleter {
 	// the caret pos should be read as the start of the selection if there is
 	// one
 	private int getEffectiveCaretPosition() {
-		int startSel = this.textComponent.getSelectionStart();
+		int startSel = textComponent.getSelectionStart();
 		if (startSel >= 0) {
 			return startSel;
 		}
-		return this.textComponent.getCaretPosition();
+		return textComponent.getCaretPosition();
 	}
 
 	public void uninstall() {
 		hidePopup();
-		this.textComponent.removeKeyListener(this.keyListener);
-		this.textComponent.removeComponentListener(this.componentListener);
-		this.textComponent.removeFocusListener(this.focusListener);
-		this.textComponent.removeHierarchyListener(this.hierarchyListener);
+		textComponent.removeKeyListener(keyListener);
+		textComponent.removeComponentListener(componentListener);
+		textComponent.removeFocusListener(focusListener);
+		textComponent.removeHierarchyListener(hierarchyListener);
 	}
 }

@@ -1,20 +1,19 @@
 package org.coode.oae.ui;
 
-import java.net.URI;
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.Set;
 
 import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.editor.OWLObjectEditor;
 import org.protege.editor.owl.ui.frame.AbstractOWLFrameSection;
 import org.protege.editor.owl.ui.frame.OWLFrame;
 import org.protege.editor.owl.ui.frame.OWLFrameSectionRow;
-import org.protege.editor.owl.ui.frame.OWLFrameSectionRowObjectEditor;
-import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.model.OWLAnnotationAxiom;
-import org.semanticweb.owl.model.OWLDataFactory;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLEntityAnnotationAxiom;
-import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import uk.ac.manchester.mae.evaluation.FormulaModel;
 import uk.ac.manchester.mae.parser.ParseException;
@@ -22,7 +21,7 @@ import uk.ac.manchester.mae.parser.ParseException;
 @SuppressWarnings("unchecked")
 public class OWLCalculationsFormulaDataPropertyFrameSection
 		extends
-		AbstractOWLFrameSection<OWLDataProperty, OWLAnnotationAxiom<OWLDataProperty>, FormulaModel> {
+        AbstractOWLFrameSection<OWLDataProperty, OWLAnnotationAssertionAxiom, FormulaModel> {
 	private static final String LABEL = "Formulas";
 	protected boolean inferredFormulas = true;
 
@@ -37,18 +36,19 @@ public class OWLCalculationsFormulaDataPropertyFrameSection
 	}
 
 	@Override
-	protected OWLAnnotationAxiom createAxiom(FormulaModel object) {
-		OWLAnnotationAxiom toReturn = null;
+    protected OWLAnnotationAssertionAxiom createAxiom(FormulaModel object) {
+        OWLAnnotationAssertionAxiom toReturn = null;
 		OWLDataProperty dataProperty = getRootObject();
 		OWLDataFactory odf = getOWLDataFactory();
 		if (dataProperty != null) {
-			URI uri = object.getFormulaURI();
+            IRI uri = object.getFormulaURI();
 			if (uri != null) {
 				try {
-					toReturn = odf.getOWLEntityAnnotationAxiom(dataProperty,
-							uri, odf.getOWLTypedConstant(MAENodeAdapter
-									.toFormula(object, getOWLModelManager())
-									.toString()));
+                    toReturn = odf.getOWLAnnotationAssertionAxiom(
+                            odf.getOWLAnnotationProperty(uri),
+                            dataProperty.getIRI(),
+                            odf.getOWLLiteral(MAENodeAdapter.toFormula(object,
+                                    getOWLModelManager()).toString()));
 				} catch (ParseException e) {
 					// Impossible
 					e.printStackTrace();
@@ -59,7 +59,7 @@ public class OWLCalculationsFormulaDataPropertyFrameSection
 	}
 
 	@Override
-	public OWLFrameSectionRowObjectEditor<FormulaModel> getObjectEditor() {
+    public OWLObjectEditor<FormulaModel> getObjectEditor() {
 		// return new OWLArithmeticFormulaEditor(this.getOWLEditorKit(), null,
 		// true, this.formulaAnnotationURIs);
 		return new OWLCalculationsFormulaEditor(getOWLEditorKit());
@@ -67,9 +67,10 @@ public class OWLCalculationsFormulaDataPropertyFrameSection
 
 	@Override
 	protected void refill(OWLOntology ontology) {
-		Set<OWLAnnotationAxiom> annotationAxioms = getRootObject()
-				.getAnnotationAxioms(ontology);
-		for (OWLAnnotationAxiom annotationAxiom : annotationAxioms) {
+        Collection<OWLAnnotationAssertionAxiom> annotationAxioms = EntitySearcher
+                .getAnnotationAssertionAxioms(getRootObject().getIRI(),
+                        ontology);
+        for (OWLAnnotationAssertionAxiom annotationAxiom : annotationAxioms) {
 			OWLArithmeticsAxiomFormulaExtractor visitor = new OWLArithmeticsAxiomFormulaExtractor(
 					null, getOWLModelManager());
 			annotationAxiom.accept(visitor);
@@ -82,16 +83,18 @@ public class OWLCalculationsFormulaDataPropertyFrameSection
 	}
 
 	@Override
-	protected void refillInferred() throws OWLReasonerException {
-		if (this.inferredFormulas) {
-			for (Set<OWLDataProperty> superPropertySet : getOWLModelManager()
-					.getReasoner().getAncestorProperties(getRootObject())) {
-				for (OWLDataProperty superProperty : superPropertySet) {
+    protected void refillInferred() {
+		if (inferredFormulas) {
+            for (OWLDataProperty superProperty : getOWLModelManager()
+                    .getReasoner()
+                    .getSuperDataProperties(getRootObject(), false)
+                    .getFlattened()) {
 					for (OWLOntology ontology : getOWLEditorKit()
 							.getModelManager().getOntologies()) {
-						Set<OWLAnnotationAxiom> annotationAxioms = superProperty
-								.getAnnotationAxioms(ontology);
-						for (OWLAnnotationAxiom annotationAxiom : annotationAxioms) {
+                    Collection<OWLAnnotationAssertionAxiom> annotationAxioms = EntitySearcher
+                            .getAnnotationAssertionAxioms(
+                                    superProperty.getIRI(), ontology);
+                    for (OWLAnnotationAssertionAxiom annotationAxiom : annotationAxioms) {
 							OWLArithmeticsAxiomFormulaExtractor visitor = new OWLArithmeticsAxiomFormulaExtractor(
 									null, getOWLModelManager());
 							annotationAxiom.accept(visitor);
@@ -103,16 +106,19 @@ public class OWLCalculationsFormulaDataPropertyFrameSection
 						}
 					}
 				}
-			}
+
 		}
 	}
 
-	public Comparator<OWLFrameSectionRow<OWLDataProperty, OWLAnnotationAxiom<OWLDataProperty>, FormulaModel>> getRowComparator() {
+    @Override
+    public
+            Comparator<OWLFrameSectionRow<OWLDataProperty, OWLAnnotationAssertionAxiom, FormulaModel>>
+            getRowComparator() {
 		return null;
 	}
 
 	@Override
-	public void visit(OWLEntityAnnotationAxiom axiom) {
+    public void visit(OWLAnnotationAssertionAxiom axiom) {
 		OWLArithmeticsAxiomFormulaExtractor visitor = new OWLArithmeticsAxiomFormulaExtractor(
 				null, getOWLModelManager());
 		axiom.accept(visitor);

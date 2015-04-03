@@ -24,7 +24,7 @@ package org.coode.oae.ui;
 
 import org.coode.oae.utils.ParserFactory;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.model.description.OWLExpressionParserException;
+import org.protege.editor.owl.model.classexpression.OWLExpressionParserException;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
 
 import uk.ac.manchester.mae.evaluation.FormulaModel;
@@ -54,20 +54,22 @@ public class OWLCalculationsExpressionChecker implements
 	/**
 	 * @see org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker#check(java.lang.String)
 	 */
-	public void check(String text) throws OWLExpressionParserException {
+	@Override
+    public void check(String text) throws OWLExpressionParserException {
 		createObject(text);
 	}
 
 	/**
 	 * @see org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker#createObject(java.lang.String)
 	 */
-	public FormulaModel createObject(String text)
+	@Override
+    public FormulaModel createObject(String text)
 			throws OWLExpressionParserException {
-		ParserFactory.initParser(text, this.owlEditorKit.getModelManager());
+		ParserFactory.initParser(text, owlEditorKit.getModelManager());
 		try {
 			MAEStart formulaNode = (MAEStart) ArithmeticsParser.Start();
 			return MAENodeAdapter.toFormulaModel(formulaNode, null,
-					this.owlEditorKit);
+					owlEditorKit);
 		} catch (ParseException e) {
 			throw new OWLExpressionParserException(e);
 		}

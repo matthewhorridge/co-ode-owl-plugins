@@ -6,13 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxEditorParser;
 import org.protege.editor.owl.ui.clsdescriptioneditor.AutoCompleterMatcher;
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.expression.OWLEntityChecker;
-import org.semanticweb.owl.expression.ParserException;
-import org.semanticweb.owl.model.OWLDataFactory;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.expression.OWLEntityChecker;
+import org.semanticweb.owlapi.expression.ParserException;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.util.mansyntax.ManchesterOWLSyntaxParser;
 
 public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		ArithmeticsParserConstants {
@@ -112,7 +112,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		boolean storeToExpressed = false;
 		boolean bindingExpressed = false;
 		try {
-			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+			switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 				case 25:
 					ConflictStrategy();
 					conflictExpressed = true;
@@ -122,7 +122,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 			}
 			initCompletions(conflictExpressed, appliesToExpressed,
 					storeToExpressed, bindingExpressed);
-			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+			switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 				case 28:
 					AppliesTo();
 					appliesToExpressed = true;
@@ -132,7 +132,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 			}
 			initCompletions(conflictExpressed, appliesToExpressed,
 					storeToExpressed, bindingExpressed);
-			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+			switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 				case 26:
 					StoreTo();
 					storeToExpressed = true;
@@ -142,7 +142,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 			}
 			initCompletions(conflictExpressed, appliesToExpressed,
 					storeToExpressed, bindingExpressed);
-			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+			switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 				case OPENCURLYBRACKET:
 					jj_consume_token(OPENCURLYBRACKET);
 					initCompletions(conflictExpressed, appliesToExpressed,
@@ -151,7 +151,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 					bindingExpressed = true;
 					completions.addAll(variables);
 					label_1: while (true) {
-						switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+						switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 							case 23:
 								break;
 							default:
@@ -167,7 +167,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 				default:
 					jj_la1[4] = jj_gen;
 			}
-			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+			switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 				case INTEGER_LITERAL:
 				case NUMBER:
 				case IDENTIFIER:
@@ -288,11 +288,12 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 				}
 			}
 			String content = jjtn000.getContent();
-			ManchesterOWLSyntaxEditorParser parser = new ManchesterOWLSyntaxEditorParser(
-					dataFactory, content);
+            ManchesterOWLSyntaxParser parser = OWLManager
+                    .createManchesterParser();
+            parser.setStringToParse(content);
 			parser.setOWLEntityChecker(owlEntityChecker);
 			try {
-				parser.parseDescription();
+                parser.parseClassExpression();
 			} catch (ParserException e) {
 				if (matcher != null) {
 					int lastIndexOfWhiteSpace = content.lastIndexOf(" ");
@@ -319,11 +320,12 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 				throw new ParseException(e.getMessage());
 			}
 			String expression = content + "**";
-			ManchesterOWLSyntaxEditorParser completerParser = new ManchesterOWLSyntaxEditorParser(
-					dataFactory, expression);
+            ManchesterOWLSyntaxParser completerParser = OWLManager
+                    .createManchesterParser();
+            parser.setStringToParse(expression);
 			completerParser.setOWLEntityChecker(owlEntityChecker);
 			try {
-				completerParser.parseDescription();
+                completerParser.parseClassExpression();
 			} catch (ParserException e) {
 				if (matcher != null) {
 					int lastIndexOfWhiteSpace = expression.lastIndexOf(" ");
@@ -472,13 +474,15 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 			}
 			if (jjte000 instanceof ParseException) {
 				{
-					if (true)
-						throw (ParseException) jjte000;
+					if (true) {
+                        throw (ParseException) jjte000;
+                    }
 				}
 			}
 			{
-				if (true)
-					throw (Error) jjte000;
+				if (true) {
+                    throw (Error) jjte000;
+                }
 			}
 		} finally {
 			if (jjtc000) {
@@ -501,7 +505,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		try {
 			MultiplicativeExpression(variables);
 			label_2: while (true) {
-				switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+				switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 					case SUM:
 						break;
 					default:
@@ -542,7 +546,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		try {
 			UnaryExpression(variables);
 			label_3: while (true) {
-				switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+				switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 					case MULTIPLY:
 						break;
 					default:
@@ -582,7 +586,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		if (jj_2_1(2)) {
 			Power(variables);
 		} else {
-			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+			switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 				case 30:
 					jj_consume_token(30);
 					Expression(variables);
@@ -611,7 +615,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		Double exp;
 		Token baseId = null;
 		try {
-			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+			switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 				case INTEGER_LITERAL:
 				case NUMBER:
 					base = Integer();
@@ -667,7 +671,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		jjtree.openNodeScope(jjtn000);
 		Token t;
 		try {
-			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+			switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 				case NUMBER:
 					t = jj_consume_token(NUMBER);
 					jjtree.closeNodeScope(jjtn000, true);
@@ -707,8 +711,9 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 			jjtc000 = false;
 			if (!variables.contains(t.image)) {
 				{
-					if (true)
-						throw new ParseException("Unbound symbol: " + t.image);
+					if (true) {
+                        throw new ParseException("Unbound symbol: " + t.image);
+                    }
 				}
 			}
 			jjtn000.setIdentifierName(t.image);
@@ -722,7 +727,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 
 	static final public void groundTerm(Set<String> variables)
 			throws ParseException {
-		switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+		switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 			case INTEGER_LITERAL:
 			case NUMBER:
 				Integer();
@@ -749,7 +754,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		boolean jjtc000 = true;
 		jjtree.openNodeScope(jjtn000);
 		try {
-			switch ((jj_ntk == -1) ? jj_ntk() : jj_ntk) {
+			switch (jj_ntk == -1 ? jj_ntk() : jj_ntk) {
 				case 33:
 					jj_consume_token(33);
 					break;
@@ -772,19 +777,22 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 			}
 			if (jjte000 instanceof RuntimeException) {
 				{
-					if (true)
-						throw (RuntimeException) jjte000;
+					if (true) {
+                        throw (RuntimeException) jjte000;
+                    }
 				}
 			}
 			if (jjte000 instanceof ParseException) {
 				{
-					if (true)
-						throw (ParseException) jjte000;
+					if (true) {
+                        throw (ParseException) jjte000;
+                    }
 				}
 			}
 			{
-				if (true)
-					throw (Error) jjte000;
+				if (true) {
+                    throw (Error) jjte000;
+                }
 			}
 		} finally {
 			if (jjtc000) {
@@ -806,8 +814,9 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 	}
 
 	static private boolean jj_3R_9() {
-		if (jj_scan_token(INTEGER_LITERAL))
-			return true;
+		if (jj_scan_token(INTEGER_LITERAL)) {
+            return true;
+        }
 		return false;
 	}
 
@@ -816,29 +825,34 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		xsp = jj_scanpos;
 		if (jj_3R_5()) {
 			jj_scanpos = xsp;
-			if (jj_3R_6())
-				return true;
+			if (jj_3R_6()) {
+                return true;
+            }
 		}
-		if (jj_scan_token(32))
-			return true;
+		if (jj_scan_token(32)) {
+            return true;
+        }
 		return false;
 	}
 
 	static private boolean jj_3R_5() {
-		if (jj_3R_7())
-			return true;
+		if (jj_3R_7()) {
+            return true;
+        }
 		return false;
 	}
 
 	static private boolean jj_3R_6() {
-		if (jj_scan_token(IDENTIFIER))
-			return true;
+		if (jj_scan_token(IDENTIFIER)) {
+            return true;
+        }
 		return false;
 	}
 
 	static private boolean jj_3R_8() {
-		if (jj_scan_token(NUMBER))
-			return true;
+		if (jj_scan_token(NUMBER)) {
+            return true;
+        }
 		return false;
 	}
 
@@ -847,15 +861,17 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		xsp = jj_scanpos;
 		if (jj_3R_8()) {
 			jj_scanpos = xsp;
-			if (jj_3R_9())
-				return true;
+			if (jj_3R_9()) {
+                return true;
+            }
 		}
 		return false;
 	}
 
 	static private boolean jj_3_1() {
-		if (jj_3R_4())
-			return true;
+		if (jj_3R_4()) {
+            return true;
+        }
 		return false;
 	}
 
@@ -919,10 +935,12 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		token = new Token();
 		jj_ntk = -1;
 		jj_gen = 0;
-		for (int i = 0; i < 13; i++)
-			jj_la1[i] = -1;
-		for (int i = 0; i < jj_2_rtns.length; i++)
-			jj_2_rtns[i] = new JJCalls();
+		for (int i = 0; i < 13; i++) {
+            jj_la1[i] = -1;
+        }
+		for (int i = 0; i < jj_2_rtns.length; i++) {
+            jj_2_rtns[i] = new JJCalls();
+        }
 	}
 
 	/** Reinitialise. */
@@ -942,10 +960,12 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		jj_ntk = -1;
 		jjtree.reset();
 		jj_gen = 0;
-		for (int i = 0; i < 13; i++)
-			jj_la1[i] = -1;
-		for (int i = 0; i < jj_2_rtns.length; i++)
-			jj_2_rtns[i] = new JJCalls();
+		for (int i = 0; i < 13; i++) {
+            jj_la1[i] = -1;
+        }
+		for (int i = 0; i < jj_2_rtns.length; i++) {
+            jj_2_rtns[i] = new JJCalls();
+        }
 	}
 
 	/** Constructor. */
@@ -964,10 +984,12 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		token = new Token();
 		jj_ntk = -1;
 		jj_gen = 0;
-		for (int i = 0; i < 13; i++)
-			jj_la1[i] = -1;
-		for (int i = 0; i < jj_2_rtns.length; i++)
-			jj_2_rtns[i] = new JJCalls();
+		for (int i = 0; i < 13; i++) {
+            jj_la1[i] = -1;
+        }
+		for (int i = 0; i < jj_2_rtns.length; i++) {
+            jj_2_rtns[i] = new JJCalls();
+        }
 	}
 
 	/** Reinitialise. */
@@ -978,10 +1000,12 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		jj_ntk = -1;
 		jjtree.reset();
 		jj_gen = 0;
-		for (int i = 0; i < 13; i++)
-			jj_la1[i] = -1;
-		for (int i = 0; i < jj_2_rtns.length; i++)
-			jj_2_rtns[i] = new JJCalls();
+		for (int i = 0; i < 13; i++) {
+            jj_la1[i] = -1;
+        }
+		for (int i = 0; i < jj_2_rtns.length; i++) {
+            jj_2_rtns[i] = new JJCalls();
+        }
 	}
 
 	/** Constructor with generated Token Manager. */
@@ -999,10 +1023,12 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		token = new Token();
 		jj_ntk = -1;
 		jj_gen = 0;
-		for (int i = 0; i < 13; i++)
-			jj_la1[i] = -1;
-		for (int i = 0; i < jj_2_rtns.length; i++)
-			jj_2_rtns[i] = new JJCalls();
+		for (int i = 0; i < 13; i++) {
+            jj_la1[i] = -1;
+        }
+		for (int i = 0; i < jj_2_rtns.length; i++) {
+            jj_2_rtns[i] = new JJCalls();
+        }
 	}
 
 	/** Reinitialise. */
@@ -1012,18 +1038,21 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		jj_ntk = -1;
 		jjtree.reset();
 		jj_gen = 0;
-		for (int i = 0; i < 13; i++)
-			jj_la1[i] = -1;
-		for (int i = 0; i < jj_2_rtns.length; i++)
-			jj_2_rtns[i] = new JJCalls();
+		for (int i = 0; i < 13; i++) {
+            jj_la1[i] = -1;
+        }
+		for (int i = 0; i < jj_2_rtns.length; i++) {
+            jj_2_rtns[i] = new JJCalls();
+        }
 	}
 
 	static private Token jj_consume_token(int kind) throws ParseException {
 		Token oldToken;
-		if ((oldToken = token).next != null)
-			token = token.next;
-		else
-			token = token.next = ArithmeticsParserTokenManager.getNextToken();
+		if ((oldToken = token).next != null) {
+            token = token.next;
+        } else {
+            token = token.next = ArithmeticsParserTokenManager.getNextToken();
+        }
 		jj_ntk = -1;
 		if (token.kind == kind) {
 			jj_gen++;
@@ -1032,8 +1061,9 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 				for (int i = 0; i < jj_2_rtns.length; i++) {
 					JJCalls c = jj_2_rtns[i];
 					while (c != null) {
-						if (c.gen < jj_gen)
-							c.first = null;
+						if (c.gen < jj_gen) {
+                            c.first = null;
+                        }
 						c = c.next;
 					}
 				}
@@ -1070,22 +1100,26 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 				i++;
 				tok = tok.next;
 			}
-			if (tok != null)
-				jj_add_error_token(kind, i);
+			if (tok != null) {
+                jj_add_error_token(kind, i);
+            }
 		}
-		if (jj_scanpos.kind != kind)
-			return true;
-		if (jj_la == 0 && jj_scanpos == jj_lastpos)
-			throw jj_ls;
+		if (jj_scanpos.kind != kind) {
+            return true;
+        }
+		if (jj_la == 0 && jj_scanpos == jj_lastpos) {
+            throw jj_ls;
+        }
 		return false;
 	}
 
 	/** Get the next Token. */
 	static final public Token getNextToken() {
-		if (token.next != null)
-			token = token.next;
-		else
-			token = token.next = ArithmeticsParserTokenManager.getNextToken();
+		if (token.next != null) {
+            token = token.next;
+        } else {
+            token = token.next = ArithmeticsParserTokenManager.getNextToken();
+        }
 		jj_ntk = -1;
 		jj_gen++;
 		return token;
@@ -1095,20 +1129,22 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 	static final public Token getToken(int index) {
 		Token t = token;
 		for (int i = 0; i < index; i++) {
-			if (t.next != null)
-				t = t.next;
-			else
-				t = t.next = ArithmeticsParserTokenManager.getNextToken();
+			if (t.next != null) {
+                t = t.next;
+            } else {
+                t = t.next = ArithmeticsParserTokenManager.getNextToken();
+            }
 		}
 		return t;
 	}
 
 	static private int jj_ntk() {
-		if ((jj_nt = token.next) == null)
-			return (jj_ntk = (token.next = ArithmeticsParserTokenManager
-					.getNextToken()).kind);
-		else
-			return (jj_ntk = jj_nt.kind);
+		if ((jj_nt = token.next) == null) {
+            return jj_ntk = (token.next = ArithmeticsParserTokenManager
+					.getNextToken()).kind;
+        } else {
+            return jj_ntk = jj_nt.kind;
+        }
 	}
 
 	static private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
@@ -1118,8 +1154,9 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 	static private int jj_endpos;
 
 	static private void jj_add_error_token(int kind, int pos) {
-		if (pos >= 100)
-			return;
+		if (pos >= 100) {
+            return;
+        }
 		if (pos == jj_endpos + 1) {
 			jj_lasttokens[jj_endpos++] = kind;
 		} else if (jj_endpos != 0) {
@@ -1129,7 +1166,7 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 			}
 			jj_entries_loop: for (java.util.Iterator<?> it = jj_expentries
 					.iterator(); it.hasNext();) {
-				int[] oldentry = (int[]) (it.next());
+				int[] oldentry = (int[]) it.next();
 				if (oldentry.length == jj_expentry.length) {
 					for (int i = 0; i < jj_expentry.length; i++) {
 						if (oldentry[i] != jj_expentry[i]) {
@@ -1140,8 +1177,9 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 					break jj_entries_loop;
 				}
 			}
-			if (pos != 0)
-				jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+			if (pos != 0) {
+                jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+            }
 		}
 	}
 
@@ -1156,10 +1194,10 @@ public class ArithmeticsParser implements ArithmeticsParserTreeConstants,
 		for (int i = 0; i < 13; i++) {
 			if (jj_la1[i] == jj_gen) {
 				for (int j = 0; j < 32; j++) {
-					if ((jj_la1_0[i] & (1 << j)) != 0) {
+					if ((jj_la1_0[i] & 1 << j) != 0) {
 						la1tokens[j] = true;
 					}
-					if ((jj_la1_1[i] & (1 << j)) != 0) {
+					if ((jj_la1_1[i] & 1 << j) != 0) {
 						la1tokens[32 + j] = true;
 					}
 				}

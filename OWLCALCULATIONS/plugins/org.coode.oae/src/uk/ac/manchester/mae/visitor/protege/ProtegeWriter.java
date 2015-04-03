@@ -23,8 +23,8 @@
 package uk.ac.manchester.mae.visitor.protege;
 
 import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLIndividual;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
 
 import uk.ac.manchester.mae.report.EvaluationReport;
 import uk.ac.manchester.mae.visitor.Writer;
@@ -37,7 +37,8 @@ import uk.ac.manchester.mae.visitor.Writer;
  *         Apr 22, 2008
  */
 public class ProtegeWriter extends Writer {
-	public ProtegeWriter(OWLIndividual individual,
+
+    public ProtegeWriter(OWLNamedIndividual individual,
 			OWLDataProperty dataProperty, Object results,
 			OWLModelManager modelManager, EvaluationReport evaluationReport) {
 		super(individual, dataProperty, results, modelManager

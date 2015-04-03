@@ -24,17 +24,14 @@ package uk.ac.manchester.mae.visitor;
 
 import java.util.Set;
 
-import org.coode.manchesterowlsyntax.ManchesterOWLSyntaxDescriptionParser;
-import org.semanticweb.owl.expression.ParserException;
-import org.semanticweb.owl.expression.ShortFormEntityChecker;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.util.BidirectionalShortFormProviderAdapter;
-import org.semanticweb.owl.util.OWLEntitySetProvider;
-import org.semanticweb.owl.util.ReferencedEntitySetProvider;
-import org.semanticweb.owl.util.SimpleShortFormProvider;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.expression.ShortFormEntityChecker;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.util.BidirectionalShortFormProviderAdapter;
+import org.semanticweb.owlapi.util.SimpleShortFormProvider;
+import org.semanticweb.owlapi.util.mansyntax.ManchesterOWLSyntaxParser;
 
 import uk.ac.manchester.mae.parser.MAEAdd;
 import uk.ac.manchester.mae.parser.MAEBigSum;
@@ -60,7 +57,7 @@ import uk.ac.manchester.mae.parser.SimpleNode;
 public class DescriptionFacetExtractor extends FacetExtractor {
 	private OWLOntologyManager manager;
 	private Set<OWLOntology> ontologies;
-	private OWLDescription classDescription;
+    private OWLClassExpression classDescription;
 
 	/**
 	 * @param manager
@@ -85,7 +82,8 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStart,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEStart node, Object data) {
+	@Override
+    public Object visit(MAEStart node, Object data) {
 		return null;
 	}
 
@@ -93,7 +91,8 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEConflictStrategy,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEConflictStrategy node, Object data) {
+	@Override
+    public Object visit(MAEConflictStrategy node, Object data) {
 		return null;
 	}
 
@@ -101,7 +100,8 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEStoreTo,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEStoreTo node, Object data) {
+	@Override
+    public Object visit(MAEStoreTo node, Object data) {
 		node.childrenAccept(this, data);
 		return null;
 	}
@@ -110,29 +110,26 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEmanSyntaxClassExpression,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEmanSyntaxClassExpression node, Object data) {
-		BidirectionalShortFormProviderAdapter adapter = new BidirectionalShortFormProviderAdapter(
+	@Override
+    public Object visit(MAEmanSyntaxClassExpression node, Object data) {
+        BidirectionalShortFormProviderAdapter adapter = new BidirectionalShortFormProviderAdapter(
+                ontologies,
 				new SimpleShortFormProvider());
-		OWLEntitySetProvider<OWLEntity> owlEntitySetProvider = new ReferencedEntitySetProvider(
-				this.ontologies);
-		adapter.rebuild(owlEntitySetProvider);
-		ManchesterOWLSyntaxDescriptionParser parser = new ManchesterOWLSyntaxDescriptionParser(
-				this.manager.getOWLDataFactory(), new ShortFormEntityChecker(
-						adapter));
-		try {
-			this.classDescription = parser.parse(node.getContent());
-			data = this.classDescription;
+        ManchesterOWLSyntaxParser parser = OWLManager.createManchesterParser();
+        parser.setOWLEntityChecker(new ShortFormEntityChecker(adapter));
+        parser.setStringToParse(node.getContent());
+        classDescription = parser.parseClassExpression();
+			data = classDescription;
 			return data;
-		} catch (ParserException e) {
-			return null;
-		}
+
 	}
 
 	/**
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEBinding,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEBinding node, Object data) {
+	@Override
+    public Object visit(MAEBinding node, Object data) {
 		return null;
 	}
 
@@ -140,7 +137,8 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPropertyChain,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEpropertyChainExpression node, Object data) {
+	@Override
+    public Object visit(MAEpropertyChainExpression node, Object data) {
 		// XXX this seems bogus anyway
 		// for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 		// Node child = node.jjtGetChild(i);
@@ -168,7 +166,8 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEAdd,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEAdd node, Object data) {
+	@Override
+    public Object visit(MAEAdd node, Object data) {
 		return null;
 	}
 
@@ -176,7 +175,8 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEMult,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEMult node, Object data) {
+	@Override
+    public Object visit(MAEMult node, Object data) {
 		return null;
 	}
 
@@ -184,7 +184,8 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEPower,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEPower node, Object data) {
+	@Override
+    public Object visit(MAEPower node, Object data) {
 		return null;
 	}
 
@@ -192,7 +193,8 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEIntNode,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEIntNode node, Object data) {
+	@Override
+    public Object visit(MAEIntNode node, Object data) {
 		return null;
 	}
 
@@ -200,7 +202,8 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEIdentifier,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEIdentifier node, Object data) {
+	@Override
+    public Object visit(MAEIdentifier node, Object data) {
 		return null;
 	}
 
@@ -208,12 +211,13 @@ public class DescriptionFacetExtractor extends FacetExtractor {
 	 * @see uk.ac.manchester.mae.parser.ArithmeticsParserVisitor#visit(uk.ac.manchester.mae.parser.MAEBigSum,
 	 *      java.lang.Object)
 	 */
-	public Object visit(MAEBigSum node, Object data) {
+	@Override
+    public Object visit(MAEBigSum node, Object data) {
 		return null;
 	}
 
 	@Override
-	public OWLDescription getExtractedDescription() {
-		return this.classDescription;
+    public OWLClassExpression getExtractedDescription() {
+		return classDescription;
 	}
 }

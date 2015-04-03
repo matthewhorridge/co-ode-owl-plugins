@@ -33,7 +33,7 @@ import javax.swing.JPanel;
 import org.protege.editor.core.ui.util.InputVerificationStatusChangedListener;
 import org.protege.editor.core.ui.util.VerifiedInputEditor;
 import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.frame.AbstractOWLFrameSectionRowObjectEditor;
+import org.protege.editor.owl.ui.editor.AbstractOWLObjectEditor;
 
 import uk.ac.manchester.mae.evaluation.FormulaModel;
 
@@ -45,7 +45,7 @@ import uk.ac.manchester.mae.evaluation.FormulaModel;
  *         Apr 4, 2008
  */
 public class OWLCalculationsFormulaEditor extends
-		AbstractOWLFrameSectionRowObjectEditor<FormulaModel> implements
+        AbstractOWLObjectEditor<FormulaModel> implements
 		VerifiedInputEditor, InputVerificationStatusChangedListener {
 	private OWLEditorKit owlEditorKit;
 	protected FormulaModel formulaModel;
@@ -59,22 +59,19 @@ public class OWLCalculationsFormulaEditor extends
 	 */
 	public OWLCalculationsFormulaEditor(OWLEditorKit owlEditorKit) {
 		this.owlEditorKit = owlEditorKit;
-		this.grapheditor = new GraphicalEditor(this.owlEditorKit);
-		this.grapheditor.addStatusChangedListener(this);
-		this.mainPanel.add(this.grapheditor);
+		grapheditor = new GraphicalEditor(this.owlEditorKit);
+		grapheditor.addStatusChangedListener(this);
+		mainPanel.add(grapheditor);
 	}
 
-	public void clear() {
-		this.formulaModel = null;
-		this.grapheditor.clear();
+	@Override
+    public void dispose() {
+		listeners.clear();
 	}
 
-	public void dispose() {
-		this.listeners.clear();
-	}
-
-	public FormulaModel getEditedObject() {
-		return this.formulaModel;
+	@Override
+    public FormulaModel getEditedObject() {
+		return formulaModel;
 	}
 
 	@Override
@@ -83,38 +80,58 @@ public class OWLCalculationsFormulaEditor extends
 	}
 
 	public void setFormula(FormulaModel formulaModel) {
-		this.grapheditor.initFormula(formulaModel);
+		grapheditor.initFormula(formulaModel);
 	}
 
-	public void addStatusChangedListener(
+	@Override
+    public void addStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		this.listeners.add(listener);
+		listeners.add(listener);
 		listener.verifiedStatusChanged(isValid());
 	}
 
-	public void removeStatusChangedListener(
+	@Override
+    public void removeStatusChangedListener(
 			InputVerificationStatusChangedListener listener) {
-		this.listeners.remove(listener);
+		listeners.remove(listener);
 	}
 
-	public JComponent getEditorComponent() {
-		return this.mainPanel;
+	@Override
+    public JComponent getEditorComponent() {
+		return mainPanel;
 	}
 
 	public void handleChange(boolean state) {
 		boolean valid = isValid() && state;
-		for (InputVerificationStatusChangedListener listener : this.listeners) {
+		for (InputVerificationStatusChangedListener listener : listeners) {
 			listener.verifiedStatusChanged(valid);
 		}
 	}
 
 	private boolean isValid() {
-		return this.formulaModel != null ? this.formulaModel.getFormulaURI() != null
+		return formulaModel != null ? formulaModel.getFormulaURI() != null
 				: false;
 	}
 
-	public void verifiedStatusChanged(boolean newState) {
-		this.formulaModel = this.grapheditor.getFormulaModel();
+	@Override
+    public void verifiedStatusChanged(boolean newState) {
+		formulaModel = grapheditor.getFormulaModel();
 		handleChange(newState);
 	}
+
+    @Override
+    public String getEditorTypeName() {
+        return getClass().getSimpleName();
+    }
+
+    @Override
+    public boolean canEdit(Object object) {
+        return object instanceof FormulaModel;
+    }
+
+    @Override
+    public boolean setEditedObject(FormulaModel editedObject) {
+        setFormula(editedObject);
+        return true;
+    }
 }

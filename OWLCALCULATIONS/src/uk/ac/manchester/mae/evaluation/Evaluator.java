@@ -22,20 +22,20 @@
  */
 package uk.ac.manchester.mae.evaluation;
 
-import java.lang.reflect.Constructor;
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.model.OWLDataProperty;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLIndividual;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyCreationException;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataProperty;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.reasoner.InferenceType;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.reasoner.OWLReasonerFactory;
 
 import uk.ac.manchester.mae.PropertyVisitor;
 import uk.ac.manchester.mae.UnresolvedSymbolsException;
@@ -54,49 +54,56 @@ import uk.ac.manchester.mae.visitor.Writer;
  *         Apr 30, 2008
  */
 public class Evaluator {
-	private Set<OWLOntology> ontologies;
-	private OWLOntologyManager ontologyManager;
-	private OWLReasoner reasoner;
-	private EvaluationReport report;
-	private OWLOntology ontology;
 
-	/**
-	 * @param ontologyManager
-	 * @throws OWLReasonerException
-	 */
-	public Evaluator(OWLOntology ontology, OWLOntologyManager ontologyManager,
-			OWLReasoner reasoner) throws OWLReasonerException {
-		this.ontology = ontology;
-		this.ontologyManager = ontologyManager;
-		this.report = new EvaluationReport();
-		// new OWLOntologyNamespaceManager(this.ontologyManager, ontology);
-		this.ontologies = this.ontologyManager.getImportsClosure(ontology);
-		this.reasoner = reasoner;
-		this.reasoner.loadOntologies(this.ontologies);
-	}
+    private final Set<OWLOntology> ontologies;
+    private final OWLOntologyManager ontologyManager;
+    private final OWLReasoner reasoner;
+    private final EvaluationReport report;
+    private final OWLOntology ontology;
 
-	public IndividualEvaluationResult evaluate(OWLIndividual individual,
+    /**
+     * @param ontologyManager
+     */
+    public Evaluator(OWLOntology ontology, OWLOntologyManager ontologyManager,
+            OWLReasonerFactory reasonerFactory) {
+        this(ontology, ontologyManager, reasonerFactory
+                .createReasoner(ontology));
+    }
+
+    /**
+     * @param ontologyManager
+     */
+    public Evaluator(OWLOntology ontology, OWLOntologyManager ontologyManager,
+            OWLReasoner reasoner) {
+        this.ontology = ontology;
+        this.ontologyManager = ontologyManager;
+        report = new EvaluationReport();
+        // new OWLOntologyNamespaceManager(this.ontologyManager, ontology);
+        ontologies = this.ontologyManager.getImportsClosure(ontology);
+        this.reasoner = reasoner;
+    }
+
+    public IndividualEvaluationResult evaluate(OWLNamedIndividual individual,
 			OWLDataProperty dataProperty, MAEStart formula, boolean write) {
 		IndividualEvaluationResult toReturn = null;
-		ClassExtractor classExtractor = new ClassExtractor(this.ontologies,
-				this.ontologyManager);
+		ClassExtractor classExtractor = new ClassExtractor(ontologies,
+				ontologyManager);
 		formula.jjtAccept(classExtractor, null);
-		OWLDescription description = classExtractor.getClassDescription();
+        OWLClassExpression description = classExtractor.getClassDescription();
 		try {
-			if (!this.reasoner.isClassified()) {
-				this.reasoner.classify();
-			}
-			if (this.reasoner.hasType(individual, description, false)) {
+            reasoner.precomputeInferences(InferenceType.CLASS_ASSERTIONS);
+            if (reasoner.isEntailed(ontologyManager.getOWLDataFactory()
+                    .getOWLClassAssertionAxiom(description, individual))) {
 				// Must pick only one formula for each individual
 				AlternativeFormulaPicker picker = new AlternativeFormulaPicker(
-						individual, formula, this.ontologies, this.reasoner,
-						this.ontologyManager);
+						individual, formula, ontologies, reasoner,
+						ontologyManager);
 				dataProperty.accept(picker);
 				MAEStart pickedFormula = picker.pickFormula();
 				if (pickedFormula == null) {
 					BindingAssigner assigner = new BindingAssigner(individual,
-							this.ontologyManager, this.ontologies,
-							this.reasoner);
+							ontologyManager, ontologies,
+							reasoner);
 					formula.jjtAccept(assigner, null);
 					Set<BindingAssignment> bindingAssignments = assigner
 							.getBindingAssignments();
@@ -110,13 +117,13 @@ public class Evaluator {
 								evaluationResults);
 						ResultReportWriter rrw = new ResultReportWriter(
 								dataProperty, formula, toReturn);
-						this.report.accept(rrw, null);
+						report.accept(rrw, null);
 						if (write) {
 							Writer writer = new Writer(individual,
 									dataProperty,
 									evaluationResults.getValues(),
-									this.ontology, this.reasoner,
-									this.ontologyManager, this.report);
+									ontology, reasoner,
+									ontologyManager, report);
 							formula.jjtAccept(writer, null);
 						}
 					} else {
@@ -125,7 +132,7 @@ public class Evaluator {
 								new UnresolvedSymbolsException(
 										"There are some unresolved variables for the individual "
 												+ individual));
-						this.report.accept(erw, null);
+						report.accept(erw, null);
 					}
 				}
 			}
@@ -142,12 +149,12 @@ public class Evaluator {
 	public FormulaEvaluationResult evaluate(OWLDataProperty dataProperty,
 			MAEStart formula, boolean write) {
 		FormulaEvaluationResult toReturn = null;
-		Set<OWLIndividual> individuals = new HashSet<OWLIndividual>();
-		for (OWLOntology onto : this.ontologies) {
-			individuals.addAll(onto.getReferencedIndividuals());
+        Set<OWLNamedIndividual> individuals = new HashSet<OWLNamedIndividual>();
+		for (OWLOntology onto : ontologies) {
+            individuals.addAll(onto.getIndividualsInSignature());
 		}
 		Set<IndividualEvaluationResult> individualEvaluationResults = new HashSet<IndividualEvaluationResult>();
-		for (OWLIndividual individual : individuals) {
+        for (OWLNamedIndividual individual : individuals) {
 			IndividualEvaluationResult individualEvaluationResult = this
 					.evaluate(individual, dataProperty, formula, write);
 			if (individualEvaluationResult != null) {
@@ -162,7 +169,7 @@ public class Evaluator {
 	public PropertyEvaluationResult evaluate(OWLDataProperty dataProperty,
 			boolean write) {
 		PropertyEvaluationResult toReturn = null;
-		PropertyVisitor propertyVisitor = new PropertyVisitor(this.ontologies);
+		PropertyVisitor propertyVisitor = new PropertyVisitor(ontologies);
 		dataProperty.accept(propertyVisitor);
 		Set<MAEStart> formulas = propertyVisitor.getExtractedFormulas();
 		if (!formulas.isEmpty()) {
@@ -181,8 +188,8 @@ public class Evaluator {
 
 	public Set<PropertyEvaluationResult> evaluate(boolean write) {
 		Set<OWLDataProperty> properties = new HashSet<OWLDataProperty>();
-		for (OWLOntology onto : this.ontologies) {
-			properties.addAll(onto.getReferencedDataProperties());
+		for (OWLOntology onto : ontologies) {
+            properties.addAll(onto.getDataPropertiesInSignature());
 		}
 		Set<PropertyEvaluationResult> toReturn = new HashSet<PropertyEvaluationResult>(
 				properties.size());
@@ -197,22 +204,9 @@ public class Evaluator {
 	}
 
 	public EvaluationReport getReport() {
-		return this.report == null ? new EvaluationReport() : this.report;
+		return report == null ? new EvaluationReport() : report;
 	}
 
-	@SuppressWarnings("unchecked")
-	private static OWLReasoner createReasoner(
-			OWLOntologyManager ontologyManager, String reasonerClassName) {
-		try {
-			Class<OWLReasoner> reasonerClass = (Class<OWLReasoner>) Class
-					.forName(reasonerClassName);
-			Constructor<OWLReasoner> con = reasonerClass
-					.getConstructor(OWLOntologyManager.class);
-			return con.newInstance(ontologyManager);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	public static void main(String[] args) {
 		String ontologyURI = args[0];
@@ -221,11 +215,13 @@ public class Evaluator {
 				.createOWLOntologyManager();
 		try {
 			OWLOntology ontology = ontologyManager
-					.loadOntologyFromPhysicalURI(URI.create(ontologyURI));
-			Evaluator evaluator = new Evaluator(ontology, ontologyManager,
-					createReasoner(ontologyManager, reasonerClassName));
-			Set<PropertyEvaluationResult> evaluation = evaluator
-					.evaluate(false);
+                    .loadOntologyFromOntologyDocument(IRI.create(ontologyURI));
+            OWLReasonerFactory reasonerFactory = (OWLReasonerFactory) Class
+                    .forName(reasonerClassName).newInstance();
+            Evaluator evaluator = new Evaluator(ontology, ontologyManager,
+                    reasonerFactory);
+            Set<PropertyEvaluationResult> evaluation = evaluator
+                    .evaluate(false);
 			System.out.println("Evaluation carried out: ");
 			for (PropertyEvaluationResult propertyEvaluationResult : evaluation) {
 				System.out.println(propertyEvaluationResult);
@@ -235,7 +231,7 @@ public class Evaluator {
 					.println("Problems in loading the ontlogy formt the URI: "
 							+ ontologyURI);
 			e.printStackTrace();
-		} catch (OWLReasonerException e) {
+        } catch (Exception e) {
 			System.out
 					.println("Problem in loading the ontlogies on to the reasoner ");
 			e.printStackTrace();

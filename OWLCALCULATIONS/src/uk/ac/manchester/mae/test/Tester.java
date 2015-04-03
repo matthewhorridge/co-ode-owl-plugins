@@ -13,7 +13,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.coode.oae.utils.ParserFactory;
-import org.semanticweb.owl.apibinding.OWLManager;
+import org.semanticweb.owlapi.apibinding.OWLManager;
 
 import uk.ac.manchester.mae.parser.ArithmeticsParser;
 import uk.ac.manchester.mae.parser.ParseException;
@@ -29,14 +29,14 @@ public class Tester extends TestCase {
 
 	@Override
 	protected void setUp() throws Exception {
-		this.tests = new File(System
+		tests = new File(System
 				.getProperty(expressionFilePathPropertyName));
-		this.lines = this.loadLines(new FileReader(this.tests));
+		lines = loadLines(new FileReader(tests));
 		super.setUp();
 	}
 
 	public void testParser() {
-		for (String string : this.lines) {
+		for (String string : lines) {
 			ParserFactory.initParser(string, OWLManager
 					.createOWLOntologyManager());
 			System.out.println(string);

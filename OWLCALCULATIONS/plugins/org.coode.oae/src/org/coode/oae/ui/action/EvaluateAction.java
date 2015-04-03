@@ -29,7 +29,7 @@ import javax.swing.JOptionPane;
 import org.coode.oae.ui.OWLCalculations;
 import org.protege.editor.core.ui.workspace.Workspace;
 import org.protege.editor.owl.ui.action.ProtegeOWLAction;
-import org.semanticweb.owl.inference.OWLReasonerException;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
 
 import uk.ac.manchester.mae.ProtegeEvaluator;
 
@@ -66,17 +66,17 @@ public class EvaluateAction extends ProtegeOWLAction {
 	public void actionPerformed(ActionEvent arg0) {
 		ProtegeEvaluator protegeEvaluator = null;
 		try {
-			protegeEvaluator = new ProtegeEvaluator(this.getOWLModelManager());
+			protegeEvaluator = new ProtegeEvaluator(getOWLModelManager());
 			protegeEvaluator.evaluate(true);
 			OWLCalculations.setLastEvaluationReport(protegeEvaluator
 					.getReport());
-			this.getOWLWorkspace().showResultsView(
+			getOWLWorkspace().showResultsView(
 					"org.coode.oae.EvaluationResults", true,
 					Workspace.BOTTOM_RESULTS_VIEW);
 			// this.showReport(protegeEvaluator.getReport());
-		} catch (OWLReasonerException e) {
+        } catch (OWLRuntimeException e) {
 			JOptionPane
-					.showMessageDialog(this.getWorkspace(),
+					.showMessageDialog(getWorkspace(),
 							"Exception in creating the reasoner, impossible to evaluate the formulas");
 			e.printStackTrace();
 		} finally {

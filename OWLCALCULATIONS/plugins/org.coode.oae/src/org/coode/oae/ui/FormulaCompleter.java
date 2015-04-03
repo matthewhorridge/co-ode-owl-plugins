@@ -49,9 +49,8 @@ import org.coode.oae.utils.ParserFactory;
 import org.protege.editor.core.ui.util.ComponentFactory;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.ui.clsdescriptioneditor.OWLDescriptionAutoCompleter;
 import org.protege.editor.owl.ui.clsdescriptioneditor.OWLExpressionChecker;
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObject;
 
 import uk.ac.manchester.mae.parser.ArithmeticsParser;
 import uk.ac.manchester.mae.parser.ParseException;
@@ -66,28 +65,26 @@ public class FormulaCompleter {
 	protected final class SpecializedKeyAdapter extends KeyAdapter {
 		@Override
 		public void keyPressed(KeyEvent e) {
-			FormulaCompleter.this.processKeyPressed(e);
+			processKeyPressed(e);
 		}
 
 		@Override
 		public void keyReleased(KeyEvent e) {
 			if (e.getKeyCode() != KeyEvent.VK_UP
 					&& e.getKeyCode() != KeyEvent.VK_DOWN) {
-				if (FormulaCompleter.this.popupWindow.isVisible()
-						&& !FormulaCompleter.this.lastTextUpdate
-								.equals(FormulaCompleter.this.textComponent
+				if (popupWindow.isVisible()
+						&& !lastTextUpdate
+								.equals(textComponent
 										.getText())) {
-					FormulaCompleter.this.lastTextUpdate = FormulaCompleter.this.textComponent
+					lastTextUpdate = textComponent
 							.getText();
-					FormulaCompleter.this.updatePopup(FormulaCompleter.this
-							.getMatches());
+					updatePopup(getMatches());
 				}
 			}
 		}
 	}
 
-	private static Logger logger = Logger
-			.getLogger(OWLDescriptionAutoCompleter.class);
+    private static Logger logger = Logger.getLogger(FormulaCompleter.class);
 	public static final int DEFAULT_MAX_ENTRIES = 100;
 	private OWLEditorKit owlEditorKit;
 	protected JTextComponent textComponent;
@@ -104,27 +101,27 @@ public class FormulaCompleter {
 	public FormulaCompleter(OWLEditorKit owlEditorKit, JTextComponent tc,
 			OWLExpressionChecker checker) {
 		this.owlEditorKit = owlEditorKit;
-		this.textComponent = tc;
-		this.keyListener = new SpecializedKeyAdapter();
-		this.textComponent.addKeyListener(this.keyListener);
-		this.wordDelimeters = new HashSet<String>();
-		this.wordDelimeters.add(" ");
-		this.wordDelimeters.add("\n");
-		this.wordDelimeters.add("[");
-		this.wordDelimeters.add("]");
-		this.wordDelimeters.add("{");
-		this.wordDelimeters.add("}");
-		this.wordDelimeters.add("(");
-		this.wordDelimeters.add(")");
-		this.wordDelimeters.add(",");
-		this.wordDelimeters.add("^");
+		textComponent = tc;
+		keyListener = new SpecializedKeyAdapter();
+		textComponent.addKeyListener(keyListener);
+		wordDelimeters = new HashSet<String>();
+		wordDelimeters.add(" ");
+		wordDelimeters.add("\n");
+		wordDelimeters.add("[");
+		wordDelimeters.add("]");
+		wordDelimeters.add("{");
+		wordDelimeters.add("}");
+		wordDelimeters.add("(");
+		wordDelimeters.add(")");
+		wordDelimeters.add(",");
+		wordDelimeters.add("^");
 		// this.matcher = new AutoCompleterMatcherImpl(owlEditorKit
 		// .getOWLModelManager());
-		this.popupList = new JList();
-		this.popupList.setAutoscrolls(true);
-		this.popupList.setCellRenderer(owlEditorKit.getWorkspace()
+		popupList = new JList();
+		popupList.setAutoscrolls(true);
+		popupList.setCellRenderer(owlEditorKit.getWorkspace()
 				.createOWLCellRenderer());
-		this.popupList.addMouseListener(new MouseAdapter() {
+		popupList.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() == 2) {
@@ -132,9 +129,9 @@ public class FormulaCompleter {
 				}
 			}
 		});
-		this.popupList.setRequestFocusEnabled(false);
-		this.createPopupWindow();
-		this.textComponent.addHierarchyListener(new HierarchyListener() {
+		popupList.setRequestFocusEnabled(false);
+		createPopupWindow();
+		textComponent.addHierarchyListener(new HierarchyListener() {
 			/**
 			 * Called when the hierarchy has been changed. To discern the actual
 			 * type of change, call <code>HierarchyEvent.getChangeFlags()</code>
@@ -142,7 +139,8 @@ public class FormulaCompleter {
 			 * 
 			 * @see java.awt.event.HierarchyEvent#getChangeFlags()
 			 */
-			public void hierarchyChanged(HierarchyEvent e) {
+			@Override
+            public void hierarchyChanged(HierarchyEvent e) {
 				if ((e.getChangeFlags() & HierarchyEvent.PARENT_CHANGED) != 0) {
 					FormulaCompleter.this.createPopupWindow();
 				}
@@ -153,52 +151,52 @@ public class FormulaCompleter {
 	protected final void processKeyPressed(KeyEvent e) {
 		if (e.getKeyCode() == KeyEvent.VK_SPACE && e.isControlDown()) {
 			// Show popup
-			this.performAutoCompletion();
+			performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_TAB) {
 			e.consume();
-			this.performAutoCompletion();
+			performAutoCompletion();
 		} else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-			if (this.popupWindow.isVisible()) {
+			if (popupWindow.isVisible()) {
 				// Hide popup
 				e.consume();
-				this.hidePopup();
+				hidePopup();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-			if (this.popupWindow.isVisible()) {
+			if (popupWindow.isVisible()) {
 				// Complete
 				e.consume();
-				this.completeWithPopupSelection();
+				completeWithPopupSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-			if (this.popupWindow.isVisible()) {
+			if (popupWindow.isVisible()) {
 				e.consume();
-				this.incrementSelection();
+				incrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_UP) {
-			if (this.popupWindow.isVisible()) {
+			if (popupWindow.isVisible()) {
 				e.consume();
-				this.decrementSelection();
+				decrementSelection();
 			}
 		} else if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-			this.hidePopup();
+			hidePopup();
 		} else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-			this.hidePopup();
+			hidePopup();
 		}
 	}
 
 	protected final void completeWithPopupSelection() {
-		if (this.popupWindow.isVisible()) {
-			Object selObject = this.popupList.getSelectedValue();
+		if (popupWindow.isVisible()) {
+			Object selObject = popupList.getSelectedValue();
 			if (selObject != null) {
-				this.insertWord(this.getInsertText(selObject));
-				this.hidePopup();
+				insertWord(getInsertText(selObject));
+				hidePopup();
 			}
 		}
 	}
 
 	protected final List getMatches() {
-		ParserFactory.initParser(this.textComponent.getText(),
-				this.owlEditorKit.getModelManager());
+		ParserFactory.initParser(textComponent.getText(),
+				owlEditorKit.getModelManager());
 		List completions;
 		try {
 			ArithmeticsParser.Start();
@@ -207,7 +205,7 @@ public class FormulaCompleter {
 			completions = ArithmeticsParser.getCompletions();
 		}
 		List toReturn = new ArrayList(completions);
-		String wordToComplete = this.getWordToComplete().replaceAll("[<>{}]",
+		String wordToComplete = getWordToComplete().replaceAll("[<>{}]",
 				"");
 		wordToComplete = wordToComplete.replaceAll("(\\S)*!", "");
 		if (wordToComplete.length() > 0) {
@@ -221,46 +219,46 @@ public class FormulaCompleter {
 	}
 
 	protected final void createPopupWindow() {
-		JScrollPane sp = ComponentFactory.createScrollPane(this.popupList);
-		this.popupWindow = new JWindow((Window) SwingUtilities
-				.getAncestorOfClass(Window.class, this.textComponent));
-		this.popupWindow.setAlwaysOnTop(true);
-		this.popupWindow.getContentPane().setLayout(new BorderLayout());
-		this.popupWindow.getContentPane().add(sp, BorderLayout.CENTER);
-		this.popupWindow.setFocusableWindowState(false);
+		JScrollPane sp = ComponentFactory.createScrollPane(popupList);
+		popupWindow = new JWindow((Window) SwingUtilities
+				.getAncestorOfClass(Window.class, textComponent));
+		popupWindow.setAlwaysOnTop(true);
+		popupWindow.getContentPane().setLayout(new BorderLayout());
+		popupWindow.getContentPane().add(sp, BorderLayout.CENTER);
+		popupWindow.setFocusableWindowState(false);
 	}
 
 	private void performAutoCompletion() {
-		List matches = this.getMatches();
+		List matches = getMatches();
 		if (matches.size() == 1) {
 			// Don't show popup
-			this.insertWord(this.getInsertText(matches.iterator().next()));
+			insertWord(getInsertText(matches.iterator().next()));
 		} else if (matches.size() > 1) {
 			// Show popup
-			this.lastTextUpdate = this.textComponent.getText();
-			this.showPopup();
-			this.updatePopup(matches);
+			lastTextUpdate = textComponent.getText();
+			showPopup();
+			updatePopup(matches);
 		}
 	}
 
 	private void insertWord(String word) {
 		try {
-			String wordToComplete = this.getWordToComplete().replaceAll(
+			String wordToComplete = getWordToComplete().replaceAll(
 					"[<>{}]", "");
 			wordToComplete = wordToComplete.replaceAll("(\\S)*!", "");
-			int prefixIndex = this.getWordToComplete().indexOf(wordToComplete);
-			String prefix = prefixIndex > 0 ? this.getWordToComplete()
+			int prefixIndex = getWordToComplete().indexOf(wordToComplete);
+			String prefix = prefixIndex > 0 ? getWordToComplete()
 					.substring(0, prefixIndex) : "";
 			if (wordToComplete.length() > 0 && word.startsWith(wordToComplete)) {
-				int index = this.getWordIndex();
-				int caretIndex = this.textComponent.getCaretPosition();
-				this.textComponent.getDocument().remove(index,
+				int index = getWordIndex();
+				int caretIndex = textComponent.getCaretPosition();
+				textComponent.getDocument().remove(index,
 						caretIndex - index);
-				this.textComponent.getDocument().insertString(index,
+				textComponent.getDocument().insertString(index,
 						prefix + word, null);
 			} else {
-				this.textComponent.getDocument().insertString(
-						this.textComponent.getText().length(), word, null);
+				textComponent.getDocument().insertString(
+						textComponent.getText().length(), word, null);
 			}
 		} catch (BadLocationException e) {
 			logger.error(e);
@@ -268,80 +266,80 @@ public class FormulaCompleter {
 	}
 
 	private void showPopup() {
-		if (this.popupWindow == null) {
-			this.createPopupWindow();
+		if (popupWindow == null) {
+			createPopupWindow();
 		}
-		if (!this.popupWindow.isVisible()) {
-			this.popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
+		if (!popupWindow.isVisible()) {
+			popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
 			try {
-				int wordIndex = this.getWordIndex();
+				int wordIndex = getWordIndex();
 				if (wordIndex < 0) {
 					wordIndex = 0;
 				}
-				Point p = this.textComponent.modelToView(wordIndex)
+				Point p = textComponent.modelToView(wordIndex)
 						.getLocation();
-				SwingUtilities.convertPointToScreen(p, this.textComponent);
+				SwingUtilities.convertPointToScreen(p, textComponent);
 				p.y = p.y
-						+ this.textComponent.getFontMetrics(
-								this.textComponent.getFont()).getHeight();
-				this.popupWindow.setLocation(p);
+						+ textComponent.getFontMetrics(
+								textComponent.getFont()).getHeight();
+				popupWindow.setLocation(p);
 			} catch (BadLocationException e) {
 				e.printStackTrace();
 			}
-			this.popupWindow.setVisible(true);
+			popupWindow.setVisible(true);
 		}
 	}
 
 	private void hidePopup() {
-		this.popupWindow.setVisible(false);
-		this.popupList.setListData(new Object[0]);
+		popupWindow.setVisible(false);
+		popupList.setListData(new Object[0]);
 	}
 
 	protected final void updatePopup(List matches) {
 		int count = matches.size();
-		if (count > this.maxEntries) {
-			count = this.maxEntries;
+		if (count > maxEntries) {
+			count = maxEntries;
 		}
 		if (!matches.isEmpty()) {
-			this.popupList.setListData(matches.subList(0, count).toArray());
+			popupList.setListData(matches.subList(0, count).toArray());
 		} else {
-			this.popupList.setListData(matches.toArray());
+			popupList.setListData(matches.toArray());
 		}
-		this.popupList.setSelectedIndex(0);
-		this.popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
+		popupList.setSelectedIndex(0);
+		popupWindow.setSize(POPUP_WIDTH, POPUP_HEIGHT);
 	}
 
 	private void incrementSelection() {
-		if (this.popupList.getModel().getSize() > 0) {
-			int selIndex = this.popupList.getSelectedIndex();
+		if (popupList.getModel().getSize() > 0) {
+			int selIndex = popupList.getSelectedIndex();
 			selIndex++;
-			if (selIndex > this.popupList.getModel().getSize() - 1) {
+			if (selIndex > popupList.getModel().getSize() - 1) {
 				selIndex = 0;
 			}
-			this.popupList.setSelectedIndex(selIndex);
-			this.popupList.scrollRectToVisible(this.popupList.getCellBounds(
+			popupList.setSelectedIndex(selIndex);
+			popupList.scrollRectToVisible(popupList.getCellBounds(
 					selIndex, selIndex));
 		}
 	}
 
 	private void decrementSelection() {
-		if (this.popupList.getModel().getSize() > 0) {
-			int selIndex = this.popupList.getSelectedIndex();
+		if (popupList.getModel().getSize() > 0) {
+			int selIndex = popupList.getSelectedIndex();
 			selIndex--;
 			if (selIndex < 0) {
-				selIndex = this.popupList.getModel().getSize() - 1;
+				selIndex = popupList.getModel().getSize() - 1;
 			}
-			this.popupList.setSelectedIndex(selIndex);
-			this.popupList.scrollRectToVisible(this.popupList.getCellBounds(
+			popupList.setSelectedIndex(selIndex);
+			popupList.scrollRectToVisible(popupList.getCellBounds(
 					selIndex, selIndex));
 		}
 	}
 
 	private int getWordIndex() {
 		try {
-			int caretPos = this.textComponent.getCaretPosition() - 1;
+			int caretPos = textComponent.getCaretPosition() - 1;
 			for (int index = caretPos; index > -1; index--) {
-				if (this.wordDelimeters.contains(this.textComponent
+				if (wordDelimeters.contains(textComponent
 						.getDocument().getText(index, 1))) {
 					return index + 1;
 				}
@@ -357,10 +355,9 @@ public class FormulaCompleter {
 
 	private String getInsertText(Object o) {
 		if (o instanceof OWLObject) {
-			OWLModelManager owlModelManager = this.owlEditorKit
+			OWLModelManager owlModelManager = owlEditorKit
 					.getModelManager();
-			return owlModelManager.getOWLObjectRenderer().render((OWLObject) o,
-					owlModelManager.getOWLEntityRenderer());
+            return owlModelManager.getOWLObjectRenderer().render((OWLObject) o);
 		} else {
 			return o.toString();
 		}
@@ -368,9 +365,9 @@ public class FormulaCompleter {
 
 	private String getWordToComplete() {
 		try {
-			int index = this.getWordIndex();
-			int caretIndex = this.textComponent.getCaretPosition();
-			String toReturn = this.textComponent.getDocument().getText(index,
+			int index = getWordIndex();
+			int caretIndex = textComponent.getCaretPosition();
+			String toReturn = textComponent.getDocument().getText(index,
 					caretIndex - index);
 			return toReturn;
 		} catch (BadLocationException e) {
@@ -379,6 +376,6 @@ public class FormulaCompleter {
 	}
 
 	public void uninstall() {
-		this.textComponent.removeKeyListener(this.keyListener);
+		textComponent.removeKeyListener(keyListener);
 	}
 }
