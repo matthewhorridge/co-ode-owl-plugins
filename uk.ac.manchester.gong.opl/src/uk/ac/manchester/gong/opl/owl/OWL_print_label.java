@@ -1,32 +1,25 @@
 package uk.ac.manchester.gong.opl.owl;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 //import org.mindswap.pellet.owlapi.Reasoner;
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.model.OWLAnnotationAxiom;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDataFactory;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyChangeException;
-import org.semanticweb.owl.model.OWLOntologyCreationException;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.util.OWLEntityRemover;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
-
-import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.inference.OWLReasonerAdapter;
-
-
-import uk.ac.manchester.gong.opl.select.SelectStatementResult;
 import uk.ac.manchester.gong.opl.ReasonerFactory;
 
 
@@ -36,20 +29,23 @@ public class OWL_print_label {
 		try {
 			// Load the ontology from disk
 			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-	        URI physicalURI = URI.create("file:/home/pik/Bioinformatics/MolecularFunction/ontologies/gene_ontology_edit.owl");
-			OWLOntology ontology = manager.loadOntologyFromPhysicalURI(physicalURI);
+            IRI physicalURI = IRI
+                    .create("file:/home/pik/Bioinformatics/MolecularFunction/ontologies/gene_ontology_edit.owl");
+            OWLOntology ontology = manager
+                    .loadOntologyFromOntologyDocument(physicalURI);
 			
-			String ontologyURI = ontology.getURI().toString();
+            String ontologyURI = ontology.getOntologyID().getOntologyIRI()
+                    .get().toString();
 			
             OWLDataFactory factory = manager.getOWLDataFactory();  
-            OWLClass catalytic_activity = factory.getOWLClass(URI.create(ontologyURI + "#GO_0003824"));
+            OWLClass catalytic_activity = factory.getOWLClass(IRI
+                    .create(ontologyURI + "#GO_0003824"));
 			
 	        // Load the reasoner
 	        OWLReasoner reasoner = ReasonerFactory.createReasoner(manager);
 	        
-	        Set<Set<OWLClass>> subClsSets = reasoner.getDescendantClasses(catalytic_activity);
-//	        Set<Set<OWLClass>> subClsSets = reasoner.getSubClasses(catalytic_activity);
-            Set<OWLClass> subClses = OWLReasonerAdapter.flattenSetOfSets(subClsSets);
+            Set<OWLClass> subClses = reasoner.getSubClasses(catalytic_activity,
+                    false).getFlattened();
 
             List regexps = new ArrayList();
             regexps.add(new String("(.+?)\\s(halidohydrolase activity)"));
@@ -65,9 +61,9 @@ public class OWL_print_label {
             List checked_functions = new ArrayList();
             
             for(OWLClass cls : subClses) {
-            	for(OWLAnnotationAxiom annotAxiom : cls.getAnnotationAxioms(ontology)){
-    				if(annotAxiom.getAnnotation().getAnnotationURI().getFragment().equals("label")){
-    					String label_value = annotAxiom.getAnnotation().getAnnotationValue().toString();
+                for (OWLAnnotation annotAxiom : EntitySearcher.getAnnotations(
+                        cls.getIRI(), ontology, factory.getRDFSLabel())) {
+                    String label_value = annotAxiom.getValue().toString();
 //    					System.out.println(label_value);
     					Iterator regexp_iterator = regexps.iterator();
     					while(regexp_iterator.hasNext()){
@@ -88,12 +84,11 @@ public class OWL_print_label {
     					}
     				}
             	}
-            }
 	      
 	     
 		} catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
-		} catch (OWLReasonerException e) {
+        } catch (OWLRuntimeException e) {
 			e.printStackTrace();
 		} 
 	}

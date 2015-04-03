@@ -15,22 +15,22 @@
  */
 package uk.ac.manchester.gong.opl.select.condition;
 
-import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+
 import uk.ac.manchester.gong.opl.ReasonerFactory;
 import uk.ac.manchester.gong.opl.javacc.select.OPLSelectParser;
 import uk.ac.manchester.gong.opl.javacc.select.ParseException;
 import uk.ac.manchester.gong.opl.select.SelectStatementResult;
 import uk.ac.manchester.gong.opl.select.SelectStatementResultSet;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public class equivalentTo implements MatchingCondition {
@@ -42,37 +42,37 @@ public class equivalentTo implements MatchingCondition {
 		this.manager=manager;
 		this.ns2uri=ns2uri;
 	}
-	public String getConditionName (){
+	@Override
+    public String getConditionName (){
 		return "equivalenTo";
 	}
 
 	/* (non-Javadoc)
 	 * @see uk.ac.manchester.gong.opl.select.condition.MatchingCondition#match(java.lang.String, org.semanticweb.owl.model.OWLOntology)
 	 */
-	public SelectStatementResultSet match(String SelectExpression,OWLOntology ontology) {
+	@Override
+    public SelectStatementResultSet match(String SelectExpression,OWLOntology ontology) {
 		
 		// List to store the results
 		List results = new ArrayList();
 		
 		// Parse the expression and obtain an OWLExpression to query the reasoner
 		OPLSelectParser oplselectparser = new OPLSelectParser();
-		OWLDescription owldescription = null;
+        OWLClassExpression owldescription = null;
 		try {
-			owldescription = oplselectparser.parse(SelectExpression.split(getConditionName())[1], ns2uri, manager);
+			owldescription = OPLSelectParser.parse(SelectExpression.split(getConditionName())[1], ns2uri, manager);
 		} 
 		catch (ParseException e1) {e1.printStackTrace();}
 		
 		// Create a reasoner and query it
         OWLReasoner reasoner = ReasonerFactory.createReasoner(manager);
-        try {
-			Set<OWLClass> subClsEs = reasoner.getEquivalentClasses(owldescription);
+        Set<OWLClass> subClsEs = reasoner.getEquivalentClasses(owldescription)
+                .getEntities();
             for(OWLClass cls : subClsEs) {
                 SelectStatementResult result = new SelectStatementResult (cls);
     			results.add(result);
             }
-        } 
-        catch (OWLReasonerException e) {e.printStackTrace();}
-		
+
         // Create the result set and pass it
 		SelectStatementResultSet resultSet = new SelectStatementResultSet(results, SelectExpression);
 		return resultSet;

@@ -15,39 +15,45 @@
  */
 package uk.ac.manchester.gong.opl.select;
 
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.vocab.OWLRDFVocabulary;
-import uk.ac.manchester.gong.opl.select.condition.*;
-
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
+
+import uk.ac.manchester.gong.opl.select.condition.MatchingCondition;
+import uk.ac.manchester.gong.opl.select.condition.SubPropertyOf;
+import uk.ac.manchester.gong.opl.select.condition.annotation;
+import uk.ac.manchester.gong.opl.select.condition.descendantOf;
+import uk.ac.manchester.gong.opl.select.condition.equivalentTo;
+import uk.ac.manchester.gong.opl.select.condition.subClassOf;
+
 
 public class SelectStatementProcessor {
 
-    private Map<String, URI> ns2uri;
+    private Map<String, IRI> ns2uri;
     private OWLOntologyManager manager;
 
     private List<MatchingCondition> conditions = new ArrayList<MatchingCondition>();
 
-    public SelectStatementProcessor(Map<String, URI> ns2uri, OWLOntologyManager manager) {
+    public SelectStatementProcessor(Map<String, IRI> ns2uri,
+            OWLOntologyManager manager) {
         this.ns2uri = ns2uri;
         this.manager = manager;
 
-        List<URI> annotationURIs = new ArrayList<URI>();
 
         for (OWLOntology ont : manager.getOntologies()) {
-            annotationURIs.addAll(ont.getAnnotationURIs());
+            for (OWLAnnotationProperty p : ont
+                    .getAnnotationPropertiesInSignature()) {
+                addAnnotation(p.getIRI());
+            }
         }
 
-        for (URI uri : annotationURIs){
-            addAnnotation(uri);
-        }
-
-        for (URI uri : OWLRDFVocabulary.BUILT_IN_ANNOTATION_PROPERTIES) {
+        for (IRI uri : OWLRDFVocabulary.BUILT_IN_ANNOTATION_PROPERTY_IRIS) {
             addAnnotation(uri);
         }
 
@@ -57,7 +63,7 @@ public class SelectStatementProcessor {
         conditions.add(new descendantOf(manager, ns2uri));
     }
 
-    private void addAnnotation(URI annotURI) {
+    private void addAnnotation(IRI annotURI) {
         // @@TODO handle annotation URIs without a fragment
         String name = annotURI.getFragment();
         if (name == null){

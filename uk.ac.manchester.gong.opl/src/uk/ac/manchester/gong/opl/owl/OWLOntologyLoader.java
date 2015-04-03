@@ -15,25 +15,28 @@
  */
 package uk.ac.manchester.gong.opl.owl;
 
-import java.net.URI;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.model.OWLException;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.util.SimpleURIMapper;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
 import uk.ac.manchester.gong.opl.io.OPLFileException;
 
 public class OWLOntologyLoader {
 	private List<String> ontologies;
-	private Map<String, URI> namespace2uri;
+    private Map<String, IRI> namespace2uri;
 	private OWLOntology centralOntology;
 
     public OWLOntologyLoader(List<String> ontologies) {
 		this.ontologies = ontologies;
-		this.namespace2uri = new HashMap<String, URI>();
+        namespace2uri = new HashMap<String, IRI>();
 	}
 	public OWLOntologyManager getOWLOntologyManager () throws OWLException, OPLFileException{
 		// Create the OWLOntologyManager
@@ -46,19 +49,21 @@ public class OWLOntologyLoader {
 			try{
 				// Get the things
 				String [] ontology_meta = ontology.split("-");
-				URI physicalURI = URI.create(ontology_meta[2]);
-				URI logicalURI = URI.create(ontology_meta[1]);
+                IRI physicalURI = IRI.create(ontology_meta[2]);
+                IRI logicalURI = IRI.create(ontology_meta[1]);
 				String NS = ontology_meta[0];
 				
 				// Put the things into place
 				namespace2uri.put(NS,logicalURI);
-				SimpleURIMapper mapper = new SimpleURIMapper(logicalURI, physicalURI);
-				manager.addURIMapper(mapper);
+                SimpleIRIMapper mapper = new SimpleIRIMapper(logicalURI,
+                        physicalURI);
+                manager.addIRIMapper(mapper);
 				if(centralOntology == true){
-					this.centralOntology = manager.loadOntologyFromPhysicalURI(physicalURI);
+                    this.centralOntology = manager
+                            .loadOntologyFromOntologyDocument(physicalURI);
 				}
 				else{
-					manager.loadOntologyFromPhysicalURI(physicalURI);
+                    manager.loadOntologyFromOntologyDocument(physicalURI);
 				}
 				centralOntology = false;
 			}
@@ -68,10 +73,11 @@ public class OWLOntologyLoader {
 		}
 		return manager;
 	}
-	public Map<String, URI> namespace2uri (){
+
+    public Map<String, IRI> namespace2uri() {
 		return namespace2uri;
 	}
 	public OWLOntology getCentralOntology (){
-		return this.centralOntology;
+		return centralOntology;
 	}
 }

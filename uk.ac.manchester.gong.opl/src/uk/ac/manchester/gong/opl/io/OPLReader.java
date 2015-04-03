@@ -1,10 +1,13 @@
 package uk.ac.manchester.gong.opl.io;
 
-import java.util.List;
-import java.util.*;
-import java.io.IOException;
 import java.io.BufferedReader;
-import java.net.URI;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.semanticweb.owlapi.model.IRI;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -59,7 +62,7 @@ public class OPLReader {
                     instruction += str;
                     instructions.add(instruction);
                 }
-                else if((str.length()>0) && !str.startsWith("#")){
+                else if(str.length()>0 && !str.startsWith("#")){
                     nsDeclarations.add(str);
                 }
             }
@@ -71,12 +74,12 @@ public class OPLReader {
         return nsDeclarations;
     }
 
-    public Map<String, URI> getNSMappings(){
-        Map<String, URI> ns2uri = new HashMap<String, URI>();
+    public Map<String, IRI> getNSMappings() {
+        Map<String, IRI> ns2uri = new HashMap<String, IRI>();
         for (String nsMapping : nsDeclarations){
             String [] ontology_meta = nsMapping.split(" ");
             if (ontology_meta.length == 2){
-                URI logicalURI = URI.create(ontology_meta[1]);
+                IRI logicalURI = IRI.create(ontology_meta[1]);
                 String NS = ontology_meta[0];
                 ns2uri.put(NS,logicalURI);
             }

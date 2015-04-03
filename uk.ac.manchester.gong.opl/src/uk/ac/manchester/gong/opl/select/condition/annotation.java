@@ -15,16 +15,17 @@
  */
 package uk.ac.manchester.gong.opl.select.condition;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.semanticweb.owl.model.OWLAnnotationAxiom;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import uk.ac.manchester.gong.opl.select.SelectStatementResult;
 import uk.ac.manchester.gong.opl.select.SelectStatementResultSet;
@@ -33,12 +34,14 @@ public class annotation implements MatchingCondition {
 	private String propName;
 	
 	public annotation(String name) {
-		this.propName = name;
+		propName = name;
 	}
-	public String getConditionName (){
+	@Override
+    public String getConditionName (){
 		return propName;
 	}
-	public SelectStatementResultSet match(String select, OWLOntology ontology) {
+	@Override
+    public SelectStatementResultSet match(String select, OWLOntology ontology) {
 		List results = new ArrayList();
 
 		//	Get the regexp from the select statement
@@ -50,12 +53,15 @@ public class annotation implements MatchingCondition {
         Pattern pattern = Pattern.compile(RegexpString);
         
 		// Visit every class in the ontology and try to match
-		for(OWLClass cls : ontology.getReferencedClasses()) {
+            for (OWLClass cls : ontology.getClassesInSignature()) {
 			String finalComment = null;
 			
-			for(OWLAnnotationAxiom annotAxiom : cls.getAnnotationAxioms(ontology)){
-				if(annotAxiom.getAnnotation().getAnnotationURI().getFragment().equals(propName)){
-					String wholeComment = annotAxiom.getAnnotation().getAnnotationValue().toString();
+                for (OWLAnnotation annotAxiom : EntitySearcher.getAnnotations(
+                        cls.getIRI(), ontology)) {
+                    if (annotAxiom.getProperty().getIRI()
+                            .getFragment().equals(propName)) {
+                        String wholeComment = annotAxiom
+                                .getValue().toString();
 					if(wholeComment.contains("@")){
 						finalComment = wholeComment.split("@")[0];
 					}

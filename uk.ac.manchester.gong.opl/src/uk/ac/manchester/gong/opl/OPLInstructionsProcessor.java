@@ -15,15 +15,13 @@
  */
 package uk.ac.manchester.gong.opl;
 
-import java.util.List;
-import java.util.Map;
+import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
-import java.io.PrintStream;
-import java.net.URI;
+import java.util.Map;
 
-import org.semanticweb.owl.model.OWLObject;
-import org.semanticweb.owl.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.manchester.gong.opl.action.ActionStatementProcessor;
 import uk.ac.manchester.gong.opl.io.OPLFileException;
@@ -35,13 +33,14 @@ public class OPLInstructionsProcessor {
 
     private PrintStream log = System.out;
 
-    private Map<String, URI> ns2uri;
+    private Map<String, IRI> ns2uri;
     private OWLOntologyManager manager;
     
     private ActionStatementProcessor actionstatementprocessor;
     private SelectStatementProcessor selectstatementprocessor;
 
-    public OPLInstructionsProcessor(Map<String, URI> ns2uri, OWLOntologyManager manager) {
+    public OPLInstructionsProcessor(Map<String, IRI> ns2uri,
+            OWLOntologyManager manager) {
         this.ns2uri = ns2uri;
         this.manager = manager;
         actionstatementprocessor = new ActionStatementProcessor(ns2uri, manager);
@@ -72,7 +71,7 @@ public class OPLInstructionsProcessor {
 					List res = selectstatementresultset.getSelectStatementResults();
 					Iterator resIterator = res.iterator();
 					while(resIterator.hasNext()){
-						log.println("[MATCH] " + (((SelectStatementResult)resIterator.next()).matchedOWLObject()));
+						log.println("[MATCH] " + ((SelectStatementResult)resIterator.next()).matchedOWLObject());
 					}
 				}
 				

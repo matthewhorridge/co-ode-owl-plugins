@@ -1,21 +1,9 @@
 package uk.ac.manchester.gong.opl.protege;
 
-import org.protege.editor.core.ui.view.DisposableAction;
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.model.inference.NoOpReasoner;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.util.NamespaceUtil;
-import uk.ac.manchester.gong.opl.OPLInstructionsProcessor;
-import uk.ac.manchester.gong.opl.ReasonerFactory;
-import uk.ac.manchester.gong.opl.io.OPLReader;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.net.URI;
 import java.util.Map;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -40,6 +28,23 @@ import java.util.Map;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import org.protege.editor.core.ui.view.DisposableAction;
+import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.inference.NoOpReasoner;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.util.NamespaceUtil;
+
+import uk.ac.manchester.gong.opl.OPLInstructionsProcessor;
+import uk.ac.manchester.gong.opl.ReasonerFactory;
+import uk.ac.manchester.gong.opl.io.OPLReader;
+
 /**
  * Author: Nick Drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -54,9 +59,11 @@ public class OPLComponent extends JComponent {
     private OWLEditorKit eKit;
 
     private DisposableAction processAction = new DisposableAction("Process", null){
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             handleProcessAction();
         }
+        @Override
         public void dispose() {
         }
     };
@@ -84,10 +91,16 @@ public class OPLComponent extends JComponent {
         NamespaceUtil nsUtil = new NamespaceUtil();
 
         OWLOntology activeOnt = eKit.getModelManager().getActiveOntology();
-        String nsText = nsUtil.generatePrefix(activeOnt.getURI().toString()) + " " + activeOnt.getURI() + "\n";
+        String nsText = nsUtil.getPrefix(activeOnt.getOntologyID()
+                .getOntologyIRI().get().toString())
+                + " " + activeOnt.getOntologyID().getOntologyIRI().get() + "\n";
         for (OWLOntology ont : eKit.getModelManager().getActiveOntologies()){
             if (!ont.equals(activeOnt)){
-                nsText += nsUtil.generatePrefix(activeOnt.getURI().toString()) + " " + ont.getURI() + "\n";
+                nsText += nsUtil.getPrefix(activeOnt.getOntologyID()
+                        .getOntologyIRI().get().toString())
+                        + " "
+                        + ont.getOntologyID().getOntologyIRI().get()
+                        + "\n";
             }
         }
 
@@ -111,7 +124,7 @@ public class OPLComponent extends JComponent {
             BufferedReader in = new BufferedReader(new StringReader(textPanel.getText()));
             OPLReader r = new OPLReader(in);
 
-            Map<String, URI> ns2uri = r.getNSMappings();
+            Map<String, IRI> ns2uri = r.getNSMappings();
 
             // Parse the instructions
             OPLInstructionsProcessor processor = new OPLInstructionsProcessor(ns2uri, mngr);

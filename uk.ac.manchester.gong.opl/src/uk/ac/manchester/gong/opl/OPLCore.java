@@ -16,17 +16,16 @@
 package uk.ac.manchester.gong.opl;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.Map;
 
-import org.semanticweb.owl.io.RDFXMLOntologyFormat;
-import org.semanticweb.owl.model.OWLException;
-import org.semanticweb.owl.model.OWLOntologyManager;
-
-import uk.ac.manchester.gong.opl.io.OPLFileReader;
-import uk.ac.manchester.gong.opl.owl.OWLOntologyLoader;
+import org.semanticweb.owlapi.io.RDFXMLOntologyFormat;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import uk.ac.manchester.gong.opl.io.OPLFileException;
+import uk.ac.manchester.gong.opl.io.OPLFileReader;
+import uk.ac.manchester.gong.opl.owl.OWLOntologyLoader;
 
 public class OPLCore {
 
@@ -45,7 +44,7 @@ public class OPLCore {
 		// Load the ontology
 		OWLOntologyLoader owlontologyloader = new OWLOntologyLoader(oplfilereader.getNSDeclarations());
 		OWLOntologyManager owlontologymanager = null;
-		Map<String, URI> ns2uri = null;
+        Map<String, IRI> ns2uri = null;
 		try {
 			owlontologymanager = owlontologyloader.getOWLOntologyManager();
 			ns2uri = owlontologyloader.namespace2uri();
@@ -61,7 +60,7 @@ public class OPLCore {
 		catch (OPLFileException e1) {e1.printStackTrace();}
 		
 		// Save the new ontology
-		URI physicalURI2 = URI.create("file:" + newOntologyPath);
+        IRI physicalURI2 = IRI.create("file:" + newOntologyPath);
 		try {
 			
 			owlontologymanager.saveOntology(owlontologyloader.getCentralOntology(), new RDFXMLOntologyFormat(), physicalURI2);

@@ -3,35 +3,29 @@ package uk.ac.manchester.gong.opl.javacc.select;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.Map;
 import java.util.HashSet;
-import java.net.URI;
-import java.util.regex.Matcher;
+import java.util.Map;
 
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.AddAxiom;
-import org.semanticweb.owl.model.RemoveAxiom;
-import org.semanticweb.owl.model.OWLAnnotation;
-import org.semanticweb.owl.model.OWLAxiom;
-import org.semanticweb.owl.model.OWLAnnotationAxiom;
-import org.semanticweb.owl.model.OWLException;
-import org.semanticweb.owl.model.OWLDataFactory;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObjectProperty;
-
-import uk.ac.manchester.gong.opl.select.SelectStatementResult;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 public class OPLSelectParser implements OPLSelectParserConstants {
 
         public OPLSelectParser(){}
 
-        public static OWLDescription parse(String inString, Map ns2uri, OWLOntologyManager manager) throws ParseException{
+    public static OWLClassExpression parse(String inString, Map ns2uri,
+            OWLOntologyManager manager) throws ParseException {
                 Reader reader = new StringReader(inString);
                 OPLSelectParser parser = new OPLSelectParser(reader);
-                OWLDescription owldescription = parser.Input(ns2uri, manager);
+        OWLClassExpression owldescription = parser.Input(ns2uri, manager);
                 System.out.println("[OWLDESCRIPTION] " + owldescription);
                 return owldescription;
         }
@@ -44,24 +38,31 @@ public class OPLSelectParser implements OPLSelectParserConstants {
             return owlProperty;
         }
 
-  final public OWLDescription Input(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description = null;
+    final public OWLClassExpression
+            Input(Map ns2uri, OWLOntologyManager manager) throws ParseException {
+        OWLClassExpression description = null;
     description = ClassDescription(ns2uri, manager);
     jj_consume_token(0);
-                        {if (true) return description;}
+                        {if (true) {
+                            return description;
+                        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription ClassDescription(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description;
+    final public OWLClassExpression ClassDescription(Map ns2uri,
+            OWLOntologyManager manager) throws ParseException {
+        OWLClassExpression description;
     description = And(ns2uri, manager);
-        {if (true) return description;}
+        {if (true) {
+            return description;
+        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription And(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description;
-        OWLDescription totaldescription;
+    final public OWLClassExpression And(Map ns2uri, OWLOntologyManager manager)
+            throws ParseException {
+        OWLClassExpression description;
+        OWLClassExpression totaldescription;
     description = Or(ns2uri, manager);
      totaldescription=description;
     label_1:
@@ -79,13 +80,16 @@ public class OPLSelectParser implements OPLSelectParserConstants {
                         set.add(description);
                         totaldescription = factory.getOWLObjectIntersectionOf(set);
     }
-        {if (true) return totaldescription;}
+        {if (true) {
+            return totaldescription;
+        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription Or(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description;
-        OWLDescription totaldescription;
+    final public OWLClassExpression Or(Map ns2uri, OWLOntologyManager manager)
+            throws ParseException {
+        OWLClassExpression description;
+        OWLClassExpression totaldescription;
     description = NonNaryBooleanDescription(ns2uri, manager);
          totaldescription=description;
     label_2:
@@ -103,12 +107,15 @@ public class OPLSelectParser implements OPLSelectParserConstants {
                         set.add(description);
                         totaldescription = factory.getOWLObjectUnionOf(set);
     }
-        {if (true) return totaldescription;}
+        {if (true) {
+            return totaldescription;
+        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription NonNaryBooleanDescription(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description;
+    final public OWLClassExpression NonNaryBooleanDescription(Map ns2uri,
+            OWLOntologyManager manager) throws ParseException {
+        OWLClassExpression description;
     if (jj_2_3(2)) {
       description = ObjectPropertyRestriction(ns2uri, manager);
     } else if (jj_2_4(2)) {
@@ -119,22 +126,28 @@ public class OPLSelectParser implements OPLSelectParserConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-        {if (true) return description;}
+        {if (true) {
+            return description;
+        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription Not(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description;
+    final public OWLClassExpression Not(Map ns2uri, OWLOntologyManager manager)
+            throws ParseException {
+        OWLClassExpression description;
     jj_consume_token(NOT);
     description = NamedClassOrNestedDescription(ns2uri, manager);
         OWLDataFactory factory = manager.getOWLDataFactory();
                 description = factory.getOWLObjectComplementOf(description);
-        {if (true) return description;}
+        {if (true) {
+            return description;
+        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription ObjectPropertyRestriction(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description;
+    final public OWLClassExpression ObjectPropertyRestriction(Map ns2uri,
+            OWLOntologyManager manager) throws ParseException {
+        OWLClassExpression description;
     if (jj_2_6(2)) {
       description = OWLObjectSomeRestriction(ns2uri, manager);
     } else if (jj_2_7(2)) {
@@ -143,38 +156,47 @@ public class OPLSelectParser implements OPLSelectParserConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-        {if (true) return description;}
+        {if (true) {
+            return description;
+        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription OWLObjectAllRestriction(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description = null;
+    final public OWLClassExpression OWLObjectAllRestriction(Map ns2uri,
+            OWLOntologyManager manager) throws ParseException {
+        OWLClassExpression description = null;
         OWLObjectProperty property;
-        OWLDescription filler;
+        OWLClassExpression filler;
     property = resolvedOWLObjectProperty(ns2uri, manager);
     jj_consume_token(ALL);
     filler = NamedClassOrNestedDescription(ns2uri, manager);
         OWLDataFactory factory = manager.getOWLDataFactory();
-        description = (OWLDescription) factory.getOWLObjectAllRestriction(property, filler);
-        {if (true) return description;}
+        description = factory.getOWLObjectAllValuesFrom(property, filler);
+        {if (true) {
+            return description;
+        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription OWLObjectSomeRestriction(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description = null;
+    final public OWLClassExpression OWLObjectSomeRestriction(Map ns2uri,
+            OWLOntologyManager manager) throws ParseException {
+        OWLClassExpression description = null;
         OWLObjectProperty property;
-        OWLDescription filler;
+        OWLClassExpression filler;
     property = resolvedOWLObjectProperty(ns2uri, manager);
     jj_consume_token(SOME);
     filler = NamedClassOrNestedDescription(ns2uri, manager);
         OWLDataFactory factory = manager.getOWLDataFactory();
-        description = (OWLDescription) factory.getOWLObjectSomeRestriction(property, filler);
-        {if (true) return description;}
+        description = factory.getOWLObjectSomeValuesFrom(property, filler);
+        {if (true) {
+            return description;
+        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription NamedClassOrNestedDescription(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description;
+    final public OWLClassExpression NamedClassOrNestedDescription(Map ns2uri,
+            OWLOntologyManager manager) throws ParseException {
+        OWLClassExpression description;
     if (jj_2_8(2)) {
       description = owlresolvedclass(ns2uri, manager);
     } else if (jj_2_9(2)) {
@@ -183,23 +205,29 @@ public class OPLSelectParser implements OPLSelectParserConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-        {if (true) return description;}
+        {if (true) {
+            return description;
+        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription NestedClassDescription(Map ns2uri, OWLOntologyManager manager) throws ParseException {
-        OWLDescription description;
+    final public OWLClassExpression NestedClassDescription(Map ns2uri,
+            OWLOntologyManager manager) throws ParseException {
+        OWLClassExpression description;
     jj_consume_token(LeftPar);
     description = ClassDescription(ns2uri, manager);
     jj_consume_token(RightPar);
-        {if (true) return description;}
+        {if (true) {
+            return description;
+        }}
     throw new Error("Missing return statement in function");
   }
 
-  final public OWLDescription owlresolvedclass(Map ns2uri, OWLOntologyManager manager) throws ParseException {
+    final public OWLClassExpression owlresolvedclass(Map<String, IRI> ns2uri,
+            OWLOntologyManager manager) throws ParseException {
         Token nonresolvedclass=null;
         Token owllabelnamedobject=null;
-        OWLDescription description=null;
+        OWLClassExpression description = null;
     if (jj_2_10(2)) {
       nonresolvedclass = jj_consume_token(OWLNamedObject);
     } else if (jj_2_11(2)) {
@@ -210,18 +238,20 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     }
                 OWLDataFactory factory = manager.getOWLDataFactory();
                 if (owllabelnamedobject!=null){
-                        String label = (owllabelnamedobject.image).split("<LABEL>")[1];
-                        String NS = (owllabelnamedobject.image).split(":")[0];
-                        OWLOntology ontology = manager.getOntology((URI)ns2uri.get(NS));
-                        description=(OWLDescription)getClassByLabel (ontology, label);
+                        String label = owllabelnamedobject.image.split("<LABEL>")[1];
+                        String NS = owllabelnamedobject.image.split(":")[0];
+            OWLOntology ontology = manager.getOntology(ns2uri.get(NS));
+            description = getClassByLabel(ontology, label);
                 }
                 else{
-                        String NS = (nonresolvedclass.image).split(":")[0];
-                        String ClassName = (nonresolvedclass.image).split(":")[1];
-                        URI ClassURI = URI.create(ns2uri.get(NS) +"#" + ClassName);
-                        description= (OWLDescription)factory.getOWLClass(ClassURI);
+                        String NS = nonresolvedclass.image.split(":")[0];
+                        String ClassName = nonresolvedclass.image.split(":")[1];
+            IRI ClassURI = IRI.create(ns2uri.get(NS) + "#" + ClassName);
+            description = factory.getOWLClass(ClassURI);
                 }
-                {if (true) return description;}
+                {if (true) {
+                    return description;
+                }}
     throw new Error("Missing return statement in function");
   }
 
@@ -229,43 +259,45 @@ public class OPLSelectParser implements OPLSelectParserConstants {
         Token nonresolvedproperty;
         OWLObjectProperty property=null;
     nonresolvedproperty = jj_consume_token(OWLNamedObject);
-                String NS = (nonresolvedproperty.image).split(":")[0];
-                String PropName = (nonresolvedproperty.image).split(":")[1];
-                URI PropURI = URI.create(ns2uri.get(NS) +"#" + PropName);
+                String NS = nonresolvedproperty.image.split(":")[0];
+                String PropName = nonresolvedproperty.image.split(":")[1];
+        IRI PropURI = IRI.create(ns2uri.get(NS) + "#" + PropName);
                 OWLDataFactory factory = manager.getOWLDataFactory();
                 property = factory.getOWLObjectProperty(PropURI);
-                {if (true) return property;}
+                {if (true) {
+                    return property;
+                }}
     throw new Error("Missing return statement in function");
   }
 
   final public OWLClass getClassByLabel(OWLOntology ontology, String label) throws ParseException {
+        OWLAnnotationProperty rdfslabel = ontology.getOWLOntologyManager()
+                .getOWLDataFactory().getRDFSLabel();
         OWLClass resultclass = null;
-                for(OWLClass cls : ontology.getReferencedClasses()) {
-                        String finalLabel = null;
-                        for(OWLAnnotationAxiom annotAxiom : cls.getAnnotationAxioms(ontology)){
-                                if(annotAxiom.getAnnotation().getAnnotationURI().getFragment().equals("label")){
-                                        String wholeLabel = annotAxiom.getAnnotation().getAnnotationValue().toString();
-                                        if(wholeLabel.contains("@")){
-                                                finalLabel = wholeLabel.split("@")[0];
-                                        }
-                                        else if(wholeLabel.contains("^^")){
-                                                finalLabel = wholeLabel.split("\"")[1];
-                                        }
-                                        else{
-                                                finalLabel = wholeLabel;
-                                        }
-                                }
-                        }
-
-                        if(finalLabel!=null && label!=null){
-                                if(finalLabel.equals(label)){
-                                        resultclass=cls;
-                                }
-                        }
+        for (OWLClass cls : ontology.getClassesInSignature()) {
+            String finalLabel = null;
+            for (OWLAnnotation annotAxiom : EntitySearcher.getAnnotations(
+                    cls.getIRI(), ontology, rdfslabel)) {
+                String wholeLabel = annotAxiom.getValue().toString();
+                if (wholeLabel.contains("@")) {
+                    finalLabel = wholeLabel.split("@")[0];
+                } else if (wholeLabel.contains("^^")) {
+                    finalLabel = wholeLabel.split("\"")[1];
+                } else {
+                    finalLabel = wholeLabel;
                 }
+            }
+            if (finalLabel != null && label != null) {
+                if (finalLabel.equals(label)) {
+                    resultclass = cls;
+                }
+            }
+        }
 
 
-    {if (true) return resultclass;}
+    {if (true) {
+        return resultclass;
+    }}
     throw new Error("Missing return statement in function");
   }
 
@@ -347,17 +379,23 @@ public class OPLSelectParser implements OPLSelectParserConstants {
   }
 
   final private boolean jj_3R_14() {
-    if (jj_3R_3()) return true;
+    if (jj_3R_3()) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3_4() {
-    if (jj_3R_6()) return true;
+    if (jj_3R_6()) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3_3() {
-    if (jj_3R_5()) return true;
+    if (jj_3R_5()) {
+        return true;
+    }
     return false;
   }
 
@@ -368,37 +406,55 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     jj_scanpos = xsp;
     if (jj_3_4()) {
     jj_scanpos = xsp;
-    if (jj_3_5()) return true;
+    if (jj_3_5()) {
+        return true;
+    }
     }
     }
     return false;
   }
 
   final private boolean jj_3R_9() {
-    if (jj_3R_12()) return true;
-    if (jj_scan_token(ALL)) return true;
+    if (jj_3R_12()) {
+        return true;
+    }
+    if (jj_scan_token(ALL)) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3R_11() {
-    if (jj_scan_token(LeftPar)) return true;
-    if (jj_3R_13()) return true;
+    if (jj_scan_token(LeftPar)) {
+        return true;
+    }
+    if (jj_3R_13()) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3R_13() {
-    if (jj_3R_14()) return true;
+    if (jj_3R_14()) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3_2() {
-    if (jj_scan_token(OR)) return true;
-    if (jj_3R_4()) return true;
+    if (jj_scan_token(OR)) {
+        return true;
+    }
+    if (jj_3R_4()) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3R_12() {
-    if (jj_scan_token(OWLNamedObject)) return true;
+    if (jj_scan_token(OWLNamedObject)) {
+        return true;
+    }
     return false;
   }
 
@@ -407,33 +463,45 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     xsp = jj_scanpos;
     if (jj_3_6()) {
     jj_scanpos = xsp;
-    if (jj_3_7()) return true;
+    if (jj_3_7()) {
+        return true;
+    }
     }
     return false;
   }
 
   final private boolean jj_3_7() {
-    if (jj_3R_9()) return true;
+    if (jj_3R_9()) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3_6() {
-    if (jj_3R_8()) return true;
+    if (jj_3R_8()) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3_9() {
-    if (jj_3R_11()) return true;
+    if (jj_3R_11()) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3R_3() {
-    if (jj_3R_4()) return true;
+    if (jj_3R_4()) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3_8() {
-    if (jj_3R_10()) return true;
+    if (jj_3R_10()) {
+        return true;
+    }
     return false;
   }
 
@@ -442,36 +510,54 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     xsp = jj_scanpos;
     if (jj_3_8()) {
     jj_scanpos = xsp;
-    if (jj_3_9()) return true;
+    if (jj_3_9()) {
+        return true;
+    }
     }
     return false;
   }
 
   final private boolean jj_3R_6() {
-    if (jj_scan_token(NOT)) return true;
-    if (jj_3R_7()) return true;
+    if (jj_scan_token(NOT)) {
+        return true;
+    }
+    if (jj_3R_7()) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3_11() {
-    if (jj_scan_token(OWLLABELNamedObject)) return true;
+    if (jj_scan_token(OWLLABELNamedObject)) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3_10() {
-    if (jj_scan_token(OWLNamedObject)) return true;
+    if (jj_scan_token(OWLNamedObject)) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3R_8() {
-    if (jj_3R_12()) return true;
-    if (jj_scan_token(SOME)) return true;
+    if (jj_3R_12()) {
+        return true;
+    }
+    if (jj_scan_token(SOME)) {
+        return true;
+    }
     return false;
   }
 
   final private boolean jj_3_1() {
-    if (jj_scan_token(AND)) return true;
-    if (jj_3R_3()) return true;
+    if (jj_scan_token(AND)) {
+        return true;
+    }
+    if (jj_3R_3()) {
+        return true;
+    }
     return false;
   }
 
@@ -480,13 +566,17 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     xsp = jj_scanpos;
     if (jj_3_10()) {
     jj_scanpos = xsp;
-    if (jj_3_11()) return true;
+    if (jj_3_11()) {
+        return true;
+    }
     }
     return false;
   }
 
   final private boolean jj_3_5() {
-    if (jj_3R_7()) return true;
+    if (jj_3R_7()) {
+        return true;
+    }
     return false;
   }
 
@@ -525,8 +615,12 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    for (int i = 0; i < 0; i++) {
+        jj_la1[i] = -1;
+    }
+    for (int i = 0; i < jj_2_rtns.length; i++) {
+        jj_2_rtns[i] = new JJCalls();
+    }
   }
 
   public void ReInit(java.io.InputStream stream) {
@@ -538,8 +632,12 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    for (int i = 0; i < 0; i++) {
+        jj_la1[i] = -1;
+    }
+    for (int i = 0; i < jj_2_rtns.length; i++) {
+        jj_2_rtns[i] = new JJCalls();
+    }
   }
 
   public OPLSelectParser(java.io.Reader stream) {
@@ -548,8 +646,12 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    for (int i = 0; i < 0; i++) {
+        jj_la1[i] = -1;
+    }
+    for (int i = 0; i < jj_2_rtns.length; i++) {
+        jj_2_rtns[i] = new JJCalls();
+    }
   }
 
   public void ReInit(java.io.Reader stream) {
@@ -558,8 +660,12 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    for (int i = 0; i < 0; i++) {
+        jj_la1[i] = -1;
+    }
+    for (int i = 0; i < jj_2_rtns.length; i++) {
+        jj_2_rtns[i] = new JJCalls();
+    }
   }
 
   public OPLSelectParser(OPLSelectParserTokenManager tm) {
@@ -567,8 +673,12 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    for (int i = 0; i < 0; i++) {
+        jj_la1[i] = -1;
+    }
+    for (int i = 0; i < jj_2_rtns.length; i++) {
+        jj_2_rtns[i] = new JJCalls();
+    }
   }
 
   public void ReInit(OPLSelectParserTokenManager tm) {
@@ -576,14 +686,21 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 0; i++) jj_la1[i] = -1;
-    for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
+    for (int i = 0; i < 0; i++) {
+        jj_la1[i] = -1;
+    }
+    for (int i = 0; i < jj_2_rtns.length; i++) {
+        jj_2_rtns[i] = new JJCalls();
+    }
   }
 
   final private Token jj_consume_token(int kind) throws ParseException {
     Token oldToken;
-    if ((oldToken = token).next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
+    if ((oldToken = token).next != null) {
+        token = token.next;
+    } else {
+        token = token.next = token_source.getNextToken();
+    }
     jj_ntk = -1;
     if (token.kind == kind) {
       jj_gen++;
@@ -592,7 +709,9 @@ public class OPLSelectParser implements OPLSelectParserConstants {
         for (int i = 0; i < jj_2_rtns.length; i++) {
           JJCalls c = jj_2_rtns[i];
           while (c != null) {
-            if (c.gen < jj_gen) c.first = null;
+            if (c.gen < jj_gen) {
+                c.first = null;
+            }
             c = c.next;
           }
         }
@@ -620,16 +739,25 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     if (jj_rescan) {
       int i = 0; Token tok = token;
       while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
-      if (tok != null) jj_add_error_token(kind, i);
+      if (tok != null) {
+        jj_add_error_token(kind, i);
     }
-    if (jj_scanpos.kind != kind) return true;
-    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
+    }
+    if (jj_scanpos.kind != kind) {
+        return true;
+    }
+    if (jj_la == 0 && jj_scanpos == jj_lastpos) {
+        throw jj_ls;
+    }
     return false;
   }
 
   final public Token getNextToken() {
-    if (token.next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
+    if (token.next != null) {
+        token = token.next;
+    } else {
+        token = token.next = token_source.getNextToken();
+    }
     jj_ntk = -1;
     jj_gen++;
     return token;
@@ -638,17 +766,21 @@ public class OPLSelectParser implements OPLSelectParserConstants {
   final public Token getToken(int index) {
     Token t = lookingAhead ? jj_scanpos : token;
     for (int i = 0; i < index; i++) {
-      if (t.next != null) t = t.next;
-      else t = t.next = token_source.getNextToken();
+      if (t.next != null) {
+        t = t.next;
+    } else {
+        t = t.next = token_source.getNextToken();
+    }
     }
     return t;
   }
 
   final private int jj_ntk() {
-    if ((jj_nt=token.next) == null)
-      return (jj_ntk = (token.next=token_source.getNextToken()).kind);
-    else
-      return (jj_ntk = jj_nt.kind);
+    if ((jj_nt=token.next) == null) {
+        return jj_ntk = (token.next=token_source.getNextToken()).kind;
+    } else {
+        return jj_ntk = jj_nt.kind;
+    }
   }
 
   private java.util.Vector<int[]> jj_expentries = new java.util.Vector<int[]>();
@@ -658,7 +790,9 @@ public class OPLSelectParser implements OPLSelectParserConstants {
   private int jj_endpos;
 
   private void jj_add_error_token(int kind, int pos) {
-    if (pos >= 100) return;
+    if (pos >= 100) {
+        return;
+    }
     if (pos == jj_endpos + 1) {
       jj_lasttokens[jj_endpos++] = kind;
     } else if (jj_endpos != 0) {
@@ -668,7 +802,7 @@ public class OPLSelectParser implements OPLSelectParserConstants {
       }
       boolean exists = false;
       for (java.util.Enumeration e = jj_expentries.elements(); e.hasMoreElements();) {
-        int[] oldentry = (int[])(e.nextElement());
+        int[] oldentry = (int[])e.nextElement();
         if (oldentry.length == jj_expentry.length) {
           exists = true;
           for (int i = 0; i < jj_expentry.length; i++) {
@@ -677,11 +811,17 @@ public class OPLSelectParser implements OPLSelectParserConstants {
               break;
             }
           }
-          if (exists) break;
+          if (exists) {
+            break;
+        }
         }
       }
-      if (!exists) jj_expentries.addElement(jj_expentry);
-      if (pos != 0) jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+      if (!exists) {
+        jj_expentries.addElement(jj_expentry);
+    }
+      if (pos != 0) {
+        jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+    }
     }
   }
 
@@ -698,10 +838,10 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     for (int i = 0; i < 0; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
-          if ((jj_la1_0[i] & (1<<j)) != 0) {
+          if ((jj_la1_0[i] & 1<<j) != 0) {
             la1tokens[j] = true;
           }
-          if ((jj_la1_1[i] & (1<<j)) != 0) {
+          if ((jj_la1_1[i] & 1<<j) != 0) {
             la1tokens[32+j] = true;
           }
         }
@@ -719,7 +859,7 @@ public class OPLSelectParser implements OPLSelectParserConstants {
     jj_add_error_token(0, 0);
     int[][] exptokseq = new int[jj_expentries.size()][];
     for (int i = 0; i < jj_expentries.size(); i++) {
-      exptokseq[i] = (int[])jj_expentries.elementAt(i);
+      exptokseq[i] = jj_expentries.elementAt(i);
     }
     return new ParseException(token, exptokseq, tokenImage);
   }

@@ -1,9 +1,5 @@
 package uk.ac.manchester.gong.opl;
 
-import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.protege.editor.owl.model.OWLModelManager;
 import org.apache.log4j.Logger;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -27,6 +23,11 @@ import org.apache.log4j.Logger;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
+import org.semanticweb.owlapi.reasoner.InferenceType;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
 
 /**
  * Author: Nick Drummond<br>
@@ -46,19 +47,15 @@ public class ReasonerFactory {
         mngr = modelMngr;
     }
 
-    public static OWLReasoner createReasoner(OWLOntologyManager man){
+    public static OWLReasoner createReasoner(OWLOntologyManager man) {
         OWLReasoner r = mngr.getOWLReasonerManager().getCurrentReasoner();
         try {
-            if (!r.isClassified()){
-                r.classify();
-            }
-        }
-        catch (OWLReasonerException e) {
+            r.precomputeInferences(InferenceType.CLASS_ASSERTIONS);
+        } catch (OWLRuntimeException e) {
             logger.error(e);
         }
         return r;
     }
-
 //    public static OWLReasoner createReasoner(OWLOntologyManager man){
 //        try {
 //            // The following code is a little overly complicated.  The reason for using

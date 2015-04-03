@@ -1,19 +1,16 @@
 package uk.ac.manchester.gong.opl.select.condition;
 
-import org.semanticweb.owl.model.*;
-import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.inference.OWLReasonerAdapter;
-import org.semanticweb.owl.inference.OWLReasonerException;
-
-import java.util.Map;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-import uk.ac.manchester.gong.opl.select.SelectStatementResultSet;
-import uk.ac.manchester.gong.opl.select.SelectStatementResult;
-import uk.ac.manchester.gong.opl.javacc.select.OPLSelectParser;
-import uk.ac.manchester.gong.opl.javacc.select.ParseException;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+
 import uk.ac.manchester.gong.opl.ReasonerFactory;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -37,6 +34,10 @@ import uk.ac.manchester.gong.opl.ReasonerFactory;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import uk.ac.manchester.gong.opl.javacc.select.OPLSelectParser;
+import uk.ac.manchester.gong.opl.javacc.select.ParseException;
+import uk.ac.manchester.gong.opl.select.SelectStatementResult;
+import uk.ac.manchester.gong.opl.select.SelectStatementResultSet;
 
 /**
  * Author: Nick Drummond<br>
@@ -56,6 +57,7 @@ public class SubPropertyOf implements MatchingCondition {
         this.ns2uri=ns2uri;
     }
 
+    @Override
     public String getConditionName (){
         return "subPropertyOf";
     }
@@ -63,6 +65,7 @@ public class SubPropertyOf implements MatchingCondition {
     /* (non-Javadoc)
       * @see uk.ac.manchester.gong.opl.select.condition.MatchingCondition#match(java.lang.String, org.semanticweb.owl.model.OWLOntology)
       */
+    @Override
     public SelectStatementResultSet match(String SelectExpression, OWLOntology ontology) {
 
         // List to store the results
@@ -78,15 +81,12 @@ public class SubPropertyOf implements MatchingCondition {
         // Create a reasoner and query it
         OWLReasoner reasoner = ReasonerFactory.createReasoner(manager);
 
-        try {
-            Set<Set<OWLObjectProperty>> subPropSets = reasoner.getSubProperties(property);
-            Set<OWLObjectProperty> subProps = OWLReasonerAdapter.flattenSetOfSets(subPropSets);
-            for(OWLObjectProperty prop : subProps) {
+        Set<OWLObjectPropertyExpression> subProps = reasoner
+                .getSubObjectProperties(property, false).getFlattened();
+        for (OWLObjectPropertyExpression prop : subProps) {
                 SelectStatementResult result = new SelectStatementResult (prop);
                 results.add(result);
             }
-        }
-        catch (OWLReasonerException e) {e.printStackTrace();}
 
         // Create the result set and pass it
         return new SelectStatementResultSet(results, SelectExpression);

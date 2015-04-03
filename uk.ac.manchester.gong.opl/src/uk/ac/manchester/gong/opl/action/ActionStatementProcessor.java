@@ -15,18 +15,18 @@
  */
 package uk.ac.manchester.gong.opl.action;
 
-import java.net.URI;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLEntity;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyChangeException;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.util.OWLEntityRemover;
-
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.util.OWLEntityRemover;
 
 import uk.ac.manchester.gong.opl.javacc.actions.OPLActionsParser;
 import uk.ac.manchester.gong.opl.javacc.actions.ParseException;
@@ -35,10 +35,11 @@ import uk.ac.manchester.gong.opl.select.SelectStatementResultSet;
 
 public class ActionStatementProcessor {
 
-    private Map<String, URI> ns2uri;
+    private Map<String, IRI> ns2uri;
     private OWLOntologyManager manager;
 
-    public ActionStatementProcessor(Map<String, URI> ns2uri, OWLOntologyManager manager) {
+    public ActionStatementProcessor(Map<String, IRI> ns2uri,
+            OWLOntologyManager manager) {
         this.ns2uri = ns2uri;
         this.manager = manager;
     }
@@ -67,8 +68,10 @@ public class ActionStatementProcessor {
 //				System.out.println(owlentity.getURI().toString().split("#")[0]);
 
 //				OWLOntology ontology = manager.getOntology(URI.create((String)ns2uri.get(matcher.group(1))));
-                OWLOntology ontology = manager.getOntology(URI.create(owlentity.getURI().toString().split("#")[0]));
-                OWLEntityRemover remover = new OWLEntityRemover(manager, Collections.singleton(ontology));
+                OWLOntology ontology = manager.getOntology(IRI.create(owlentity
+                        .getIRI().getNamespace()));
+                OWLEntityRemover remover = new OWLEntityRemover(
+                        Collections.singleton(ontology));
 
                 owlentity.accept(remover);
                 try {
@@ -84,7 +87,7 @@ public class ActionStatementProcessor {
             for (SelectStatementResult selectResult : selectedresults){
                 OPLActionsParser actionsparser = new OPLActionsParser();
                 try {
-                    actionsparser.parse(ActionStatement,ns2uri,manager, selectResult);
+                    OPLActionsParser.parse(ActionStatement,ns2uri,manager, selectResult);
                 }
                 catch (ParseException e) {e.printStackTrace();}
             }

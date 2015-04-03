@@ -17,7 +17,7 @@ package uk.ac.manchester.gong.opl.select;
 
 import java.util.regex.Matcher;
 
-import org.semanticweb.owl.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLObject;
 
 public class SelectStatementResult {
 	private OWLObject matchedOWLObject;

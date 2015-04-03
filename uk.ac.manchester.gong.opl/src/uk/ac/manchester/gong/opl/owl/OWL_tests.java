@@ -1,24 +1,21 @@
 package uk.ac.manchester.gong.opl.owl;
 
-import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
 
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.model.OWLClass;
-import org.semanticweb.owl.model.OWLDataFactory;
-import org.semanticweb.owl.model.OWLDescription;
-import org.semanticweb.owl.model.OWLObjectProperty;
-import org.semanticweb.owl.model.OWLOntology;
-import org.semanticweb.owl.model.OWLOntologyChangeException;
-import org.semanticweb.owl.model.OWLOntologyCreationException;
-import org.semanticweb.owl.model.OWLOntologyManager;
-import org.semanticweb.owl.util.OWLEntityRemover;
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLClassExpression;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.OWLRuntimeException;
+import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.util.OWLEntityRemover;
 
-
-import org.semanticweb.owl.inference.OWLReasoner;
-import org.semanticweb.owl.inference.OWLReasonerException;
-import org.semanticweb.owl.inference.OWLReasonerAdapter;
 import uk.ac.manchester.gong.opl.ReasonerFactory;
 
 
@@ -28,11 +25,13 @@ public class OWL_tests {
 		try {
 			// Load the ontology from disk
 			OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-	        URI physicalURI = URI.create("file:/home/pik/Bioinformatics/OPL/sample_for_opl.owl");
-			OWLOntology ontology = manager.loadOntologyFromPhysicalURI(physicalURI);
+            IRI physicalURI = IRI
+                    .create("file:/home/pik/Bioinformatics/OPL/sample_for_opl.owl");
+            OWLOntology ontology = manager
+                    .loadOntologyFromOntologyDocument(physicalURI);
 			
 			// Print all the classes
-	        for(OWLClass cls : ontology.getReferencedClasses()) {
+            for (OWLClass cls : ontology.getClassesInSignature()) {
 	        	System.out.println(cls);
 	        }
 	        
@@ -40,36 +39,39 @@ public class OWL_tests {
 	        // Load the reasoner
 	        OWLReasoner reasoner = ReasonerFactory.createReasoner(manager);
 	      
-	        String ontologyURI = ontology.getURI().toString(); 
+            String ontologyURI = ontology.getOntologyID().getOntologyIRI()
+                    .get().toString();
 	        
             OWLDataFactory factory = manager.getOWLDataFactory();
-            OWLObjectProperty produces = factory.getOWLObjectProperty(URI.create(ontologyURI + "#produces"));  
-            OWLClass chorizo = factory.getOWLClass(URI.create(ontologyURI + "#chorizo"));
+            OWLObjectProperty produces = factory.getOWLObjectProperty(IRI
+                    .create(ontologyURI + "#produces"));
+            OWLClass chorizo = factory.getOWLClass(IRI.create(ontologyURI
+                    + "#chorizo"));
 
-            OWLDescription producesSomeChorizo = factory.getOWLObjectSomeRestriction(produces, chorizo);
+            OWLClassExpression producesSomeChorizo = factory
+                    .getOWLObjectSomeValuesFrom(produces, chorizo);
 
-            Set<Set<OWLClass>> subClsSets = reasoner.getSubClasses(producesSomeChorizo);
-            Set<OWLClass> subClses = OWLReasonerAdapter.flattenSetOfSets(subClsSets);
+            Set<OWLClass> subClses = reasoner.getSubClasses(
+                    producesSomeChorizo, false).getFlattened();
 
             for(OWLClass cls : subClses) {
                 System.out.println(">>>>>>>>" + cls);
             }
             
             // Remove classes
-	        OWLEntityRemover remover = new OWLEntityRemover(manager, Collections.singleton(ontology));
-	        for(OWLClass cls : ontology.getReferencedClasses()) {
+            OWLEntityRemover remover = new OWLEntityRemover(
+                    Collections.singleton(ontology));
+            for (OWLClass cls : ontology.getClassesInSignature()) {
 	        	cls.accept(remover);
 	        }
 	        manager.applyChanges(remover.getChanges());
 	        remover.reset();
-	        System.out.println("Number of classes: " + ontology.getReferencedClasses().size());
+            System.out.println("Number of classes: "
+                    + ontology.getClassesInSignature().size());
            
 		} catch (OWLOntologyCreationException e) {
 			e.printStackTrace();
-		} catch (OWLReasonerException e) {
-			e.printStackTrace();
-		} catch (OWLOntologyChangeException e) {
-			// TODO Auto-generated catch block
+        } catch (OWLRuntimeException e) {
 			e.printStackTrace();
 		}
 	}  
@@ -160,7 +162,7 @@ public class OWL_tests {
 ////    System.out.println(reasoner.getSubClasses(finalowldescription));
 //	
 //    // GET RDFS_LABEL
-////    for(OWLClass cls : owlontology.getReferencedClasses()) {
+// // for(OWLClass cls : owlontology.getClassesInSignature()) {
 //////    	HashSet annots = (HashSet) cls.getAnnotationAxioms(owlontology);
 ////    	for(OWLAnnotationAxiom annotAxiom : cls.getAnnotationAxioms(owlontology)){
 ////    		System.out.println(annotAxiom.getAnnotation().getAnnotationURI().getFragment());
