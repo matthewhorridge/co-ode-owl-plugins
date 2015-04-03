@@ -1,10 +1,5 @@
 package org.coode.obotools.hierarchy;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProviderListener;
-import org.semanticweb.owlapi.model.*;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -31,6 +26,16 @@ import java.util.Set;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProviderListener;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 /**
  * Author: drummond<br>
@@ -93,8 +98,8 @@ public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObj
         if (filtered.contains(entity)){
             return false;
         }
-        for (OWLOntology ont : mngr.getActiveOntologies())
-            for (OWLAnnotation annot : entity.getAnnotations(ont)){
+        for (OWLOntology ont : mngr.getActiveOntologies()) {
+            for (OWLAnnotation annot : EntitySearcher.getAnnotations( entity.getIRI(), ont)){
                 if (annot.getProperty().equals(annotationProperty)){
                     if (annotationValue == null || annot.getValue().equals(annotationValue)){
                         filtered.add(entity);
@@ -102,6 +107,7 @@ public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObj
                     }
                 }
             }
+        }
         return true;
     }
 

@@ -1,7 +1,7 @@
 package org.coode.obotools.hierarchy;
 
 
-import org.coode.owlapi.obo.parser.OBOVocabulary;
+import org.coode.owlapi.obo12.parser.OBOVocabulary;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
 import org.protege.editor.owl.ui.view.cls.ToldOWLClassHierarchyViewComponent;
 import org.semanticweb.owlapi.model.OWLClass;
