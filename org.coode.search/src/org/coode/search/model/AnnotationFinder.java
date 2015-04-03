@@ -1,7 +1,5 @@
 package org.coode.search.model;
 
-import org.semanticweb.owlapi.model.*;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +28,14 @@ import java.util.regex.PatternSyntaxException;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+import org.semanticweb.owlapi.model.AxiomType;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.parameters.Imports;
 
 /**
  * Author: drummond<br>
@@ -62,7 +68,8 @@ public class AnnotationFinder {
 
         for (OWLOntology ont : onts){
             for (OWLAnnotationProperty p : properties){
-                for (OWLAxiom refAx : ont.getReferencingAxioms(p)){
+                for (OWLAxiom refAx : ont.getReferencingAxioms(p,
+                        Imports.EXCLUDED)) {
                     if (refAx.isOfType(AxiomType.ANNOTATION_ASSERTION)){
                         OWLAnnotationAssertionAxiom ax = (OWLAnnotationAssertionAxiom)refAx;
                         if (pattern != null){
