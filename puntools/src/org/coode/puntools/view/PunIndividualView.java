@@ -1,16 +1,8 @@
 package org.coode.puntools.view;
 
-import org.protege.editor.core.ui.view.View;
-import org.protege.editor.core.ui.view.ViewsPane;
-import org.protege.editor.core.ui.view.ViewsPaneMemento;
-import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
-import org.protege.editor.owl.ui.view.individual.AbstractOWLIndividualViewComponent;
-import org.semanticweb.owlapi.model.*;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.event.ActionEvent;
-import java.net.URI;
 import java.net.URL;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -35,6 +27,26 @@ import java.net.URL;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+import org.protege.editor.core.ui.view.View;
+import org.protege.editor.core.ui.view.ViewsPane;
+import org.protege.editor.core.ui.view.ViewsPaneMemento;
+import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
+import org.protege.editor.owl.ui.view.individual.AbstractOWLIndividualViewComponent;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObject;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.parameters.Imports;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -58,6 +70,7 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
     private CardLayout cardLayout;
 
 
+    @Override
     public void initialiseView() throws Exception {
         cardLayout = new CardLayout();
         setLayout(cardLayout);
@@ -78,6 +91,7 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
 
         addNewPane = new JPanel(new BorderLayout());
         addNewPane.add(new JButton(new AbstractAction("Add individual pun"){
+            @Override
             public void actionPerformed(ActionEvent event) {
                 handleAddPun();
             }
@@ -111,11 +125,13 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
         cardLayout.show(this, view);
     }
 
+    @Override
     public void disposeView() {
         individualViewsPane.dispose();
     }
 
 
+    @Override
     protected OWLObject updateView() {
         OWLNamedIndividual pun = null;
         OWLEntity currentEntity = getCurrentEntity();
@@ -125,7 +141,7 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
         else{
             IRI iri = currentEntity.getIRI();
             for (OWLOntology ont : getOWLModelManager().getActiveOntologies()){
-                if (ont.containsIndividualInSignature(iri)){
+                if (ont.containsIndividualInSignature(iri, Imports.EXCLUDED)) {
                     pun = getOWLModelManager().getOWLDataFactory().getOWLNamedIndividual(iri);
                     break;
                 }
@@ -151,26 +167,31 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
     }
 
 
+    @Override
     protected boolean isOWLClassView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLObjectPropertyView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLDataPropertyView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLIndividualView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLDatatypeView() {
         return true;
     }
