@@ -22,6 +22,7 @@
  */
 package uk.ac.manchester.cs.owl.lint.examples;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -29,6 +30,7 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import uk.ac.manchester.cs.owl.lint.commons.Match;
 import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
@@ -62,9 +64,9 @@ public final class NonLeafNoInfoLintPattern extends
 	private boolean matches(OWLClass owlClass, OWLOntology target) {
 		boolean toReturn = false;
 		// If this class is a leaf we just do not bother
-		if (!owlClass.getSubClasses(target).isEmpty()) {
-			Set<OWLClassExpression> superClasses = owlClass
-					.getSuperClasses(target);
+        if (!EntitySearcher.getSubClasses(owlClass, target).isEmpty()) {
+            Collection<OWLClassExpression> superClasses = EntitySearcher
+                    .getSuperClasses(owlClass, target);
 			Iterator<OWLClassExpression> it = superClasses.iterator();
 			boolean found = false;
 			OWLClassExpression anOWLDescription;
@@ -75,7 +77,8 @@ public final class NonLeafNoInfoLintPattern extends
 			if (found) {
 				toReturn = false;
 			} else {
-				it = owlClass.getEquivalentClasses(target).iterator();
+                it = EntitySearcher.getEquivalentClasses(owlClass, target)
+                        .iterator();
 				while (!found && it.hasNext()) {
 					anOWLDescription = it.next();
 					found = anOWLDescription.isAnonymous();
@@ -83,7 +86,8 @@ public final class NonLeafNoInfoLintPattern extends
 				if (found) {
 					toReturn = false;
 				} else {
-					it = owlClass.getDisjointClasses(target).iterator();
+                    it = EntitySearcher.getDisjointClasses(owlClass, target)
+                            .iterator();
 					while (!found && it.hasNext()) {
 						anOWLDescription = it.next();
 						found = anOWLDescription.isAnonymous();
@@ -95,7 +99,8 @@ public final class NonLeafNoInfoLintPattern extends
 		return toReturn;
 	}
 
-	public boolean isInferenceRequired() {
+	@Override
+    public boolean isInferenceRequired() {
 		return false;
 	}
 }

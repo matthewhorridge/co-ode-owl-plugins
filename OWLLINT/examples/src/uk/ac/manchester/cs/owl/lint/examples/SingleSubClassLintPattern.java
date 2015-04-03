@@ -22,6 +22,7 @@
  */
 package uk.ac.manchester.cs.owl.lint.examples;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -33,6 +34,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLRuntimeException;
 import org.semanticweb.owlapi.reasoner.NodeSet;
 import org.semanticweb.owlapi.reasoner.OWLReasoner;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 import uk.ac.manchester.cs.owl.lint.commons.Match;
@@ -59,7 +61,8 @@ public final class SingleSubClassLintPattern extends OntologyWiseLintPattern<OWL
 			OWLReasoner reasoner = LintManagerFactory.getInstance().getReasoner();
 			if (reasoner == null) {
 				for (OWLClass cls : ontology.getClassesInSignature()) {
-					Set<OWLClassExpression> subClasses = cls.getSubClasses(ontology);
+                    Collection<OWLClassExpression> subClasses = EntitySearcher
+                            .getSubClasses(cls, ontology);
 					int count = 0;
 					Iterator<OWLClassExpression> it = subClasses.iterator();
 					while (count <= 1 && it.hasNext()) {
@@ -93,7 +96,8 @@ public final class SingleSubClassLintPattern extends OntologyWiseLintPattern<OWL
 		return toReturn;
 	}
 
-	public boolean isInferenceRequired() {
+	@Override
+    public boolean isInferenceRequired() {
 		return true;
 	}
 }

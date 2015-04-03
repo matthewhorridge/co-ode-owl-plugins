@@ -6,7 +6,6 @@ package uk.ac.manchester.cs.owl.lint.examples;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.semanticweb.owlapi.lint.ActingLint;
 import org.semanticweb.owlapi.lint.LintActionException;
@@ -23,6 +22,7 @@ import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.RemoveAxiom;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import uk.ac.manchester.cs.owl.lint.LintManagerFactory;
 import uk.ac.manchester.cs.owl.lint.commons.NonConfigurableLintConfiguration;
@@ -34,18 +34,20 @@ import uk.ac.manchester.cs.owl.lint.commons.SimpleMatchBasedLintReport;
  */
 public final class TransitiveObjectPropertyLint implements
 		ActingLint<OWLObjectProperty> {
-	public LintReport<OWLObjectProperty> detected(
+	@Override
+    public LintReport<OWLObjectProperty> detected(
 			Collection<? extends OWLOntology> targets) throws LintException {
 		SimpleMatchBasedLintReport<OWLObjectProperty> report = new SimpleMatchBasedLintReport<OWLObjectProperty>(
 				this);
 		for (OWLOntology ontology : targets) {
 			for (OWLObjectProperty objectProperty : ontology
 					.getObjectPropertiesInSignature()) {
-				if (objectProperty.isTransitive(ontology)) {
-					Set<OWLObjectPropertyExpression> superProperties = objectProperty
-							.getSuperProperties(ontology);
+                if (EntitySearcher.isTransitive(objectProperty, ontology)) {
+                    Collection<OWLObjectPropertyExpression> superProperties = EntitySearcher
+                            .getSuperProperties(objectProperty, ontology);
 					for (OWLObjectPropertyExpression objectPropertyExpression : superProperties) {
-						if (objectPropertyExpression.isTransitive(ontology)) {
+                        if (EntitySearcher.isTransitive(
+                                objectPropertyExpression, ontology)) {
 							report
 									.add(
 											objectProperty,
@@ -61,7 +63,8 @@ public final class TransitiveObjectPropertyLint implements
 		return report;
 	}
 
-	public void executeActions(Collection<? extends OWLOntology> ontologies)
+	@Override
+    public void executeActions(Collection<? extends OWLOntology> ontologies)
 			throws LintActionException {
 		List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
 		OWLOntologyManager ontologyManager = LintManagerFactory.getInstance()
@@ -69,7 +72,7 @@ public final class TransitiveObjectPropertyLint implements
 		OWLDataFactory dataFactory = ontologyManager.getOWLDataFactory();
 		LintReport<OWLObjectProperty> report;
 		try {
-			report = this.detected(ontologies);
+			report = detected(ontologies);
 			for (OWLOntology owlOntology : ontologies) {
 				for (OWLObjectProperty objectProperty : report
 						.getAffectedOWLObjects(owlOntology)) {
@@ -88,27 +91,33 @@ public final class TransitiveObjectPropertyLint implements
 		}
 	}
 
-	public String getDescription() {
+	@Override
+    public String getDescription() {
 		return "Detects all the transitive object properties which have a super property that is transitive";
 	}
 
-	public String getName() {
+	@Override
+    public String getName() {
 		return "Transitive Object Property Lint";
 	}
 
-	public void accept(LintVisitor visitor) {
+	@Override
+    public void accept(LintVisitor visitor) {
 		visitor.visitActingLint(this);
 	}
 
-	public <P> P accept(LintVisitorEx<P> visitor) {
+	@Override
+    public <P> P accept(LintVisitorEx<P> visitor) {
 		return visitor.visitActingLint(this);
 	}
 
-	public LintConfiguration getLintConfiguration() {
+	@Override
+    public LintConfiguration getLintConfiguration() {
 		return NonConfigurableLintConfiguration.getInstance();
 	}
 
-	public boolean isInferenceRequired() {
+	@Override
+    public boolean isInferenceRequired() {
 		return false;
 	}
 }

@@ -22,6 +22,7 @@
  */
 package uk.ac.manchester.cs.owl.lint.examples;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -29,6 +30,7 @@ import java.util.Set;
 import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.search.EntitySearcher;
 
 import uk.ac.manchester.cs.owl.lint.commons.Match;
 import uk.ac.manchester.cs.owl.lint.commons.OntologyWiseLintPattern;
@@ -51,7 +53,7 @@ public class RedundantInfoInSubClassesLintPattern extends
 	public Set<Match<OWLClass>> matches(OWLOntology target) {
 		Set<Match<OWLClass>> toReturn = new HashSet<Match<OWLClass>>();
 		for (OWLClass owlClass : target.getClassesInSignature()) {
-			boolean hasRedundancy = this.hasRedundantInfoInSubclasses(owlClass,
+			boolean hasRedundancy = hasRedundantInfoInSubclasses(owlClass,
 					target);
 			if (hasRedundancy) {
 				toReturn
@@ -64,17 +66,18 @@ public class RedundantInfoInSubClassesLintPattern extends
 
 	private boolean hasRedundantInfoInSubclasses(OWLClass c, OWLOntology ont) {
 		boolean toReturn = false;
-		Set<OWLClassExpression> csubS = c.getSubClasses(ont);
+        Collection<OWLClassExpression> csubS = EntitySearcher.getSubClasses(c,
+                ont);
 		if (!csubS.isEmpty()) {
 			Iterator<OWLClassExpression> csubSIT = csubS.iterator();
 			OWLClass firstsubC = csubSIT.next().asOWLClass();
-			HashSet<OWLClassExpression> firstsuperS = new HashSet<OWLClassExpression>(
-					firstsubC.getSuperClasses(ont));
+            Set<OWLClassExpression> firstsuperS = new HashSet<OWLClassExpression>(
+                    EntitySearcher.getSuperClasses(firstsubC, ont));
 			firstsuperS.remove(c);
 			while (csubSIT.hasNext()) {
 				OWLClass csubC = csubSIT.next().asOWLClass();
-				Set<OWLClassExpression> nextsuperS = csubC.asOWLClass()
-						.getSuperClasses(ont);
+                Collection<OWLClassExpression> nextsuperS = EntitySearcher
+                        .getSuperClasses(csubC.asOWLClass(), ont);
 				Iterator<OWLClassExpression> firstsuperSIT = firstsuperS
 						.iterator();
 				while (firstsuperSIT.hasNext() && !firstsuperS.isEmpty()) {
@@ -89,7 +92,8 @@ public class RedundantInfoInSubClassesLintPattern extends
 		return toReturn;
 	}
 
-	public boolean isInferenceRequired() {
+	@Override
+    public boolean isInferenceRequired() {
 		return false;
 	}
 }
