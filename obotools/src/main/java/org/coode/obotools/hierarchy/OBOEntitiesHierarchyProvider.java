@@ -47,7 +47,7 @@ import org.semanticweb.owlapi.search.EntitySearcher;
  */
 public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObjectHierarchyProvider<N> {
 
-    private Set<N> filtered = new HashSet<N>();
+    private Set<N> filtered = new HashSet<>();
 
     private OWLModelManager mngr;
 
@@ -57,9 +57,10 @@ public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObj
 
     private OWLObjectHierarchyProvider<N> delegate;
 
-    private List<OWLObjectHierarchyProviderListener<N>> listeners = new ArrayList<OWLObjectHierarchyProviderListener<N>>();
+    protected List<OWLObjectHierarchyProviderListener<N>> listeners = new ArrayList<>();
 
     private OWLObjectHierarchyProviderListener<N> delegateListener = new OWLObjectHierarchyProviderListener<N>() {
+        @Override
         public void nodeChanged(N node) {
             if (passesFilter(node)){
                 for (OWLObjectHierarchyProviderListener<N> l : listeners){
@@ -69,6 +70,7 @@ public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObj
         }
 
 
+        @Override
         public void hierarchyChanged() {
             for (OWLObjectHierarchyProviderListener<N> l : listeners){
                 l.hierarchyChanged();
@@ -112,22 +114,25 @@ public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObj
     }
 
 
+    @Override
     public void setOntologies(Set<OWLOntology> ontologies) {
         filtered.clear();
         delegate.setOntologies(ontologies);
     }
 
 
+    @Override
     public Set<N> getRoots() {
         return delegate.getRoots();
     }
 
 
+    @Override
     public Set<N> getChildren(N object) {
         Set<N> children = delegate.getChildren(object);
         if (object.equals(mngr.getOWLDataFactory().getOWLThing())){
 
-            Set<N> filteredChildren = new HashSet<N>();
+            Set<N> filteredChildren = new HashSet<>();
             for (N n : children){
                 if (passesFilter(n)){
                     filteredChildren.add(n);
@@ -139,46 +144,55 @@ public class OBOEntitiesHierarchyProvider<N extends OWLEntity> implements OWLObj
     }
 
 
+    @Override
     public Set<N> getDescendants(N object) {
         return delegate.getDescendants(object);
     }
 
 
+    @Override
     public Set<N> getParents(N object) {
         return delegate.getParents(object);
     }
 
 
+    @Override
     public Set<N> getAncestors(N object) {
         return delegate.getAncestors(object);
     }
 
 
+    @Override
     public Set<N> getEquivalents(N object) {
         return delegate.getEquivalents(object);
     }
 
 
+    @Override
     public Set<List<N>> getPathsToRoot(N object) {
         return delegate.getPathsToRoot(object);
     }
 
 
+    @Override
     public boolean containsReference(N object) {
         return passesFilter(object) && delegate.containsReference(object);
     }
 
 
+    @Override
     public void addListener(OWLObjectHierarchyProviderListener<N> listener) {
         listeners.add(listener);
     }
 
 
+    @Override
     public void removeListener(OWLObjectHierarchyProviderListener<N> listener) {
         listeners.remove(listener);
     }
 
 
+    @Override
     public void dispose() {
         delegate.removeListener(delegateListener);
         delegate.dispose();

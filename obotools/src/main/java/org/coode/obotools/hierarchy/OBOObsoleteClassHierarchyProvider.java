@@ -1,12 +1,10 @@
 package org.coode.obotools.hierarchy;
 
-
-import org.coode.owlapi.obo12.parser.OBOVocabulary;
+import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.ui.view.cls.ToldOWLClassHierarchyViewComponent;
-import org.semanticweb.owlapi.model.OWLClass;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationValue;
+import org.semanticweb.owlapi.model.OWLEntity;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -38,19 +36,20 @@ import org.semanticweb.owlapi.model.OWLDataFactory;
  * Bio Health Informatics Group<br>
  * Date: Jun 15, 2009<br><br>
  */
-public class OBOClassHierarchyViewComponent extends ToldOWLClassHierarchyViewComponent {
+public class OBOObsoleteClassHierarchyProvider<N extends OWLEntity> extends OBOEntitiesHierarchyProvider<N> {
 
-    private OWLObjectHierarchyProvider<OWLClass> hp;
+    public OBOObsoleteClassHierarchyProvider(OWLObjectHierarchyProvider<N> delegate, OWLAnnotationProperty property, OWLModelManager mngr) {
+        super(delegate, property, mngr);
+    }
 
 
-    protected OWLObjectHierarchyProvider<OWLClass> getHierarchyProvider() {
-        if (hp == null){
-            final OWLDataFactory df = getOWLModelManager().getOWLDataFactory();
-            hp = new OBOEntitiesHierarchyProvider<OWLClass>(super.getHierarchyProvider(),
-                                                         df.getOWLAnnotationProperty(OBOVocabulary.IS_OBSOLETE.getIRI()),
-                                                         df.getOWLStringLiteral("true"),
-                                                         getOWLModelManager());
-        }
-        return hp;
+    public OBOObsoleteClassHierarchyProvider(OWLObjectHierarchyProvider<N> delegate, OWLAnnotationProperty property, OWLAnnotationValue value, OWLModelManager mngr) {
+        super(delegate, property, value, mngr);
+    }
+
+
+    @Override
+    protected boolean passesFilter(N entity) {
+        return !super.passesFilter(entity);
     }
 }

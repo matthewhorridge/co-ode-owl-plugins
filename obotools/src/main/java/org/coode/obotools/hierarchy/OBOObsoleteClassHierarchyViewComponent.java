@@ -1,10 +1,11 @@
 package org.coode.obotools.hierarchy;
 
+import org.coode.owlapi.obo12.parser.OBOVocabulary;
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLAnnotationValue;
-import org.semanticweb.owlapi.model.OWLEntity;
+import org.protege.editor.owl.ui.view.cls.AbstractOWLClassHierarchyViewComponent;
+import org.semanticweb.owlapi.model.OWLClass;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -36,19 +37,27 @@ import org.semanticweb.owlapi.model.OWLEntity;
  * Bio Health Informatics Group<br>
  * Date: Jun 15, 2009<br><br>
  */
-public class OBOObsoleteClassHierarchyProvider<N extends OWLEntity> extends OBOEntitiesHierarchyProvider<N> {
+public class OBOObsoleteClassHierarchyViewComponent extends AbstractOWLClassHierarchyViewComponent {
 
-    public OBOObsoleteClassHierarchyProvider(OWLObjectHierarchyProvider<N> delegate, OWLAnnotationProperty property, OWLModelManager mngr) {
-        super(delegate, property, mngr);
+    private static final long serialVersionUID = 1L;
+    private OWLObjectHierarchyProvider<OWLClass> hp;
+
+
+    @Override
+    protected void performExtraInitialisation() {
     }
 
 
-    public OBOObsoleteClassHierarchyProvider(OWLObjectHierarchyProvider<N> delegate, OWLAnnotationProperty property, OWLAnnotationValue value, OWLModelManager mngr) {
-        super(delegate, property, value, mngr);
-    }
-
-
-    protected boolean passesFilter(N entity) {
-        return !super.passesFilter(entity);
+    @Override
+    protected OWLObjectHierarchyProvider<OWLClass> getHierarchyProvider() {
+        if (hp == null){
+            final OWLModelManager mngr = getOWLModelManager();
+            final OWLDataFactory df = mngr.getOWLDataFactory();
+            hp = new OBOObsoleteClassHierarchyProvider<>(mngr.getOWLHierarchyManager().getOWLClassHierarchyProvider(),
+                                                                 df.getOWLAnnotationProperty(OBOVocabulary.IS_OBSOLETE.getIRI()),
+                                                                 df.getOWLLiteral("true"),
+                                                                 mngr);
+        }
+        return hp;
     }
 }
