@@ -1,16 +1,6 @@
 package uk.ac.manchester.cs.bhig.jtreetable.test;
 
-import uk.ac.manchester.cs.bhig.jtreetable.JTreeTable;
-import uk.ac.manchester.cs.bhig.jtreetable.AbstractTreeTableModel;
-import uk.ac.manchester.cs.bhig.jtreetable.TreeTableModel;
-
-import javax.swing.*;
-import javax.swing.table.TableColumn;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeSelectionModel;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -35,6 +25,24 @@ import java.awt.event.ActionEvent;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.AbstractAction;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeSelectionModel;
+
+import org.junit.Ignore;
+
+import uk.ac.manchester.cs.bhig.jtreetable.AbstractTreeTableModel;
+import uk.ac.manchester.cs.bhig.jtreetable.JTreeTable;
+import uk.ac.manchester.cs.bhig.jtreetable.TreeTableModel;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -43,6 +51,7 @@ import java.awt.event.ActionEvent;
  * Bio Health Informatics Group<br>
  * Date: Sep 5, 2008<br><br>
  */
+@Ignore
 public class TestJTreeTable {
 
     private int column_index = 0;
