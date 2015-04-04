@@ -1,11 +1,6 @@
 package org.coode.annotate;
 
-import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLObject;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 /*
@@ -31,6 +26,12 @@ import java.awt.event.HierarchyListener;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.JScrollPane;
+
+import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObject;
+
 /**
  * Author: Nick Drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -40,13 +41,14 @@ import java.awt.event.HierarchyListener;
  * Date: Aug 16, 2007<br><br>
  */
 public class AnnotationTemplateView extends AbstractOWLSelectionViewComponent {
-
+    private static final long serialVersionUID = 1L;
     private TemplateModel model;
     private Template form;
 
-    private boolean updateRequired = false;
+    protected boolean updateRequired = false;
 
     private HierarchyListener hListener = new HierarchyListener(){
+        @Override
         public void hierarchyChanged(HierarchyEvent hierarchyEvent) {
             if (updateRequired){
                 updateView();
@@ -54,7 +56,8 @@ public class AnnotationTemplateView extends AbstractOWLSelectionViewComponent {
         }
     };
 
-    public void initialiseView() throws Exception {
+    @Override
+    public void initialiseView() {
         setLayout(new BorderLayout());
         model = new TemplateModel(getOWLModelManager());
         form = new Template(model);
@@ -63,10 +66,12 @@ public class AnnotationTemplateView extends AbstractOWLSelectionViewComponent {
         addHierarchyListener(hListener);
     }
 
+    @Override
     public void disposeView() {
         model.dispose();
     }
 
+    @Override
     protected OWLObject updateView() {
         OWLEntity selectedEntity = getOWLWorkspace().getOWLSelectionModel().getSelectedEntity();
         if (isShowing()){
@@ -79,31 +84,37 @@ public class AnnotationTemplateView extends AbstractOWLSelectionViewComponent {
         return selectedEntity;
     }
 
+    @Override
     protected boolean isOWLClassView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLObjectPropertyView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLDataPropertyView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLIndividualView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLDatatypeView() {
         return true;
     }
 
 
+    @Override
     protected boolean isOWLAnnotationPropertyView() {
         return true;
     }

@@ -67,7 +67,7 @@ import org.semanticweb.owlapi.model.RemoveAxiom;
  */
 public class TemplateRow {
 
-    private JComponent editor;
+    protected JComponent editor;
 
     private TemplateModel model;
 
@@ -76,12 +76,14 @@ public class TemplateRow {
     private OWLAnnotationSubject subject;
 
     private FocusListener focusListener = new FocusAdapter(){
+        @Override
         public void focusLost(FocusEvent focusEvent) {
             updateAnnotation();
         }
     };
 
     private ActionListener acceptAction = new ActionListener(){
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             updateAnnotation();
             editor.transferFocus();
@@ -108,7 +110,7 @@ public class TemplateRow {
     }
 
 
-    private void updateAnnotation() {
+    protected void updateAnnotation() {
 
         final OWLModelManager mngr = model.getOWLModelManager();
 
@@ -118,7 +120,7 @@ public class TemplateRow {
             newAxiom = mngr.getOWLDataFactory().getOWLAnnotationAssertionAxiom(property, subject, newValue);
         }
 
-        List<OWLOntologyChange> changes = new ArrayList<OWLOntologyChange>();
+        List<OWLOntologyChange> changes = new ArrayList<>();
 
         if (annotAxiom != null){
             if (!annotAxiom.getAnnotation().getValue().equals(newValue)){
@@ -200,8 +202,8 @@ public class TemplateRow {
         if (editor == null){
             EditorType type = model.getComponentType(property);
 
-            Set<AWTKeyStroke> newForwardKeys = new HashSet<AWTKeyStroke>();
-            Set<AWTKeyStroke> newBackwardKeys = new HashSet<AWTKeyStroke>();
+            Set<AWTKeyStroke> newForwardKeys = new HashSet<>();
+            Set<AWTKeyStroke> newBackwardKeys = new HashSet<>();
 
             newForwardKeys.add(AWTKeyStroke.getAWTKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK));
 

@@ -1,15 +1,26 @@
 package org.coode.annotate;
 
-import org.apache.log4j.Logger;
-import org.coode.annotate.prefs.AnnotationTemplateDescriptor;
-import org.coode.annotate.prefs.AnnotationTemplatePrefs;
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owlapi.model.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.io.IOException;
-import java.util.*;
+
+import org.coode.annotate.prefs.AnnotationTemplateDescriptor;
+import org.coode.annotate.prefs.AnnotationTemplatePrefs;
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.AxiomType;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLAnnotationSubject;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 
 /*
 * Copyright (C) 2007, University of Manchester
@@ -44,32 +55,32 @@ import java.util.*;
  */
 public class TemplateModel {
 
-    private static final Logger logger = Logger.getLogger(TemplateModel.class.getName());
-
-    private final java.util.List<TemplateRow> cList = new ArrayList<TemplateRow>();
+    private final java.util.List<TemplateRow> cList = new ArrayList<>();
 
     private final AnnotationComponentComparator comparator = new AnnotationComponentComparator();
 
-    private final Set<TemplateModelListener> listeners = new HashSet<TemplateModelListener>();
+    private final Set<TemplateModelListener> listeners = new HashSet<>();
 
     private final OWLModelManager mngr;
 
     private OWLAnnotationSubject subject;
 
     private OWLOntologyChangeListener ontChangeListener = new OWLOntologyChangeListener(){
-        public void ontologiesChanged(List<? extends OWLOntologyChange> list) throws OWLException {
+        @Override
+        public void ontologiesChanged(List<? extends OWLOntologyChange> list) {
             handleOntologyChanges(list);
         }
     };
 
     private ChangeListener layoutChangeListener = new ChangeListener(){
+        @Override
         public void stateChanged(ChangeEvent event) {
             refresh();
         }
     };
 
 
-    public TemplateModel(OWLModelManager mngr) throws IOException {
+    public TemplateModel(OWLModelManager mngr) {
         this.mngr = mngr;
 
         mngr.addOntologyChangeListener(ontChangeListener);
@@ -84,7 +95,7 @@ public class TemplateModel {
 
 
     public Set<OWLAnnotationAssertionAxiom> getAnnotations(OWLAnnotationSubject annotationSubject) {
-        Set<OWLAnnotationAssertionAxiom> annotations = new HashSet<OWLAnnotationAssertionAxiom>();
+        Set<OWLAnnotationAssertionAxiom> annotations = new HashSet<>();
         for (OWLOntology ont : mngr.getActiveOntologies()){
             annotations.addAll(ont.getAnnotationAssertionAxioms(annotationSubject));
         }
@@ -93,7 +104,7 @@ public class TemplateModel {
 
 
     public Set<OWLOntology> getOntologiesContainingAnnotation(TemplateRow templateRow) {
-        Set<OWLOntology> onts = new HashSet<OWLOntology>();
+        Set<OWLOntology> onts = new HashSet<>();
         OWLAxiom ax = templateRow.getAxiom();
         if (ax != null) {
         	for (OWLOntology ont : mngr.getActiveOntologies()){
@@ -113,7 +124,7 @@ public class TemplateModel {
         return subject;
     }
 
-    private void handleOntologyChanges(List<? extends OWLOntologyChange> changes) {
+    protected void handleOntologyChanges(List<? extends OWLOntologyChange> changes) {
         for (OWLOntologyChange change : changes){
             if (change.isAxiomChange() &&
                 change.getAxiom().isOfType(AxiomType.ANNOTATION_ASSERTION) &&
@@ -124,7 +135,7 @@ public class TemplateModel {
         }
     }
 
-    private void refresh(){
+    protected void refresh(){
         setSubject(subject);
     }
 
@@ -136,7 +147,7 @@ public class TemplateModel {
             final List<OWLAnnotationProperty> properties = getDefaultDescriptor().getProperties();
 
             Set<OWLAnnotationAssertionAxiom> annots = getAnnotations(annotationSubject);
-            Set<OWLAnnotationProperty> usedProperties = new HashSet<OWLAnnotationProperty>();
+            Set<OWLAnnotationProperty> usedProperties = new HashSet<>();
             for (OWLAnnotationAssertionAxiom annot : annots){
                 final OWLAnnotationProperty property = annot.getAnnotation().getProperty();
                 if (properties.contains(property)){
@@ -210,13 +221,14 @@ public class TemplateModel {
     }
 
 
-    private AnnotationTemplateDescriptor getDefaultDescriptor() {
+    protected AnnotationTemplateDescriptor getDefaultDescriptor() {
         return AnnotationTemplatePrefs.getInstance().getDefaultDescriptor(mngr.getOWLDataFactory());
     }
 
 
     class AnnotationComponentComparator implements Comparator<TemplateRow> {
 
+        @Override
         public int compare(TemplateRow c1, TemplateRow c2) {
             OWLAnnotationProperty uri1 = c1.getProperty();
             OWLAnnotationProperty uri2 = c2.getProperty();

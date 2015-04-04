@@ -1,12 +1,11 @@
 package org.coode.annotate;
 
-import org.protege.editor.core.ui.util.Icons;
-import org.protege.editor.owl.ui.renderer.OWLAnnotationCellRenderer2;
-import org.semanticweb.owlapi.model.OWLAnnotationSubject;
-import org.semanticweb.owlapi.model.OWLOntology;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 /*
@@ -32,6 +31,15 @@ import java.awt.event.MouseEvent;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.Scrollable;
+
+import org.protege.editor.core.ui.util.Icons;
+import org.protege.editor.owl.ui.renderer.OWLAnnotationCellRenderer2;
+import org.semanticweb.owlapi.model.OWLAnnotationSubject;
+import org.semanticweb.owlapi.model.OWLOntology;
+
 /**
  * Author: Nick Drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -41,12 +49,13 @@ import java.awt.event.MouseEvent;
  * Date: Aug 21, 2007<br><br>
  */
 public class Template extends JComponent implements Scrollable {
-
+    private static final long serialVersionUID = 1L;
     private static final Color LABEL_COLOUR = OWLAnnotationCellRenderer2.ANNOTATION_PROPERTY_FOREGROUND;
 
-    private TemplateModel model;
+    protected TemplateModel model;
 
     private TemplateModelListener modelListener = new TemplateModelListener(){
+        @Override
         public void modelStructureChanged() {
             rebuildUI();
         }
@@ -64,7 +73,7 @@ public class Template extends JComponent implements Scrollable {
         model.setSubject(subject);
     }
 
-    private void rebuildUI() {
+    protected void rebuildUI() {
         removeAll();
 
         if (model.getSubject() != null){
@@ -121,22 +130,27 @@ public class Template extends JComponent implements Scrollable {
         return str.length() == 0 ? null : "Asserted in: " + str;
     }
 
+    @Override
     public Dimension getPreferredScrollableViewportSize() {
         return new Dimension(300, 200);
     }
 
+    @Override
     public int getScrollableUnitIncrement(Rectangle rectangle, int i, int i1) {
         return getFontMetrics(getFont()).getHeight();
     }
 
+    @Override
     public int getScrollableBlockIncrement(Rectangle rectangle, int i, int i1) {
         return 100;
     }
 
+    @Override
     public boolean getScrollableTracksViewportWidth() {
         return true;
     }
 
+    @Override
     public boolean getScrollableTracksViewportHeight() {
         return false;
     }
@@ -150,6 +164,7 @@ public class Template extends JComponent implements Scrollable {
             this.c = c;
         }
 
+        @Override
         public void mouseReleased(MouseEvent mouseEvent) {
             model.removeRow(c);
         }
@@ -163,6 +178,7 @@ public class Template extends JComponent implements Scrollable {
             this.c = c;
         }
 
+        @Override
         public void mouseReleased(MouseEvent mouseEvent) {
             model.addRow(c.getProperty());
         }

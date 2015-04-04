@@ -1,22 +1,13 @@
 package org.coode.annotate.prefs;
 
-import org.apache.log4j.Logger;
-import org.coode.annotate.EditorType;
-import org.protege.editor.core.ui.util.Icons;
-import org.protege.editor.core.ui.util.UIUtil;
-import org.protege.editor.owl.ui.OWLIcons;
-import org.protege.editor.owl.ui.UIHelper;
-import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
-import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Collections;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -41,6 +32,29 @@ import java.util.Collections;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableModel;
+
+import org.coode.annotate.EditorType;
+import org.protege.editor.core.ui.util.Icons;
+import org.protege.editor.core.ui.util.UIUtil;
+import org.protege.editor.owl.ui.OWLIcons;
+import org.protege.editor.owl.ui.UIHelper;
+import org.protege.editor.owl.ui.preferences.OWLPreferencesPanel;
+import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -50,9 +64,7 @@ import java.util.Collections;
  * Date: Apr 1, 2008<br><br>
  */
 public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
-
-    private static final Logger logger = Logger.getLogger(AnnotationTemplatePrefsPanel.class);
-
+    private static final long serialVersionUID = 1L;
     private JTable table;
     private JToolBar toolbar;
 
@@ -61,24 +73,33 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
     private boolean dirty = false;
 
     private Action addAction = new AbstractAction("Add Annotation", OWLIcons.getIcon("property.annotation.add.png")){
+        private static final long serialVersionUID = 1L;
+
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             handleAddAnnotation();
         }
     };
 
     private Action removeAction = new AbstractAction("Remove Annotation", OWLIcons.getIcon("property.annotation.remove.png")){
+        private static final long serialVersionUID = 1L;
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             handleRemoveAnnotation();
         }
     };
 
     private Action upAction = new AbstractAction("Move Up", Icons.getIcon("object.move_up.gif")){
+        private static final long serialVersionUID = 1L;
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             handleMoveUp();
         }
     };
 
     private Action downAction = new AbstractAction("Move Down", Icons.getIcon("object.move_down.gif")){
+        private static final long serialVersionUID = 1L;
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             handleMoveDown();
         }
@@ -86,6 +107,8 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
     };
 
     private Action importAction = new AbstractAction("Import from file", Icons.getIcon("project.open.gif")){
+        private static final long serialVersionUID = 1L;
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             handleImport();
         }
@@ -94,15 +117,18 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
 
     private Action exportAction = new AbstractAction("Export to file", Icons.getIcon("project.save.gif")){
+        private static final long serialVersionUID = 1L;
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             handleExport();
         }
 
     };
 
-    private AnnotationTemplateDescriptor descriptor;
+    protected AnnotationTemplateDescriptor descriptor;
 
 
+    @Override
     public void applyChanges() {
         if (dirty){
             AnnotationTemplatePrefs.getInstance().setDefaultDescriptor(descriptor);
@@ -111,7 +137,8 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
     }
 
 
-    public void initialise() throws Exception {
+    @Override
+    public void initialise() {
 
         setLayout(new BorderLayout());
 
@@ -161,11 +188,12 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
     }
 
 
-    public void dispose() throws Exception {
+    @Override
+    public void dispose() {
         // do nothing
     }
 
-    private void handleAddAnnotation() {
+    protected void handleAddAnnotation() {
         OWLAnnotationProperty property = new UIHelper(getOWLEditorKit()).pickAnnotationProperty();
         if (property != null){
             Object[] rowData = new Object[]{property, EditorType.text};
@@ -176,7 +204,7 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
     }
 
 
-    private void handleRemoveAnnotation() {
+    protected void handleRemoveAnnotation() {
         final int row = table.getSelectedRow();
         if (row != -1){
             model.removeRow(row);
@@ -190,7 +218,7 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         }
     }
 
-    private void handleMoveUp() {
+    protected void handleMoveUp() {
         final int row = table.getSelectedRow();
         if (row > 0){
             model.moveRow(row, row, row-1);
@@ -199,7 +227,7 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         }
     }
 
-    private void handleMoveDown() {
+    protected void handleMoveDown() {
         final int row = table.getSelectedRow();
         if (row < model.getRowCount()-1){
             model.moveRow(row, row, row+1);
@@ -209,7 +237,7 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
     }
 
 
-    private void handleImport() {
+    protected void handleImport() {
         JFrame f = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, getParent());
         if (f == null) {
             f = new JFrame();
@@ -217,8 +245,7 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
         File importFile = UIUtil.openFile(f, "Import a template file for your annotations", Collections.EMPTY_SET);
         if (importFile != null){
-            try {
-                FileInputStream inStream = new FileInputStream(importFile);
+            try (FileInputStream inStream = new FileInputStream(importFile)) {
                 descriptor = new AnnotationTemplateDescriptor(inStream, getOWLModelManager().getOWLDataFactory());
                 model = new MyTableModel(descriptor);
                 table.setModel(model);
@@ -232,7 +259,7 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
     }
 
 
-    private void handleExport() {
+    protected void handleExport() {
         JFrame f = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, getParent());
         if (f == null) {
             f = new JFrame();
@@ -240,8 +267,9 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
         File exportFile = UIUtil.saveFile(f, "Export a template file for your annotations", Collections.EMPTY_SET);
         if (exportFile != null){
-            try {
-                PrintStream outStream = new PrintStream(new FileOutputStream(exportFile));
+            try (
+                FileOutputStream out = new FileOutputStream(exportFile);
+                PrintStream outStream = new PrintStream(out);){
                 descriptor.export(outStream);
                 outStream.flush();
                 outStream.close();
@@ -254,8 +282,8 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
 
 
     private class MyTableModel extends DefaultTableModel {
-
-        private MyTableModel(AnnotationTemplateDescriptor descriptor) {
+        private static final long serialVersionUID = 1L;
+        protected MyTableModel(AnnotationTemplateDescriptor descriptor) {
             addColumn("Annotation property");
             addColumn("Editor type");
 
@@ -266,6 +294,7 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         }
 
 
+        @Override
         public void setValueAt(Object o, int row, int col) {
             super.setValueAt(o, row, col);
             OWLAnnotationProperty property = descriptor.getProperties().get(row);
@@ -278,12 +307,14 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         }
 
 
+        @Override
         public void moveRow(int start, int end, int to) {
             super.moveRow(start, end, to);
             descriptor.move(start, end, to);
         }
 
 
+        @Override
         public void removeRow(int row) {
             super.removeRow(row);
             OWLAnnotationProperty property = descriptor.getProperties().get(row);
@@ -291,12 +322,14 @@ public class AnnotationTemplatePrefsPanel extends OWLPreferencesPanel {
         }
 
 
+        @Override
         public void addRow(Object[] rowData) {
             super.addRow(rowData);
             descriptor.addRow((OWLAnnotationProperty)rowData[0], (EditorType)rowData[1]);
         }
 
 
+        @Override
         public Class<?> getColumnClass(int col) {
             if (col == 0){
                 return OWLAnnotationProperty.class;

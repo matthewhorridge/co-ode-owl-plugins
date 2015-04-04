@@ -1,11 +1,5 @@
 package org.coode.annotate.prefs;
 
-import org.protege.editor.core.prefs.Preferences;
-import org.protege.editor.core.prefs.PreferencesManager;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -33,6 +27,13 @@ import java.util.List;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.protege.editor.core.prefs.Preferences;
+import org.protege.editor.core.prefs.PreferencesManager;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -53,7 +54,7 @@ public class AnnotationTemplatePrefs {
 
     private AnnotationTemplateDescriptor descriptor;
 
-    private List<ChangeListener> listeners = new ArrayList<ChangeListener>();
+    private List<ChangeListener> listeners = new ArrayList<>();
 
 
     public static AnnotationTemplatePrefs getInstance(){
@@ -71,8 +72,7 @@ public class AnnotationTemplatePrefs {
             descriptor = new AnnotationTemplateDescriptor(prefs, TEMPLATE, df);
 
             if (descriptor.isEmpty()){
-                InputStream stream = getClass().getClassLoader().getResourceAsStream(PROPS_FILENAME);
-                try {
+                try (InputStream stream = getClass().getClassLoader().getResourceAsStream(PROPS_FILENAME)) {
                     descriptor = new AnnotationTemplateDescriptor(stream, df);
                 }
                 catch (IOException e) {

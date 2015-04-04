@@ -1,16 +1,12 @@
 package org.coode.annotate.prefs;
 
-import org.apache.log4j.Logger;
-import org.coode.annotate.EditorType;
-import org.protege.editor.core.prefs.Preferences;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLDataFactory;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -33,6 +29,18 @@ import java.util.*;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.coode.annotate.EditorType;
+import org.protege.editor.core.prefs.Preferences;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLDataFactory;
 
 /**
  * Author: drummond<br>
@@ -53,15 +61,15 @@ public class AnnotationTemplateDescriptor {
 
 
     public AnnotationTemplateDescriptor(InputStream stream, OWLDataFactory df) throws IOException {
-        properties = new ArrayList<OWLAnnotationProperty>();
-        prop2EditorMap = new HashMap<OWLAnnotationProperty, EditorType>();
+        properties = new ArrayList<>();
+        prop2EditorMap = new HashMap<>();
         parse(stream, df);
     }
 
 
     public AnnotationTemplateDescriptor(Preferences prefs, String key, OWLDataFactory df) {
-        properties = new ArrayList<OWLAnnotationProperty>();
-        prop2EditorMap = new HashMap<OWLAnnotationProperty, EditorType>();
+        properties = new ArrayList<>();
+        prop2EditorMap = new HashMap<>();
         for (String line : prefs.getStringList(key, new ArrayList<String>())){
             parseLine(line, df);
         }
@@ -69,8 +77,8 @@ public class AnnotationTemplateDescriptor {
 
 
     public AnnotationTemplateDescriptor(AnnotationTemplateDescriptor descriptor) {
-        properties = new ArrayList<OWLAnnotationProperty>(descriptor.properties);
-        prop2EditorMap = new HashMap<OWLAnnotationProperty, EditorType>(descriptor.prop2EditorMap);
+        properties = new ArrayList<>(descriptor.properties);
+        prop2EditorMap = new HashMap<>(descriptor.prop2EditorMap);
     }
 
 
@@ -128,7 +136,7 @@ public class AnnotationTemplateDescriptor {
 
 
     public List<String> exportStringList() {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (OWLAnnotationProperty property : properties){
             list.add(property.getIRI() + ", " + prop2EditorMap.get(property));
         }
@@ -162,7 +170,7 @@ public class AnnotationTemplateDescriptor {
 
 
     public void move(int start, int end, int to) {
-        List<OWLAnnotationProperty> sel = new ArrayList<OWLAnnotationProperty>(properties.subList(start, end+1));
+        List<OWLAnnotationProperty> sel = new ArrayList<>(properties.subList(start, end+1));
         properties.removeAll(sel);
         properties.addAll(to, sel);
     }
