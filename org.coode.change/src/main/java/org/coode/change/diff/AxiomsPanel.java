@@ -1,24 +1,13 @@
 package org.coode.change.diff;
 
-import org.protege.editor.core.Disposable;
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.event.EventType;
-import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
-import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
-import org.protege.editor.owl.ui.frame.AxiomListFrameSection;
-import org.protege.editor.owl.ui.framelist.OWLFrameList;
-import org.protege.editor.owl.ui.renderer.OWLOntologyCellRenderer;
-import org.semanticweb.owlapi.model.*;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -42,6 +31,29 @@ import java.util.List;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.util.Set;
+import java.util.Vector;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+
+import org.protege.editor.core.Disposable;
+import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
+import org.protege.editor.owl.ui.frame.AbstractOWLFrame;
+import org.protege.editor.owl.ui.frame.AxiomListFrameSection;
+import org.protege.editor.owl.ui.framelist.OWLFrameList;
+import org.protege.editor.owl.ui.renderer.OWLOntologyCellRenderer;
+import org.semanticweb.owlapi.model.AxiomType;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 
 /**
  * Author: drummond<br>
@@ -53,24 +65,28 @@ import java.util.List;
  */
 public class AxiomsPanel extends JPanel implements OntologySelector, Disposable {
 
+    private static final long serialVersionUID = 1L;
+
     private OWLEditorKit eKit;
 
-    private JComboBox ontologySelector;
+    protected JComboBox<OWLOntology> ontologySelector;
     private OWLFrameList <Set<OWLAxiom>> list;
-    private OWLOntology currentOntology;
+    protected OWLOntology currentOntology;
 
     private OntologySelector diff;
 
-    private List<OWLOntologySelectionListener> listeners = new ArrayList<OWLOntologySelectionListener>();
+    private List<OWLOntologySelectionListener> listeners = new ArrayList<>();
 
     private OWLOntologyChangeListener ontChangeListener = new OWLOntologyChangeListener(){
-        public void ontologiesChanged(java.util.List<? extends OWLOntologyChange> changes) throws OWLException {
+        @Override
+        public void ontologiesChanged(java.util.List<? extends OWLOntologyChange> changes) {
             handleChanges(changes);
         }
     };
 
 
     private ItemListener itemSelectorListener = new ItemListener(){
+        @Override
         public void itemStateChanged(ItemEvent event) {
             setOntology((OWLOntology)ontologySelector.getSelectedItem());
         }
@@ -78,6 +94,7 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
 
 
     private OWLOntologySelectionListener diffListener = new OWLOntologySelectionListener(){
+        @Override
         public void selectionChanged(OWLOntology selectedOntology) {
             refresh();
         }
@@ -85,6 +102,7 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
 
     private OWLModelManagerListener mngrListener = new OWLModelManagerListener(){
 
+        @Override
         public void handleChange(OWLModelManagerChangeEvent event) {
             if (event.getType().equals(EventType.ONTOLOGY_LOADED)){
                 reloadOntologySelector();
@@ -95,9 +113,10 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
         }
     };
 
-    private boolean updateViewRequired = true;
+    protected boolean updateViewRequired = true;
 
     private HierarchyListener componentHierarchyListener = new HierarchyListener() {
+        @Override
         public void hierarchyChanged(HierarchyEvent hierarchyEvent) {
             if (isShowing()) {
                 if (updateViewRequired) {
@@ -120,12 +139,12 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
 
         setOntology(eKit.getOWLModelManager().getActiveOntology());
         
-        ontologySelector = new JComboBox();
+        ontologySelector = new JComboBox<>();
         reloadOntologySelector();
         ontologySelector.setRenderer(new OWLOntologyCellRenderer(eKit));
 
         OWLAxiomListFrame frame = new OWLAxiomListFrame(eKit);
-        list = new OWLFrameList<Set<OWLAxiom>>(eKit, frame);
+        list = new OWLFrameList<>(eKit, frame);
 
         add(ontologySelector, BorderLayout.NORTH);
         add(new JScrollPane(list), BorderLayout.CENTER);
@@ -162,18 +181,18 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     }
 
 
-    private void reloadOntologySelector() {
+    protected void reloadOntologySelector() {
         Set<OWLOntology> ontologies = eKit.getOWLModelManager().getOntologies();
-        ontologySelector.setModel(new DefaultComboBoxModel(ontologies.toArray()));
+        ontologySelector.setModel(new DefaultComboBoxModel<>(new Vector<>(ontologies)));
         if (ontologies.contains(currentOntology)){
             ontologySelector.setSelectedItem(currentOntology);
         }
     }
 
 
-    private void refresh() {
+    protected void refresh() {
         if (isShowing()){
-            final Set<OWLAxiom> axioms = new HashSet<OWLAxiom>(isShowAnnotations() ? currentOntology.getAxioms() : currentOntology.getLogicalAxioms());
+            final Set<OWLAxiom> axioms = new HashSet<>(isShowAnnotations() ? currentOntology.getAxioms() : currentOntology.getLogicalAxioms());
             if (!showDisjointClasses){
                 axioms.removeAll(currentOntology.getAxioms(AxiomType.DISJOINT_CLASSES));
             }
@@ -192,7 +211,7 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     }
 
 
-    private void handleChanges(List<? extends OWLOntologyChange> changes) {
+    protected void handleChanges(List<? extends OWLOntologyChange> changes) {
         boolean requiresReload = false;
         for (OWLOntologyChange chg : changes){
             if (chg.getOntology().equals(currentOntology)){
@@ -206,7 +225,8 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     }
 
 
-    public void dispose() throws Exception {
+    @Override
+    public void dispose() {
         list.dispose();
         eKit.getOWLModelManager().removeOntologyChangeListener(ontChangeListener);
         eKit.getOWLModelManager().removeListener(mngrListener);
@@ -214,16 +234,19 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
     }
 
 
+    @Override
     public OWLOntology getSelectedOntology() {
         return currentOntology;
     }
 
 
+    @Override
     public void addOntologySelectionListener(OWLOntologySelectionListener l) {
         listeners.add(l);
     }
 
 
+    @Override
     public void removeOntologySelectionListener(OWLOntologySelectionListener l) {
         listeners.remove(l);
     }
@@ -251,6 +274,7 @@ public class AxiomsPanel extends JPanel implements OntologySelector, Disposable 
         public OWLAxiomListFrame(OWLEditorKit owlEditorKit) {
             super(owlEditorKit.getModelManager().getOWLOntologyManager());
             addSection(new AxiomListFrameSection(owlEditorKit, this){
+                @Override
                 protected Set<OWLOntology> getOntologies() {
                     return Collections.singleton(currentOntology);
                 }

@@ -1,14 +1,16 @@
 package org.coode.change;
 
+import java.awt.Component;
+
+import javax.swing.Icon;
+import javax.swing.JTree;
+
 import org.protege.editor.core.ui.util.Icons;
 import org.protege.editor.owl.OWLEditorKit;
 import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.RemoveAxiom;
-
-import javax.swing.*;
-import java.awt.*;
 
 /*
 * Copyright (C) 2007, University of Manchester
@@ -56,6 +58,7 @@ public class ChangeTreeCellRenderer extends OWLCellRenderer {
     }
 
 
+    @Override
     public Component getTreeCellRendererComponent(JTree jTree, Object o, boolean b, boolean b1, boolean b2, int i, boolean b3) {
         realObject = o;
         setStrikeThrough(o instanceof RemoveAxiom);
@@ -63,12 +66,13 @@ public class ChangeTreeCellRenderer extends OWLCellRenderer {
             o = ((OWLOntologyChange)o).getAxiom();
         }
         else if (o instanceof java.util.List){
-            o = "anonymous changeset (" + ((java.util.List)o).size() + ")";
+            o = "anonymous changeset (" + ((java.util.List<?>)o).size() + ")";
         }
         return super.getTreeCellRendererComponent(jTree, o, b, b1, b2, i, b3);
     }
 
 
+    @Override
     protected Icon getIcon(Object object) {
         if (realObject instanceof AddAxiom){
             return addIcon;

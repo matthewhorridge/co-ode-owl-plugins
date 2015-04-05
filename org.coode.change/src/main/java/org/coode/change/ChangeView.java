@@ -1,14 +1,15 @@
 package org.coode.change;
 
+import java.awt.BorderLayout;
+import java.util.List;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+
 import org.protege.editor.owl.model.OWLModelManager;
 import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
 import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
-
-import javax.swing.*;
-import java.awt.*;
-import java.util.List;
 
 /*
 * Copyright (C) 2007, University of Manchester
@@ -42,18 +43,20 @@ import java.util.List;
  * Date: Apr 10, 2008<br><br>
  */
 public class ChangeView extends AbstractOWLViewComponent {
-
+    private static final long serialVersionUID = 1L;
     private JTree tree;
-    private ChangesTreeModel changesModel;
+    protected ChangesTreeModel changesModel;
 
     private OWLOntologyChangeListener ontChangeListener = new OWLOntologyChangeListener(){
-        public void ontologiesChanged(List<? extends OWLOntologyChange> owlOntologyChanges) throws OWLException {
+        @Override
+        public void ontologiesChanged(List<? extends OWLOntologyChange> owlOntologyChanges) {
             changesModel.reload();
         }
     };
 
 
-    protected void initialiseOWLView() throws Exception {
+    @Override
+    protected void initialiseOWLView() {
         final OWLModelManager mngr = getOWLModelManager();
         
         changesModel = new ChangesTreeModel(mngr.getHistoryManager());
@@ -68,6 +71,7 @@ public class ChangeView extends AbstractOWLViewComponent {
     }
 
 
+    @Override
     protected void disposeOWLView() {
         getOWLModelManager().removeOntologyChangeListener(ontChangeListener);
     }

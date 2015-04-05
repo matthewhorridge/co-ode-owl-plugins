@@ -1,9 +1,6 @@
 package org.coode.change.diff;
 
-import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 /*
@@ -29,6 +26,13 @@ import java.awt.event.ActionListener;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JSplitPane;
+
+import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -38,16 +42,17 @@ import java.awt.event.ActionListener;
  * Date: Dec 24, 2008<br><br>
  */
 public class DiffView extends AbstractOWLViewComponent {
+    private static final long serialVersionUID = 1L;
+    protected AxiomsPanel left;
 
-    private AxiomsPanel left;
+    protected AxiomsPanel right;
 
-    private AxiomsPanel right;
-
-    private JCheckBox showAnnotationsCheckbox;
-    private JCheckBox showDisjointsCheckbox;
+    protected JCheckBox showAnnotationsCheckbox;
+    protected JCheckBox showDisjointsCheckbox;
 
 
-    protected void initialiseOWLView() throws Exception {
+    @Override
+    protected void initialiseOWLView() {
         setLayout(new BorderLayout());
 
         left = new AxiomsPanel(getOWLEditorKit());
@@ -67,6 +72,7 @@ public class DiffView extends AbstractOWLViewComponent {
         showAnnotationsCheckbox.setSelected(true);
         showAnnotationsCheckbox.addActionListener(new ActionListener(){
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 left.setShowAnnotations(showAnnotationsCheckbox.isSelected());
                 right.setShowAnnotations(showAnnotationsCheckbox.isSelected());
@@ -77,6 +83,7 @@ public class DiffView extends AbstractOWLViewComponent {
         showDisjointsCheckbox.setSelected(true);
         showDisjointsCheckbox.addActionListener(new ActionListener(){
 
+            @Override
             public void actionPerformed(ActionEvent event) {
                 left.setShowDisjointClasses(showDisjointsCheckbox.isSelected());
                 right.setShowDisjointClasses(showDisjointsCheckbox.isSelected());
@@ -93,6 +100,7 @@ public class DiffView extends AbstractOWLViewComponent {
     }
 
 
+    @Override
     protected void disposeOWLView() {
         try {
             left.dispose();

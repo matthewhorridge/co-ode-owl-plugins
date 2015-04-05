@@ -1,17 +1,5 @@
 package org.coode.change.diff;
 
-import org.protege.editor.owl.model.event.EventType;
-import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
-import org.protege.editor.owl.model.event.OWLModelManagerListener;
-import org.protege.editor.owl.ui.OWLAxiomTypeFramePanel;
-import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-import org.semanticweb.owlapi.model.OWLException;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyChange;
-import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
-
-import javax.swing.*;
-import java.awt.*;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -34,6 +22,18 @@ import java.awt.*;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.awt.BorderLayout;
+
+import javax.swing.JScrollPane;
+
+import org.protege.editor.owl.model.event.EventType;
+import org.protege.editor.owl.model.event.OWLModelManagerChangeEvent;
+import org.protege.editor.owl.model.event.OWLModelManagerListener;
+import org.protege.editor.owl.ui.OWLAxiomTypeFramePanel;
+import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 
 /**
  * Author: drummond<br>
@@ -44,11 +44,12 @@ import java.awt.*;
  * Date: Dec 24, 2008<br><br>
  */
 public class AxiomsView extends AbstractOWLViewComponent {
-
+    private static final long serialVersionUID = 1L;
     private OWLAxiomTypeFramePanel list;
 
     private OWLModelManagerListener listener = new OWLModelManagerListener(){
 
+        @Override
         public void handleChange(OWLModelManagerChangeEvent event) {
             if (event.getType().equals(EventType.ACTIVE_ONTOLOGY_CHANGED)){
                 setOntology(getOWLModelManager().getActiveOntology());
@@ -58,7 +59,8 @@ public class AxiomsView extends AbstractOWLViewComponent {
 
     private OWLOntologyChangeListener ontChangeListener = new OWLOntologyChangeListener(){
 
-        public void ontologiesChanged(java.util.List<? extends OWLOntologyChange> changes) throws OWLException {
+        @Override
+        public void ontologiesChanged(java.util.List<? extends OWLOntologyChange> changes) {
             boolean requiresReload = false;
             for (OWLOntologyChange chg : changes){
                 if (chg.getOntology().equals(currentOntology)){
@@ -72,10 +74,11 @@ public class AxiomsView extends AbstractOWLViewComponent {
         }
     };
 
-    private OWLOntology currentOntology;
+    protected OWLOntology currentOntology;
 
 
-    protected void initialiseOWLView() throws Exception {
+    @Override
+    protected void initialiseOWLView() {
         setLayout(new BorderLayout());
 
         list = new OWLAxiomTypeFramePanel(getOWLEditorKit());
@@ -95,6 +98,7 @@ public class AxiomsView extends AbstractOWLViewComponent {
     }
 
 
+    @Override
     protected void disposeOWLView() {
         getOWLModelManager().removeListener(listener);
         getOWLModelManager().removeOntologyChangeListener(ontChangeListener);

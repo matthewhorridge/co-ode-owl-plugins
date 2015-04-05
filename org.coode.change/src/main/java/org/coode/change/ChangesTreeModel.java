@@ -1,14 +1,15 @@
 package org.coode.change;
 
-import org.protege.editor.owl.model.history.HistoryManager;
-import org.semanticweb.owlapi.model.OWLOntologyChange;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import java.util.ArrayList;
-import java.util.List;
+
+import org.protege.editor.owl.model.history.HistoryManager;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
 
 /*
 * Copyright (C) 2007, University of Manchester
@@ -47,7 +48,7 @@ public class ChangesTreeModel implements TreeModel {
 
     private HistoryManager historyManager;
 
-    private List<TreeModelListener> listeners = new ArrayList<TreeModelListener>();
+    private List<TreeModelListener> listeners = new ArrayList<>();
 
     private String ROOT = "Changes since startup";
 
@@ -58,11 +59,13 @@ public class ChangesTreeModel implements TreeModel {
     }
 
 
+    @Override
     public Object getRoot() {
         return ROOT;
     }
 
 
+    @Override
     public Object getChild(Object o, int i) {
         if (o.equals(ROOT)){
             return changes.get(i);
@@ -73,6 +76,7 @@ public class ChangesTreeModel implements TreeModel {
     }
 
 
+    @Override
     public int getChildCount(Object o) {
         if (o.equals(ROOT)){
             return changes.size();
@@ -83,11 +87,13 @@ public class ChangesTreeModel implements TreeModel {
     }
 
 
+    @Override
     public boolean isLeaf(Object o) {
         return o instanceof OWLOntologyChange;
     }
 
 
+    @Override
     public void valueForPathChanged(TreePath treePath, Object o) {
         for (TreeModelListener l : listeners){
             l.treeNodesChanged(new TreeModelEvent(this, treePath));
@@ -95,6 +101,7 @@ public class ChangesTreeModel implements TreeModel {
     }
 
 
+    @Override
     public int getIndexOfChild(Object parent, Object child) {
         if (parent.equals(ROOT)){
             return changes.indexOf(child);
@@ -105,11 +112,13 @@ public class ChangesTreeModel implements TreeModel {
     }
 
 
+    @Override
     public void addTreeModelListener(TreeModelListener treeModelListener) {
         listeners.add(treeModelListener);
     }
 
 
+    @Override
     public void removeTreeModelListener(TreeModelListener treeModelListener) {
         listeners.remove(treeModelListener);
     }
