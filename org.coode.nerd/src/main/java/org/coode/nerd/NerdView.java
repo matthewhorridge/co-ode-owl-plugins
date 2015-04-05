@@ -1,11 +1,5 @@
 package org.coode.nerd;
 
-import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-
-import javax.swing.*;
-import javax.swing.border.LineBorder;
-import java.net.URL;
-import java.awt.*;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -28,6 +22,15 @@ import java.awt.*;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.net.URL;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+
+import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
 
 /**
  * Author: Nick Drummond<br>
@@ -39,7 +42,10 @@ import java.awt.*;
  */
 public class NerdView extends AbstractOWLViewComponent {
 
-    protected void initialiseOWLView() throws Exception {
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected void initialiseOWLView() {
 
         setLayout(new BorderLayout());
 
@@ -52,6 +58,7 @@ public class NerdView extends AbstractOWLViewComponent {
         add(nerdLabel, BorderLayout.CENTER);
     }
 
+    @Override
     protected void disposeOWLView() {
     }
 }
