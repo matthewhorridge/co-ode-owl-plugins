@@ -1,14 +1,8 @@
 package org.coode.shell.view;
 
-import bsh.EvalError;
-import bsh.Interpreter;
-import bsh.util.JConsole;
-import org.protege.editor.core.ui.util.UIUtil;
-import org.protege.editor.core.ui.view.DisposableAction;
-import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +29,16 @@ import java.util.HashSet;/*
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.SwingUtilities;
+
+import org.protege.editor.core.ui.util.UIUtil;
+import org.protege.editor.core.ui.view.DisposableAction;
+import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
+
+import bsh.EvalError;
+import bsh.Interpreter;
+import bsh.util.JConsole;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -44,7 +48,7 @@ import java.util.HashSet;/*
  * Date: Jun 18, 2008<br><br>
  */
 public class BeanShellView extends AbstractOWLViewComponent {
-
+    private static final long serialVersionUID = 1L;
     private Interpreter interpreter;
 
     private JConsole console;
@@ -52,27 +56,31 @@ public class BeanShellView extends AbstractOWLViewComponent {
     private File lastRunScript = null;
 
     private DisposableAction runScriptAction = new DisposableAction("Run script", null){
-
+        private static final long serialVersionUID = 1L;
+        @Override
         public void actionPerformed(ActionEvent event) {
             handleRunScript();
         }
 
+        @Override
         public void dispose() {
         }
     };
 
     private DisposableAction reRunScriptAction = new DisposableAction("Rerun script", null){
-
+        private static final long serialVersionUID = 1L;
+        @Override
         public void actionPerformed(ActionEvent event) {
             handleReRunScript();
         }
 
+        @Override
         public void dispose() {
         }
     };
 
 
-    private void handleRunScript() {
+    protected void handleRunScript() {
         Window f = (Window) SwingUtilities.getAncestorOfClass(Window.class, this);
         File file = UIUtil.openFile(f, "Select a script to run", new HashSet<String>());
         if (file != null){
@@ -83,7 +91,7 @@ public class BeanShellView extends AbstractOWLViewComponent {
     }
 
 
-    private void handleReRunScript() {
+    protected void handleReRunScript() {
         if (lastRunScript != null){
             runScript(lastRunScript);
         }
@@ -107,6 +115,7 @@ public class BeanShellView extends AbstractOWLViewComponent {
     }
 
 
+    @Override
     protected void initialiseOWLView() throws Exception {
         setLayout(new BorderLayout());
         console = new JConsole();
@@ -130,6 +139,7 @@ public class BeanShellView extends AbstractOWLViewComponent {
     }
 
 
+    @Override
     protected void disposeOWLView() {
         // do nothing
     }
