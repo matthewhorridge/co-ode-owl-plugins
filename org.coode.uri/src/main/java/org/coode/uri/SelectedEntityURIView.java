@@ -1,11 +1,5 @@
 package org.coode.uri;
 
-import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
-import org.semanticweb.owlapi.model.OWLEntity;
-import org.semanticweb.owlapi.model.OWLObject;
-
-import javax.swing.*;
-import java.awt.*;
 /*
 * Copyright (C) 2007, University of Manchester
 *
@@ -28,6 +22,13 @@ import java.awt.*;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.awt.BorderLayout;
+
+import javax.swing.JTextField;
+
+import org.protege.editor.owl.ui.view.AbstractOWLSelectionViewComponent;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObject;
 
 /**
  * Author: drummond<br>
@@ -38,16 +39,18 @@ import java.awt.*;
  * Date: Mar 3, 2009<br><br>
  */
 public class SelectedEntityURIView extends AbstractOWLSelectionViewComponent {
-
+    private static final long serialVersionUID = 1L;
     private JTextField uriComponent;
 
-    public void initialiseView() throws Exception {
+    @Override
+    public void initialiseView() {
         setLayout(new BorderLayout(6, 6));
         uriComponent = new JTextField();
         uriComponent.setEditable(false);
         add(uriComponent, BorderLayout.NORTH);
     }
 
+    @Override
     protected OWLObject updateView() {
         uriComponent.setText("");
         OWLEntity selEntity = getOWLWorkspace().getOWLSelectionModel().getSelectedEntity();
@@ -57,6 +60,7 @@ public class SelectedEntityURIView extends AbstractOWLSelectionViewComponent {
         return selEntity;
     }
 
+    @Override
     public void disposeView() {
         // do nothing
     }
