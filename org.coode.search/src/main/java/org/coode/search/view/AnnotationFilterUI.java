@@ -1,17 +1,5 @@
 package org.coode.search.view;
 
-import org.coode.search.model.AnnotationFinder;
-import org.coode.search.ui.FlatButton;
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.OWLIcons;
-import org.protege.editor.owl.ui.UIHelper;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLAnnotationProperty;
-import org.semanticweb.owlapi.model.OWLOntology;
-
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collections;
@@ -39,6 +27,26 @@ import java.util.Set;/*
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JTextField;
+import javax.swing.Timer;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import org.coode.search.model.AnnotationFinder;
+import org.coode.search.ui.FlatButton;
+import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.OWLIcons;
+import org.protege.editor.owl.ui.UIHelper;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLAnnotationProperty;
+import org.semanticweb.owlapi.model.OWLOntology;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -48,37 +56,40 @@ import java.util.Set;/*
  * Date: Jun 26, 2008<br><br>
  */
 public class AnnotationFilterUI extends JComponent {
+    private static final long serialVersionUID = 1L;
 
     private static final String ALL_ANNOTATIONS = "All annotations";
 
     // implement a wait after each keypress
     private static final int SEARCH_PAUSE_MILLIS = 1000;
 
-    private Timer timer;
+    protected Timer timer;
 
     private Thread currentSearch;
 
-    private Set<OWLAnnotationAssertionAxiom> results = new HashSet<OWLAnnotationAssertionAxiom>();
+    private Set<OWLAnnotationAssertionAxiom> results = new HashSet<>();
 
     private Runnable searcher = new Runnable(){
+        @Override
         public void run() {
             handleSearch();
         }
     };
 
-    private OWLEditorKit eKit;
+    protected OWLEditorKit eKit;
 
     private ResultsView resultsView;
 
     private JCheckBox regexpCheckbox;
     private JTextField searchField;
 
-    private JButton propertySelectButton;
+    protected JButton propertySelectButton;
 
-    private OWLAnnotationProperty filterByProperty;
+    protected OWLAnnotationProperty filterByProperty;
 
     private ActionListener actionListener = new ActionListener(){
 
+        @Override
         public void actionPerformed(ActionEvent actionEvent) {
             startSearch();
         }
@@ -87,14 +98,17 @@ public class AnnotationFilterUI extends JComponent {
 
     private DocumentListener searchFieldChangeListener = new DocumentListener(){
 
+        @Override
         public void insertUpdate(DocumentEvent documentEvent) {
             timer.restart();
         }
 
+        @Override
         public void removeUpdate(DocumentEvent documentEvent) {
             timer.restart();
         }
 
+        @Override
         public void changedUpdate(DocumentEvent documentEvent) {
             timer.restart();
         }
@@ -102,7 +116,8 @@ public class AnnotationFilterUI extends JComponent {
 
 
     private Action propertySelectAction = new AbstractAction(ALL_ANNOTATIONS, OWLIcons.getIcon("property.annotation.png")){
-
+        private static final long serialVersionUID = 1L;
+        @Override
         public void actionPerformed(ActionEvent event) {
             filterByProperty = new UIHelper(eKit).pickAnnotationProperty();
             if (filterByProperty != null){
@@ -158,7 +173,7 @@ public class AnnotationFilterUI extends JComponent {
     }
     
 
-    private void handleSearch() {
+    protected void handleSearch() {
         String str = searchField.getText();
 
         if (str != null && str.length() > 0){
@@ -207,7 +222,7 @@ public class AnnotationFilterUI extends JComponent {
 
 
     public Set<OWLAnnotationProperty> getAllAnnotationProperties() {
-        Set<OWLAnnotationProperty> allAnnotationProperties = new HashSet<OWLAnnotationProperty>();
+        Set<OWLAnnotationProperty> allAnnotationProperties = new HashSet<>();
         for (OWLOntology ont : eKit.getOWLModelManager().getActiveOntologies()){
             allAnnotationProperties.addAll(ont.getAnnotationPropertiesInSignature());
         }

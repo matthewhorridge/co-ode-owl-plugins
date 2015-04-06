@@ -1,10 +1,7 @@
 package org.coode.search.ui;
 
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 /*
@@ -30,6 +27,12 @@ import java.awt.event.MouseEvent;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.Action;
+import javax.swing.JButton;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -39,18 +42,21 @@ import java.awt.event.MouseEvent;
  * Date: Jul 29, 2009<br><br>
  */
 public class FlatButton extends JButton {
+    private static final long serialVersionUID = 1L;
 
         public final Border MOUSE_OVER_BORDER = new LineBorder(Color.BLACK, 1);
         public final Border MOUSE_OUT_BORDER = new EmptyBorder(1, 1, 1, 1);
-        private Color normalBackground;
+        protected Color normalBackground;
 
         public FlatButton(Action action) {
             super(action);
             addMouseListener(new MouseAdapter(){
+                @Override
                 public void mouseEntered(MouseEvent event) {
                     setBorder(MOUSE_OVER_BORDER);
                     setBackground(Color.LIGHT_GRAY);
                 }
+                @Override
                 public void mouseExited(MouseEvent event) {
                     setBorder(MOUSE_OUT_BORDER);
                     setBackground(normalBackground);
@@ -61,6 +67,7 @@ public class FlatButton extends JButton {
         }
 
 
+    @Override
     public Dimension getPreferredSize() {
         return new Dimension(super.getPreferredSize().width + 10, 20);
     }

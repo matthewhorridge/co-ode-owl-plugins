@@ -1,18 +1,10 @@
 package org.coode.search.view;
 
-import org.coode.search.ResultsTreeCellRenderer;
-import org.coode.search.ui.FlatButton;
-import org.protege.editor.owl.ui.tree.OWLLinkedObjectTree;
-import org.protege.editor.owl.ui.view.AbstractActiveOntologyViewComponent;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLOntology;
-
-import javax.swing.*;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.event.ActionEvent;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 /*
 * Copyright (C) 2007, University of Manchester
@@ -36,6 +28,23 @@ import java.util.List;
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.AbstractAction;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+
+import org.coode.search.ResultsTreeCellRenderer;
+import org.coode.search.ui.FlatButton;
+import org.protege.editor.owl.ui.tree.OWLLinkedObjectTree;
+import org.protege.editor.owl.ui.view.AbstractActiveOntologyViewComponent;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLOntology;
 
 /**
  * Author: drummond<br>
@@ -46,21 +55,20 @@ import java.util.List;
  * Date: Mar 18, 2008<br><br>
  */
 public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent implements ResultsView {
+    private static final long serialVersionUID = 1L;
 
-    private List<AnnotationFilterUI> filters = new ArrayList<AnnotationFilterUI>();
+    protected List<AnnotationFilterUI> filters = new ArrayList<>();
 
     private OWLLinkedObjectTree resultsTree;
 
-    private JComponent filterPanel;
+    protected JComponent filterPanel;
 
-    private Map<AnnotationFilterUI, Set<OWLAnnotationAssertionAxiom>> resultsMap = new HashMap<AnnotationFilterUI, Set<OWLAnnotationAssertionAxiom>>();
+    protected Map<AnnotationFilterUI, Set<OWLAnnotationAssertionAxiom>> resultsMap = new HashMap<>();
 
     private ResultsTreeCellRenderer cellRenderer;
 
-    private JScrollPane scroller;
-
-
-    protected void initialiseOntologyView() throws Exception {
+    @Override
+    protected void initialiseOntologyView() {
         setLayout(new BorderLayout());
 
         resultsTree = new OWLLinkedObjectTree(getOWLEditorKit());
@@ -80,6 +88,7 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
     }
 
 
+    @Override
     protected void disposeOntologyView() {
         for (AnnotationFilterUI filter : filters){
             filter.dispose();
@@ -87,19 +96,22 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
     }
 
 
-    protected synchronized void updateView(OWLOntology activeOntology) throws Exception {
+    @Override
+    protected synchronized void updateView(OWLOntology activeOntology) {
         for (AnnotationFilterUI filter : filters){
             filter.startSearch();
         }
     }
 
 
-    private void addFilter(int index) {
+    protected void addFilter(int index) {
         final AnnotationFilterUI filter = new AnnotationFilterUI(this, getOWLEditorKit());
         final JComponent filterHolder = new JPanel();
         filterHolder.setLayout(new BoxLayout(filterHolder, BoxLayout.LINE_AXIS));
         filterHolder.add(filter);
         filterHolder.add(new FlatButton(new AbstractAction("-"){
+            private static final long serialVersionUID = 1L;
+            @Override
             public void actionPerformed(ActionEvent event) {
                 if (filters.size() > 1){
                     filters.remove(filter);
@@ -112,6 +124,8 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
             }
         }));
         filterHolder.add(new FlatButton(new AbstractAction("+"){
+            private static final long serialVersionUID = 1L;
+            @Override
             public void actionPerformed(ActionEvent event) {
                 // add after the current one
                 addFilter(filters.indexOf(filter)+1);
@@ -132,14 +146,15 @@ public class SearchAnnotationsView extends AbstractActiveOntologyViewComponent i
     }
 
 
+    @Override
     public void resultsChanged(AnnotationFilterUI filterUI) {
         resultsMap.put(filterUI, filterUI.getResults());
         refresh();
     }
 
 
-    private void refresh() {
-        List<Set<OWLAnnotationAssertionAxiom>> results = new ArrayList<Set<OWLAnnotationAssertionAxiom>>();
+    protected void refresh() {
+        List<Set<OWLAnnotationAssertionAxiom>> results = new ArrayList<>();
         cellRenderer.clearSearches();
         for (AnnotationFilterUI filter : filters){
             final String search = filter.getSearchText();

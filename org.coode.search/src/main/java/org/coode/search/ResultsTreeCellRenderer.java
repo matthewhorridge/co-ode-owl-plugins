@@ -1,13 +1,6 @@
 package org.coode.search;
 
-import org.protege.editor.owl.OWLEditorKit;
-import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
-
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-import java.awt.*;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +30,14 @@ import java.util.regex.Pattern;
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+
+import org.protege.editor.owl.OWLEditorKit;
+import org.protege.editor.owl.ui.renderer.OWLCellRenderer;
+
 /**
  * Author: drummond<br>
  * http://www.cs.man.ac.uk/~drummond/<br><br>
@@ -47,9 +48,9 @@ import java.util.regex.Pattern;
  */
 public class ResultsTreeCellRenderer extends OWLCellRenderer {
 
-    private List<String> searches = new ArrayList<String>();
+    private List<String> searches = new ArrayList<>();
 
-    private Map<String, Color> colourMap = new HashMap<String, Color>();
+    private Map<String, Color> colourMap = new HashMap<>();
 
     private Color[] colours = new Color[]{
             Color.yellow,
@@ -73,6 +74,7 @@ public class ResultsTreeCellRenderer extends OWLCellRenderer {
     }
 
 
+    @Override
     protected void highlightText(StyledDocument doc) {
         super.highlightText(doc);
 

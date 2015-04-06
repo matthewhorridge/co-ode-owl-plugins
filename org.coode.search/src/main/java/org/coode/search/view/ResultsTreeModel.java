@@ -1,15 +1,6 @@
 package org.coode.search.view;
 
-import org.protege.editor.owl.model.OWLModelManager;
-import org.semanticweb.owlapi.model.IRI;
-import org.semanticweb.owlapi.model.OWLAnnotation;
-import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
-import org.semanticweb.owlapi.model.OWLEntity;
-
-import javax.swing.event.TreeModelListener;
-import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreePath;
-import java.util.*;/*
+/*
 * Copyright (C) 2007, University of Manchester
 *
 * Modifications to the initial code base are copyright of their
@@ -31,6 +22,26 @@ import java.util.*;/*
 * License along with this library; if not, write to the Free Software
 * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.swing.event.TreeModelListener;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreePath;
+
+import org.protege.editor.owl.model.OWLModelManager;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotationAssertionAxiom;
+import org.semanticweb.owlapi.model.OWLEntity;
+import org.semanticweb.owlapi.model.OWLObject;
 
 /**
  * Author: drummond<br>
@@ -42,11 +53,11 @@ import java.util.*;/*
  */
 public class ResultsTreeModel implements TreeModel {
 
-    private Comparator comparator;
+    private Comparator<OWLObject> comparator;
 
     private List<Set<OWLAnnotationAssertionAxiom>> results;
 
-    final Map<OWLEntity, Set<OWLAnnotation>> entityAnnotationsMap = new HashMap<OWLEntity, Set<OWLAnnotation >>();
+    final Map<OWLEntity, Set<OWLAnnotation>> entityAnnotationsMap = new HashMap<>();
 
     private List<OWLEntity> sortedEntities;
 
@@ -63,7 +74,7 @@ public class ResultsTreeModel implements TreeModel {
     }
 
 
-    public void setComparator(Comparator comparator){
+    public void setComparator(Comparator<OWLObject> comparator){
         this.comparator = comparator;
     }
 
@@ -80,7 +91,7 @@ public class ResultsTreeModel implements TreeModel {
                         for (OWLEntity entity : mngr.getOWLEntityFinder().getEntities(subjectIRI)){
                             Set<OWLAnnotation> annotations = entityAnnotationsMap.get(entity);
                             if (annotations == null){
-                                annotations = new HashSet<OWLAnnotation>();
+                                annotations = new HashSet<>();
                             }
                             annotations.add(ax.getAnnotation());
                             entityAnnotationsMap.put(entity, annotations);
@@ -90,7 +101,7 @@ public class ResultsTreeModel implements TreeModel {
                 }
                 else{
                     if (!entityAnnotationsMap.isEmpty()){ // don't bother getting any more unless there is something already in the set
-                        Set<OWLEntity> markedEntities = new HashSet<OWLEntity>();
+                        Set<OWLEntity> markedEntities = new HashSet<>();
                         for (OWLAnnotationAssertionAxiom ax : result){
                             IRI subjectIRI = (IRI)ax.getSubject(); // we know this must be on an IRI already
                             for (OWLEntity entity : mngr.getOWLEntityFinder().getEntities(subjectIRI)){
@@ -116,21 +127,23 @@ public class ResultsTreeModel implements TreeModel {
         }
 
         // sort the entities once (as this will always have to be done)
-        sortedEntities = new ArrayList<OWLEntity>(entityAnnotationsMap.keySet());
+        sortedEntities = new ArrayList<>(entityAnnotationsMap.keySet());
         if (comparator != null){
             Collections.sort(sortedEntities, comparator);
         }
     }
 
 
+    @Override
     public Object getRoot() {
         return "results (" + entityAnnotationsMap.size() + ")";
     }
 
 
+    @Override
     public Object getChild(Object o, int i) {
         if (o instanceof OWLEntity){
-            final List<OWLAnnotation> l = new ArrayList<OWLAnnotation>(entityAnnotationsMap.get(o));
+            final List<OWLAnnotation> l = new ArrayList<>(entityAnnotationsMap.get(o));
             if (comparator != null){
                 Collections.sort(l, comparator);
             }
@@ -143,6 +156,7 @@ public class ResultsTreeModel implements TreeModel {
     }
 
 
+    @Override
     public int getChildCount(Object o) {
         if (o instanceof OWLEntity){
             return entityAnnotationsMap.get(o).size();
@@ -154,19 +168,22 @@ public class ResultsTreeModel implements TreeModel {
     }
 
 
+    @Override
     public boolean isLeaf(Object o) {
         return o instanceof OWLAnnotation || entityAnnotationsMap.isEmpty();
     }
 
 
+    @Override
     public void valueForPathChanged(TreePath treePath, Object o) {
         // do nothing
     }
 
 
+    @Override
     public int getIndexOfChild(Object parent, Object child) {
         if (parent instanceof OWLEntity){
-            final List<OWLAnnotation> l = new ArrayList<OWLAnnotation>(entityAnnotationsMap.get(parent));
+            final List<OWLAnnotation> l = new ArrayList<>(entityAnnotationsMap.get(parent));
             if (comparator != null){
                 Collections.sort(l, comparator);
             }
@@ -179,11 +196,13 @@ public class ResultsTreeModel implements TreeModel {
     }
 
 
+    @Override
     public void addTreeModelListener(TreeModelListener treeModelListener) {
         // do nothing
     }
 
 
+    @Override
     public void removeTreeModelListener(TreeModelListener treeModelListener) {
         // do nothing
     }

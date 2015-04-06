@@ -54,7 +54,7 @@ public class AnnotationFinder {
     }
 
     public Set<OWLAnnotationAssertionAxiom> getAnnotationAxioms(Set<OWLAnnotationProperty> properties, String str, Set<OWLOntology> onts) {
-        annotAxioms = new HashSet<OWLAnnotationAssertionAxiom>();
+        annotAxioms = new HashSet<>();
 
         Pattern pattern = null;
         try{
