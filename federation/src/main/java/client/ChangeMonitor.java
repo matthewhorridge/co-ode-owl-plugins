@@ -14,7 +14,7 @@ import org.semanticweb.owlapi.model.OWLOntologyChangeListener;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
-import test.ReverseChangeGenerator;
+import changeServerPackage.ReverseChangeGenerator;
 import fileManagerPackage.TagReader;
 
 /**
@@ -26,13 +26,13 @@ import fileManagerPackage.TagReader;
  * synchronizing with the server. Changes can also be saved out to file (and reloaded) from this object.
  */
 public class ChangeMonitor implements OWLOntologyChangeListener {
-    public List<OWLOntologyChange> recordedChanges = new ArrayList<OWLOntologyChange>();
+    public List<List<OWLOntologyChange>> recordedChanges = new ArrayList<>();
     protected OWLOntology ontology;
 
     private boolean active = true; //sets if this listener is currently actively listening for changes ('true' by default)
 
     /** initiallizes a change monitor object with an existing list of changes (from the history manager, or elsewhere) */
-    public ChangeMonitor(OWLOntology ontology, List<OWLOntologyChange> initialChanges) {
+    public ChangeMonitor(OWLOntology ontology, List<List<OWLOntologyChange>> initialChanges) {
         this.ontology = ontology;
 
         if (ontology != null && initialChanges != null) {
@@ -51,16 +51,16 @@ public class ChangeMonitor implements OWLOntologyChangeListener {
     }
 
     /* returns the stored changes for publishing */
-    public List<OWLOntologyChange> getChanges() {
+    public List<List<OWLOntologyChange>> getChanges() {
         return recordedChanges;
     }
 
 
 
     /** read the change sequence number of an ontology */
-    protected Long getOntologySequenceNumber(OWLOntology ontology) {
+    protected Long getOntologySequenceNumber(OWLOntology o) {
         Long number = null;
-        Set<OWLAnnotation> allAnnotations = ontology.getAnnotations();
+        Set<OWLAnnotation> allAnnotations = o.getAnnotations();
         for (OWLAnnotation annotation : allAnnotations) {
             if (annotation.getProperty().getIRI()
                     .compareTo(OWLRDFVocabulary.OWL_VERSION_INFO.getIRI()) == 0) {
@@ -80,14 +80,19 @@ public class ChangeMonitor implements OWLOntologyChangeListener {
     @Override
     public void ontologiesChanged(List<? extends OWLOntologyChange> changes) throws OWLException {
         if (active) {
-            for(OWLOntologyChange change : changes) {
-                if (change.getOntology().equals(ontology)) { //only monitor changes on this object's ontology
-                    recordedChanges.add(change);
-                }
-            }
+            recordedChanges.add(filter(changes));
         }
     }
 
+    public List<OWLOntologyChange> filter(List<? extends OWLOntologyChange> changes){
+        List<OWLOntologyChange> toReturn=new ArrayList<>();
+        for(OWLOntologyChange c:changes) {
+            if(c.getOntology()==ontology) {
+                toReturn.add(c);
+            }
+        }
+        return toReturn;
+    }
     /** sets whether or not this listener temporary stops listening to changes being made to the ontology */
     public void setEnabled(boolean enabled) {
         active = enabled;
@@ -109,12 +114,12 @@ public class ChangeMonitor implements OWLOntologyChangeListener {
         setEnabled(false);
 
         //undo changes
-        ArrayList<OWLOntologyChange> undoChanges = new ArrayList<OWLOntologyChange>(recordedChanges.size());
-        for(OWLOntologyChange change : recordedChanges) {
-            ReverseChangeGenerator gen = new ReverseChangeGenerator();
-            change.accept(gen);
-            // Reverse the order
-            undoChanges.add(0, gen.getReverseChange());
+        ReverseChangeGenerator reverser=new ReverseChangeGenerator();
+        List<OWLOntologyChange> undoChanges = new ArrayList<>(recordedChanges.size());
+        for(List<OWLOntologyChange> l:recordedChanges) {
+            for(OWLOntologyChange c:l) {
+                undoChanges.add(c.accept(reverser));
+            }
         }
         // Apply the undo changes
         manager.applyChanges(undoChanges);

@@ -1,10 +1,9 @@
-package test;
-
+package changeServerPackage;
 import org.semanticweb.owlapi.model.AddAxiom;
 import org.semanticweb.owlapi.model.AddImport;
 import org.semanticweb.owlapi.model.AddOntologyAnnotation;
 import org.semanticweb.owlapi.model.OWLOntologyChange;
-import org.semanticweb.owlapi.model.OWLOntologyChangeVisitor;
+import org.semanticweb.owlapi.model.OWLOntologyChangeVisitorEx;
 /*
  * Copyright (C) 2007, University of Manchester
  *
@@ -39,55 +38,47 @@ import org.semanticweb.owlapi.model.SetOntologyID;
  * Bio-Health Informatics Group<br>
  * Date: 16-Jan-2007<br><br>
  */
-public class ReverseChangeGenerator implements OWLOntologyChangeVisitor {
+public class ReverseChangeGenerator implements OWLOntologyChangeVisitorEx<OWLOntologyChange> {
 
-    private OWLOntologyChange reverseChange;
-
-
-    public OWLOntologyChange getReverseChange() {
-        return reverseChange;
+    @Override
+    public OWLOntologyChange visit(AddAxiom change) {
+        return new RemoveAxiom(change.getOntology(), change.getAxiom());
     }
 
 
     @Override
-    public void visit(AddAxiom change) {
-        reverseChange = new RemoveAxiom(change.getOntology(), change.getAxiom());
+    public OWLOntologyChange visit(RemoveAxiom change) {
+        return new AddAxiom(change.getOntology(), change.getAxiom());
     }
 
 
     @Override
-    public void visit(RemoveAxiom change) {
-        reverseChange = new AddAxiom(change.getOntology(), change.getAxiom());
-    }
-
-
-    @Override
-    public void visit(SetOntologyID change) {
-        reverseChange = new SetOntologyID(change.getOntology(),
+    public OWLOntologyChange visit(SetOntologyID change) {
+        return new SetOntologyID(change.getOntology(),
                 change.getOriginalOntologyID());
     }
 
     @Override
-    public void visit(AddImport change) {
-        reverseChange = new RemoveImport(change.getOntology(),
+    public OWLOntologyChange visit(AddImport change) {
+        return new RemoveImport(change.getOntology(),
                 change.getImportDeclaration());
     }
 
     @Override
-    public void visit(RemoveImport change) {
-        reverseChange = new AddImport(change.getOntology(),
+    public OWLOntologyChange visit(RemoveImport change) {
+        return new AddImport(change.getOntology(),
                 change.getImportDeclaration());
     }
 
     @Override
-    public void visit(AddOntologyAnnotation change) {
-        reverseChange = new RemoveOntologyAnnotation(change.getOntology(),
+    public OWLOntologyChange visit(AddOntologyAnnotation change) {
+        return new RemoveOntologyAnnotation(change.getOntology(),
                 change.getAnnotation());
     }
 
     @Override
-    public void visit(RemoveOntologyAnnotation change) {
-        reverseChange = new AddOntologyAnnotation(change.getOntology(),
+    public OWLOntologyChange visit(RemoveOntologyAnnotation change) {
+        return new AddOntologyAnnotation(change.getOntology(),
                 change.getAnnotation());
     }
 }

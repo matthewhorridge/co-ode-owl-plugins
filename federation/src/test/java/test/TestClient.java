@@ -10,6 +10,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -29,6 +30,7 @@ import org.semanticweb.owlapi.util.SimpleIRIMapper;
 
 import changeServerPackage.ApplyChangesServlet;
 import changeServerPackage.ChangeCapsule;
+import changeServerPackage.ReverseChangeGenerator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -89,14 +91,9 @@ public class TestClient {
     /** deletes changes from client, so they can be downloaded from the server again and be property integrated (in the right order) */
     private void undoChanges(List<OWLOntologyChange> existingChanges) throws OWLOntologyChangeException {
         ArrayList<OWLOntologyChange> changesToUndo = new ArrayList<OWLOntologyChange>(existingChanges.size());
-
-        int i = existingChanges.size()-1;
-        while(i >= 0) {
-            OWLOntologyChange changeUndo = existingChanges.get(i);
-            ReverseChangeGenerator gen = new ReverseChangeGenerator();
-            changeUndo.accept(gen);
-            changesToUndo.add(gen.getReverseChange());
-            i--;
+        ReverseChangeGenerator gen = new ReverseChangeGenerator();
+        for(OWLOntologyChange changeUndo: existingChanges) {
+            changesToUndo.add(changeUndo.accept(gen));
         }
 
         manager.applyChanges(changesToUndo);
@@ -191,7 +188,7 @@ public class TestClient {
 
 
     /** queries the current ontology as to it's change sequence number */
-    public long getOntologySequenceNumber(OWLOntology ontology) {
+    public long getOntologySequenceNumber(OWLOntology o) {
         return -1;
     }
 
@@ -205,7 +202,7 @@ public class TestClient {
             List<OWLOntologyChange> changeObjects = client.applyNewChange();
 
             //record changes in changeCapsule object
-            ChangeCapsule changeSet = new ChangeCapsule(changeObjects); //create new object encapsulating all that changes made to the ontology
+            ChangeCapsule changeSet = new ChangeCapsule(Collections.singletonList(changeObjects)); //create new object encapsulating all that changes made to the ontology
             changeSet.setUsername(InetAddress.getLocalHost().getHostName());
             changeSet.setSequence(1);
             changeSet.setSummary("This is a test summary for a change");

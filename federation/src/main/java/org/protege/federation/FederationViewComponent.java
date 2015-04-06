@@ -1,35 +1,53 @@
 package org.protege.federation;
 
-import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
-import org.protege.editor.owl.model.OWLModelManager;
-import org.protege.editor.owl.model.history.HistoryManagerImpl;
-import org.protege.editor.core.prefs.PreferencesManager;
-import org.protege.editor.core.prefs.Preferences;
-import org.semanticweb.owlapi.model.OWLOntology;
-import org.semanticweb.owlapi.model.OWLOntologyChangeException;
-import org.semanticweb.owlapi.model.OWLOntologyCreationException;
-import org.semanticweb.owlapi.model.OWLOntologyChange;
-import org.semanticweb.owl.util.SimpleURIShortFormProvider;
-
-import javax.swing.*;
-import java.awt.event.ActionListener;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.*;
-import java.util.Set;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
-import java.net.*;
-import java.io.IOException;
-import java.io.File;
-import java.io.PrintWriter;
-import java.io.FileNotFoundException;
+import java.util.Map;
+import java.util.Set;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+
+import org.protege.editor.core.prefs.Preferences;
+import org.protege.editor.core.prefs.PreferencesManager;
+import org.protege.editor.owl.model.OWLModelManager;
+import org.protege.editor.owl.model.history.HistoryManager;
+import org.protege.editor.owl.ui.view.AbstractOWLViewComponent;
+import org.semanticweb.owlapi.model.IRI;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyID;
+import org.semanticweb.owlapi.util.SimpleIRIShortFormProvider;
+
+import changeServerPackage.ChangeCapsule;
+import changeServerPackage.ChangeConflictException;
 import client.ChangeMonitor;
 import client.OperationsClient;
-import changeServerPackage.ChangeConflictException;
-import changeServerPackage.ChangeCapsule;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,9 +60,9 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
 
     private OWLModelManager manager;
     private ChangeSaverLoader changeSaverLoader;    //loader dialog boxes for the saving and loading of serialized changes
-    private static HashMap<String, ChangeMonitor> changeMonitors = new HashMap<String, ChangeMonitor>(1); //map between ontology URIs and their corrosponding change monitors
-    private static HashMap<String, VersioningStrategy> versioningStrategies = new HashMap<String, VersioningStrategy>(1); //map between ontology URIs and their corrosponding change monitors
-    private static HashMap<String, ChangeCountUpdater> changeCountUpdaters = new HashMap<String, ChangeCountUpdater>(1);    //detects changes and updates the change count appropriately
+    private static Map<OWLOntologyID, ChangeMonitor> changeMonitors = new HashMap<>(1); //map between ontology URIs and their corrosponding change monitors
+    private static Map<OWLOntologyID, VersioningStrategy> versioningStrategies = new HashMap<>(1); //map between ontology URIs and their corrosponding change monitors
+    private static Map<OWLOntologyID, ChangeCountUpdater> changeCountUpdaters = new HashMap<>(1);    //detects changes and updates the change count appropriately
     private OperationsClient operationsClient = null;
 
     protected JTextField serverField;
@@ -59,7 +77,7 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
     protected JLabel serverChangeSummary;
     protected JLabel serverChangeAuthor;
     protected JLabel serverChangeTimestamp;*/
-    protected static HashMap<String, LabelSet> labelSets = new HashMap<String, LabelSet>(1);    //encapsulates all the above labels and controls
+    protected static Map<OWLOntologyID, LabelSet> labelSets = new HashMap<>(1);    //encapsulates all the above labels and controls
 
     private static final int XGRIDSPACING = 10;
     private static final int YGRIDSPACING = 10;
@@ -67,8 +85,8 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
 
     /** remove any listeners added to this tab */
     protected void disposeOWLView() {
-        Set<String> ontologyURIs = changeMonitors.keySet();
-        for(String uri : ontologyURIs)
+        Set<OWLOntologyID> ontologyURIs = changeMonitors.keySet();
+        for(OWLOntologyID uri : ontologyURIs)
         manager.removeOntologyChangeListener(changeMonitors.get(uri));
     }
 
@@ -144,18 +162,18 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
         initialPanel.add(serverConnector, BorderLayout.NORTH);
 
         //build the tabbed pane for each ontology
-        SimpleURIShortFormProvider shortener = new SimpleURIShortFormProvider();
+        SimpleIRIShortFormProvider shortener = new SimpleIRIShortFormProvider();
         JTabbedPane tabbedPane = new JTabbedPane();
         Set<OWLOntology> ontologies =  manager.getOntologies();
         for(OWLOntology onto : ontologies) {
-            final String ontoURI = onto.getURI().toString();
+            final OWLOntologyID ontoURI = onto.getOntologyID();
 
             //use or create a new ChangeMonitor for each loaded ontology
             final ChangeMonitor changeMonitor;
             if (!changeMonitors.containsKey(ontoURI)) {
-                HistoryManagerImpl historyManager = (HistoryManagerImpl)manager.getHistoryManager();
+                HistoryManager historyManager = (HistoryManager)manager.getHistoryManager();
 
-                changeMonitor = new ChangeMonitor(onto, historyManager.getChanges());
+                changeMonitor = new ChangeMonitor(onto, historyManager.getLoggedChanges());
                 changeMonitors.put(ontoURI, changeMonitor);
             } else {
                 changeMonitor = changeMonitors.get(ontoURI);
@@ -315,7 +333,8 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
             tabContents.add(serverControlsPanel);
 
             tab.add(tabContents, BorderLayout.CENTER);
-            tabbedPane.addTab(shortener.getShortForm(onto.getURI()), null, tab, onto.getURI().toString()); //tooltip of complete URI, name of just the last bit of the URI
+            IRI i=onto.getOntologyID().getOntologyIRI().orNull();
+            tabbedPane.addTab(shortener.getShortForm(i), null, tab, i.toString()); //tooltip of complete URI, name of just the last bit of the URI
         }
         initialPanel.add(tabbedPane, BorderLayout.SOUTH);
 
@@ -323,7 +342,7 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
     }
 
     /** publishes the changes recorded so far*/
-    protected void publishChanges(String ontoURL) {
+    protected void publishChanges(OWLOntologyID ontoURL) {
         checkOperationsClient();
 
         try {
@@ -361,13 +380,13 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
     }
 
     /** queries the server for the state of the latest change */
-    protected void queryChanges(String ontoURL) {
+    protected void queryChanges(OWLOntologyID ontoURL) {
         checkOperationsClient();
 
         if (changeMonitors.containsKey(ontoURL) && labelSets.containsKey(ontoURL)) {  //basic sanity check to make sure the ontology is actually being change tracked
             try {
                 Long latestVersion = changeMonitors.get(ontoURL).getLatestVersionNumber();
-                OWLOntology ontology = manager.getOWLOntologyManager().getOntology(new URI(ontoURL));
+                OWLOntology ontology = manager.getOWLOntologyManager().getOntology(ontoURL);
                 LabelSet labelSet = labelSets.get(ontoURL);
 
                 //fetch the latest change
@@ -381,9 +400,6 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
             } catch (IOException e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, e.toString(), "I/O Error", JOptionPane.ERROR_MESSAGE);
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                JOptionPane.showMessageDialog(this, e.toString(), "Ontology URI not found", JOptionPane.ERROR_MESSAGE);
             }
         } else {
             JOptionPane.showMessageDialog(this, "No ontology found", "Ontology URI not found", JOptionPane.ERROR_MESSAGE);
@@ -393,7 +409,7 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
     /** downloads all new changes from the server and integrates them into the current ontology.
      * This method executes four different types of operations depending on the state of the local model
      * and the state of the model on the server. */
-    protected void downloadChanges(String ontoURL) {
+    protected void downloadChanges(OWLOntologyID ontoURL) {
         if (changeMonitors.containsKey(ontoURL)) {  //basic sanity check to make sure the ontology is actually being change tracked
 
             ChangeMonitor cm = changeMonitors.get(ontoURL); //fetch the correct change monitor for this ontology
@@ -444,7 +460,7 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
      * (if this is called as part of the "publish changes" function,
      * then changes will be re-applied once the new state of the ontology
      * is downloaded from the server after publishing) */
-    protected void clearChanges(String ontoURL) {
+    protected void clearChanges(OWLOntologyID ontoURL) {
         if (changeMonitors.containsKey(ontoURL)) {
             try {
                 Integer preDeleteCount = 0;
@@ -460,14 +476,14 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
     }
 
     /** saves all changes recorded so far into a changeCapsule in a file (so they can be loaded later) */
-    protected void saveChanges(String ontoURL) {
+    protected void saveChanges(OWLOntologyID ontoURL) {
         if (changeMonitors.containsKey(ontoURL)) {
             try {
                 ChangeMonitor cm = changeMonitors.get(ontoURL);
 
                 File toSave = changeSaverLoader.saveFile("changes"+cm.getLatestVersionNumber()+".txt"); //get file
 
-                List<OWLOntologyChange> changes = cm.getChanges();
+                List<List<OWLOntologyChange>> changes = cm.getChanges();
                 ChangeCapsule capsule = new ChangeCapsule(changes);
                 String changeText = capsule.toJSON();
                 PrintWriter pw = new PrintWriter(toSave);
@@ -480,7 +496,7 @@ public class FederationViewComponent extends AbstractOWLViewComponent {
     }
 
     /** loads a saved set of changes from a changeCapsule file and applies them on the current ontology */
-    protected void loadChanges(String ontoURL) {
+    protected void loadChanges(OWLOntologyID ontoURL) {
         File toOpen = changeSaverLoader.openFile();
     }
 

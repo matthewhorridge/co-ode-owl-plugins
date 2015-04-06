@@ -25,30 +25,30 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 import com.google.common.base.Optional;
 
 /**
- * Created by IntelliJ IDEA.
- * User: candidasa
- * Date: Jan 14, 2008
- * Time: 3:14:52 PM
- * Object to store all the metadata and actual data about a change. It can export/import itself
- * into a serialized JSON and/or XML format.
+ * Created by IntelliJ IDEA. User: candidasa Date: Jan 14, 2008 Time: 3:14:52 PM
+ * Object to store all the metadata and actual data about a change. It can
+ * export/import itself into a serialized JSON and/or XML format.
  */
 public class ChangeCapsule {
 
     protected String username = null;
-    //the timestamp refers to the time the server received the change, this fits better with the model of change and avoids complications between different timezones
-    protected String timestamp = null; 
+    // the timestamp refers to the time the server received the change, this
+    // fits better with the model of change and avoids complications between
+    // different timezones
+    protected String timestamp = null;
     protected String summary = "";
-    //no initial value, a change must always have a ChangeObject
-    protected List<String> changes;  
-    //the ontology URIs each change applies to
-    protected List<OWLOntologyID> changesOntologies;  
-    //sequence number of this change (-1 = unassigned); this is assigned when the change is written to file on the server
-    protected long sequence = -1;    
-    //uri of the ontology this change object primarily applies to
-    protected String ontologyURI = null;   
-    //parser for use in converting XML OWL serialization into an actual OWL object
+    // no initial value, a change must always have a ChangeObject
+    protected List<String> changes;
+    // the ontology URIs each change applies to
+    protected List<OWLOntologyID> changesOntologies;
+    // sequence number of this change (-1 = unassigned); this is assigned when
+    // the change is written to file on the server
+    protected long sequence = -1;
+    // uri of the ontology this change object primarily applies to
+    protected OWLOntologyID ontologyURI = null;
+    // parser for use in converting XML OWL serialization into an actual OWL
+    // object
     private SAXParser parser = null;
-
 
     /**
      * create an empty change capsule for querying and updating. This
@@ -58,16 +58,17 @@ public class ChangeCapsule {
     public ChangeCapsule() {}
 
     /** create a new change object from a list of changes */
-    public ChangeCapsule(List<OWLOntologyChange> owlChanges) {
-        changes = new ArrayList<String>(owlChanges.size());
-        changesOntologies = new ArrayList<OWLOntologyID>(owlChanges.size());
-        for (OWLOntologyChange cha : owlChanges) {
-            // convert change to String
-            String serializeChange = serializeChange(cha);
-            if (!serializeChange.isEmpty()) {
-            changes.add(serializeChange);
-
-                changesOntologies.add(cha.getOntology().getOntologyID());
+    public ChangeCapsule(List<List<OWLOntologyChange>> owlChanges) {
+        changes = new ArrayList<>(owlChanges.size());
+        changesOntologies = new ArrayList<>(owlChanges.size());
+        for (List<OWLOntologyChange> l : owlChanges) {
+            for (OWLOntologyChange cha : l) {
+                // convert change to String
+                String serializeChange = serializeChange(cha);
+                if (!serializeChange.isEmpty()) {
+                    changes.add(serializeChange);
+                    changesOntologies.add(cha.getOntology().getOntologyID());
+                }
             }
         }
     }
@@ -83,19 +84,20 @@ public class ChangeCapsule {
         sequence = (Long) jsonObj.get(ChangeServer.sequence);
         // convert array of JSON Change strings into an arraylist of strings
         JSONArray jsonArr = (JSONArray) jsonObj.get(ChangeServer.change);
-        changes = new ArrayList<String>(jsonArr.size());
+        changes = new ArrayList<>(jsonArr.size());
         for (Object cha : jsonArr) {
             changes.add((String) cha);
         }
         // convert array of ontologyURIs into arrayList of strings
         JSONArray jsonOnto = (JSONArray) jsonObj.get(ChangeServer.ontology);
-        changesOntologies = new ArrayList<OWLOntologyID>(jsonArr.size());
+        changesOntologies = new ArrayList<>(jsonArr.size());
         for (Object ont : jsonOnto) {
-            changesOntologies.add(new OWLOntologyID(Optional.fromNullable(IRI
-                    .create((String) ont)), Optional.<IRI> absent()));
+            changesOntologies.add(new OWLOntologyID(
+                    Optional.fromNullable(IRI.create((String) ont)),
+                    Optional.<IRI> absent()));
         }
-
-        //convert booleans of add/remove nature of change into the corresponding list object
+        // convert booleans of add/remove nature of change into the
+        // corresponding list object
         JSONArray jsonBools = (JSONArray) jsonObj.get(ChangeServer.addremove);
     }
 
@@ -114,7 +116,8 @@ public class ChangeCapsule {
     /** returns the URI of the first change in this change capsule */
     public OWLOntologyID getOntologyURI() {
         if (ontologyURI == null && changesOntologies != null) {
-            //either use the URI set in the object, or fetch the URI of the ontology that the first change is applied to
+            // either use the URI set in the object, or fetch the URI of the
+            // ontology that the first change is applied to
             return changesOntologies.get(0);
         }
         return ontologyURI;
@@ -125,7 +128,9 @@ public class ChangeCapsule {
         ontologyURI = uri;
     }
 
-    /** returns if this change capsule is empty, i.e. if it contains zero changes */
+    /**
+     * returns if this change capsule is empty, i.e. if it contains zero changes
+     */
     public boolean empty() {
         return changes.isEmpty() || changesOntologies.isEmpty();
     }
@@ -135,7 +140,7 @@ public class ChangeCapsule {
      * applied in order to take effect)
      */
     public List<OWLOntologyChange> getChangeOWL(OWLOntologyManager manager) {
-        ArrayList<OWLOntologyChange> owlChanges = new ArrayList<OWLOntologyChange>(
+        ArrayList<OWLOntologyChange> owlChanges = new ArrayList<>(
                 changes.size());
         // the iterator will always have the exact same number of objects as the
         // changes list, so this slight hack is perfectly safe
@@ -214,12 +219,12 @@ public class ChangeCapsule {
      */
     private String serializeChange(OWLOntologyChange change) {
         try {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream stream = new ObjectOutputStream(out);
-        stream.writeObject(change.getChangeData());
-        stream.writeObject(change.getOntology().getOntologyID());
-        stream.flush();
-        return Base64.encodeBase64String(out.toByteArray());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ObjectOutputStream stream = new ObjectOutputStream(out);
+            stream.writeObject(change.getChangeData());
+            stream.writeObject(change.getOntology().getOntologyID());
+            stream.flush();
+            return Base64.encodeBase64String(out.toByteArray());
         } catch (IOException e) {
             return "";
         }
@@ -232,17 +237,18 @@ public class ChangeCapsule {
     private OWLOntologyChange deserializeChange(OWLOntology ontology,
             String changeString) {
         try {
-        ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(
-Base64.decodeBase64(changeString)));
-        OWLOntologyChangeData data = (OWLOntologyChangeData) in.readObject();
+            ObjectInputStream in = new ObjectInputStream(
+                    new ByteArrayInputStream(
+                            Base64.decodeBase64(changeString)));
+            OWLOntologyChangeData data = (OWLOntologyChangeData) in
+                    .readObject();
             OWLOntologyID id = (OWLOntologyID) in.readObject();
             if (ontology.getOntologyID().equals(id)) {
-        return data.createOntologyChange(ontology);
-        }
+                return data.createOntologyChange(ontology);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-
 }

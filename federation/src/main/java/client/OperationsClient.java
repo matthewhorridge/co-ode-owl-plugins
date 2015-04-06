@@ -109,7 +109,7 @@ public class OperationsClient {
 
 
     /** sends a series of change to the server and returns the response */
-    public String commitChangestoServer(OWLOntology ontology, Long localSequenceNumber, String summary, List<OWLOntologyChange> changes) throws IOException {
+    public String commitChangestoServer(OWLOntology ontology, Long localSequenceNumber, String summary, List<List<OWLOntologyChange>> changes) throws IOException {
         ChangeCapsule changeCapsule = new ChangeCapsule(changes);
         changeCapsule.setUsername(username);
         changeCapsule.setOntologyURI(ontology.getOntologyID());

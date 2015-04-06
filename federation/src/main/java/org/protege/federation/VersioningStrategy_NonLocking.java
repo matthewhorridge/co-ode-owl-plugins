@@ -1,26 +1,34 @@
 package org.protege.federation;
 
-import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owl.apibinding.OWLManager;
-import org.semanticweb.owl.vocab.OWLRDFVocabulary;
+import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.semanticweb.owlapi.apibinding.OWLManager;
+import org.semanticweb.owlapi.model.AddAxiom;
+import org.semanticweb.owlapi.model.AddOntologyAnnotation;
+import org.semanticweb.owlapi.model.OWLAnnotation;
+import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLLiteral;
+import org.semanticweb.owlapi.model.OWLOntology;
+import org.semanticweb.owlapi.model.OWLOntologyChange;
+import org.semanticweb.owlapi.model.OWLOntologyChangeException;
+import org.semanticweb.owlapi.model.OWLOntologyCreationException;
+import org.semanticweb.owlapi.model.OWLOntologyManager;
+import org.semanticweb.owlapi.model.RemoveAxiom;
+import org.semanticweb.owlapi.model.RemoveOntologyAnnotation;
+import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
+
+import changeServerPackage.ChangeCapsule;
+import changeServerPackage.ChangeConflictException;
 import client.ChangeMonitor;
 import client.OperationsClient;
-
-import java.io.IOException;
-import java.io.File;
-import java.io.UnsupportedEncodingException;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ArrayList;
-import java.net.URISyntaxException;
-import java.net.URI;
-
-import changeServerPackage.ChangeConflictException;
-import changeServerPackage.ChangeCapsule;
 import fileManagerPackage.TagReader;
-
-import javax.swing.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,10 +64,12 @@ public class VersioningStrategy_NonLocking implements VersioningStrategy {
             // (don't store on the client, since then we would need to save off a new copy of the ontology
             // every time we download an update, unnecessarily degrading performance)
             File downloadedTag = operationsClient.downloadSpecificTag(localOntology, changeMonitor.getLatestVersionNumber());
-            OWLOntology downloadedOntology = tempManager.loadOntologyFromPhysicalURI(downloadedTag.toURI());
+            OWLOntology downloadedOntology = tempManager.loadOntologyFromOntologyDocument(downloadedTag);
 
             //apply changes current in memory (from history manager+change monitor) to downloaded tag
-            tempManager.applyChanges(changeMonitor.getChanges());
+            for(List<OWLOntologyChange> l:changeMonitor.getChanges())  {
+                tempManager.applyChanges(l);
+            }
 
             //compare local memory ontology with just downloaded+changes tag from server
             Set<OWLAxiom> localAxioms = localOntology.getAxioms();
@@ -98,14 +108,14 @@ public class VersioningStrategy_NonLocking implements VersioningStrategy {
             OWLDataFactory df = manager.getOWLDataFactory();
 
             //remove existing change version annotation
-            Set<OWLOntologyAnnotationAxiom> allAnnotations = localOntology.getOntologyAnnotationAxioms();
-            for(OWLOntologyAnnotationAxiom annotation: allAnnotations) {
-                if (annotation.getAnnotation().getAnnotationURI().compareTo(OWLRDFVocabulary.OWL_VERSION_INFO.getURI()) == 0) {
-                    if (annotation.getAnnotation().getAnnotationValue() instanceof OWLConstant) {
-                        String literal = ((OWLConstant)annotation.getAnnotation().getAnnotationValue()).getLiteral();
+            Set<OWLAnnotation> allAnnotations = localOntology.getAnnotations();
+            for(OWLAnnotation annotation: allAnnotations) {
+                if (annotation.getProperty().getIRI().equals(OWLRDFVocabulary.OWL_VERSION_INFO.getIRI())) {
+                    if (annotation.getValue() instanceof OWLLiteral) {
+                        String literal = ((OWLLiteral)annotation.getValue()).getLiteral();
                         if (literal.startsWith(TagReader.CHANGEAXIOMPREFIX)) {
                             try {
-                                manager.applyChange(new RemoveAxiom(localOntology, annotation));
+                                manager.applyChange(new RemoveOntologyAnnotation(localOntology, annotation));
                             } catch (OWLOntologyChangeException e) {
                                 e.printStackTrace();
                             }
@@ -115,12 +125,11 @@ public class VersioningStrategy_NonLocking implements VersioningStrategy {
             }
 
             //add an annotation to indicate the version of this tag
-            OWLConstant cons = df.getOWLUntypedConstant(TagReader.CHANGEAXIOMPREFIX+newVersionNumber);
-            OWLAnnotation anno = df.getOWLConstantAnnotation(OWLRDFVocabulary.OWL_VERSION_INFO.getURI(), cons);
-            OWLOntologyAnnotationAxiom annoax = df.getOWLOntologyAnnotationAxiom(localOntology, anno);
+            OWLLiteral cons = df.getOWLLiteral(TagReader.CHANGEAXIOMPREFIX+newVersionNumber);
+            OWLAnnotation anno = df.getOWLAnnotation(df.getOWLAnnotationProperty(OWLRDFVocabulary.OWL_VERSION_INFO.getIRI()), cons);
 
             try {
-                manager.applyChange(new AddAxiom(localOntology, annoax));
+                manager.applyChange(new AddOntologyAnnotation(localOntology, anno));
                 success = true;
             } catch (OWLOntologyChangeException e) {
                 e.printStackTrace();
@@ -174,7 +183,7 @@ public class VersioningStrategy_NonLocking implements VersioningStrategy {
             //download the latest tag from the server
             OWLOntologyManager tempManager = OWLManager.createOWLOntologyManager();    //new ontology manager for the temporary downloaded ontology
             File tag = operationsClient.downloadLatestTag(localOntology);
-            OWLOntology tagOntology = tempManager.loadOntologyFromPhysicalURI(tag.toURI());
+            OWLOntology tagOntology = tempManager.loadOntologyFromOntologyDocument(tag);
 
             //generate diff: latest server's+mem
             List<OWLAxiom> toAdd = generateDiff(localOntology, tagOntology);   //what do I need to get from local to tag?
@@ -198,7 +207,7 @@ public class VersioningStrategy_NonLocking implements VersioningStrategy {
             else messageString = "Recovered from dirty local ontology.\n Integreated changes from latest version of the ontology on the server.\n Please check for any errors (dangling references, etc.) in the ontology.";
 
             //clean up
-            tempManager.removeOntology(tagOntology.getURI());
+            tempManager.removeOntology(tagOntology);
             tag.deleteOnExit();
             isClean = true; //we are now garanteed to be stay clean (until Protege is quit and reloaded
 
@@ -207,11 +216,12 @@ public class VersioningStrategy_NonLocking implements VersioningStrategy {
 
         if (!dirty && !upToDate) {  //clean and outdated
             //save monitored changes
-            List<OWLOntologyChange> changes = changeMonitor.getChanges();
+            List<List<OWLOntologyChange>> changes = changeMonitor.getChanges();
             List<OWLOntologyChange> copyOfChanges = new ArrayList<OWLOntologyChange>();
-            for(OWLOntologyChange change : changes) {
-                copyOfChanges.add(change);
-            }
+            for(List<OWLOntologyChange> l : changes) {
+                for(OWLOntologyChange change : l) {
+                          copyOfChanges.add(change);
+            }}
 
             //undo all changes
             changeMonitor.undoAndDeleteChanges(manager);
