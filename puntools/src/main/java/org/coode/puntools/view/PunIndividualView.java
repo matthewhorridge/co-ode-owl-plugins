@@ -56,7 +56,7 @@ import org.semanticweb.owlapi.model.parameters.Imports;
  * Date: Apr 21, 2009<br><br>
  */
 public class PunIndividualView extends AbstractOWLSelectionViewComponent {
-
+    private static final long serialVersionUID = 1L;
     private ViewsPane individualViewsPane;
 
     private JScrollPane scroller;
@@ -71,7 +71,7 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
 
 
     @Override
-    public void initialiseView() throws Exception {
+    public void initialiseView() {
         cardLayout = new CardLayout();
         setLayout(cardLayout);
 
@@ -91,6 +91,7 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
 
         addNewPane = new JPanel(new BorderLayout());
         addNewPane.add(new JButton(new AbstractAction("Add individual pun"){
+            private static final long serialVersionUID = 1L;
             @Override
             public void actionPerformed(ActionEvent event) {
                 handleAddPun();
@@ -104,7 +105,7 @@ public class PunIndividualView extends AbstractOWLSelectionViewComponent {
     }
 
 
-    private void handleAddPun() {
+    protected void handleAddPun() {
         OWLEntity currentEntity = getCurrentEntity();
         if (currentEntity != null && !currentEntity.isOWLNamedIndividual()){
             final OWLOntology ont = getOWLModelManager().getActiveOntology();
