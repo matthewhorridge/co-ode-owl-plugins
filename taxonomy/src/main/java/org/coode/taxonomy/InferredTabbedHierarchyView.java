@@ -3,15 +3,16 @@
 */
 package org.coode.taxonomy;
 
-import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
-import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
-import org.protege.editor.owl.ui.OWLObjectComparator;
-import org.semanticweb.owlapi.model.OWLClass;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+
+import org.protege.editor.owl.model.hierarchy.OWLObjectHierarchyProvider;
+import org.protege.editor.owl.ui.view.cls.AbstractOWLClassViewComponent;
+import org.semanticweb.owlapi.model.OWLClass;
 
 /**
  * Author: Nick Drummond<br>
@@ -24,7 +25,7 @@ import java.util.Collections;
  * Used to generate inf/asserted hierarchy of classes - sorted URIs
  */
 public class InferredTabbedHierarchyView extends AbstractOWLClassViewComponent {
-
+    private static final long serialVersionUID = 1L;
     private JTextArea namesComponent;
 
     // convenience class for querying the asserted subsumption hierarchy directly
@@ -32,7 +33,8 @@ public class InferredTabbedHierarchyView extends AbstractOWLClassViewComponent {
 
 
     // create the GUI
-    public void initialiseClassView() throws Exception {
+    @Override
+    public void initialiseClassView() {
         setLayout(new BorderLayout(6, 6));
         // in our implementation, just create a simple text area in a scrollpane
         namesComponent = new JTextArea();
@@ -41,6 +43,7 @@ public class InferredTabbedHierarchyView extends AbstractOWLClassViewComponent {
     }
 
     // called automatically when the global selection changes
+    @Override
     protected OWLClass updateView(OWLClass selectedClass) {
         namesComponent.setText("");
         if (selectedClass != null){
@@ -60,7 +63,7 @@ public class InferredTabbedHierarchyView extends AbstractOWLClassViewComponent {
 
 
         // the hierarchy provider gets subclasses for us
-        final java.util.List<OWLClass> children = new ArrayList<OWLClass>(hp.getChildren(selectedClass));
+        final java.util.List<OWLClass> children = new ArrayList<>(hp.getChildren(selectedClass));
         Collections.sort(children, getOWLModelManager().getOWLObjectComparator());
         for (OWLClass sub: children){
             render(sub, indent+1);
@@ -68,6 +71,7 @@ public class InferredTabbedHierarchyView extends AbstractOWLClassViewComponent {
     }
 
     // remove any listeners and perform tidyup (none required in this case)
+    @Override
     public void disposeView() {
     }
 }
